@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<componentregistry>
+ <adapters/>
+ <utilities>
+  <utility
+     interface="collective.solr.interfaces.ISolrIndexQueueProcessor"
+     factory="collective.solr.indexer.SolrIndexQueueProcessor"/>
+ </utilities>
+</componentregistry>

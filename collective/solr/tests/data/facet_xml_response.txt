@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<response>
+
+<lst name="responseHeader">
+ <int name="status">0</int>
+ <int name="QTime">1</int>
+ <lst name="params">
+  <str name="facet.limit">-1</str>
+  <str name="rows">0</str>
+
+  <str name="facet">true</str>
+  <arr name="facet.field">
+	<str>cat</str>
+	<str>inStock</str>
+  </arr>
+  <str name="indent">10</str>
+  <str name="q">solr</str>
+
+ </lst>
+</lst>
+<result name="response" numFound="1" start="0"/>
+<lst name="facet_counts">
+ <lst name="facet_queries"/>
+ <lst name="facet_fields">
+  <lst name="cat">
+	<int name="electronics">0</int>
+	<int name="monitor">0</int>
+
+	<int name="search">1</int>
+	<int name="software">1</int>
+  </lst>
+  <lst name="inStock">
+	<int name="true">1</int>
+  </lst>
+ </lst>
+
+</lst>
+</response>

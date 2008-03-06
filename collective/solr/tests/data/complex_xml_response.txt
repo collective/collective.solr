@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<response>
+
+<lst name="responseHeader">
+ <int name="status">0</int>
+ <int name="QTime">0</int>
+ <lst name="params">
+  <str name="indent">on</str>
+  <str name="rows">10</str>
+
+  <str name="start">0</str>
+  <str name="q">id:[* TO *]</str>
+  <str name="version">2.2</str>
+ </lst>
+</lst>
+<result name="response" numFound="2" start="0">
+ <doc>
+  <arr name="cat"><str>software</str><str>search</str></arr>
+
+  <arr name="features"><str>Advanced Full-Text Search Capabilities using Lucene</str><str>Optimizied for High Volume Web Traffic</str><str>Standards Based Open Interfaces - XML and HTTP</str>
+	<str>Comprehensive HTML Administration Interfaces</str><str>Scalability - Efficient Replication to other Solr Search Servers</str><str>Flexible and Adaptable with XML configuration and Schema</str><str>Good unicode support: héllo (hello with an accent over the e)</str></arr>
+  <str name="id">SOLR1000</str>
+  <bool name="inStock">true</bool>
+
+  <date name="incubationdate_dt">2006-01-17T00:00:00.000Z</date>
+  <str name="manu">Apache Software Foundation</str>
+  <str name="name">Solr, the Enterprise Search Server</str>
+  <int name="popularity">10</int>
+  <float name="price">0.0</float>
+  <str name="sku">SOLR1000</str>
+
+  <date name="timestamp">2008-03-01T00:13:11.767Z</date>
+ </doc>
+ <doc>
+  <arr name="cat"><str>electronics</str><str>monitor</str></arr>
+  <arr name="features"><str>30" TFT active matrix LCD, 2560 x 1600, .25mm dot pitch, 700:1 contrast</str></arr>
+  <str name="id">3007WFP</str>
+
+  <bool name="inStock">true</bool>
+  <str name="includes">USB cable</str>
+  <str name="manu">Dell, Inc.</str>
+  <str name="name">Dell Widescreen UltraSharp 3007WFP</str>
+  <int name="popularity">6</int>
+  <float name="price">2199.0</float>
+
+  <str name="sku">3007WFP</str>
+  <date name="timestamp">2008-03-01T00:13:11.814Z</date>
+  <float name="weight">401.6</float>
+ </doc>
+</result>
+</response>
