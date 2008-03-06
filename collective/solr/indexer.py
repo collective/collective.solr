@@ -37,7 +37,7 @@ class SolrIndexQueueProcessor(Persistent):
             data = self.getData(obj, attributes)
             self.prepareData(data)
             try:
-                logger.debug('indexing %r (%r)' % (obj, data))
+                logger.debug('indexing %r (%r)', obj, data)
                 conn.add(**data)
             except SolrException, e:
                 logger.exception('exception during index')
@@ -53,7 +53,7 @@ class SolrIndexQueueProcessor(Persistent):
             # TODO: perhaps we should consider <uniqueKey> here
             assert data.has_key('id'), "no id in object data"
             try:
-                logger.debug('unindexing %r (%r)' % (obj, data))
+                logger.debug('unindexing %r (%r)', obj, data)
                 conn.delete(id=data['id'])
             except SolrException, e:
                 logger.exception('exception during delete')
@@ -117,7 +117,7 @@ class SolrIndexQueueProcessor(Persistent):
         conn = getattr(self, '_v_connection', None)
         if conn is None and self.host is not None:
             host = '%s:%d' % (self.host, self.port)
-            logger.debug('opening connection to %s' % host)
+            logger.debug('opening connection to %s', host)
             conn = SolrConnection(host=host, solrBase=self.base, persistent=True)
             self._v_connection = conn
             self.schema = None
