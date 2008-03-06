@@ -1,4 +1,5 @@
 TODOs:
+* add thread-local connection handling and signal handlers (from store.py)
 * browsertest for indexing
 * browser view for reindexing
 * move caching of schema to `solr.py`
