@@ -1,0 +1,88 @@
+Index: collective.solr/trunk/collective/solr/tests/test_integration.py
+===================================================================
+--- collective.solr/trunk/collective/solr/tests/test_integration.py	(revision 13525)
++++ collective.solr/trunk/collective/solr/tests/test_integration.py	(revision 13526)
+@@ -5,6 +5,7 @@
+ from unittest import TestSuite, makeSuite, main
+ from Products.Five import zcml
+ from Products.Five import fiveconfigure
++from Testing import ZopeTestCase as ztc
+ from Products.PloneTestCase import PloneTestCase as ptc
+ from Products.PloneTestCase.layer import onsetup
+ 
+@@ -17,11 +18,29 @@
+     fiveconfigure.debug_mode = False
+ 
+ setup_product()
+-ptc.setupPloneSite()
++ptc.setupPloneSite(products=['collective.solr'])
++
++
++# test-specific import go here...
++from zope.component import queryUtility, getUtilitiesFor
++from collective.indexing.interfaces import IIndexQueueProcessor
++from collective.solr.interfaces import ISolrIndexQueueProcessor
++
+ 
+ 
+ class TestCase(ptc.PloneTestCase):
+-    pass
++
++    def testGenericInterface(self):
++        proc = queryUtility(IIndexQueueProcessor)
++        self.failUnless(proc, 'utility not found')
++        self.failUnless(IIndexQueueProcessor.providedBy(proc))
++        self.failUnless(ISolrIndexQueueProcessor.providedBy(proc))
++
++    def testSolrInterface(self):
++        proc = queryUtility(ISolrIndexQueueProcessor)
++        self.failUnless(proc, 'utility not found')
++        self.failUnless(IIndexQueueProcessor.providedBy(proc))
++        self.failUnless(ISolrIndexQueueProcessor.providedBy(proc))
+ 
+ 
+ def test_suite():
+Index: collective.solr/trunk/collective/solr/profiles/default/componentregistry.xml
+===================================================================
+--- collective.solr/trunk/collective/solr/profiles/default/componentregistry.xml	(revision 0)
++++ collective.solr/trunk/collective/solr/profiles/default/componentregistry.xml	(revision 13526)
+@@ -0,0 +1,9 @@
++<?xml version="1.0"?>
++<componentregistry>
++ <adapters/>
++ <utilities>
++  <utility
++     interface="collective.solr.interfaces.ISolrIndexQueueProcessor"
++     factory="collective.solr.indexer.SolrIndexQueueProcessor"/>
++ </utilities>
++</componentregistry>
+Index: collective.solr/trunk/collective/solr/configure.zcml
+===================================================================
+--- collective.solr/trunk/collective/solr/configure.zcml	(revision 13525)
++++ collective.solr/trunk/collective/solr/configure.zcml	(revision 13526)
+@@ -3,5 +3,6 @@
+     xmlns:five="http://namespaces.zope.org/five"
+     i18n_domain="collective.solr">
+ 
++  <include file="profiles.zcml" />
+ 
+ </configure>
+Index: collective.solr/trunk/collective/solr/profiles.zcml
+===================================================================
+--- collective.solr/trunk/collective/solr/profiles.zcml	(revision 0)
++++ collective.solr/trunk/collective/solr/profiles.zcml	(revision 13526)
+@@ -0,0 +1,14 @@
++<configure
++    xmlns="http://namespaces.zope.org/zope"
++    xmlns:genericsetup="http://namespaces.zope.org/genericsetup"
++    i18n_domain="collective.solr">
++
++  <genericsetup:registerProfile
++      name="default"
++      title="collective.solr"
++      directory="profiles/default"
++      description='Solr integration for Plone'
++      provides="Products.GenericSetup.interfaces.EXTENSION"
++      />
++
++</configure>

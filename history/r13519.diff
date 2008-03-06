@@ -1,0 +1,20 @@
+Index: collective.solr/trunk/collective/solr/tests/test_indexer.py
+===================================================================
+--- collective.solr/trunk/collective/solr/tests/test_indexer.py	(revision 13518)
++++ collective.solr/trunk/collective/solr/tests/test_indexer.py	(revision 13519)
+@@ -54,6 +54,15 @@
+         output = ''.join(output).replace('\r', '')
+         self.assertEqual(output, getData('delete_request.txt'))
+ 
++    def testCommit(self):
++        proc = self.setupProcessor()
++        output = []
++        response = getData('commit_response.txt')
++        fakehttp(proc.getConnection(), response, output)    # fake response
++        proc.commit()                                       # committing sends data
++        output = ''.join(output).replace('\r', '')
++        self.assertEqual(output, getData('commit_request.txt'))
++
+ 
+ def test_suite():
+     return TestSuite([

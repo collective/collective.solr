@@ -1,0 +1,67 @@
+Index: collective.solr/trunk/collective/solr/indexer.py
+===================================================================
+--- collective.solr/trunk/collective/solr/indexer.py	(revision 13476)
++++ collective.solr/trunk/collective/solr/indexer.py	(revision 13477)
+@@ -1,6 +1,9 @@
++from zope.interface import implements
+ from zope.component import getMultiAdapter
+ from Products.CMFCore.utils import getToolByName
+ from DateTime import DateTime
++
++from collective.indexing.interfaces import IIndexQueueProcessor
+ from collective.solr.solr import SolrConnection
+ from collective.solr.indexablewrapper import ISolrIndexableObjectWrapper
+ 
+@@ -16,22 +19,35 @@
+ handlers = {'solr.DateField': datehandler}
+ 
+ 
+-def indexObject(obj):
+-    portal = getToolByName(obj, 'portal_url').getPortalObject()
+-    wrapper = getMultiAdapter((obj,portal), ISolrIndexableObjectWrapper)
+-    conn = SolrConnection(host='localhost:8983', persistent=True)
+-    data = {}
+-    schema = conn.getSchema()
+-    for key, class_ in schema.fields.items():
+-        value = getattr(wrapper, key, None)
+-        if callable(value):
+-            value = value()
+-        if handlers.has_key(class_):
+-            value = handlers[class_](value)
+-        data[key] = value
+-    conn.add(**data)
+-    r = conn.commit()
++class SolrIndexQueueProcessor(object):
++    """ a queue processor for solr """
++    implements(IIndexQueueProcessor)
++
++    def index(self, obj, attributes=None):
++        portal = getToolByName(obj, 'portal_url').getPortalObject()
++        wrapper = getMultiAdapter((obj,portal), ISolrIndexableObjectWrapper)
++        conn = SolrConnection(host='localhost:8983', persistent=True)
++        data = {}
++        schema = conn.getSchema()
++        for key, class_ in schema.fields.items():
++            value = getattr(wrapper, key, None)
++            if callable(value):
++                value = value()
++            if handlers.has_key(class_):
++                value = handlers[class_](value)
++            data[key] = value
++        conn.add(**data)
++        r = conn.commit()
++
++    def reindex(self, obj, attributes=None):
++        pass
++
++    def unindex(self, obj):
++        pass
++
++    def begin(self):
++        pass
+ 
+-# from collective.solr.indexer import indexObject
+-# indexObject(app.eli.nordic)
++    def commit(self):
++        pass
+ 

@@ -1,0 +1,68 @@
+Index: collective.solr/trunk/collective/solr/tests.py
+===================================================================
+--- collective.solr/trunk/collective/solr/tests.py	(revision 13425)
++++ collective.solr/trunk/collective/solr/tests.py	(revision 13426)
+@@ -1,8 +1,9 @@
+-import unittest
+-import httplib
++# -*- coding: utf-8 -*-
+ 
+-import StringIO
++from unittest import TestCase, TestSuite, makeSuite, main
++from StringIO import StringIO
+ from DateTime import DateTime
++from httplib import HTTPConnection
+ 
+ from collective.solr.solr import SolrConnection
+ from collective.solr.parser import parseResults
+@@ -205,18 +206,19 @@
+ </response>
+ """
+ 
+-class TestSolr(unittest.TestCase):
++class TestSolr(TestCase):
++
+     def fakehttp(self, solrconn, fakedata, output):
+-        class FakeSocket(StringIO.StringIO):
++        class FakeSocket(StringIO):
+             def sendall(self, str): output.append(str)
+             def makefile(self, mode, name): return self
+             def read(self, amt=None):
+                 if self.closed: return ''
+-                return StringIO.StringIO.read(self, amt)
++                return StringIO.read(self, amt)
+             def readline(self, length=None):
+                 if self.closed: return ''
+-                return StringIO.StringIO.readline(self, length)
+-        class FakeHTTPConnection(httplib.HTTPConnection):
++                return StringIO.readline(self, length)
++        class FakeHTTPConnection(HTTPConnection):
+             def connect(self):
+                 self.sock = FakeSocket(fakedata)
+         solrconn.conn = FakeHTTPConnection(solrconn.conn.host)
+@@ -289,7 +291,7 @@
+         res.find('QTime')
+ 
+ 
+-class ParserTests(unittest.TestCase):
++class ParserTests(TestCase):
+ 
+     def testParseSimpleSearchResults(self):
+         results = parseResults(SEARCH_RESPONSE.split('\n\n', 1)[1])
+@@ -320,10 +322,11 @@
+ 
+ 
+ def test_suite():
+-    return unittest.TestSuite((
+-        unittest.makeSuite( TestSolr ),
+-        unittest.makeSuite( ParserTests ),
+-        ))
++    return TestSuite((
++        makeSuite(TestSolr),
++        makeSuite(ParserTests),
++    ))
+ 
+ if __name__ == '__main__':
+-    unittest.main(defaultTest='test_suite')
++    main(defaultTest='test_suite')
++

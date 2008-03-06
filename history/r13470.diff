@@ -1,0 +1,25 @@
+Index: collective.solr/trunk/collective/solr/tests/test_parser.py
+===================================================================
+--- collective.solr/trunk/collective/solr/tests/test_parser.py	(revision 13469)
++++ collective.solr/trunk/collective/solr/tests/test_parser.py	(revision 13470)
+@@ -92,13 +92,13 @@
+         self.assertEqual(schema['cat'].multiValued, 'true')        
+         self.assertEqual(schema['cat'].termVectors, 'true')        
+         self.assertEqual(schema['sku'].positionIncrementGap, '100')
+-        self.assertEqual(schema['features'].multiValued, 'true')
+-        self.assertEqual(schema['weight'].class_, 'solr.SortableFloatField')
+-        self.assertEqual(schema['popularity'].class_, 'solr.SortableIntField')
+-        self.assertEqual(schema['inStock'].class_, 'solr.BoolField')
+-        self.assertEqual(schema['timestamp'].class_, 'solr.DateField')
+-        self.assertEqual(schema['timestamp'].default, 'NOW')
+-        self.assertEqual(schema['timestamp'].multiValued, 'false')
++        self.assertEqual(schema.features.multiValued, 'true')
++        self.assertEqual(schema.weight.class_, 'solr.SortableFloatField')
++        self.assertEqual(schema.popularity.class_, 'solr.SortableIntField')
++        self.assertEqual(schema.inStock.class_, 'solr.BoolField')
++        self.assertEqual(schema.timestamp.class_, 'solr.DateField')
++        self.assertEqual(schema.timestamp.default, 'NOW')
++        self.assertEqual(schema.timestamp.multiValued, 'false')
+ 
+ 
+ def test_suite():

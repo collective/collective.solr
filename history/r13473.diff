@@ -1,0 +1,47 @@
+Index: collective.solr/trunk/collective/solr/tests/test_parser.py
+===================================================================
+--- collective.solr/trunk/collective/solr/tests/test_parser.py	(revision 13472)
++++ collective.solr/trunk/collective/solr/tests/test_parser.py	(revision 13473)
+@@ -88,7 +88,9 @@
+         self.assertEqual(schema['id'].class_, 'solr.StrField')
+         self.assertEqual(schema['id'].required, True)
+         self.assertEqual(schema['id'].omitNorms, True)
++        self.assertEqual(schema['id'].multiValued, False)
+         self.assertEqual(schema['cat'].class_, 'solr.TextField')
++        self.assertEqual(schema['cat'].required, False)
+         self.assertEqual(schema['cat'].multiValued, True)
+         self.assertEqual(schema['cat'].termVectors, True)
+         self.assertEqual(schema['sku'].positionIncrementGap, '100')
+Index: collective.solr/trunk/collective/solr/parser.py
+===================================================================
+--- collective.solr/trunk/collective/solr/parser.py	(revision 13472)
++++ collective.solr/trunk/collective/solr/parser.py	(revision 13473)
+@@ -74,8 +74,8 @@
+         return self
+ 
+ 
+-class SolrField(dict):
+-    """ a schema field representation """
++class AttrDict(dict):
++    """ a dictionary with attribute access """
+ 
+     # look up attributes in dict
+     def __getattr__(self, name):
+@@ -87,7 +87,16 @@
+             raise AttributeError, name
+ 
+ 
+-class SolrSchema(SolrField):
++class SolrField(AttrDict):
++    """ a schema field representation """
++
++    def __init__(self, *args, **kw):
++        self['required'] = False
++        self['multiValued'] = False
++        super(SolrField, self).__init__(*args, **kw)
++
++
++class SolrSchema(AttrDict):
+     """ a solr schema parser:  the xml schema is partially parsed and the
+         information collected is later on used both for indexing items as
+         well as buiding search queries;  for the time being we are only

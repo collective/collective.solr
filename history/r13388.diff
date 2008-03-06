@@ -1,0 +1,638 @@
+diff -rNu -x .svn collective.solr/trunk/README.txt collective.solr/trunk/README.txt
+--- collective.solr/trunk/README.txt	1970-01-01 01:00:00.000000000 +0100
++++ collective.solr/trunk/README.txt	2008-02-29 10:00:57.000000000 +0100
+@@ -0,0 +1,4 @@
++Introduction
++============
++
++
+diff -rNu -x .svn collective.solr/trunk/collective/__init__.py collective.solr/trunk/collective/__init__.py
+--- collective.solr/trunk/collective/__init__.py	1970-01-01 01:00:00.000000000 +0100
++++ collective.solr/trunk/collective/__init__.py	2008-02-29 10:00:57.000000000 +0100
+@@ -0,0 +1,6 @@
++# See http://peak.telecommunity.com/DevCenter/setuptools#namespace-packages
++try:
++    __import__('pkg_resources').declare_namespace(__name__)
++except ImportError:
++    from pkgutil import extend_path
++    __path__ = extend_path(__path__, __name__)
+diff -rNu -x .svn collective.solr/trunk/collective/solr/configure.zcml collective.solr/trunk/collective/solr/configure.zcml
+--- collective.solr/trunk/collective/solr/configure.zcml	1970-01-01 01:00:00.000000000 +0100
++++ collective.solr/trunk/collective/solr/configure.zcml	2008-02-29 10:00:57.000000000 +0100
+@@ -0,0 +1,7 @@
++<configure
++    xmlns="http://namespaces.zope.org/zope"
++    xmlns:five="http://namespaces.zope.org/five"
++    i18n_domain="collective.solr">
++
++
++</configure>
+diff -rNu -x .svn collective.solr/trunk/collective/solr/solr.py collective.solr/trunk/collective/solr/solr.py
+--- collective.solr/trunk/collective/solr/solr.py	1970-01-01 01:00:00.000000000 +0100
++++ collective.solr/trunk/collective/solr/solr.py	2008-02-29 10:00:57.000000000 +0100
+@@ -0,0 +1,196 @@
++# http://svn.apache.org/repos/asf/lucene/solr/trunk/client/python/solr.py
++
++# Licensed to the Apache Software Foundation (ASF) under one or more
++# contributor license agreements.  See the NOTICE file distributed with
++# this work for additional information regarding copyright ownership.
++# The ASF licenses this file to You under the Apache License, Version 2.0
++# (the "License"); you may not use this file except in compliance with
++# the License.  You may obtain a copy of the License at
++#
++#     http://www.apache.org/licenses/LICENSE-2.0
++#
++# Unless required by applicable law or agreed to in writing, software
++# distributed under the License is distributed on an "AS IS" BASIS,
++# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++# See the License for the specific language governing permissions and
++# limitations under the License.
++
++
++# $Id$
++# A simple Solr client for python.
++# This is prototype level code and subject to change.
++#
++# quick examples on use:
++#
++# from solr import *
++# c = SolrConnection(host='localhost:8983', persistent=True)
++# c.add(id='500',name='python test doc')
++# c.delete('123')
++# c.commit()
++# print c.search(q='id:[* TO *]', wt='python', rows='10',indent='on')
++# data = c.search(q='id:500', wt='python')
++# print 'first match=', eval(data)['response']['docs'][0]
++
++import httplib
++import socket
++from xml.dom.minidom import parseString
++import codecs
++import urllib
++
++
++class SolrException(Exception):
++    """ An exception thrown by solr connections """
++    def __init__(self, httpcode, reason=None, body=None):
++        self.httpcode = httpcode
++        self.reason = reason
++        self.body = body
++
++    def __repr__(self):
++        return 'HTTP code=%s, Reason=%s, body=%s' % (
++                    self.httpcode, self.reason, self.body)
++
++    def __str__(self):
++        return 'HTTP code=%s, reason=%s' % (self.httpcode, self.reason)
++
++
++class SolrConnection:
++    def __init__(self, host='localhost:8983', solrBase='/solr', persistent=True, postHeaders={}):
++        self.host = host
++        self.solrBase = solrBase
++        self.persistent = persistent
++        self.reconnects = 0
++        self.encoder = codecs.getencoder('utf-8')
++        #responses from Solr will always be in UTF-8
++        self.decoder = codecs.getdecoder('utf-8')  
++        #a real connection to the server is not opened at this point.
++        self.conn = httplib.HTTPConnection(self.host)
++        #self.conn.set_debuglevel(1000000)
++        self.xmlheaders = {'Content-Type': 'text/xml; charset=utf-8'}
++        self.xmlheaders.update(postHeaders)
++        if not self.persistent: self.xmlheaders['Connection']='close'
++        self.formheaders = {'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8'}
++        if not self.persistent: self.formheaders['Connection']='close'
++
++    def __str__(self):
++        return 'SolrConnection{host=%s, solrBase=%s, persistent=%s, postHeaders=%s, reconnects=%s}' % \
++            (self.host, self.solrBase, self.persistent, self.xmlheaders, self.reconnects)
++
++    def __reconnect(self):
++        self.reconnects+=1
++        self.conn.close()
++        self.conn.connect()
++
++    def __errcheck(self,rsp):
++        if rsp.status != 200:
++            ex = SolrException(rsp.status, rsp.reason)
++            try:
++                ex.body = rsp.read()
++            except:
++                pass
++            raise ex
++        return rsp
++
++    def doPost(self,url,body,headers):
++        try:
++            self.conn.request('POST', url, body, headers)
++            return self.__errcheck(self.conn.getresponse())
++        except (socket.error,httplib.CannotSendRequest) :
++            #Reconnect in case the connection was broken from the server going down,
++            #the server timing out our persistent connection, or another
++            #network failure. Also catch httplib.CannotSendRequest because the
++            #HTTPConnection object can get in a bad state.
++            self.__reconnect()
++            self.conn.request('POST', url, body, headers)
++            return self.__errcheck(self.conn.getresponse())
++
++    def doUpdateXML(self, request):
++        try:
++            rsp = self.doPost(self.solrBase+'/update', request, self.xmlheaders)
++            data = rsp.read()
++        finally:
++            if not self.persistent: self.conn.close()
++        #detect old-style error response (HTTP response code of
++        #200 with a non-zero status.
++        if data.startswith('<result status="') and not data.startswith('<result status="0"'):
++            data = self.decoder(data)[0]
++            parsed = parseString(data)
++            status = parsed.documentElement.getAttribute('status')
++            if status != 0:
++                reason = parsed.documentElement.firstChild.nodeValue
++                raise SolrException(rsp.status, reason)
++        return data
++
++    def escapeVal(self,val):
++        val = val.replace("&", "&amp;")
++        val = val.replace("<", "&lt;")
++        val = val.replace("]]>", "]]&gt;")
++        return self.encoder(val)[0]  #to utf8
++
++    def escapeKey(self,key):
++        key = key.replace("&", "&amp;")
++        key = key.replace('"', "&quot;")
++        return self.encoder(key)[0]  #to utf8
++    
++    def delete(self, id):
++        xstr = '<delete><id>'+self.escapeVal(unicode(id))+'</id></delete>'
++        return self.doUpdateXML(xstr)
++
++    def deleteByQyery(self, query):
++        xstr = '<delete><query>'+self.escapeVal(query)+'</query></delete>'
++        return self.doUpdateXML(xstr)
++
++    def __makeField(self, lst, f, v):
++        if not isinstance(f, basestring):
++            f = str(f)
++        if not isinstance(v, basestring):
++            v = str(v)
++        lst.append('<field name="')
++        lst.append(self.escapeKey(f))
++        lst.append('">')
++        lst.append(self.escapeVal(v))
++        lst.append('</field>') 
++
++    def __add(self, lst, fields):
++        lst.append('<doc>')
++        for f,v in fields.items():
++        if isinstance(v, list): # multi-valued
++            for value in v:
++                self.__makeField(lst, f, value)
++        else:
++            self.__makeField(lst, f, v) 
++        lst.append('</doc>')
++
++    def add(self, **fields):
++        lst=['<add>']
++        self.__add(lst,fields)
++        lst.append('</add>')
++        xstr = ''.join(lst)
++        return self.doUpdateXML(xstr)
++
++    def addMany(self, arrOfMap):
++        lst=['<add>']
++        for doc in arrOfMap:
++            self.__add(lst,doc)
++        lst.append('</add>')
++        xstr = ''.join(lst)
++        return self.doUpdateXML(xstr)
++
++    def commit(self, waitFlush=True, waitSearcher=True, optimize=False):
++        xstr = '<commit'
++        if optimize: xstr='<optimize'
++        if not waitSearcher:  #just handle deviations from the default
++            if not waitFlush: xstr +=' waitFlush="false" waitSearcher="false"'
++            else: xstr += ' waitSearcher="false"'
++        xstr += '/>'
++        return self.doUpdateXML(xstr)
++
++    def search(self, **params):
++        request=urllib.urlencode(params, doseq=True)
++        try:
++            rsp = self.doPost(self.solrBase+'/select', request, self.formheaders)
++            data = rsp.read()
++        finally:
++            if not self.persistent: self.conn.close()
++        return data
++
++    
+\ No newline at end of file
+diff -rNu -x .svn collective.solr/trunk/collective/solr/tests.py collective.solr/trunk/collective/solr/tests.py
+--- collective.solr/trunk/collective/solr/tests.py	1970-01-01 01:00:00.000000000 +0100
++++ collective.solr/trunk/collective/solr/tests.py	2008-02-29 10:00:57.000000000 +0100
+@@ -0,0 +1,54 @@
++import unittest
++
++from zope.testing import doctestunit
++from zope.component import testing
++from Testing import ZopeTestCase as ztc
++
++from Products.Five import zcml
++from Products.Five import fiveconfigure
++from Products.PloneTestCase import PloneTestCase as ptc
++from Products.PloneTestCase.layer import PloneSite
++ptc.setupPloneSite()
++
++import collective.solr
++
++class TestCase(ptc.PloneTestCase):
++    class layer(PloneSite):
++        @classmethod
++        def setUp(cls):
++            fiveconfigure.debug_mode = True
++            zcml.load_config('configure.zcml',
++                             collective.solr)
++            fiveconfigure.debug_mode = False
++
++        @classmethod
++        def tearDown(cls):
++            pass
++
++
++def test_suite():
++    return unittest.TestSuite([
++
++        # Unit tests
++        #doctestunit.DocFileSuite(
++        #    'README.txt', package='collective.solr',
++        #    setUp=testing.setUp, tearDown=testing.tearDown),
++
++        #doctestunit.DocTestSuite(
++        #    module='collective.solr.mymodule',
++        #    setUp=testing.setUp, tearDown=testing.tearDown),
++
++
++        # Integration tests that use PloneTestCase
++        #ztc.ZopeDocFileSuite(
++        #    'README.txt', package='collective.solr',
++        #    test_class=TestCase),
++
++        #ztc.FunctionalDocFileSuite(
++        #    'browser.txt', package='collective.solr',
++        #    test_class=TestCase),
++
++        ])
++
++if __name__ == '__main__':
++    unittest.main(defaultTest='test_suite')
+diff -rNu -x .svn collective.solr/trunk/docs/HISTORY.txt collective.solr/trunk/docs/HISTORY.txt
+--- collective.solr/trunk/docs/HISTORY.txt	1970-01-01 01:00:00.000000000 +0100
++++ collective.solr/trunk/docs/HISTORY.txt	2008-02-29 10:00:57.000000000 +0100
+@@ -0,0 +1,8 @@
++Changelog
++=========
++
++0.1 - Unreleased
++----------------
++
++* Initial release
++
+diff -rNu -x .svn collective.solr/trunk/docs/INSTALL.txt collective.solr/trunk/docs/INSTALL.txt
+--- collective.solr/trunk/docs/INSTALL.txt	1970-01-01 01:00:00.000000000 +0100
++++ collective.solr/trunk/docs/INSTALL.txt	2008-02-29 10:00:57.000000000 +0100
+@@ -0,0 +1,43 @@
++collective.solr Installation
++==========================
++
++To install collective.solr into the global Python environment (or a workingenv),
++using a traditional Zope 2 instance, you can do this:
++
++ * When you're reading this you have probably already run 
++   ``easy_install collective.solr``. Find out how to install setuptools
++   (and EasyInstall) here:
++   http://peak.telecommunity.com/DevCenter/EasyInstall
++
++ * Create a file called ``collective.solr-configure.zcml`` in the
++   ``/path/to/instance/etc/package-includes`` directory.  The file
++   should only contain this::
++
++       <include package="collective.solr" />
++
++
++Alternatively, if you are using zc.buildout and the plone.recipe.zope2instance
++recipe to manage your project, you can do this:
++
++ * Add ``collective.solr`` to the list of eggs to install, e.g.:
++ 
++    [buildout]
++    ...
++    eggs =
++        ...
++        collective.solr
++        
++  * Tell the plone.recipe.zope2instance recipe to install a ZCML slug:
++  
++    [instance]
++    recipe = plone.recipe.zope2instance
++    ...
++    zcml =
++        collective.solr
++        
++  * Re-run buildout, e.g. with:
++  
++    $ ./bin/buildout
++        
++You can skip the ZCML slug if you are going to explicitly include the package
++from another package's configure.zcml file.
+diff -rNu -x .svn collective.solr/trunk/docs/LICENSE.GPL collective.solr/trunk/docs/LICENSE.GPL
+--- collective.solr/trunk/docs/LICENSE.GPL	1970-01-01 01:00:00.000000000 +0100
++++ collective.solr/trunk/docs/LICENSE.GPL	2008-02-29 10:00:57.000000000 +0100
+@@ -0,0 +1,222 @@
++		    GNU GENERAL PUBLIC LICENSE
++   TERMS AND CONDITIONS FOR COPYING, DISTRIBUTION AND MODIFICATION
++
++  0. This License applies to any program or other work which contains
++a notice placed by the copyright holder saying it may be distributed
++under the terms of this General Public License.  The "Program", below,
++refers to any such program or work, and a "work based on the Program"
++means either the Program or any derivative work under copyright law:
++that is to say, a work containing the Program or a portion of it,
++either verbatim or with modifications and/or translated into another
++language.  (Hereinafter, translation is included without limitation in
++the term "modification".)  Each licensee is addressed as "you".
++
++Activities other than copying, distribution and modification are not
++covered by this License; they are outside its scope.  The act of
++running the Program is not restricted, and the output from the Program
++is covered only if its contents constitute a work based on the
++Program (independent of having been made by running the Program).
++Whether that is true depends on what the Program does.
++
++  1. You may copy and distribute verbatim copies of the Program's
++source code as you receive it, in any medium, provided that you
++conspicuously and appropriately publish on each copy an appropriate
++copyright notice and disclaimer of warranty; keep intact all the
++notices that refer to this License and to the absence of any warranty;
++and give any other recipients of the Program a copy of this License
++along with the Program.
++
++You may charge a fee for the physical act of transferring a copy, and
++you may at your option offer warranty protection in exchange for a fee.
++
++  2. You may modify your copy or copies of the Program or any portion
++of it, thus forming a work based on the Program, and copy and
++distribute such modifications or work under the terms of Section 1
++above, provided that you also meet all of these conditions:
++
++    a) You must cause the modified files to carry prominent notices
++    stating that you changed the files and the date of any change.
++
++    b) You must cause any work that you distribute or publish, that in
++    whole or in part contains or is derived from the Program or any
++    part thereof, to be licensed as a whole at no charge to all third
++    parties under the terms of this License.
++
++    c) If the modified program normally reads commands interactively
++    when run, you must cause it, when started running for such
++    interactive use in the most ordinary way, to print or display an
++    announcement including an appropriate copyright notice and a
++    notice that there is no warranty (or else, saying that you provide
++    a warranty) and that users may redistribute the program under
++    these conditions, and telling the user how to view a copy of this
++    License.  (Exception: if the Program itself is interactive but
++    does not normally print such an announcement, your work based on
++    the Program is not required to print an announcement.)
++
++These requirements apply to the modified work as a whole.  If
++identifiable sections of that work are not derived from the Program,
++and can be reasonably considered independent and separate works in
++themselves, then this License, and its terms, do not apply to those
++sections when you distribute them as separate works.  But when you
++distribute the same sections as part of a whole which is a work based
++on the Program, the distribution of the whole must be on the terms of
++this License, whose permissions for other licensees extend to the
++entire whole, and thus to each and every part regardless of who wrote it.
++
++Thus, it is not the intent of this section to claim rights or contest
++your rights to work written entirely by you; rather, the intent is to
++exercise the right to control the distribution of derivative or
++collective works based on the Program.
++
++In addition, mere aggregation of another work not based on the Program
++with the Program (or with a work based on the Program) on a volume of
++a storage or distribution medium does not bring the other work under
++the scope of this License.
++
++  3. You may copy and distribute the Program (or a work based on it,
++under Section 2) in object code or executable form under the terms of
++Sections 1 and 2 above provided that you also do one of the following:
++
++    a) Accompany it with the complete corresponding machine-readable
++    source code, which must be distributed under the terms of Sections
++    1 and 2 above on a medium customarily used for software interchange; or,
++
++    b) Accompany it with a written offer, valid for at least three
++    years, to give any third party, for a charge no more than your
++    cost of physically performing source distribution, a complete
++    machine-readable copy of the corresponding source code, to be
++    distributed under the terms of Sections 1 and 2 above on a medium
++    customarily used for software interchange; or,
++
++    c) Accompany it with the information you received as to the offer
++    to distribute corresponding source code.  (This alternative is
++    allowed only for noncommercial distribution and only if you
++    received the program in object code or executable form with such
++    an offer, in accord with Subsection b above.)
++
++The source code for a work means the preferred form of the work for
++making modifications to it.  For an executable work, complete source
++code means all the source code for all modules it contains, plus any
++associated interface definition files, plus the scripts used to
++control compilation and installation of the executable.  However, as a
++special exception, the source code distributed need not include
++anything that is normally distributed (in either source or binary
++form) with the major components (compiler, kernel, and so on) of the
++operating system on which the executable runs, unless that component
++itself accompanies the executable.
++
++If distribution of executable or object code is made by offering
++access to copy from a designated place, then offering equivalent
++access to copy the source code from the same place counts as
++distribution of the source code, even though third parties are not
++compelled to copy the source along with the object code.
++
++  4. You may not copy, modify, sublicense, or distribute the Program
++except as expressly provided under this License.  Any attempt
++otherwise to copy, modify, sublicense or distribute the Program is
++void, and will automatically terminate your rights under this License.
++However, parties who have received copies, or rights, from you under
++this License will not have their licenses terminated so long as such
++parties remain in full compliance.
++
++  5. You are not required to accept this License, since you have not
++signed it.  However, nothing else grants you permission to modify or
++distribute the Program or its derivative works.  These actions are
++prohibited by law if you do not accept this License.  Therefore, by
++modifying or distributing the Program (or any work based on the
++Program), you indicate your acceptance of this License to do so, and
++all its terms and conditions for copying, distributing or modifying
++the Program or works based on it.
++
++  6. Each time you redistribute the Program (or any work based on the
++Program), the recipient automatically receives a license from the
++original licensor to copy, distribute or modify the Program subject to
++these terms and conditions.  You may not impose any further
++restrictions on the recipients' exercise of the rights granted herein.
++You are not responsible for enforcing compliance by third parties to
++this License.
++
++  7. If, as a consequence of a court judgment or allegation of patent
++infringement or for any other reason (not limited to patent issues),
++conditions are imposed on you (whether by court order, agreement or
++otherwise) that contradict the conditions of this License, they do not
++excuse you from the conditions of this License.  If you cannot
++distribute so as to satisfy simultaneously your obligations under this
++License and any other pertinent obligations, then as a consequence you
++may not distribute the Program at all.  For example, if a patent
++license would not permit royalty-free redistribution of the Program by
++all those who receive copies directly or indirectly through you, then
++the only way you could satisfy both it and this License would be to
++refrain entirely from distribution of the Program.
++
++If any portion of this section is held invalid or unenforceable under
++any particular circumstance, the balance of the section is intended to
++apply and the section as a whole is intended to apply in other
++circumstances.
++
++It is not the purpose of this section to induce you to infringe any
++patents or other property right claims or to contest validity of any
++such claims; this section has the sole purpose of protecting the
++integrity of the free software distribution system, which is
++implemented by public license practices.  Many people have made
++generous contributions to the wide range of software distributed
++through that system in reliance on consistent application of that
++system; it is up to the author/donor to decide if he or she is willing
++to distribute software through any other system and a licensee cannot
++impose that choice.
++
++This section is intended to make thoroughly clear what is believed to
++be a consequence of the rest of this License.
++
++  8. If the distribution and/or use of the Program is restricted in
++certain countries either by patents or by copyrighted interfaces, the
++original copyright holder who places the Program under this License
++may add an explicit geographical distribution limitation excluding
++those countries, so that distribution is permitted only in or among
++countries not thus excluded.  In such case, this License incorporates
++the limitation as if written in the body of this License.
++
++  9. The Free Software Foundation may publish revised and/or new versions
++of the General Public License from time to time.  Such new versions will
++be similar in spirit to the present version, but may differ in detail to
++address new problems or concerns.
++
++Each version is given a distinguishing version number.  If the Program
++specifies a version number of this License which applies to it and "any
++later version", you have the option of following the terms and conditions
++either of that version or of any later version published by the Free
++Software Foundation.  If the Program does not specify a version number of
++this License, you may choose any version ever published by the Free Software
++Foundation.
++
++  10. If you wish to incorporate parts of the Program into other free
++programs whose distribution conditions are different, write to the author
++to ask for permission.  For software which is copyrighted by the Free
++Software Foundation, write to the Free Software Foundation; we sometimes
++make exceptions for this.  Our decision will be guided by the two goals
++of preserving the free status of all derivatives of our free software and
++of promoting the sharing and reuse of software generally.
++
++			    NO WARRANTY
++
++  11. BECAUSE THE PROGRAM IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
++FOR THE PROGRAM, TO THE EXTENT PERMITTED BY APPLICABLE LAW.  EXCEPT WHEN
++OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES
++PROVIDE THE PROGRAM "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED
++OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
++MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.  THE ENTIRE RISK AS
++TO THE QUALITY AND PERFORMANCE OF THE PROGRAM IS WITH YOU.  SHOULD THE
++PROGRAM PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL NECESSARY SERVICING,
++REPAIR OR CORRECTION.
++
++  12. IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
++WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
++REDISTRIBUTE THE PROGRAM AS PERMITTED ABOVE, BE LIABLE TO YOU FOR DAMAGES,
++INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL OR CONSEQUENTIAL DAMAGES ARISING
++OUT OF THE USE OR INABILITY TO USE THE PROGRAM (INCLUDING BUT NOT LIMITED
++TO LOSS OF DATA OR DATA BEING RENDERED INACCURATE OR LOSSES SUSTAINED BY
++YOU OR THIRD PARTIES OR A FAILURE OF THE PROGRAM TO OPERATE WITH ANY OTHER
++PROGRAMS), EVEN IF SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE
++POSSIBILITY OF SUCH DAMAGES.
++
++		     END OF TERMS AND CONDITIONS
+diff -rNu -x .svn collective.solr/trunk/docs/LICENSE.txt collective.solr/trunk/docs/LICENSE.txt
+--- collective.solr/trunk/docs/LICENSE.txt	1970-01-01 01:00:00.000000000 +0100
++++ collective.solr/trunk/docs/LICENSE.txt	2008-02-29 10:00:57.000000000 +0100
+@@ -0,0 +1,16 @@
++  collective.solr is copyright Jarn AS
++
++  This program is free software; you can redistribute it and/or modify
++  it under the terms of the GNU General Public License as published by
++  the Free Software Foundation; either version 2 of the License, or
++  (at your option) any later version.
++
++  This program is distributed in the hope that it will be useful,
++  but WITHOUT ANY WARRANTY; without even the implied warranty of
++  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
++  GNU General Public License for more details.
++
++  You should have received a copy of the GNU General Public License
++  along with this program; if not, write to the Free Software
++  Foundation, Inc., 59 Temple Place, Suite 330, Boston, 
++  MA 02111-1307 USA.
+diff -rNu -x .svn collective.solr/trunk/setup.cfg collective.solr/trunk/setup.cfg
+--- collective.solr/trunk/setup.cfg	1970-01-01 01:00:00.000000000 +0100
++++ collective.solr/trunk/setup.cfg	2008-02-29 10:00:57.000000000 +0100
+@@ -0,0 +1,3 @@
++[egg_info]
++tag_build = dev
++tag_svn_revision = true
+diff -rNu -x .svn collective.solr/trunk/setup.py collective.solr/trunk/setup.py
+--- collective.solr/trunk/setup.py	1970-01-01 01:00:00.000000000 +0100
++++ collective.solr/trunk/setup.py	2008-02-29 10:00:57.000000000 +0100
+@@ -0,0 +1,34 @@
++from setuptools import setup, find_packages
++import os
++
++version = '0.1'
++
++setup(name='collective.solr',
++      version=version,
++      description="Solr search integration",
++      long_description=open("README.txt").read() + "\n" +
++                       open(os.path.join("docs", "HISTORY.txt")).read(),
++      # Get more strings from http://www.python.org/pypi?%3Aaction=list_classifiers
++      classifiers=[
++        "Framework :: Plone",
++        "Programming Language :: Python",
++        "Topic :: Software Development :: Libraries :: Python Modules",
++        ],
++      keywords='',
++      author='Jarn AS',
++      author_email='info@jarn.com',
++      url='http://www.jarn.com',
++      license='GPL',
++      packages=find_packages(exclude=['ez_setup']),
++      namespace_packages=['collective'],
++      include_package_data=True,
++      zip_safe=False,
++      install_requires=[
++          'setuptools',
++          'simplejson',
++          # -*- Extra requirements: -*-
++      ],
++      entry_points="""
++      # -*- Entry points: -*-
++      """,
++      )

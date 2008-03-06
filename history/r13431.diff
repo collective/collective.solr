@@ -1,0 +1,115 @@
+Index: collective.solr/trunk/collective/solr/parser.py
+===================================================================
+--- collective.solr/trunk/collective/solr/parser.py	(revision 13430)
++++ collective.solr/trunk/collective/solr/parser.py	(revision 13431)
+@@ -99,3 +99,82 @@
+         return lst
+ 
+ 
++# Handlers, register for event and element names, like ('end','int')
++# lst is dict, arr is list, bool, date, float, int, str are the same as python
++# last has name variables, arr does not
++# response - the whole thing (dict)
++# name=responseHeader is special
++# result - create result obj
++# doc - create SolrFlare (dict)
++
++def pop_stack(elem, stack):
++    stack.pop()
++
++def handle_start_response(elem, stack):
++    response = {} # Create new Response obj
++    stack.append(response)
++
++def handle_start_lst(elem, stack):
++    lst = {}
++    if elem.get('name', None) is not None:
++        stack[-1][elem.get('name')] = lst
++    else:
++        stack[-1].append(lst)
++    stack.append(lst)
++
++def handle_start_result(elem, stack):
++    # Set special attributes like numfound and start
++    result = [] # Create result object wtih special attributes
++    stack[-1][elem.get('name')] = result
++    stack.append(result)
++
++def handle_start_arr(elem, stack):
++    # Set special attributes like numfound and start
++    arr = []
++    if elem.get('name', None) is not None:
++        stack[-1][elem.get('name')] = arr
++    else:
++        stack[-1].append(arr)
++    stack.append(arr)
++
++def handle_start_doc(elem, stack):
++    doc = {} # Create SolrFlare
++    stack[-1].append(doc)
++    stack.append(doc)
++
++def handle_literal(func):
++    def handle(elem, stack):
++        if elem.get('name', None) is not None:
++            stack[-1][elem.get('name')] = func(elem)
++        else:
++            stack[-1].append(func(elem))
++    return handle
++
++handlers = {
++    ('start','response'): handle_start_response,
++    ('start','lst'): handle_start_lst,
++    ('end'  ,'lst'): pop_stack,
++    ('start','arr'): handle_start_arr,
++    ('end'  ,'arr'): pop_stack,
++    ('start','result'): handle_start_result,
++    ('end'  ,'result'): pop_stack,
++    ('start','doc'): handle_start_doc,
++    ('end'  ,'doc'): pop_stack,
++    ('end','int'):   handle_literal(lambda x: int(x.text)),
++    ('end','float'): handle_literal(lambda x: float(x.text)),
++    ('end','bool'):  handle_literal(lambda x: x.text == 'true'),
++    ('end','str'):   handle_literal(lambda x: x.text or ''),
++    ('end','date'):  handle_literal(lambda x: DateTime(x.text)),
++}
++
++def parse2(data):
++    """ parse a solr response contained in a string or file-like object """
++    if isinstance(data, basestring):
++        data = StringIO(data)
++    stack = []
++    elements = iterparse(data, events=('start', 'end'))
++    for action, elem in elements:
++        handler = handlers.get((action,elem.tag), None)
++        if handler is not None:
++            handler(elem, stack)
++    return stack[0]
+\ No newline at end of file
+Index: collective.solr/trunk/collective/solr/tests.py
+===================================================================
+--- collective.solr/trunk/collective/solr/tests.py	(revision 13430)
++++ collective.solr/trunk/collective/solr/tests.py	(revision 13431)
+@@ -7,6 +7,7 @@
+ 
+ from collective.solr.solr import SolrConnection
+ from collective.solr.parser import SolrResponse
++from collective.solr.parser import parse2
+ 
+ 
+ ADD_REQUEST = """POST /solr/update HTTP/1.1\r
+@@ -357,6 +358,14 @@
+         self.assertEqual(counts['facet_fields']['cat']['software'], 1)
+         self.assertEqual(counts['facet_fields']['inStock']['true'], 1)
+ 
++    def testParse2(self):
++        response = parse2(FACET_XML_RESPONSE)
++        self.failUnless(response)
++        response = parse2(COMPLEX_XML_RESPONSE)
++        self.failUnless(response)
++        response = parse2(SEARCH_RESPONSE.split('\n\n', 1)[1])
++        self.failUnless(response)
++
+ 
+ def test_suite():
+     return TestSuite((

@@ -1,0 +1,75 @@
+Index: collective.solr/trunk/collective/solr/tests/data/plone_schema.xml
+===================================================================
+--- collective.solr/trunk/collective/solr/tests/data/plone_schema.xml	(revision 0)
++++ collective.solr/trunk/collective/solr/tests/data/plone_schema.xml	(revision 13530)
+@@ -0,0 +1,16 @@
++HTTP/1.1 200 OK
++Content-Type: text/xml; charset=utf-8
++Content-Length: 397
++Server: Jetty(6.1.3)
++
++<?xml version="1.0" encoding="UTF-8"?>
++<schema name="example" version="1.1">
++  <types>
++    <fieldType name="string" class="solr.StrField" sortMissingLast="true" omitNorms="true"/>
++ </types>
++ <fields>
++   <field name="id" type="string" indexed="true" stored="true" required="true"/> 
++   <field name="title" type="string" indexed="true" stored="true"/>
++ </fields>
++ <uniqueKey>id</uniqueKey>
++</schema>
+\ No newline at end of file
+Index: collective.solr/trunk/collective/solr/tests/test_integration.py
+===================================================================
+--- collective.solr/trunk/collective/solr/tests/test_integration.py	(revision 13529)
++++ collective.solr/trunk/collective/solr/tests/test_integration.py	(revision 13530)
+@@ -12,6 +12,8 @@
+ @onsetup
+ def setup_product():
+     fiveconfigure.debug_mode = True
++    import collective.indexing
++    zcml.load_config('configure.zcml', collective.indexing)
+     import collective.solr
+     zcml.load_config('configure.zcml', collective.solr)
+     fiveconfigure.debug_mode = False
+@@ -24,7 +26,8 @@
+ from zope.component import queryUtility, getUtilitiesFor
+ from collective.indexing.interfaces import IIndexQueueProcessor
+ from collective.solr.interfaces import ISolrIndexQueueProcessor
+-
++from collective.solr.tests.test_solr import fakehttp
++from collective.solr.tests.utils import getData
+ 
+ 
+ class TestCase(ptc.PloneTestCase):
+@@ -47,6 +50,29 @@
+         solr = queryUtility(ISolrIndexQueueProcessor)
+         self.failUnless(solr in [util for name, util in procs], 'solr utility not found')
+ 
++    def setupProcessor(self, schema='plone_schema.xml'):
++        proc = queryUtility(ISolrIndexQueueProcessor)
++        proc.setHost()
++        conn = proc.getConnection()
++        fakehttp(conn, getData(schema), []) # fake schema response
++        proc.getSchema()                    # read and cache the schema
++        return conn                         # return connection for faking requests
++
++    def testIndexObject(self):
++        output = []
++        connection = self.setupProcessor()
++        response = getData('add_response.txt')
++        fakehttp(connection, response, output)      # fake add response
++        self.folder.processForm({'title': 'Foo'})   # updating sends data
++        output = ''.join(output).replace('\r', '')
++        # TODO: collective.solr still need to be changed to put the actual
++        # objects into the queue instead of the UIDs (which will make things
++        # clearer anyway), so for now we check for the UID... and also only
++        # for it's lower-case version, since this is mangled somewhere on
++        # the way... %)
++        required = '<field name="title">%s</field>' % self.folder.UID()
++        self.assert_(output.lower().find(required.lower()) > 0, '"title" data not found')
++
+ 
+ def test_suite():
+     return TestSuite([

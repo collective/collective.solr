@@ -1,0 +1,137 @@
+Index: collective.solr/trunk/collective/solr/tests/test_indexer.py
+===================================================================
+--- collective.solr/trunk/collective/solr/tests/test_indexer.py	(revision 13493)
++++ collective.solr/trunk/collective/solr/tests/test_indexer.py	(revision 13494)
+@@ -1,45 +1,10 @@
+-from unittest import TestSuite, makeSuite, main
++from unittest import TestCase, TestSuite, makeSuite, main
+ 
+-from Products.Five import zcml
+-from Products.Five import fiveconfigure
+-from Products.PloneTestCase import PloneTestCase as ptc
+-from Products.PloneTestCase.layer import onsetup
+-
+-import collective.solr
+ from collective.solr.indexer import SolrIndexQueueProcessor
+ from collective.solr.tests.test_solr import fakehttp
+ from collective.solr.tests.utils import getData
+ 
+ 
+-@onsetup
+-def setup_product():
+-    """Set up additional products and ZCML required to test this product.
+-    
+-    The @onsetup decorator causes the execution of this body to be deferred
+-    until the setup of the Plone site testing layer.
+-    """
+-    # Load the ZCML configuration for this package and its dependencies
+-    fiveconfigure.debug_mode = True
+-    zcml.load_config('configure.zcml',
+-                     collective.solr)
+-    fiveconfigure.debug_mode = False
+-
+-    # We need to tell the testing framework that these products
+-    # should be available. This can't happen until after we have loaded
+-    # the ZCML.
+-    #ptc.installPackage('collective.solr')
+-    fiveconfigure.debug_mode = False
+-
+-
+-# The order here is important: We first call the deferred function and then 
+-# let PloneTestCase install it during Plone site setup
+-setup_product()
+-ptc.setupPloneSite()
+-
+-
+-class TestCase(ptc.PloneTestCase):
+-    pass
+-
+ class QueueIndexerTests(TestCase):
+ 
+     def testPrepareData(self):
+@@ -48,6 +13,11 @@
+         self.assertEqual(data, {'allowedRolesAndUsers': ['user$test_user_1_', 'user$portal_owner']})
+ 
+     def testIndexObject(self):
++        class Foo:
++            pass
++        foo = Foo()
++        foo.id = '500'
++        foo.name = 'python test doc'
+         proc = SolrIndexQueueProcessor()
+         proc.setHost()
+         conn = proc.getConnection()
+@@ -56,9 +26,7 @@
+         output = []
+         response = getData('add_response.txt')
+         fakehttp(conn, response, output)            # fake add response
+-        self.folder.id = '500'                      # fake the needed values
+-        self.folder.name = 'python test doc'
+-        proc.index(self.folder)                     # indexing sends data
++        proc.index(foo)                             # indexing sends data
+         output = ''.join(output).replace('\r', '')
+         self.assertEqual(output, getData('add_request.txt'))
+ 
+@@ -70,3 +38,4 @@
+ 
+ if __name__ == '__main__':
+     main(defaultTest='test_suite')
++
+Index: collective.solr/trunk/collective/solr/tests/test_integration.py
+===================================================================
+--- collective.solr/trunk/collective/solr/tests/test_integration.py	(revision 0)
++++ collective.solr/trunk/collective/solr/tests/test_integration.py	(revision 13494)
+@@ -0,0 +1,47 @@
++from unittest import TestSuite, makeSuite, main
++
++from Products.Five import zcml
++from Products.Five import fiveconfigure
++from Products.PloneTestCase import PloneTestCase as ptc
++from Products.PloneTestCase.layer import onsetup
++
++import collective.solr
++
++
++@onsetup
++def setup_product():
++    """Set up additional products and ZCML required to test this product.
++    
++    The @onsetup decorator causes the execution of this body to be deferred
++    until the setup of the Plone site testing layer.
++    """
++    # Load the ZCML configuration for this package and its dependencies
++    fiveconfigure.debug_mode = True
++    zcml.load_config('configure.zcml',
++                     collective.solr)
++    fiveconfigure.debug_mode = False
++
++    # We need to tell the testing framework that these products
++    # should be available. This can't happen until after we have loaded
++    # the ZCML.
++    #ptc.installPackage('collective.solr')
++    fiveconfigure.debug_mode = False
++
++
++# The order here is important: We first call the deferred function and then 
++# let PloneTestCase install it during Plone site setup
++setup_product()
++ptc.setupPloneSite()
++
++
++class TestCase(ptc.PloneTestCase):
++    pass
++
++
++def test_suite():
++    return TestSuite([
++        # makeSuite(QueueIndexerTests),
++    ])
++
++if __name__ == '__main__':
++    main(defaultTest='test_suite')
+
+Property changes on: collective.solr/trunk/collective/solr/tests/test_integration.py
+___________________________________________________________________
+Name: svn:eol-style
+   + native
+

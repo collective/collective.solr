@@ -1,0 +1,260 @@
+Index: collective.solr/trunk/collective/solr/solr.py
+===================================================================
+--- collective.solr/trunk/collective/solr/solr.py	(revision 13418)
++++ collective.solr/trunk/collective/solr/solr.py	(revision 13419)
+@@ -39,6 +39,7 @@
+ from xml.sax.saxutils import escape
+ import codecs
+ import urllib
++from xml.sax.saxutils import escape
+ 
+ 
+ class SolrException(Exception):
+@@ -127,10 +128,11 @@
+         return parsed
+ 
+     def escapeVal(self,val):
+-        val = val.replace("&", "&amp;")
+-        val = val.replace("<", "&lt;")
+-        val = val.replace("]]>", "]]&gt;")
+-        return self.encoder(val)[0]  #to utf8
++        val = escape(val)
++        try:
++            return self.encoder(val)[0]  #to utf8
++        except UnicodeDecodeError:
++            return val # Already utf-8?
+ 
+     def escapeKey(self,key):
+         key = key.replace("&", "&amp;")
+@@ -141,7 +143,7 @@
+         xstr = '<delete><id>'+self.escapeVal(unicode(id))+'</id></delete>'
+         return self.doUpdateXML(xstr)
+ 
+-    def deleteByQyery(self, query):
++    def deleteByQuery(self, query):
+         xstr = '<delete><query>'+self.escapeVal(query)+'</query></delete>'
+         return self.doUpdateXML(xstr)
+ 
+@@ -193,7 +195,7 @@
+     def search(self, **params):
+         request = urllib.urlencode(params, doseq=True)
+         try:
+-            rsp = self.doPost(self.solrBase+'/select', request, self.formheaders)
++            rsp = self.doPost('%s/select' % self.solrBase, request, self.formheaders)
+             data = rsp.read()
+         finally:
+             if not self.persistent: self.conn.close()
+Index: collective.solr/trunk/collective/solr/tests.py
+===================================================================
+--- collective.solr/trunk/collective/solr/tests.py	(revision 13418)
++++ collective.solr/trunk/collective/solr/tests.py	(revision 13419)
+@@ -5,7 +5,7 @@
+ 
+ from collective.solr.solr import SolrConnection
+ 
+-ADD = """POST /solr/update HTTP/1.1\r
++ADD_REQUEST = """POST /solr/update HTTP/1.1\r
+ Host: localhost\r
+ Accept-Encoding: identity\r
+ Content-Length: 92\r
+@@ -14,7 +14,7 @@
+ <add><doc><field name="id">500</field><field name="name">python test doc</field></doc></add>"""
+ 
+ 
+-RESPONSE1 = """HTTP/1.1 200 OK
++ADD_RESPONSE = """HTTP/1.1 200 OK
+ Content-Type: text/xml; charset=utf-8
+ Content-Length: 147
+ Server: Jetty(6.1.3)
+@@ -27,7 +27,7 @@
+ """
+ 
+ 
+-COMMIT = """POST /solr/update HTTP/1.1\r
++COMMIT_REQUEST = """POST /solr/update HTTP/1.1\r
+ Host: localhost\r
+ Accept-Encoding: identity\r
+ Content-Length: 9\r
+@@ -35,7 +35,7 @@
+ \r
+ <commit/>\r"""
+ 
+-RESPONSE2 = """HTTP/1.1 200 OK
++COMMIT_RESPONSE = """HTTP/1.1 200 OK
+ Content-Type: text/xml; charset=utf-8
+ Content-Length: 148
+ Server: Jetty(6.1.3)
+@@ -47,7 +47,7 @@
+ 
+ """
+ 
+-SEARCH = """POST /solr/select HTTP/1.1\r
++SEARCH_REQUEST = """POST /solr/select HTTP/1.1\r
+ Host: localhost\r
+ Accept-Encoding: identity\r
+ Content-Length: 48\r
+@@ -56,7 +56,7 @@
+ q=id%3A%5B%2A+TO+%2A%5D&rows=10&wt=xml&indent=on\r"""
+ 
+ 
+-SEARCHRESPONSE = """HTTP/1.1 200 OK
++SEARCH_RESPONSE = """HTTP/1.1 200 OK
+ Content-Type: text/xml; charset=utf-8
+ Content-Length: 560
+ Server: Jetty(6.1.3)
+@@ -88,7 +88,7 @@
+ """
+ 
+ 
+-DELETE = """POST /solr/update HTTP/1.1\r
++DELETE_REQUEST = """POST /solr/update HTTP/1.1\r
+ Host: localhost\r
+ Accept-Encoding: identity\r
+ Content-Length: 29\r
+@@ -96,7 +96,7 @@
+ \r
+ <delete><id>500</id></delete>"""
+ 
+-RESPONSE3 = """HTTP/1.1 200 OK
++DELETE_RESPONSE = """HTTP/1.1 200 OK
+ Content-Type: text/xml; charset=utf-8
+ Content-Length: 147
+ Server: Jetty(6.1.3)
+@@ -109,89 +109,6 @@
+ """
+ 
+ 
+-COMMIT2 = """POST /solr/update HTTP/1.1\r
+-Host: localhost\r
+-Accept-Encoding: identity\r
+-Content-Length: 9\r
+-Content-Type: text/xml; charset=utf-8\r
+-\r
+-<commit/>\r"""
+-
+-RESPONSE4 = """HTTP/1.1 200 OK
+-Content-Type: text/xml; charset=utf-8
+-Content-Length: 148
+-Server: Jetty(6.1.3)
+-
+-<?xml version="1.0" encoding="UTF-8"?>
+-<response>
+-<lst name="responseHeader"><int name="status">0</int><int name="QTime">43</int></lst>
+-</response>
+-
+-"""
+-
+-
+-
+-CONFIRM = """HTTP/1.1 200 OK
+-Content-Type: text/xml; charset=utf-8
+-Content-Length: 593
+-Server: Jetty(6.1.3)
+-
+-<?xml version="1.0" encoding="UTF-8"?>
+-<response>
+-
+-<lst name="responseHeader">
+- <int name="status">0</int>
+- <int name="QTime">1</int>
+- <lst name="params">
+-  <str name="indent">on</str>
+-  <str name="rows">10</str>
+-  <str name="start">0</str>
+-  <str name="q">id:[* TO *]</str>
+-  <str name="version">2.2</str>
+- </lst>
+-</lst>
+-<result name="response" numFound="1" start="0">
+- <doc>
+-  <str name="id">500</str>
+-  <str name="name">python test doc</str>
+-  <int name="popularity">0</int>
+-  <str name="sku">500</str>
+-  <date name="timestamp">2008-02-29T14:09:10.558Z</date>
+- </doc>
+-</result>
+-</response>
+-
+-"""
+-
+-
+-QUERYRESULT = """<?xml version="1.0" encoding="UTF-8"?>
+-<response>
+-
+-<lst name="responseHeader">
+- <int name="status">0</int>
+- <int name="QTime">0</int>
+- <lst name="params">
+-  <str name="indent">on</str>
+-  <str name="rows">10</str>
+-
+-  <str name="start">0</str>
+-  <str name="q">id:[* TO *]</str>
+-  <str name="version">2.2</str>
+- </lst>
+-</lst>
+-<result name="response" numFound="1" start="0">
+- <doc>
+-  <str name="id">500</str>
+-
+-  <str name="name">python test doc</str>
+-  <int name="popularity">0</int>
+-  <str name="sku">500</str>
+-  <date name="timestamp">2008-02-29T13:47:15.334Z</date>
+- </doc>
+-</result>
+-</response>
+-"""
+-
+ class TestSolr(unittest.TestCase):
+     def fakehttp(self, solrconn, fakedata, output):
+         class FakeSocket(StringIO.StringIO):
+@@ -211,11 +128,11 @@
+     def test_add(self):
+         output = []
+         c = SolrConnection(host='localhost:8983', persistent=True)
+-        self.fakehttp(c, RESPONSE1, output)
++        self.fakehttp(c, ADD_RESPONSE, output)
+         res = c.add(id='500',name='python test doc')
+ 
+         output = ''.join(output)
+-        self.failUnlessEqual(output, ADD)
++        self.failUnlessEqual(output, ADD_REQUEST)
+         # Status
+         node = res.findall(".//int")[0]
+         self.failUnlessEqual(node.attrib['name'], 'status')
+@@ -226,6 +143,33 @@
+         self.failUnlessEqual(node.text, '4')
+         res.find('QTime')
+ 
++    def DONTtest_commit(self):
++        output = []
++        c = SolrConnection(host='localhost:8983', persistent=True)
++        self.fakehttp(c, COMMIT_RESPONSE, output)
++        res = c.add(id='500',name='python test doc')
++
++        output = ''.join(output)
++        self.failUnlessEqual(output, COMMIT_REQUEST)
++
++    def DONTtest_search(self):
++        output = []
++        c = SolrConnection(host='localhost:8983', persistent=True)
++        self.fakehttp(c, SEARCH_RESPONSE, output)
++        res = c.add(id='500',name='python test doc')
++
++        output = ''.join(output)
++        self.failUnlessEqual(output, SEARCH_REQUEST)
++
++    def DONTtest_delete(self):
++        output = []
++        c = SolrConnection(host='localhost:8983', persistent=True)
++        self.fakehttp(c, DELETE_RESPONSE, output)
++        res = c.add(id='500',name='python test doc')
++
++        output = ''.join(output)
++        self.failUnlessEqual(output, DELETE_REQUEST)
++
+ 
+ 
+ def test_suite():

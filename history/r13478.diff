@@ -1,0 +1,40 @@
+Index: collective.solr/trunk/collective/solr/indexer.py
+===================================================================
+--- collective.solr/trunk/collective/solr/indexer.py	(revision 13477)
++++ collective.solr/trunk/collective/solr/indexer.py	(revision 13478)
+@@ -1,9 +1,10 @@
+ from zope.interface import implements
+ from zope.component import getMultiAdapter
++from persistent import Persistent
+ from Products.CMFCore.utils import getToolByName
+ from DateTime import DateTime
+ 
+-from collective.indexing.interfaces import IIndexQueueProcessor
++from collective.solr.interfaces import ISolrIndexQueueProcessor
+ from collective.solr.solr import SolrConnection
+ from collective.solr.indexablewrapper import ISolrIndexableObjectWrapper
+ 
+@@ -19,9 +20,9 @@
+ handlers = {'solr.DateField': datehandler}
+ 
+ 
+-class SolrIndexQueueProcessor(object):
++class SolrIndexQueueProcessor(Persistent):
+     """ a queue processor for solr """
+-    implements(IIndexQueueProcessor)
++    implements(ISolrIndexQueueProcessor)
+ 
+     def index(self, obj, attributes=None):
+         portal = getToolByName(obj, 'portal_url').getPortalObject()
+Index: collective.solr/trunk/collective/solr/interfaces.py
+===================================================================
+--- collective.solr/trunk/collective/solr/interfaces.py	(revision 0)
++++ collective.solr/trunk/collective/solr/interfaces.py	(revision 13478)
+@@ -0,0 +1,7 @@
++from collective.indexing.interfaces import IIndexQueueProcessor
++
++
++class ISolrIndexQueueProcessor(IIndexQueueProcessor):
++    """ an index queue processor for solr """
++
++

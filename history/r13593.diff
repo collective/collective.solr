@@ -1,0 +1,13 @@
+Index: collective.solr/trunk/TODO.txt
+===================================================================
+--- collective.solr/trunk/TODO.txt	(revision 13592)
++++ collective.solr/trunk/TODO.txt	(revision 13593)
+@@ -1,6 +1,6 @@
+ TODOs:
+-* properly fix UID problem
+-* make sure the queueing kicks in
++* make sure the queueing kicks in (test?)
++* browsertest for indexing
+ * move caching of schema to `solr.py`
+ * implement on/off switch and configlet
+ * provide decorator for solr exceptions

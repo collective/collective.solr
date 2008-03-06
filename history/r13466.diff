@@ -1,0 +1,81 @@
+Index: collective.solr/trunk/collective/solr/tests/test_parser.py
+===================================================================
+--- collective.solr/trunk/collective/solr/tests/test_parser.py	(revision 13465)
++++ collective.solr/trunk/collective/solr/tests/test_parser.py	(revision 13466)
+@@ -84,7 +84,26 @@
+     def testParseConfig(self):
+         schema = SolrSchema(getData('schema.xml'))
+         fields = schema.fields
+-        self.failUnlessEqual(len(fields), 17) # 17 fields defined in schema.xml
++        self.assertEqual(len(fields), 17) # 17 fields defined in schema.xml
++        self.assertEqual(fields['id']['type'], 'string')
++        self.assertEqual(fields['id']['class'], 'solr.StrField')
++        self.assertEqual(fields['id']['required'], 'true')
++        self.assertEqual(fields['id']['omitNorms'], 'true')
++        self.assertEqual(fields['id'].required, 'true')     # attribute access...
++        self.assertEqual(fields['id'].omitNorms, 'true')
++        self.assertEqual(fields['cat']['class'], 'solr.TextField')
++        self.assertEqual(fields['cat']['multiValued'], 'true')
++        self.assertEqual(fields['cat'].multiValued, 'true')        
++        self.assertEqual(fields['sku'].positionIncrementGap, '100')
++        self.assertEqual(fields['cat'].multiValued, 'true')
++        self.assertEqual(fields['cat'].termVectors, 'true')        
++        self.assertEqual(fields['features'].multiValued, 'true')
++        self.assertEqual(fields['weight']['class'], 'solr.SortableFloatField')
++        self.assertEqual(fields['popularity']['class'], 'solr.SortableIntField')
++        self.assertEqual(fields['inStock']['class'], 'solr.BoolField')
++        self.assertEqual(fields['timestamp']['class'], 'solr.DateField')
++        self.assertEqual(fields['timestamp'].default, 'NOW')
++        self.assertEqual(fields['timestamp'].multiValued, 'false')
+ 
+ 
+ def test_suite():
+Index: collective.solr/trunk/collective/solr/parser.py
+===================================================================
+--- collective.solr/trunk/collective/solr/parser.py	(revision 13465)
++++ collective.solr/trunk/collective/solr/parser.py	(revision 13466)
+@@ -74,6 +74,19 @@
+         return self
+ 
+ 
++class SolrField(dict):
++    """ a schema field representation """
++
++    # look up attributes in dict
++    def __getattr__(self, name):
++        marker = []
++        value = self.get(name, marker) 
++        if value is not marker:
++            return value
++        else:
++            raise AttributeError, name
++
++
+ class SolrSchema(object):
+     """ a solr schema parser:  the xml schema is partially parsed and the
+         information collected is later on used both for indexing items as
+@@ -94,17 +107,13 @@
+             search and indexing queries later on """
+         if isinstance(data, basestring):
+             data = StringIO(data)
+-        fieldtypes = {}
+-        fields = {}
+-        elements = iterparse(data, events=('end',))
+-        for action, elem in elements:
++        types = {}
++        fields = self.fields = {}
++        for action, elem in iterparse(data):
++            name = elem.get('name')
+             if elem.tag == 'fieldType':
+-                fieldtypes[elem.get('name')] = elem.get('class')
++                types[name] = elem.attrib
+             elif elem.tag == 'field':
+-                fields[elem.get('name')] = elem.get('type')
+-        # Massage list, assign fieldtypes to fields
+-        res = {}
+-        for k,v in fields.items():
+-            res[k] = fieldtypes.get(v,v)
+-        self.fields = res
++                fields[name] = SolrField(types[elem.get('type')])
++                fields[name].update(elem.attrib)
+ 

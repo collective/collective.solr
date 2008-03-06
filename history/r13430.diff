@@ -1,0 +1,33 @@
+Index: collective.solr/trunk/collective/solr/tests.py
+===================================================================
+--- collective.solr/trunk/collective/solr/tests.py	(revision 13429)
++++ collective.solr/trunk/collective/solr/tests.py	(revision 13430)
+@@ -303,6 +303,13 @@
+         self.assertEqual(match.popularity, 0)
+         self.assertEqual(match.sku, '500')
+         self.assertEqual(match.timestamp, DateTime('2008-02-29 16:11:46.998 GMT'))
++        headers = response.responseHeader
++        self.assertEqual(headers['status'], 0)
++        self.assertEqual(headers['QTime'], 0)
++        self.assertEqual(headers['params']['wt'], 'xml')
++        self.assertEqual(headers['params']['indent'], 'on')
++        self.assertEqual(headers['params']['rows'], '10')
++        self.assertEqual(headers['params']['q'], 'id:[* TO *]')
+ 
+     def testParseComplexSearchResults(self):
+         response = SolrResponse(COMPLEX_XML_RESPONSE)
+@@ -318,6 +325,14 @@
+         self.assertEqual(first.manu, 'Apache Software Foundation')
+         self.assertEqual(first.popularity, 10)
+         self.assertEqual(first.price, 0.0)
++        headers = response.responseHeader
++        self.assertEqual(headers['status'], 0)
++        self.assertEqual(headers['QTime'], 0)
++        self.assertEqual(headers['params']['indent'], 'on')
++        self.assertEqual(headers['params']['rows'], '10')
++        self.assertEqual(headers['params']['start'], '0')
++        self.assertEqual(headers['params']['q'], 'id:[* TO *]')
++        self.assertEqual(headers['params']['version'], '2.2')
+ 
+     def testParseFacetSearchResults(self):
+         response = SolrResponse(FACET_XML_RESPONSE)

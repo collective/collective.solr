@@ -1,0 +1,108 @@
+Index: collective.solr/trunk/collective/solr/tests/test_parser.py
+===================================================================
+--- collective.solr/trunk/collective/solr/tests/test_parser.py	(revision 13461)
++++ collective.solr/trunk/collective/solr/tests/test_parser.py	(revision 13462)
+@@ -2,7 +2,7 @@
+ from DateTime import DateTime
+ 
+ from collective.solr.parser import SolrResponse
+-from collective.solr.parser import parseConfig
++from collective.solr.parser import SolrSchema
+ from collective.solr.tests.utils import getData
+ 
+ 
+@@ -83,7 +83,8 @@
+ 
+     def testParseConfig(self):
+         schema = getData('schema.xml')
+-        res = parseConfig(schema)
++        schema = SolrSchema(schema)
++        res = schema.fields
+         self.failUnlessEqual(len(res), 18) # 18 fields defined in schema.xml
+ 
+ 
+Index: collective.solr/trunk/collective/solr/parser.py
+===================================================================
+--- collective.solr/trunk/collective/solr/parser.py	(revision 13461)
++++ collective.solr/trunk/collective/solr/parser.py	(revision 13462)
+@@ -85,39 +85,45 @@
+         since they are only used by solr, but not relevant when building
+         search or indexing queries """
+ 
++    def __init__(self, data=None):
++        if data is not None:
++            self.parse(data)
++
++    def parse(self, data):
++        """ parse a solr schema to collect information for building
++            search and indexing queries later on """
++        if isinstance(data, basestring):
++            data = StringIO(data)
++
++        fieldtypes = {}
++        fields = {}
++        dynamicfields = {}
++        filterfields = {}
++        elements = iterparse(data, events=('end',))
++        for action, elem in elements:
++            if elem.tag == 'fieldType':
++                fieldtypes[elem.get('name')] = elem.get('class')
++            elif elem.tag == 'field':
++                fields[elem.get('name')] = elem.get('type')
++            elif elem.tag == 'dynamicField':
++                name = elem.get('name')
++                name.replace('*','')
++                dynamicfields[name] = elem.get('type')
++            elif elem.tag == 'copyField':
++                source = elem.get('source')
++                dest = elem.get('dest')
++                if not fields.has_key('source'):
++                    if fields.has_key(dest):
++                        fields[source] = fields[dest]
++                        filterfields[dest] = None
++                    else:
++                        df = dynamicfields.get('*_%s'%dest.split('_')[-1], None)
++                        if df is not None:
++                            fields[source] = df
++        # Massage list, remove filterfields, assign fieldtypes to fields
++        res = {}
++        for k,v in fields.items():
++            #if not filterfields.has_key(k):
++            res[k] = fieldtypes.get(v,v)
++        self.fields = res
+ 
+-def parseConfig(data):
+-    """Parse schema.xml"""
+-    if isinstance(data, basestring):
+-        data = StringIO(data)
+-    fieldtypes = {}
+-    fields = {}
+-    dynamicfields = {}
+-    filterfields = {}
+-    elements = iterparse(data, events=('end',))
+-    for action, elem in elements:
+-        if elem.tag == 'fieldType':
+-            fieldtypes[elem.get('name')] = elem.get('class')
+-        elif elem.tag == 'field':
+-            fields[elem.get('name')] = elem.get('type')
+-        elif elem.tag == 'dynamicField':
+-            name = elem.get('name')
+-            name.replace('*','')
+-            dynamicfields[name] = elem.get('type')
+-        elif elem.tag == 'copyField':
+-            source = elem.get('source')
+-            dest = elem.get('dest')
+-            if not fields.has_key('source'):
+-                if fields.has_key(dest):
+-                    fields[source] = fields[dest]
+-                    filterfields[dest] = None
+-                else:
+-                    df = dynamicfields.get('*_%s'%dest.split('_')[-1], None)
+-                    if df is not None:
+-                        fields[source] = df
+-    # Massage list, remove filterfields, assign fieldtypes to fields
+-    res = {}
+-    for k,v in fields.items():
+-        #if not filterfields.has_key(k):
+-        res[k] = fieldtypes.get(v,v)
+-    return res

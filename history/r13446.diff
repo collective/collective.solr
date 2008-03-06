@@ -1,0 +1,66 @@
+Index: collective.solr/trunk/collective/solr/tests/test_parser.py
+===================================================================
+--- collective.solr/trunk/collective/solr/tests/test_parser.py	(revision 13445)
++++ collective.solr/trunk/collective/solr/tests/test_parser.py	(revision 13446)
+@@ -1,11 +1,6 @@
+-# -*- coding: utf-8 -*-
+-
+ from unittest import TestCase, TestSuite, makeSuite, main
+-from StringIO import StringIO
+ from DateTime import DateTime
+-from httplib import HTTPConnection
+ 
+-from collective.solr.solr import SolrConnection
+ from collective.solr.parser import SolrResponse
+ from collective.solr.parser import parse2
+ from collective.solr.parser import parseConfig
+Index: collective.solr/trunk/collective/solr/tests/test_solr.py
+===================================================================
+--- collective.solr/trunk/collective/solr/tests/test_solr.py	(revision 13445)
++++ collective.solr/trunk/collective/solr/tests/test_solr.py	(revision 13446)
+@@ -1,17 +1,8 @@
+-# -*- coding: utf-8 -*-
+-
+-from os.path import dirname, join
+-
+ from unittest import TestCase, TestSuite, makeSuite, main
+ from StringIO import StringIO
+-from DateTime import DateTime
+ from httplib import HTTPConnection
+ 
+-import collective.solr.tests
+ from collective.solr.solr import SolrConnection
+-from collective.solr.parser import SolrResponse
+-from collective.solr.parser import parse2
+-from collective.solr.parser import parseConfig
+ from collective.solr.tests.utils import getData
+ 
+ 
+Index: collective.solr/trunk/collective/solr/tests/utils.py
+===================================================================
+--- collective.solr/trunk/collective/solr/tests/utils.py	(revision 13445)
++++ collective.solr/trunk/collective/solr/tests/utils.py	(revision 13446)
+@@ -1,7 +1,9 @@
+ from os.path import dirname, join
+-import collective.solr.tests
++from collective.solr import tests
++
+ 
+ def getData(filename):
+     """Return file as string"""
+-    filename = join(dirname(collective.solr.tests.__file__), 'data', filename)
++    filename = join(dirname(tests.__file__), 'data', filename)
+     return open(filename, 'r').read()
++
+Index: collective.solr/trunk/collective/solr/solr.py
+===================================================================
+--- collective.solr/trunk/collective/solr/solr.py	(revision 13445)
++++ collective.solr/trunk/collective/solr/solr.py	(revision 13446)
+@@ -35,7 +35,6 @@
+ from xml.sax.saxutils import escape
+ import codecs
+ import urllib
+-from xml.sax.saxutils import escape
+ 
+ 
+ class SolrException(Exception):

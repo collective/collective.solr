@@ -1,0 +1,68 @@
+Index: collective.solr/trunk/collective/solr/tests/test_indexer.py
+===================================================================
+--- collective.solr/trunk/collective/solr/tests/test_indexer.py	(revision 13514)
++++ collective.solr/trunk/collective/solr/tests/test_indexer.py	(revision 13515)
+@@ -36,6 +36,15 @@
+         output = ''.join(output).replace('\r', '')
+         self.assertEqual(output, getData('add_request.txt'))
+ 
++    def testRendexObject(self):
++        proc = self.setupProcessor()
++        output = []
++        response = getData('add_response.txt')
++        fakehttp(proc.getConnection(), response, output)    # fake add response
++        proc.reindex(Foo(id='500', name='python test doc')) # indexing sends data
++        output = ''.join(output).replace('\r', '')
++        self.assertEqual(output, getData('add_request.txt'))
++
+ 
+ def test_suite():
+     return TestSuite([
+Index: collective.solr/trunk/collective/solr/indexer.py
+===================================================================
+--- collective.solr/trunk/collective/solr/indexer.py	(revision 13514)
++++ collective.solr/trunk/collective/solr/indexer.py	(revision 13515)
+@@ -31,21 +31,12 @@
+     schema = None
+ 
+     def index(self, obj, attributes=None):
+-        data, marker = {}, []
+-        for name, field in self.getSchema().items():
+-            value = getattr(obj, name, marker)
+-            if value is marker:
+-                continue
+-            if callable(value):
+-                value = value()
+-            if handlers.has_key(field.class_):
+-                value = handlers[field.class_](value)
+-            data[name] = value
++        data = self.getData(obj)
+         self.prepareData(data)
+         self.getConnection().add(**data)
+ 
+     def reindex(self, obj, attributes=None):
+-        pass
++        self.index(obj, attributes)
+ 
+     def unindex(self, obj):
+         pass
+@@ -58,6 +49,19 @@
+ 
+     # helper methods
+ 
++    def getData(self, obj):
++        data, marker = {}, []
++        for name, field in self.getSchema().items():
++            value = getattr(obj, name, marker)
++            if value is marker:
++                continue
++            if callable(value):
++                value = value()
++            if handlers.has_key(field.class_):
++                value = handlers[field.class_](value)
++            data[name] = value
++        return data
++
+     def prepareData(self, data):
+         """ modify data according to solr specifics, i.e. replace ':' by '$'
+             for "allowedRolesAndUsers" etc """ 

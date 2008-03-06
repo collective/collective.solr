@@ -1,0 +1,44 @@
+Index: collective.solr/trunk/collective/solr/tests/test_indexer.py
+===================================================================
+--- collective.solr/trunk/collective/solr/tests/test_indexer.py	(revision 13521)
++++ collective.solr/trunk/collective/solr/tests/test_indexer.py	(revision 13522)
+@@ -36,6 +36,26 @@
+         output = ''.join(output).replace('\r', '')
+         self.assertEqual(output, getData('add_request.txt'))
+ 
++    def testPartialIndexObject(self):
++        proc = self.setupProcessor()
++        foo = Foo(id='500', name='foo', price=42.0)
++        # first index all attributes...
++        output = []
++        response = getData('add_response.txt')
++        fakehttp(proc.getConnection(), response, output)
++        proc.index(foo)
++        output = ''.join(output).replace('\r', '')
++        self.assert_(output.find('<field name="price">42.0</field>') > 0, '"price" data not found')
++        # then only a subset...
++        output = []
++        response = getData('add_response.txt')
++        fakehttp(proc.getConnection(), response, output)
++        proc.index(foo, attributes=['id', 'name'])
++        output = ''.join(output).replace('\r', '')
++        self.assert_(output.find('<field name="name">foo</field>') > 0, '"name" data not found')
++        self.assertEqual(output.find('price'), -1, '"price" data found?')
++        self.assertEqual(output.find('42'), -1, '"price" data found?')
++
+     def testReindexObject(self):
+         proc = self.setupProcessor()
+         output = []
+Index: collective.solr/trunk/collective/solr/indexer.py
+===================================================================
+--- collective.solr/trunk/collective/solr/indexer.py	(revision 13521)
++++ collective.solr/trunk/collective/solr/indexer.py	(revision 13522)
+@@ -31,7 +31,7 @@
+     schema = None
+ 
+     def index(self, obj, attributes=None):
+-        data = self.getData(obj)
++        data = self.getData(obj, attributes)
+         self.prepareData(data)
+         self.getConnection().add(**data)
+ 

@@ -1,0 +1,59 @@
+Index: collective.solr/trunk/collective/solr/indexer.py
+===================================================================
+--- collective.solr/trunk/collective/solr/indexer.py	(revision 13571)
++++ collective.solr/trunk/collective/solr/indexer.py	(revision 13572)
+@@ -26,10 +26,10 @@
+     """ a queue processor for solr """
+     implements(ISolrIndexQueueProcessor)
+ 
+-    host = None
+-    port = None
+-    connection = None
+-    schema = None
++    def __init__(self):
++        self.host = None
++        self.port = None
++        self.schema = None      # TODO: schema handling should be moved to `solr.py`
+ 
+     def index(self, obj, attributes=None):
+         conn = self.getConnection()
+@@ -66,6 +66,7 @@
+                 conn.commit()
+             except SolrException, e:
+                 logger.exception('exception during commit')
++            self.closeConnection()
+ 
+     # helper methods
+ 
+@@ -101,18 +102,24 @@
+         self.host = host
+         self.port = port
+         self.base = base
+-        if self.connection is not None:     # need to close connection?
+-            self.connection.close()
+-            self.connection = None
+-            self.schema = None
++        self.closeConnection()
+ 
++    def closeConnection(self):
++        """ close the current connection, if any """
++        if getattr(self, '_v_connection', None) is not None:
++            self._v_connection.close()
++            self._v_connection = None
++            self.schema = None
++        
+     def getConnection(self):
+         """ returns an existing connection (and schema) or opens one """
+-        if self.connection is None and self.host is not None:
++        conn = getattr(self, '_v_connection', None)
++        if conn is None and self.host is not None:
+             host = '%s:%d' % (self.host, self.port)
+-            self.connection = SolrConnection(host=host, solrBase=self.base, persistent=True)
++            conn = SolrConnection(host=host, solrBase=self.base, persistent=True)
++            self._v_connection = conn
+             self.schema = None
+-        return self.connection
++        return conn
+ 
+     def getSchema(self):
+         """ returns the currently used schema of fetches it;

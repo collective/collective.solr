@@ -1,0 +1,84 @@
+Index: collective.solr/trunk/collective/solr/parser.py
+===================================================================
+--- collective.solr/trunk/collective/solr/parser.py	(revision 13428)
++++ collective.solr/trunk/collective/solr/parser.py	(revision 13429)
+@@ -33,9 +33,12 @@
+                 if elem.tag == 'result':
+                     results = self.parseResults(elem, elements)
+                     setattr(self, elem.get('name'), results)
++                elif elem.tag == 'lst':
++                    info = self.parseListing(elem, elements)
++                    setattr(self, elem.get('name'), info)
+ 
+     def parseResults(self, elem, elements):
+-        """ sub-parser for solr search reponses """
++        """ sub-parser for solr search results """
+         results = []
+         flare = None
+         array = None
+@@ -63,3 +66,36 @@
+                     break
+         return results
+ 
++    def parseListing(self, elem, elements):
++        """ sub-parser for solr search information """
++        lst = {}
++        stack = [lst]
++        array = None
++        for action, elem in elements:
++            if action == 'start':
++                if elem.tag == 'lst':   # start of nested dictionary
++                    lst = {}
++                    stack.append(lst)
++                elif elem.tag == 'arr':   # start of array, set it up...
++                    array = []
++                    lst[elem.get('name')] = array
++                else:
++                    unmarshal = unmarshallers.get(elem.tag)
++                    if unmarshal is not None:   # known type?
++                        data = unmarshal(elem)
++                        if array is not None:   # array element
++                            array.append(data)
++                        else:                   # dictionary key/value
++                            lst[elem.get('name')] = data
++            elif action == 'end':
++                if elem.tag == 'arr':   # end of array, "close" it
++                    array = None
++                elif elem.tag == 'lst': # end of nested dictionary
++                    top = stack.pop()
++                    if not stack:
++                        break
++                    lst = stack[-1]
++                    lst[elem.get('name')] = top
++        return lst
++
++
+Index: collective.solr/trunk/collective/solr/tests.py
+===================================================================
+--- collective.solr/trunk/collective/solr/tests.py	(revision 13428)
++++ collective.solr/trunk/collective/solr/tests.py	(revision 13429)
+@@ -323,6 +323,24 @@
+         response = SolrResponse(FACET_XML_RESPONSE)
+         results = response.response     # the result set is named 'response'
+         self.assertEqual(len(results), 0)
++        headers = response.responseHeader
++        self.assertEqual(type(headers), type({}))
++        self.assertEqual(headers['status'], 0)
++        self.assertEqual(headers['QTime'], 1)
++        self.assertEqual(headers['params']['facet.limit'], '-1')
++        self.assertEqual(headers['params']['rows'], '0')
++        self.assertEqual(headers['params']['facet'], 'true')
++        self.assertEqual(headers['params']['facet.field'], ['cat', 'inStock'])
++        self.assertEqual(headers['params']['indent'], '10')
++        self.assertEqual(headers['params']['q'], 'solr')
++        counts = response.facet_counts
++        self.assertEqual(type(counts), type({}))
++        self.assertEqual(counts['facet_queries'], {})
++        self.assertEqual(counts['facet_fields']['cat']['electronics'], 0)
++        self.assertEqual(counts['facet_fields']['cat']['monitor'], 0)
++        self.assertEqual(counts['facet_fields']['cat']['search'], 1)
++        self.assertEqual(counts['facet_fields']['cat']['software'], 1)
++        self.assertEqual(counts['facet_fields']['inStock']['true'], 1)
+ 
+ 
+ def test_suite():

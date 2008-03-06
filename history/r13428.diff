@@ -1,0 +1,22 @@
+Index: collective.solr/trunk/collective/solr/parser.py
+===================================================================
+--- collective.solr/trunk/collective/solr/parser.py	(revision 13427)
++++ collective.solr/trunk/collective/solr/parser.py	(revision 13428)
+@@ -12,7 +12,7 @@
+ }
+ 
+ 
+-class Flare(object):
++class SolrFlare(object):
+     """ a sol(a)r brain; TODO: this should get an interface!! """
+ 
+ 
+@@ -42,7 +42,7 @@
+         for action, elem in elements:
+             if action == 'start':
+                 if elem.tag == 'doc':   # start of result, create brain...
+-                    flare = Flare()
++                    flare = SolrFlare()
+                     results.append(flare)
+                 elif flare is not None:
+                     if elem.tag == 'arr':   # start of array, set it up...

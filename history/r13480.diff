@@ -1,0 +1,40 @@
+Index: collective.solr/trunk/collective/solr/indexer.py
+===================================================================
+--- collective.solr/trunk/collective/solr/indexer.py	(revision 13479)
++++ collective.solr/trunk/collective/solr/indexer.py	(revision 13480)
+@@ -24,6 +24,9 @@
+     """ a queue processor for solr """
+     implements(ISolrIndexQueueProcessor)
+ 
++    connection = None
++    schema = None
++
+     def index(self, obj, attributes=None):
+         portal = getToolByName(obj, 'portal_url').getPortalObject()
+         wrapper = getMultiAdapter((obj,portal), ISolrIndexableObjectWrapper)
+@@ -52,3 +55,25 @@
+     def commit(self):
+         pass
+ 
++    # helper methods
++
++    def setHost(self, host='localhost', port=8983, base='/solr'):
++        """ set connection parameters """
++        self.host = host
++        self.port = port
++        self.base = base
++        if self.connection is not None:     # need to close connection?
++            self.connection.close()
++            self.connection = None
++            self.schema = None
++
++    def getConnection(self):
++        """ returns an existing connection (and schema) or opens one """
++        if self.connection is None:
++            host = '%s:%d' % (self.host, self.port)
++            self.connection = SolrConnection(host=host, base=self.base, persistent=True)
++            self.schema = None
++        if self.schema is None:
++            self.schema = self.connection.getSchema()
++        return self.connection, self.schema
++

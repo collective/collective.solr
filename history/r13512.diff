@@ -1,0 +1,31 @@
+Index: collective.solr/trunk/collective/solr/tests/test_indexer.py
+===================================================================
+--- collective.solr/trunk/collective/solr/tests/test_indexer.py	(revision 13511)
++++ collective.solr/trunk/collective/solr/tests/test_indexer.py	(revision 13512)
+@@ -5,6 +5,13 @@
+ from collective.solr.tests.utils import getData
+ 
+ 
++class Foo:
++    """ dummy test object """
++    def __init__(self, **kw):
++        for key, value in kw.items():
++            setattr(self, key, value)
++
++
+ class QueueIndexerTests(TestCase):
+ 
+     def testPrepareData(self):
+@@ -13,11 +20,7 @@
+         self.assertEqual(data, {'allowedRolesAndUsers': ['user$test_user_1_', 'user$portal_owner']})
+ 
+     def testIndexObject(self):
+-        class Foo:
+-            pass
+-        foo = Foo()
+-        foo.id = '500'
+-        foo.name = 'python test doc'
++        foo = Foo(id='500', name='python test doc')
+         proc = SolrIndexQueueProcessor()
+         proc.setHost()
+         conn = proc.getConnection()

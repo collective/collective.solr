@@ -1,0 +1,26 @@
+Index: collective.solr/trunk/collective/solr/indexer.py
+===================================================================
+--- collective.solr/trunk/collective/solr/indexer.py	(revision 13523)
++++ collective.solr/trunk/collective/solr/indexer.py	(revision 13524)
+@@ -7,16 +7,12 @@
+ 
+ 
+ def datehandler(value):
+-    # We might want to handle datetime and time as well
+-    # XXX check the enfold.solr implementation
++    # TODO: we might want to handle datetime and time as well;
++    # check the enfold.solr implementation
+     if isinstance(value, DateTime):
+-        value = value.toZone('UTC')
+-        value = '%04d-%02d-%02dT%02d:%02d:%06.3fZ' % ( value.year()
+-                                                   , value.month()
+-                                                   , value.day()
+-                                                   , value.hour()
+-                                                   , value.minute()
+-                                                   , value.second())
++        v = value.toZone('UTC')
++        value = '%04d-%02d-%02dT%02d:%02d:%06.3fZ' % (v.year(),
++            v.month(), v.day(), v.hour(), v.minute(), v.second())
+     return value
+ 
+ 

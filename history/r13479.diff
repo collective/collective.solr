@@ -1,0 +1,13 @@
+Index: collective.solr/trunk/setup.py
+===================================================================
+--- collective.solr/trunk/setup.py	(revision 13478)
++++ collective.solr/trunk/setup.py	(revision 13479)
+@@ -26,7 +26,7 @@
+       install_requires=[
+           'setuptools',
+           'elementtree',
+-          # -*- Extra requirements: -*-
++          'collective.indexing',
+       ],
+       entry_points="""
+       # -*- Entry points: -*-

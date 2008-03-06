@@ -1,0 +1,30 @@
+Index: collective.solr/trunk/collective/solr/parser.py
+===================================================================
+--- collective.solr/trunk/collective/solr/parser.py	(revision 13435)
++++ collective.solr/trunk/collective/solr/parser.py	(revision 13436)
+@@ -123,7 +123,7 @@
+ 
+ def handle_literal(func):
+     def handle(elem, stack):
+-        value = func(elem)
++        value = func(elem.text)
+         add_node(value, elem, stack)
+     return handle
+ 
+@@ -137,11 +137,11 @@
+     ('end'  ,'result'):   pop_stack,
+     ('start','doc'):      handle_start_doc,
+     ('end'  ,'doc'):      pop_stack,
+-    ('end'  ,'int'):      handle_literal(lambda x: int(x.text)),
+-    ('end'  ,'float'):    handle_literal(lambda x: float(x.text)),
+-    ('end'  ,'bool'):     handle_literal(lambda x: x.text == 'true'),
+-    ('end'  ,'str'):      handle_literal(lambda x: x.text or ''),
+-    ('end'  ,'date'):     handle_literal(lambda x: DateTime(x.text)),
++    ('end'  ,'int'):      handle_literal(int),
++    ('end'  ,'float'):    handle_literal(float),
++    ('end'  ,'bool'):     handle_literal(lambda x: x == 'true'),
++    ('end'  ,'str'):      handle_literal(lambda x: x or ''),
++    ('end'  ,'date'):     handle_literal(DateTime),
+ }
+ 
+ def parse2(data):

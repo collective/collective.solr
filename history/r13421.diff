@@ -1,0 +1,47 @@
+Index: collective.solr/trunk/collective/solr/tests.py
+===================================================================
+--- collective.solr/trunk/collective/solr/tests.py	(revision 13420)
++++ collective.solr/trunk/collective/solr/tests.py	(revision 13421)
+@@ -152,6 +152,16 @@
+         output = ''.join(output)
+         self.failUnlessEqual(output, COMMIT_REQUEST)
+ 
++        # Status
++        node = res.findall(".//int")[0]
++        self.failUnlessEqual(node.attrib['name'], 'status')
++        self.failUnlessEqual(node.text, '0')
++        # QTime
++        node = res.findall(".//int")[1]
++        self.failUnlessEqual(node.attrib['name'], 'QTime')
++        self.failUnlessEqual(node.text, '55')
++        res.find('QTime')
++
+     def test_search(self):
+         output = []
+         c = SolrConnection(host='localhost:8983', persistent=True)
+@@ -161,6 +171,9 @@
+         output = ''.join(output)
+         self.failUnlessEqual(output, SEARCH_REQUEST)
+ 
++        self.failUnless(res.find(('.//doc')))
++
++
+     def test_delete(self):
+         output = []
+         c = SolrConnection(host='localhost:8983', persistent=True)
+@@ -170,6 +183,15 @@
+         output = ''.join(output)
+         self.failUnlessEqual(output, DELETE_REQUEST)
+ 
++        # Status
++        node = res.findall(".//int")[0]
++        self.failUnlessEqual(node.attrib['name'], 'status')
++        self.failUnlessEqual(node.text, '0')
++        # QTime
++        node = res.findall(".//int")[1]
++        self.failUnlessEqual(node.attrib['name'], 'QTime')
++        self.failUnlessEqual(node.text, '0')
++        res.find('QTime')
+ 
+ 
+ def test_suite():

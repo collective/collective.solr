@@ -1,0 +1,17 @@
+Index: collective.solr/trunk/TODO.txt
+===================================================================
+--- collective.solr/trunk/TODO.txt	(revision 13615)
++++ collective.solr/trunk/TODO.txt	(revision 13616)
+@@ -1,11 +1,11 @@
+ TODOs:
+-* make sure the queueing kicks in (test?)
+ * browsertest for indexing
+ * move caching of schema to `solr.py`
+ * implement on/off switch and configlet
+ * provide decorator for solr exceptions
+ * what about http timeouts?
+ * design and hook up searching
++* add a configurable queue limit for large transactions
+ * mapping from accessor name to attribute name, i.e. getTitle -> title,
+   preferably via <copyField> tags in the solr schema
+ * evaluate http://www.gnuenterprise.org/~jcater/solr.py as a replacement

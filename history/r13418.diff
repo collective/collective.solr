@@ -1,0 +1,424 @@
+Index: collective.solr/trunk/setup.py
+===================================================================
+--- collective.solr/trunk/setup.py	(revision 13417)
++++ collective.solr/trunk/setup.py	(revision 13418)
+@@ -25,6 +25,7 @@
+       zip_safe=False,
+       install_requires=[
+           'setuptools',
++          'elementtree',
+           # -*- Extra requirements: -*-
+       ],
+       entry_points="""
+Index: collective.solr/trunk/collective/solr/solr.py
+===================================================================
+--- collective.solr/trunk/collective/solr/solr.py	(revision 13417)
++++ collective.solr/trunk/collective/solr/solr.py	(revision 13418)
+@@ -22,7 +22,7 @@
+ #
+ # quick examples on use:
+ #
+-# from solr import *
++# from collective.solr.solr import *
+ # c = SolrConnection(host='localhost:8983', persistent=True)
+ # c.add(id='500',name='python test doc')
+ # c.delete('123')
+@@ -33,7 +33,10 @@
+ 
+ import httplib
+ import socket
+-from xml.dom.minidom import parseString
++from StringIO import StringIO 
++from elementtree.ElementTree import fromstring
++from elementtree.ElementTree import parse as xml_parse
++from xml.sax.saxutils import escape
+ import codecs
+ import urllib
+ 
+@@ -60,11 +63,11 @@
+         self.persistent = persistent
+         self.reconnects = 0
+         self.encoder = codecs.getencoder('utf-8')
+-        #responses from Solr will always be in UTF-8
++        # responses from Solr will always be in UTF-8
+         self.decoder = codecs.getdecoder('utf-8')  
+-        #a real connection to the server is not opened at this point.
++        # a real connection to the server is not opened at this point.
+         self.conn = httplib.HTTPConnection(self.host)
+-        #self.conn.set_debuglevel(1000000)
++        # self.conn.set_debuglevel(1000000)
+         self.xmlheaders = {'Content-Type': 'text/xml; charset=utf-8'}
+         self.xmlheaders.update(postHeaders)
+         if not self.persistent: self.xmlheaders['Connection']='close'
+@@ -76,10 +79,15 @@
+             (self.host, self.solrBase, self.persistent, self.xmlheaders, self.reconnects)
+ 
+     def __reconnect(self):
+-        self.reconnects+=1
++        self.reconnects += 1
+         self.conn.close()
+         self.conn.connect()
+ 
++    reset = __reconnect
++
++    def close(self):
++        self.conn.close()
++
+     def __errcheck(self,rsp):
+         if rsp.status != 200:
+             ex = SolrException(rsp.status, rsp.reason)
+@@ -111,14 +119,12 @@
+             if not self.persistent: self.conn.close()
+         #detect old-style error response (HTTP response code of
+         #200 with a non-zero status.
+-        if data.startswith('<result status="') and not data.startswith('<result status="0"'):
+-            data = self.decoder(data)[0]
+-            parsed = parseString(data)
+-            status = parsed.documentElement.getAttribute('status')
+-            if status != 0:
+-                reason = parsed.documentElement.firstChild.nodeValue
+-                raise SolrException(rsp.status, reason)
+-        return data
++        parsed = fromstring(self.decoder(data)[0])
++        status = parsed.attrib.get('status', 0)
++        if status != 0:
++            reason = parsed.documentElement.firstChild.nodeValue
++            raise SolrException(rsp.status, reason)
++        return parsed
+ 
+     def escapeVal(self,val):
+         val = val.replace("&", "&amp;")
+@@ -153,11 +159,11 @@
+     def __add(self, lst, fields):
+         lst.append('<doc>')
+         for f,v in fields.items():
+-        if isinstance(v, list): # multi-valued
+-            for value in v:
+-                self.__makeField(lst, f, value)
+-        else:
+-            self.__makeField(lst, f, v) 
++            if isinstance(v, list): # multi-valued
++                for value in v:
++                    self.__makeField(lst, f, value)
++            else:
++                self.__makeField(lst, f, v) 
+         lst.append('</doc>')
+ 
+     def add(self, **fields):
+@@ -185,12 +191,26 @@
+         return self.doUpdateXML(xstr)
+ 
+     def search(self, **params):
+-        request=urllib.urlencode(params, doseq=True)
++        request = urllib.urlencode(params, doseq=True)
+         try:
+             rsp = self.doPost(self.solrBase+'/select', request, self.formheaders)
+             data = rsp.read()
+         finally:
+             if not self.persistent: self.conn.close()
+-        return data
++        parsed = fromstring(data)
++        return parsed
+ 
+-    
+\ No newline at end of file
++    def getSchema(self):
++        def _parseElement(el):
++            el_dict = {}
++            fields = ('indexed', 'stored', 'type', 'required')
++            for field in fields:
++                el_dict[field] = el.get(field)
++            return el.get('name'), el_dict
++
++        url = self.solrBase + '/admin/get-file.jsp?file=schema.xml'
++        self.conn.request('GET', url)
++        xml = self.__errcheck(self.conn.getresponse()).read()
++        xml = StringIO(xml.strip())
++        elem = xml_parse(xml).getroot()
++        return [_parseElement(el) for el in elem.findall('fields/field')]
+Index: collective.solr/trunk/collective/solr/tests.py
+===================================================================
+--- collective.solr/trunk/collective/solr/tests.py	(revision 13417)
++++ collective.solr/trunk/collective/solr/tests.py	(revision 13418)
+@@ -1,54 +1,238 @@
+ import unittest
++import httplib
+ 
+-from zope.testing import doctestunit
+-from zope.component import testing
+-from Testing import ZopeTestCase as ztc
+-
+-from Products.Five import zcml
+-from Products.Five import fiveconfigure
+-from Products.PloneTestCase import PloneTestCase as ptc
+-from Products.PloneTestCase.layer import PloneSite
+-ptc.setupPloneSite()
+-
+-import collective.solr
+-
+-class TestCase(ptc.PloneTestCase):
+-    class layer(PloneSite):
+-        @classmethod
+-        def setUp(cls):
+-            fiveconfigure.debug_mode = True
+-            zcml.load_config('configure.zcml',
+-                             collective.solr)
+-            fiveconfigure.debug_mode = False
+-
+-        @classmethod
+-        def tearDown(cls):
+-            pass
++import StringIO
+ 
++from collective.solr.solr import SolrConnection
+ 
+-def test_suite():
+-    return unittest.TestSuite([
+-
+-        # Unit tests
+-        #doctestunit.DocFileSuite(
+-        #    'README.txt', package='collective.solr',
+-        #    setUp=testing.setUp, tearDown=testing.tearDown),
++ADD = """POST /solr/update HTTP/1.1\r
++Host: localhost\r
++Accept-Encoding: identity\r
++Content-Length: 92\r
++Content-Type: text/xml; charset=utf-8\r
++\r
++<add><doc><field name="id">500</field><field name="name">python test doc</field></doc></add>"""
++
++
++RESPONSE1 = """HTTP/1.1 200 OK
++Content-Type: text/xml; charset=utf-8
++Content-Length: 147
++Server: Jetty(6.1.3)
++
++<?xml version="1.0" encoding="UTF-8"?>
++<response>
++<lst name="responseHeader"><int name="status">0</int><int name="QTime">4</int></lst>
++</response>
++
++"""
++
++
++COMMIT = """POST /solr/update HTTP/1.1\r
++Host: localhost\r
++Accept-Encoding: identity\r
++Content-Length: 9\r
++Content-Type: text/xml; charset=utf-8\r
++\r
++<commit/>\r"""
++
++RESPONSE2 = """HTTP/1.1 200 OK
++Content-Type: text/xml; charset=utf-8
++Content-Length: 148
++Server: Jetty(6.1.3)
++
++<?xml version="1.0" encoding="UTF-8"?>
++<response>
++<lst name="responseHeader"><int name="status">0</int><int name="QTime">55</int></lst>
++</response>
++
++"""
++
++SEARCH = """POST /solr/select HTTP/1.1\r
++Host: localhost\r
++Accept-Encoding: identity\r
++Content-Length: 48\r
++Content-Type: application/x-www-form-urlencoded; charset=utf-8\r
++\r
++q=id%3A%5B%2A+TO+%2A%5D&rows=10&wt=xml&indent=on\r"""
++
++
++SEARCHRESPONSE = """HTTP/1.1 200 OK
++Content-Type: text/xml; charset=utf-8
++Content-Length: 560
++Server: Jetty(6.1.3)
++
++<?xml version="1.0" encoding="UTF-8"?>
++<response>
++
++<lst name="responseHeader">
++ <int name="status">0</int>
++ <int name="QTime">0</int>
++ <lst name="params">
++  <str name="wt">xml</str>
++  <str name="indent">on</str>
++  <str name="rows">10</str>
++  <str name="q">id:[* TO *]</str>
++ </lst>
++</lst>
++<result name="response" numFound="1" start="0">
++ <doc>
++  <str name="id">500</str>
++  <str name="name">python test doc</str>
++  <int name="popularity">0</int>
++  <str name="sku">500</str>
++  <date name="timestamp">2008-02-29T16:11:46.998Z</date>
++ </doc>
++</result>
++</response>
++
++"""
++
++
++DELETE = """POST /solr/update HTTP/1.1\r
++Host: localhost\r
++Accept-Encoding: identity\r
++Content-Length: 29\r
++Content-Type: text/xml; charset=utf-8\r
++\r
++<delete><id>500</id></delete>"""
++
++RESPONSE3 = """HTTP/1.1 200 OK
++Content-Type: text/xml; charset=utf-8
++Content-Length: 147
++Server: Jetty(6.1.3)
++
++<?xml version="1.0" encoding="UTF-8"?>
++<response>
++<lst name="responseHeader"><int name="status">0</int><int name="QTime">0</int></lst>
++</response>
++
++"""
++
++
++COMMIT2 = """POST /solr/update HTTP/1.1\r
++Host: localhost\r
++Accept-Encoding: identity\r
++Content-Length: 9\r
++Content-Type: text/xml; charset=utf-8\r
++\r
++<commit/>\r"""
++
++RESPONSE4 = """HTTP/1.1 200 OK
++Content-Type: text/xml; charset=utf-8
++Content-Length: 148
++Server: Jetty(6.1.3)
++
++<?xml version="1.0" encoding="UTF-8"?>
++<response>
++<lst name="responseHeader"><int name="status">0</int><int name="QTime">43</int></lst>
++</response>
++
++"""
++
++
++
++CONFIRM = """HTTP/1.1 200 OK
++Content-Type: text/xml; charset=utf-8
++Content-Length: 593
++Server: Jetty(6.1.3)
++
++<?xml version="1.0" encoding="UTF-8"?>
++<response>
++
++<lst name="responseHeader">
++ <int name="status">0</int>
++ <int name="QTime">1</int>
++ <lst name="params">
++  <str name="indent">on</str>
++  <str name="rows">10</str>
++  <str name="start">0</str>
++  <str name="q">id:[* TO *]</str>
++  <str name="version">2.2</str>
++ </lst>
++</lst>
++<result name="response" numFound="1" start="0">
++ <doc>
++  <str name="id">500</str>
++  <str name="name">python test doc</str>
++  <int name="popularity">0</int>
++  <str name="sku">500</str>
++  <date name="timestamp">2008-02-29T14:09:10.558Z</date>
++ </doc>
++</result>
++</response>
++
++"""
++
++
++QUERYRESULT = """<?xml version="1.0" encoding="UTF-8"?>
++<response>
++
++<lst name="responseHeader">
++ <int name="status">0</int>
++ <int name="QTime">0</int>
++ <lst name="params">
++  <str name="indent">on</str>
++  <str name="rows">10</str>
++
++  <str name="start">0</str>
++  <str name="q">id:[* TO *]</str>
++  <str name="version">2.2</str>
++ </lst>
++</lst>
++<result name="response" numFound="1" start="0">
++ <doc>
++  <str name="id">500</str>
++
++  <str name="name">python test doc</str>
++  <int name="popularity">0</int>
++  <str name="sku">500</str>
++  <date name="timestamp">2008-02-29T13:47:15.334Z</date>
++ </doc>
++</result>
++</response>
++"""
++
++class TestSolr(unittest.TestCase):
++    def fakehttp(self, solrconn, fakedata, output):
++        class FakeSocket(StringIO.StringIO):
++            def sendall(self, str): output.append(str)
++            def makefile(self, mode, name): return self
++            def read(self, amt=None):
++                if self.closed: return ''
++                return StringIO.StringIO.read(self, amt)
++            def readline(self, length=None):
++                if self.closed: return ''
++                return StringIO.StringIO.readline(self, length)
++        class FakeHTTPConnection(httplib.HTTPConnection):
++            def connect(self):
++                self.sock = FakeSocket(fakedata)
++        solrconn.conn = FakeHTTPConnection(solrconn.conn.host)
++
++    def test_add(self):
++        output = []
++        c = SolrConnection(host='localhost:8983', persistent=True)
++        self.fakehttp(c, RESPONSE1, output)
++        res = c.add(id='500',name='python test doc')
++
++        output = ''.join(output)
++        self.failUnlessEqual(output, ADD)
++        # Status
++        node = res.findall(".//int")[0]
++        self.failUnlessEqual(node.attrib['name'], 'status')
++        self.failUnlessEqual(node.text, '0')
++        # QTime
++        node = res.findall(".//int")[1]
++        self.failUnlessEqual(node.attrib['name'], 'QTime')
++        self.failUnlessEqual(node.text, '4')
++        res.find('QTime')
+ 
+-        #doctestunit.DocTestSuite(
+-        #    module='collective.solr.mymodule',
+-        #    setUp=testing.setUp, tearDown=testing.tearDown),
+ 
+ 
+-        # Integration tests that use PloneTestCase
+-        #ztc.ZopeDocFileSuite(
+-        #    'README.txt', package='collective.solr',
+-        #    test_class=TestCase),
+-
+-        #ztc.FunctionalDocFileSuite(
+-        #    'browser.txt', package='collective.solr',
+-        #    test_class=TestCase),
++def test_suite():
++    return unittest.TestSuite((
++        unittest.makeSuite( TestSolr ),
++        ))
+ 
+-        ])
+ 
+ if __name__ == '__main__':
+     unittest.main(defaultTest='test_suite')

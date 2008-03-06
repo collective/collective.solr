@@ -1,0 +1,96 @@
+Index: collective.solr/trunk/collective/solr/tests/test_parser2.py
+===================================================================
+--- collective.solr/trunk/collective/solr/tests/test_parser2.py	(revision 13447)
++++ collective.solr/trunk/collective/solr/tests/test_parser2.py	(revision 13448)
+@@ -7,30 +7,24 @@
+ 
+ class ParserTests(TestCase):
+ 
+-    def testParseFacetSearchResults(self):
+-        facet_xml_response = getData('facet_xml_response.txt')
+-        response = parse2(facet_xml_response)
+-        self.failUnless(response)
++    def testParseSimpleSearchResults(self):
++        search_response = getData('search_response.txt')
++        response = parse2(search_response.split('\n\n', 1)[1])
+         results = response.getResults()
+-        self.assertEqual(len(results), 0)
++        match = results[0]
++        self.assertEqual(len(results), 1)
++        self.assertEqual(match.id, '500')
++        self.assertEqual(match.name, 'python test doc')
++        self.assertEqual(match.popularity, 0)
++        self.assertEqual(match.sku, '500')
++        self.assertEqual(match.timestamp, DateTime('2008-02-29 16:11:46.998 GMT'))
+         headers = response.getHeaders()
+-        self.assertEqual(type(headers), type({}))
+         self.assertEqual(headers['status'], 0)
+-        self.assertEqual(headers['QTime'], 1)
+-        self.assertEqual(headers['params']['facet.limit'], '-1')
+-        self.assertEqual(headers['params']['rows'], '0')
+-        self.assertEqual(headers['params']['facet'], 'true')
+-        self.assertEqual(headers['params']['facet.field'], ['cat', 'inStock'])
+-        self.assertEqual(headers['params']['indent'], '10')
+-        self.assertEqual(headers['params']['q'], 'solr')
+-        counts = response['facet_counts']
+-        self.assertEqual(type(counts), type({}))
+-        self.assertEqual(counts['facet_queries'], {})
+-        self.assertEqual(counts['facet_fields']['cat']['electronics'], 0)
+-        self.assertEqual(counts['facet_fields']['cat']['monitor'], 0)
+-        self.assertEqual(counts['facet_fields']['cat']['search'], 1)
+-        self.assertEqual(counts['facet_fields']['cat']['software'], 1)
+-        self.assertEqual(counts['facet_fields']['inStock']['true'], 1)
++        self.assertEqual(headers['QTime'], 0)
++        self.assertEqual(headers['params']['wt'], 'xml')
++        self.assertEqual(headers['params']['indent'], 'on')
++        self.assertEqual(headers['params']['rows'], '10')
++        self.assertEqual(headers['params']['q'], 'id:[* TO *]')
+ 
+     def testParseComplexSearchResults(self):
+         complex_xml_response = getData('complex_xml_response.txt')
+@@ -57,24 +51,30 @@
+         self.assertEqual(headers['params']['q'], 'id:[* TO *]')
+         self.assertEqual(headers['params']['version'], '2.2')
+ 
+-    def testParseSearchResponse(self):
+-        search_response = getData('search_response.txt')
+-        response = parse2(search_response.split('\n\n', 1)[1])
++    def testParseFacetSearchResults(self):
++        facet_xml_response = getData('facet_xml_response.txt')
++        response = parse2(facet_xml_response)
++        self.failUnless(response)
+         results = response.getResults()
+-        match = results[0]
+-        self.assertEqual(len(results), 1)
+-        self.assertEqual(match.id, '500')
+-        self.assertEqual(match.name, 'python test doc')
+-        self.assertEqual(match.popularity, 0)
+-        self.assertEqual(match.sku, '500')
+-        self.assertEqual(match.timestamp, DateTime('2008-02-29 16:11:46.998 GMT'))
++        self.assertEqual(len(results), 0)
+         headers = response.getHeaders()
++        self.assertEqual(type(headers), type({}))
+         self.assertEqual(headers['status'], 0)
+-        self.assertEqual(headers['QTime'], 0)
+-        self.assertEqual(headers['params']['wt'], 'xml')
+-        self.assertEqual(headers['params']['indent'], 'on')
+-        self.assertEqual(headers['params']['rows'], '10')
+-        self.assertEqual(headers['params']['q'], 'id:[* TO *]')
++        self.assertEqual(headers['QTime'], 1)
++        self.assertEqual(headers['params']['facet.limit'], '-1')
++        self.assertEqual(headers['params']['rows'], '0')
++        self.assertEqual(headers['params']['facet'], 'true')
++        self.assertEqual(headers['params']['facet.field'], ['cat', 'inStock'])
++        self.assertEqual(headers['params']['indent'], '10')
++        self.assertEqual(headers['params']['q'], 'solr')
++        counts = response['facet_counts']
++        self.assertEqual(type(counts), type({}))
++        self.assertEqual(counts['facet_queries'], {})
++        self.assertEqual(counts['facet_fields']['cat']['electronics'], 0)
++        self.assertEqual(counts['facet_fields']['cat']['monitor'], 0)
++        self.assertEqual(counts['facet_fields']['cat']['search'], 1)
++        self.assertEqual(counts['facet_fields']['cat']['software'], 1)
++        self.assertEqual(counts['facet_fields']['inStock']['true'], 1)
+ 
+ 
+ def test_suite():

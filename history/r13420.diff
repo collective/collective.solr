@@ -1,0 +1,58 @@
+Index: collective.solr/trunk/collective/solr/tests.py
+===================================================================
+--- collective.solr/trunk/collective/solr/tests.py	(revision 13419)
++++ collective.solr/trunk/collective/solr/tests.py	(revision 13420)
+@@ -33,7 +33,7 @@
+ Content-Length: 9\r
+ Content-Type: text/xml; charset=utf-8\r
+ \r
+-<commit/>\r"""
++<commit/>"""
+ 
+ COMMIT_RESPONSE = """HTTP/1.1 200 OK
+ Content-Type: text/xml; charset=utf-8
+@@ -53,7 +53,7 @@
+ Content-Length: 48\r
+ Content-Type: application/x-www-form-urlencoded; charset=utf-8\r
+ \r
+-q=id%3A%5B%2A+TO+%2A%5D&rows=10&wt=xml&indent=on\r"""
++q=id%3A%5B%2A+TO+%2A%5D&rows=10&wt=xml&indent=on"""
+ 
+ 
+ SEARCH_RESPONSE = """HTTP/1.1 200 OK
+@@ -143,29 +143,29 @@
+         self.failUnlessEqual(node.text, '4')
+         res.find('QTime')
+ 
+-    def DONTtest_commit(self):
++    def test_commit(self):
+         output = []
+         c = SolrConnection(host='localhost:8983', persistent=True)
+         self.fakehttp(c, COMMIT_RESPONSE, output)
+-        res = c.add(id='500',name='python test doc')
++        res = c.commit()
+ 
+         output = ''.join(output)
+         self.failUnlessEqual(output, COMMIT_REQUEST)
+ 
+-    def DONTtest_search(self):
++    def test_search(self):
+         output = []
+         c = SolrConnection(host='localhost:8983', persistent=True)
+         self.fakehttp(c, SEARCH_RESPONSE, output)
+-        res = c.add(id='500',name='python test doc')
++        res = c.search(q='id:[* TO *]', wt='xml', rows='10',indent='on')
+ 
+         output = ''.join(output)
+         self.failUnlessEqual(output, SEARCH_REQUEST)
+ 
+-    def DONTtest_delete(self):
++    def test_delete(self):
+         output = []
+         c = SolrConnection(host='localhost:8983', persistent=True)
+         self.fakehttp(c, DELETE_RESPONSE, output)
+-        res = c.add(id='500',name='python test doc')
++        res = c.delete('500')
+ 
+         output = ''.join(output)
+         self.failUnlessEqual(output, DELETE_REQUEST)

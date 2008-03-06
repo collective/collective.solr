@@ -1,0 +1,52 @@
+Index: collective.solr/trunk/collective/solr/tests/test_indexablewrapper.py
+===================================================================
+--- collective.solr/trunk/collective/solr/tests/test_indexablewrapper.py	(revision 13463)
++++ collective.solr/trunk/collective/solr/tests/test_indexablewrapper.py	(revision 13464)
+@@ -1,18 +1,14 @@
+ from unittest import TestSuite, makeSuite, main
+ 
+-from zope.component import adapts, getMultiAdapter
+-from zope.component import provideUtility
+-from transaction import savepoint, commit, abort
++from zope.component import getMultiAdapter
+ 
+ from Products.Five import zcml
+ from Products.Five import fiveconfigure
+ from Products.PloneTestCase import PloneTestCase as ptc
+-from Products.PloneTestCase.layer import PloneSite
+ from Products.PloneTestCase.layer import onsetup
+ 
+ import collective.solr
+ from collective.solr.indexablewrapper import ISolrIndexableObjectWrapper
+-from collective.solr.indexablewrapper import SolrExtensibleIndexableObjectWrapper
+ 
+ 
+ @onsetup
+Index: collective.solr/trunk/collective/solr/indexablewrapper.py
+===================================================================
+--- collective.solr/trunk/collective/solr/indexablewrapper.py	(revision 13463)
++++ collective.solr/trunk/collective/solr/indexablewrapper.py	(revision 13464)
+@@ -1,14 +1,16 @@
+-from zope.interface import Interface, implements, providedBy
+-from zope.component import adapts, getMultiAdapter
++from zope.interface import Interface, implements
++from zope.component import adapts
+ 
+ from plone.app.content.interfaces import IIndexableObjectWrapper
+ from Products.CMFCore.interfaces import ISiteRoot
+ from Products.CMFPlone.CatalogTool import ExtensibleIndexableObjectWrapper
+ 
++
+ class ISolrIndexableObjectWrapper(IIndexableObjectWrapper):
+     """Interface to look up Solr wrapper, needed to modify
+     data specific to Solr, like $ instead of : in allowedRolesAndUsers"""
+ 
++
+ class SolrExtensibleIndexableObjectWrapper(ExtensibleIndexableObjectWrapper):
+     """Override allowedRolesAndUsers"""
+     implements(ISolrIndexableObjectWrapper)
+@@ -19,3 +21,4 @@
+         res = self.__getattr__('allowedRolesAndUsers')
+         res = [r.replace(':','$') for r in res]
+         return res
++

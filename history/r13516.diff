@@ -1,0 +1,19 @@
+Index: collective.solr/trunk/collective/solr/tests/test_indexer.py
+===================================================================
+--- collective.solr/trunk/collective/solr/tests/test_indexer.py	(revision 13515)
++++ collective.solr/trunk/collective/solr/tests/test_indexer.py	(revision 13516)
+@@ -36,12 +36,12 @@
+         output = ''.join(output).replace('\r', '')
+         self.assertEqual(output, getData('add_request.txt'))
+ 
+-    def testRendexObject(self):
++    def testReindexObject(self):
+         proc = self.setupProcessor()
+         output = []
+         response = getData('add_response.txt')
+         fakehttp(proc.getConnection(), response, output)    # fake add response
+-        proc.reindex(Foo(id='500', name='python test doc')) # indexing sends data
++        proc.reindex(Foo(id='500', name='python test doc')) # reindexing sends data
+         output = ''.join(output).replace('\r', '')
+         self.assertEqual(output, getData('add_request.txt'))
+ 

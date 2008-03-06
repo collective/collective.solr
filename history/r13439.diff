@@ -1,0 +1,13 @@
+Index: collective.solr/trunk/collective/solr/parser.py
+===================================================================
+--- collective.solr/trunk/collective/solr/parser.py	(revision 13438)
++++ collective.solr/trunk/collective/solr/parser.py	(revision 13439)
+@@ -45,7 +45,7 @@
+         """ parse a solr response contained in a string or file-like object """
+         if isinstance(data, basestring):
+             data = StringIO(data)
+-        stack = [self]
++        stack = [self]      # the response object is the outmost container
+         elements = iterparse(data, events=('start', 'end'))
+         for action, elem in elements:
+             tag = elem.tag

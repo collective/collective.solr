@@ -1,0 +1,69 @@
+Index: collective.solr/trunk/collective/solr/tests/test_parser.py
+===================================================================
+--- collective.solr/trunk/collective/solr/tests/test_parser.py	(revision 13454)
++++ collective.solr/trunk/collective/solr/tests/test_parser.py	(revision 13455)
+@@ -12,6 +12,8 @@
+         search_response = getData('search_response.txt')
+         response = SolrResponse(search_response.split('\n\n', 1)[1])
+         results = response.response     # the result set is named 'response'
++        self.assertEqual(results.numFound, '1')
++        self.assertEqual(results.start, '0')
+         match = results[0]
+         self.assertEqual(len(results), 1)
+         self.assertEqual(match.id, '500')
+@@ -31,6 +33,8 @@
+         complex_xml_response = getData('complex_xml_response.txt')
+         response = SolrResponse(complex_xml_response)
+         results = response.response     # the result set is named 'response'
++        self.assertEqual(results.numFound, '2')
++        self.assertEqual(results.start, '0')
+         self.assertEqual(len(results), 2)
+         first = results[0]
+         self.assertEqual(first.cat, ['software', 'search'])
+@@ -55,6 +59,8 @@
+         facet_xml_response = getData('facet_xml_response.txt')
+         response = SolrResponse(facet_xml_response)
+         results = response.response     # the result set is named 'response'
++        self.assertEqual(results.numFound, '1')
++        self.assertEqual(results.start, '0')
+         self.assertEqual(len(results), 0)
+         headers = response.responseHeader
+         self.assertEqual(type(headers), type({}))
+Index: collective.solr/trunk/collective/solr/parser.py
+===================================================================
+--- collective.solr/trunk/collective/solr/parser.py	(revision 13454)
++++ collective.solr/trunk/collective/solr/parser.py	(revision 13455)
+@@ -7,6 +7,11 @@
+     """ a sol(a)r brain; TODO: this should get an interface!! """
+ 
+ 
++class SolrResults(list):
++    """ a list of results returned from solr, i.e. sol(a)r flares
++        TODO: this should get an interface!! """
++
++
+ # unmarshallers for basic types
+ unmarshallers = {
+     'null': lambda x: None,
+@@ -23,7 +28,7 @@
+ nested = {
+     'arr': list,
+     'lst': dict,
+-    'result': list,
++    'result': SolrResults,
+     'doc': SolrFlare,
+ }
+ 
+@@ -54,7 +59,11 @@
+             tag = elem.tag
+             if action == 'start':
+                 if nested.has_key(tag):
+-                    stack.append(nested[tag]())
++                    data = nested[tag]()
++                    for key, value in elem.attrib.items():
++                        if not key == 'name':   # set extra attributes
++                            setattr(data, key, value)
++                    stack.append(data)
+                 elif unmarshallers.has_key(tag):
+                     data = unmarshallers[tag](elem.text)
+                     setter(stack[-1], elem.get('name'), data)
