@@ -59,7 +59,7 @@ class TestCase(ptc.PloneTestCase):
         self.proc.getSchema()           # read and cache the schema
 
     def beforeTearDown(self):
-        self.proc.closeConnection()
+        self.proc.closeConnection(clearSchema=True)
 
     def testIndexObject(self):
         output = []

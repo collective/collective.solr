@@ -5,6 +5,7 @@ from logging import getLogger
 
 from collective.solr.interfaces import ISolrIndexQueueProcessor
 from collective.solr.solr import SolrConnection, SolrException
+from collective.solr.local import getLocal, setLocal
 
 logger = getLogger('collective.solr.indexer')
 
@@ -29,14 +30,13 @@ class SolrIndexQueueProcessor(Persistent):
     def __init__(self):
         self.host = None
         self.port = None
-        self.schema = None      # TODO: schema handling should be moved to `solr.py`
 
     def index(self, obj, attributes=None):
         conn = self.getConnection()
         if conn is not None:
             data = self.getData(obj, attributes)
             self.prepareData(data)
-            try:
+            try:                          
                 logger.debug('indexing %r (%r)', obj, data)
                 conn.add(**data)
             except SolrException, e:
@@ -75,6 +75,8 @@ class SolrIndexQueueProcessor(Persistent):
 
     def getData(self, obj, attributes=None):
         schema = self.getSchema()
+        if schema is None:
+            return {}
         if attributes is None:
             attributes = schema.keys()
         data, marker = {}, []
@@ -102,34 +104,37 @@ class SolrIndexQueueProcessor(Persistent):
         self.host = host
         self.port = port
         self.base = base
-        self.closeConnection()
+        self.closeConnection(clearSchema=True)
 
-    def closeConnection(self):
+    def closeConnection(self, clearSchema=False):
         """ close the current connection, if any """
         logger.debug('closing connection')
-        if getattr(self, '_v_connection', None) is not None:
-            self._v_connection.close()
-            self._v_connection = None
-            self.schema = None
-        
+        conn = getLocal('connection')
+        if conn is not None:
+            conn.close()
+            setLocal('connection', None)
+            if clearSchema:
+                setLocal('schema', None)
+
     def getConnection(self):
-        """ returns an existing connection (and schema) or opens one """
-        conn = getattr(self, '_v_connection', None)
+        """ returns an existing connection or opens one """
+        conn = getLocal('connection')
         if conn is None and self.host is not None:
             host = '%s:%d' % (self.host, self.port)
             logger.debug('opening connection to %s', host)
             conn = SolrConnection(host=host, solrBase=self.base, persistent=True)
-            self._v_connection = conn
-            self.schema = None
+            setLocal('connection', conn)
         return conn
 
     def getSchema(self):
         """ returns the currently used schema of fetches it;
             TODO: move schema handling (multi-value etc) into `SolrConnection` """
-        if self.schema is None:
+        schema = getLocal('schema')
+        if schema is None:
             conn = self.getConnection()
             if conn is not None:
                 logger.debug('getting schema from solr')
-                self.schema = conn.getSchema()
-        return self.schema
+                schema = conn.getSchema()
+                setLocal('schema', schema)
+        return schema
 
