@@ -9,6 +9,8 @@
 
   <configure zcml:condition="installed plone.app.controlpanel">
 
+    <include package=".browser" />
+
     <adapter factory=".configlet.SolrControlPanelAdapter" />
 
     <browser:page
