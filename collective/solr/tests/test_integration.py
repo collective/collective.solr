@@ -50,17 +50,20 @@ class TestCase(ptc.PloneTestCase):
         solr = queryUtility(ISolrIndexQueueProcessor)
         self.failUnless(solr in [util for name, util in procs], 'solr utility not found')
 
-    def setupProcessor(self, schema='plone_schema.xml'):
-        proc = queryUtility(ISolrIndexQueueProcessor)
-        proc.setHost()
-        conn = proc.getConnection()
-        fakehttp(conn, getData(schema), []) # fake schema response
-        proc.getSchema()                    # read and cache the schema
-        return conn                         # return connection for faking requests
+    def afterSetUp(self):
+        schema = getData('plone_schema.xml')
+        self.proc = queryUtility(ISolrIndexQueueProcessor)
+        self.proc.setHost()
+        conn = self.proc.getConnection()
+        fakehttp(conn, schema, [])      # fake schema response
+        self.proc.getSchema()           # read and cache the schema
+
+    def beforeTearDown(self):
+        self.proc.closeConnection()
 
     def testIndexObject(self):
         output = []
-        connection = self.setupProcessor()
+        connection = self.proc.getConnection()
         response = getData('add_response.txt')
         fakehttp(connection, response, output)              # fake add response
         self.folder.processForm(values={'title': 'Foo'})    # updating sends data
