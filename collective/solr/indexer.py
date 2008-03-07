@@ -1,8 +1,7 @@
-from zope.interface import implements
+from logging import getLogger
 from persistent import Persistent
 from DateTime import DateTime
-from logging import getLogger
-
+from zope.interface import implements
 from collective.solr.interfaces import ISolrIndexQueueProcessor
 from collective.solr.solr import SolrConnection, SolrException
 from collective.solr.local import getLocal, setLocal
@@ -36,7 +35,7 @@ class SolrIndexQueueProcessor(Persistent):
         if conn is not None:
             data = self.getData(obj, attributes)
             self.prepareData(data)
-            try:                          
+            try:
                 logger.debug('indexing %r (%r)', obj, data)
                 conn.add(**data)
             except SolrException, e:

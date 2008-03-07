@@ -1,13 +1,13 @@
 TODOs:
-* add thread-local connection handling and signal handlers (from store.py)
-* browsertest for indexing
-* browser view for reindexing
-* move caching of schema to `solr.py`
 * implement on/off switch and configlet
-* error handling for stale connections
-* provide decorator for solr exceptions
-* what about http timeouts?
+* browser view for reindexing
 * design and hook up searching
+* browsertest for indexing
+
+* provide decorator for solr exceptions
+* error handling for stale connections
+* add signal handlers (see store.py)
+* what about http timeouts?
 * add a configurable queue limit for large transactions
 * mapping from accessor name to attribute name, i.e. getTitle -> title,
   preferably via <copyField> tags in the solr schema
