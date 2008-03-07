@@ -9,12 +9,12 @@ First some initial setup code:
     >>> indexer = getUtility(ISolrIndexQueueProcessor)
     >>> indexer.active
     False
-    >>> print indexer.host
-    None
-    >>> print indexer.port
-    None
-    >>> print indexer.base
-    None
+    >>> indexer.host
+    'localhost'
+    >>> indexer.port
+    8983
+    >>> indexer.base
+    '/solr'
 
 Viewing the site control panel
 -----------------------------
@@ -71,5 +71,5 @@ Make sure the changes have been applied correctly to the tool:
     >>> indexer.port
     1234
     >>> indexer.base
-    u'/solr'
+    '/solr'
 

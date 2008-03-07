@@ -28,9 +28,9 @@ class SolrIndexQueueProcessor(Persistent):
 
     def __init__(self):
         self.active = False
-        self.host = None
-        self.port = None
-        self.base = None
+        self.host = 'localhost'
+        self.port = 8983
+        self.base = '/solr'
 
     def index(self, obj, attributes=None):
         conn = self.getConnection()

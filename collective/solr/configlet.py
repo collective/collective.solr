@@ -16,13 +16,13 @@ class ISolrSchema(Interface):
         description=_(u'Check this to enable the Solr integration, i.e. '
                        'indexing and searching using the below settings.'))
 
-    host = TextLine(title=_(u'Host'), default=u'localhost',
+    host = TextLine(title=_(u'Host'),
         description=_(u'The host name of the Solr instance to be used.'))
 
-    port = Int(title=_(u'Port'), default=8983,
+    port = Int(title=_(u'Port'),
         description=_(u'The port of the Solr instance to be used.'))
 
-    base = TextLine(title=_(u'Base'), default=u'/solr',
+    base = TextLine(title=_(u'Base'),
         description=_(u'The base prefix of the Solr instance to be used.'))
 
 
