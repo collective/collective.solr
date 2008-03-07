@@ -15,21 +15,23 @@ class Foo:
 
 class QueueIndexerTests(TestCase):
 
+    def setUp(self):
+        self.proc = SolrIndexQueueProcessor()
+        self.proc.setHost()
+        conn = self.proc.getConnection()
+        fakehttp(conn, getData('schema.xml'), [])   # fake schema response
+        self.proc.getSchema()                       # read and cache the schema
+
+    def tearDown(self):
+        self.proc.closeConnection()
+
     def testPrepareData(self):
         data = {'allowedRolesAndUsers': ['user:test_user_1_', 'user:portal_owner']}
         SolrIndexQueueProcessor().prepareData(data)
         self.assertEqual(data, {'allowedRolesAndUsers': ['user$test_user_1_', 'user$portal_owner']})
 
-    def setupProcessor(self):
-        proc = SolrIndexQueueProcessor()
-        proc.setHost()
-        conn = proc.getConnection()
-        fakehttp(conn, getData('schema.xml'), [])   # fake schema response
-        proc.getSchema()                            # read and cache the schema
-        return proc
-
     def testIndexObject(self):
-        proc = self.setupProcessor()
+        proc = self.proc
         output = []
         response = getData('add_response.txt')
         fakehttp(proc.getConnection(), response, output)    # fake add response
@@ -38,7 +40,7 @@ class QueueIndexerTests(TestCase):
         self.assertEqual(output, getData('add_request.txt'))
 
     def testPartialIndexObject(self):
-        proc = self.setupProcessor()
+        proc = self.proc
         foo = Foo(id='500', name='foo', price=42.0)
         # first index all attributes...
         output = []
@@ -58,7 +60,7 @@ class QueueIndexerTests(TestCase):
         self.assertEqual(output.find('42'), -1, '"price" data found?')
 
     def testDateIndexing(self):
-        proc = self.setupProcessor()
+        proc = self.proc
         foo = Foo(id='zeidler', name='andi', cat='nerd', timestamp=DateTime('May 11 1972 03:45 GMT'))
         output = []
         response = getData('add_response.txt')
@@ -69,7 +71,7 @@ class QueueIndexerTests(TestCase):
         self.assert_(output.find(required) > 0, '"date" data not found')
 
     def testReindexObject(self):
-        proc = self.setupProcessor()
+        proc = self.proc
         output = []
         response = getData('add_response.txt')
         fakehttp(proc.getConnection(), response, output)    # fake add response
@@ -78,7 +80,7 @@ class QueueIndexerTests(TestCase):
         self.assertEqual(output, getData('add_request.txt'))
 
     def testUnindexObject(self):
-        proc = self.setupProcessor()
+        proc = self.proc
         output = []
         response = getData('delete_response.txt')
         fakehttp(proc.getConnection(), response, output)    # fake response
@@ -87,7 +89,7 @@ class QueueIndexerTests(TestCase):
         self.assertEqual(output, getData('delete_request.txt'))
 
     def testCommit(self):
-        proc = self.setupProcessor()
+        proc = self.proc
         output = []
         response = getData('commit_response.txt')
         fakehttp(proc.getConnection(), response, output)    # fake response
