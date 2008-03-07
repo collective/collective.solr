@@ -19,7 +19,7 @@ class QueueIndexerTests(TestCase):
 
     def setUp(self):
         self.proc = SolrIndexQueueProcessor()
-        self.proc.setHost()
+        self.proc.setHost(active=True)
         conn = self.proc.getConnection()
         fakehttp(conn, getData('schema.xml'), [])   # fake schema response
         self.proc.getSchema()                       # read and cache the schema
@@ -104,7 +104,7 @@ class ThreadedConnectionTests(TestCase):
 
     def testLocalConnections(self):
         proc = SolrIndexQueueProcessor()
-        proc.setHost()
+        proc.setHost(active=True)
         schema = getData('schema.xml')
         log = []
         def runner():

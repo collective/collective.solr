@@ -100,8 +100,9 @@ class SolrIndexQueueProcessor(Persistent):
         if allowed is not None:
             data['allowedRolesAndUsers'] = [r.replace(':','$') for r in allowed]
 
-    def setHost(self, host='localhost', port=8983, base='/solr'):
+    def setHost(self, active=False, host='localhost', port=8983, base='/solr'):
         """ set connection parameters """
+        self.active = active
         self.host = host
         self.port = port
         self.base = base
@@ -119,6 +120,8 @@ class SolrIndexQueueProcessor(Persistent):
 
     def getConnection(self):
         """ returns an existing connection or opens one """
+        if not self.active:
+            return None
         conn = getLocal('connection')
         if conn is None and self.host is not None:
             host = '%s:%d' % (self.host, self.port)

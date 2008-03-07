@@ -1,5 +1,4 @@
 TODOs:
-* implement on/off switch
 * browser view for reindexing
 * design and hook up searching
 * browsertest for indexing

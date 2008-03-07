@@ -56,7 +56,7 @@ class TestCase(ptc.PloneTestCase):
     def afterSetUp(self):
         schema = getData('plone_schema.xml')
         self.proc = queryUtility(ISolrIndexQueueProcessor)
-        self.proc.setHost()
+        self.proc.setHost(active=True)
         conn = self.proc.getConnection()
         fakehttp(conn, schema, [])      # fake schema response
         self.proc.getSchema()           # read and cache the schema
