@@ -22,6 +22,9 @@ class ISolrSchema(Interface):
     port = Int(title=_(u'Port'), default=8983,
         description=_(u'The port of the Solr instance to be used.'))
 
+    base = TextLine(title=_(u'Base'), default=u'/solr',
+        description=_(u'The base prefix of the Solr instance to be used.'))
+
 
 class SolrControlPanelAdapter(SchemaAdapterBase):
     adapts(IPloneSiteRoot)
@@ -59,6 +62,17 @@ class SolrControlPanelAdapter(SchemaAdapterBase):
             util.port = value
 
     port = property(getPort, setPort)
+
+    def getBase(self):
+        util = queryUtility(ISolrIndexQueueProcessor)
+        return getattr(util, 'base', '')
+
+    def setBase(self, value):
+        util = queryUtility(ISolrIndexQueueProcessor)
+        if util is not None:
+            util.base = value
+
+    base = property(getBase, setBase)
 
 
 class SolrControlPanel(ControlPanelForm):

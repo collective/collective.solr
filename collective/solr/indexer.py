@@ -30,6 +30,7 @@ class SolrIndexQueueProcessor(Persistent):
         self.active = False
         self.host = None
         self.port = None
+        self.base = None
 
     def index(self, obj, attributes=None):
         conn = self.getConnection()
