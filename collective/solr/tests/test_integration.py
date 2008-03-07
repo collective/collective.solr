@@ -3,10 +3,13 @@
 # for more information about the following setup
 
 from unittest import TestSuite, makeSuite, main
+from zope.testing.doctest import ELLIPSIS, NORMALIZE_WHITESPACE
+from Testing.ZopeTestCase import FunctionalDocFileSuite
 from Products.Five import zcml
 from Products.Five import fiveconfigure
 from Products.PloneTestCase import PloneTestCase as ptc
 from Products.PloneTestCase.layer import onsetup
+from plone.app.controlpanel.tests.cptc import ControlPanelTestCase
 
 
 @onsetup
@@ -76,6 +79,10 @@ class TestCase(ptc.PloneTestCase):
 def test_suite():
     return TestSuite([
         makeSuite(TestCase),
+        FunctionalDocFileSuite('configlet.txt',
+            optionflags=ELLIPSIS | NORMALIZE_WHITESPACE,
+            package='collective.solr.tests',
+            test_class=ControlPanelTestCase),
     ])
 
 if __name__ == '__main__':

@@ -27,6 +27,7 @@ class SolrIndexQueueProcessor(Persistent):
     implements(ISolrIndexQueueProcessor)
 
     def __init__(self):
+        self.active = False
         self.host = None
         self.port = None
 

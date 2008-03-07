@@ -1,5 +1,5 @@
 TODOs:
-* implement on/off switch and configlet
+* implement on/off switch
 * browser view for reindexing
 * design and hook up searching
 * browsertest for indexing
@@ -8,6 +8,7 @@ TODOs:
 * error handling for stale connections
 * add signal handlers (see store.py)
 * what about http timeouts?
+* genericsetup support for configuration
 * add a configurable queue limit for large transactions
 * mapping from accessor name to attribute name, i.e. getTitle -> title,
   preferably via <copyField> tags in the solr schema

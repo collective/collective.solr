@@ -1,8 +1,22 @@
 <configure
     xmlns="http://namespaces.zope.org/zope"
     xmlns:five="http://namespaces.zope.org/five"
+    xmlns:zcml="http://namespaces.zope.org/zcml"
+    xmlns:browser="http://namespaces.zope.org/browser"
     i18n_domain="collective.solr">
 
   <include file="profiles.zcml" />
+
+  <configure zcml:condition="installed plone.app.controlpanel">
+
+    <adapter factory=".configlet.SolrControlPanelAdapter" />
+
+    <browser:page
+        name="solr-controlpanel"
+        for="Products.CMFPlone.interfaces.IPloneSiteRoot"
+        class=".configlet.SolrControlPanel"
+        permission="cmf.ManagePortal" />
+
+  </configure>
 
 </configure>
