@@ -26,11 +26,8 @@ class SolrIndexQueueProcessor(Persistent):
     """ a queue processor for solr """
     implements(ISolrIndexQueueProcessor)
 
-    def __init__(self):
-        self.active = False
-        self.host = 'localhost'
-        self.port = 8983
-        self.base = '/solr'
+    def __init__(self, active=False):
+        self.setHost(active=active)
 
     def index(self, obj, attributes=None):
         conn = self.getConnection()
@@ -115,8 +112,8 @@ class SolrIndexQueueProcessor(Persistent):
         if conn is not None:
             conn.close()
             setLocal('connection', None)
-            if clearSchema:
-                setLocal('schema', None)
+        if clearSchema:
+            setLocal('schema', None)
 
     def getConnection(self):
         """ returns an existing connection or opens one """
