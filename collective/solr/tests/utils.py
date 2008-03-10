@@ -11,17 +11,28 @@ def getData(filename):
 
 
 def fakehttp(solrconn, fakedata, output):
+    """ helper function to set up a fake http request on a SolrConnection """
+
     class FakeSocket(StringIO):
+        """ helper class to fake socket communication """
+
         def sendall(self, str): output.append(str)
+
         def makefile(self, mode, name): return self
+
         def read(self, amt=None):
             if self.closed: return ''
             return StringIO.read(self, amt)
+
         def readline(self, length=None):
             if self.closed: return ''
             return StringIO.readline(self, length)
+
     class FakeHTTPConnection(HTTPConnection):
+        """ helper class to fake a http connection object from httplib.py """
+
         def connect(self):
             self.sock = FakeSocket(fakedata)
+
     solrconn.conn = FakeHTTPConnection(solrconn.conn.host)
 
