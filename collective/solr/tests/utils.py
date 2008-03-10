@@ -16,16 +16,20 @@ def fakehttp(solrconn, fakedata, output):
     class FakeSocket(StringIO):
         """ helper class to fake socket communication """
 
-        def sendall(self, str): output.append(str)
+        def sendall(self, str):
+            output.append(str)
 
-        def makefile(self, mode, name): return self
+        def makefile(self, mode, name):
+            return self
 
         def read(self, amt=None):
-            if self.closed: return ''
+            if self.closed:
+                return ''
             return StringIO.read(self, amt)
 
         def readline(self, length=None):
-            if self.closed: return ''
+            if self.closed:
+                return ''
             return StringIO.readline(self, length)
 
     class FakeHTTPConnection(HTTPConnection):
