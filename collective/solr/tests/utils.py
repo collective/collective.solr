@@ -17,7 +17,7 @@ def fakehttp(solrconn, fakedata):
         """ helper class to organize output from fake connections """
 
         def __str__(self):
-            return ''.join(output).replace('\r', '')
+            return ''.join(self).replace('\r', '')
 
     output = FakeOutput()
 
