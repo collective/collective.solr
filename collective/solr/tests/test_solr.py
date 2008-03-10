@@ -1,25 +1,6 @@
 from unittest import TestCase, TestSuite, makeSuite, main
-from StringIO import StringIO
-from httplib import HTTPConnection
-
 from collective.solr.solr import SolrConnection
-from collective.solr.tests.utils import getData
-
-
-def fakehttp(solrconn, fakedata, output):
-    class FakeSocket(StringIO):
-        def sendall(self, str): output.append(str)
-        def makefile(self, mode, name): return self
-        def read(self, amt=None):
-            if self.closed: return ''
-            return StringIO.read(self, amt)
-        def readline(self, length=None):
-            if self.closed: return ''
-            return StringIO.readline(self, length)
-    class FakeHTTPConnection(HTTPConnection):
-        def connect(self):
-            self.sock = FakeSocket(fakedata)
-    solrconn.conn = FakeHTTPConnection(solrconn.conn.host)
+from collective.solr.tests.utils import getData, fakehttp
 
 
 class TestSolr(TestCase):

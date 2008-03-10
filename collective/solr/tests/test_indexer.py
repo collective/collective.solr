@@ -3,8 +3,7 @@ from threading import Thread
 from DateTime import DateTime
 
 from collective.solr.indexer import SolrIndexQueueProcessor
-from collective.solr.tests.test_solr import fakehttp
-from collective.solr.tests.utils import getData
+from collective.solr.tests.utils import getData, fakehttp
 from collective.solr.solr import SolrConnection
 
 

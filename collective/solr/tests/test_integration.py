@@ -29,8 +29,7 @@ ptc.setupPloneSite(products=['collective.solr'])
 from zope.component import queryUtility, getUtilitiesFor
 from collective.indexing.interfaces import IIndexQueueProcessor
 from collective.solr.interfaces import ISolrIndexQueueProcessor
-from collective.solr.tests.test_solr import fakehttp
-from collective.solr.tests.utils import getData
+from collective.solr.tests.utils import getData, fakehttp
 
 
 class TestCase(ptc.PloneTestCase):
