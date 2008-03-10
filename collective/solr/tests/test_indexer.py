@@ -20,7 +20,7 @@ class QueueIndexerTests(TestCase):
         self.proc = SolrIndexQueueProcessor()
         self.proc.setHost(active=True)
         conn = self.proc.getConnection()
-        fakehttp(conn, getData('schema.xml'), [])   # fake schema response
+        fakehttp(conn, getData('schema.xml'))       # fake schema response
         self.proc.getSchema()                       # read and cache the schema
 
     def tearDown(self):
@@ -33,29 +33,24 @@ class QueueIndexerTests(TestCase):
 
     def testIndexObject(self):
         proc = self.proc
-        output = []
         response = getData('add_response.txt')
-        fakehttp(proc.getConnection(), response, output)    # fake add response
+        output = fakehttp(proc.getConnection(), response)   # fake add response
         proc.index(Foo(id='500', name='python test doc'))   # indexing sends data
-        output = ''.join(output).replace('\r', '')
-        self.assertEqual(output, getData('add_request.txt'))
+        self.assertEqual(str(output), getData('add_request.txt'))
 
     def testPartialIndexObject(self):
         proc = self.proc
         foo = Foo(id='500', name='foo', price=42.0)
         # first index all attributes...
-        output = []
         response = getData('add_response.txt')
-        fakehttp(proc.getConnection(), response, output)
+        output = fakehttp(proc.getConnection(), response)
         proc.index(foo)
-        output = ''.join(output).replace('\r', '')
-        self.assert_(output.find('<field name="price">42.0</field>') > 0, '"price" data not found')
+        self.assert_(str(output).find('<field name="price">42.0</field>') > 0, '"price" data not found')
         # then only a subset...
-        output = []
         response = getData('add_response.txt')
-        fakehttp(proc.getConnection(), response, output)
+        output = fakehttp(proc.getConnection(), response)
         proc.index(foo, attributes=['id', 'name'])
-        output = ''.join(output).replace('\r', '')
+        output = str(output)
         self.assert_(output.find('<field name="name">foo</field>') > 0, '"name" data not found')
         self.assertEqual(output.find('price'), -1, '"price" data found?')
         self.assertEqual(output.find('42'), -1, '"price" data found?')
@@ -63,40 +58,32 @@ class QueueIndexerTests(TestCase):
     def testDateIndexing(self):
         proc = self.proc
         foo = Foo(id='zeidler', name='andi', cat='nerd', timestamp=DateTime('May 11 1972 03:45 GMT'))
-        output = []
         response = getData('add_response.txt')
-        fakehttp(proc.getConnection(), response, output)    # fake add response
+        output = fakehttp(proc.getConnection(), response)   # fake add response
         proc.index(foo)
-        output = ''.join(output).replace('\r', '')
         required = '<field name="timestamp">1972-05-11T03:45:00.000Z</field>'
-        self.assert_(output.find(required) > 0, '"date" data not found')
+        self.assert_(str(output).find(required) > 0, '"date" data not found')
 
     def testReindexObject(self):
         proc = self.proc
-        output = []
         response = getData('add_response.txt')
-        fakehttp(proc.getConnection(), response, output)    # fake add response
+        output = fakehttp(proc.getConnection(), response)   # fake add response
         proc.reindex(Foo(id='500', name='python test doc')) # reindexing sends data
-        output = ''.join(output).replace('\r', '')
-        self.assertEqual(output, getData('add_request.txt'))
+        self.assertEqual(str(output), getData('add_request.txt'))
 
     def testUnindexObject(self):
         proc = self.proc
-        output = []
         response = getData('delete_response.txt')
-        fakehttp(proc.getConnection(), response, output)    # fake response
+        output = fakehttp(proc.getConnection(), response)   # fake response
         proc.unindex(Foo(id='500', name='python test doc')) # unindexing sends data
-        output = ''.join(output).replace('\r', '')
-        self.assertEqual(output, getData('delete_request.txt'))
+        self.assertEqual(str(output), getData('delete_request.txt'))
 
     def testCommit(self):
         proc = self.proc
-        output = []
         response = getData('commit_response.txt')
-        fakehttp(proc.getConnection(), response, output)    # fake response
+        output = fakehttp(proc.getConnection(), response)   # fake response
         proc.commit()                                       # committing sends data
-        output = ''.join(output).replace('\r', '')
-        self.assertEqual(output, getData('commit_request.txt'))
+        self.assertEqual(str(output), getData('commit_request.txt'))
 
 
 class ThreadedConnectionTests(TestCase):
@@ -107,14 +94,13 @@ class ThreadedConnectionTests(TestCase):
         schema = getData('schema.xml')
         log = []
         def runner():
-            fakehttp(proc.getConnection(), schema, [])  # fake schema response
+            fakehttp(proc.getConnection(), schema)      # fake schema response
             proc.getSchema()                            # read and cache the schema
-            output = []
             response = getData('add_response.txt')
-            fakehttp(proc.getConnection(), response, output)    # fake add response
+            output = fakehttp(proc.getConnection(), response)   # fake add response
             proc.index(Foo(id='500', name='python test doc'))   # indexing sends data
             proc.closeConnection()
-            log.append(''.join(output).replace('\r', ''))
+            log.append(str(output))
             log.append(proc)
             log.append(proc.getConnection())
         # after the runner was set up, another thread can be created and
@@ -127,7 +113,7 @@ class ThreadedConnectionTests(TestCase):
         thread.start()
         thread.join()
         conn = proc.getConnection()         # get this thread's connection
-        fakehttp(conn, schema, [])          # fake schema response
+        fakehttp(conn, schema)              # fake schema response
         proc.getSchema()                    # read and cache the schema
         proc.closeConnection()
         self.assertEqual(len(log), 3)

@@ -57,7 +57,7 @@ class TestCase(ptc.PloneTestCase):
         self.proc = queryUtility(ISolrIndexQueueProcessor)
         self.proc.setHost(active=True)
         conn = self.proc.getConnection()
-        fakehttp(conn, schema, [])      # fake schema response
+        fakehttp(conn, schema)          # fake schema response
         self.proc.getSchema()           # read and cache the schema
 
     def beforeTearDown(self):
@@ -67,12 +67,11 @@ class TestCase(ptc.PloneTestCase):
         output = []
         connection = self.proc.getConnection()
         response = getData('add_response.txt')
-        fakehttp(connection, response, output)              # fake add response
+        output = fakehttp(connection, response)             # fake add response
         self.folder.processForm(values={'title': 'Foo'})    # updating sends data
         self.assertEqual(self.folder.Title(), 'Foo')
-        output = ''.join(output).replace('\r', '')
         required = '<field name="Title">Foo</field>'
-        self.assert_(output.find(required) > 0, '"title" data not found')
+        self.assert_(str(output).find(required) > 0, '"title" data not found')
 
 
 def test_suite():
