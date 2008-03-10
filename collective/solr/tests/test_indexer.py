@@ -86,6 +86,57 @@ class QueueIndexerTests(TestCase):
         self.assertEqual(str(output), getData('commit_request.txt'))
 
 
+class FakeHTTPConnectionTests(TestCase):
+
+    def setUp(self):
+        self.foo = Foo(id='500', name='python test doc')
+        self.schema_request = 'GET /solr/admin/get-file.jsp?file=schema.xml'
+
+    def testSingleRequest(self):
+        proc = SolrIndexQueueProcessor(active=True)
+        output = fakehttp(proc.getConnection(), getData('schema.xml'))
+        proc.getSchema()
+        proc.closeConnection()
+        self.failUnless(output.get().startswith(self.schema_request))
+
+    def testTwoRequests(self):
+        proc = SolrIndexQueueProcessor(active=True)
+        output = fakehttp(proc.getConnection(), getData('schema.xml'),
+            getData('add_response.txt'))
+        proc.index(self.foo)
+        proc.closeConnection()
+        self.assertEqual(len(output), 2)
+        self.failUnless(output.get().startswith(self.schema_request))
+        self.assertEqual(output.get(), getData('add_request.txt'))
+
+    def testThreeRequests(self):
+        proc = SolrIndexQueueProcessor(active=True)
+        output = fakehttp(proc.getConnection(), getData('schema.xml'),
+            getData('add_response.txt'), getData('delete_response.txt'))
+        proc.index(self.foo)
+        proc.unindex(self.foo)
+        proc.closeConnection()
+        self.assertEqual(len(output), 3)
+        self.failUnless(output.get().startswith(self.schema_request))
+        self.assertEqual(output.get(), getData('add_request.txt'))
+        self.assertEqual(output.get(), getData('delete_request.txt'))
+
+    def testFourRequests(self):
+        proc = SolrIndexQueueProcessor(active=True)
+        output = fakehttp(proc.getConnection(), getData('schema.xml'),
+            getData('add_response.txt'), getData('delete_response.txt'),
+            getData('commit_response.txt'))
+        proc.index(self.foo)
+        proc.unindex(self.foo)
+        proc.commit()
+        proc.closeConnection()
+        self.assertEqual(len(output), 4)
+        self.failUnless(output.get().startswith(self.schema_request))
+        self.assertEqual(output.get(), getData('add_request.txt'))
+        self.assertEqual(output.get(), getData('delete_request.txt'))
+        self.assertEqual(output.get(), getData('commit_request.txt'))
+
+
 class ThreadedConnectionTests(TestCase):
 
     def testLocalConnections(self):
@@ -129,6 +180,7 @@ class ThreadedConnectionTests(TestCase):
 def test_suite():
     return TestSuite([
         makeSuite(QueueIndexerTests),
+        makeSuite(FakeHTTPConnectionTests),
         makeSuite(ThreadedConnectionTests),
     ])
 

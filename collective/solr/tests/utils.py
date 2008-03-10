@@ -16,8 +16,19 @@ def fakehttp(solrconn, *fakedata):
     class FakeOutput(list):
         """ helper class to organize output from fake connections """
 
+        def log(self, item):
+            self.current.append(item)
+
+        def get(self, skip=0):
+            self[:] = self[skip:]
+            return ''.join(self.pop(0)).replace('\r', '')
+
+        def new(self):
+            self.current = []
+            self.append(self.current)
+
         def __str__(self):
-            return ''.join(self).replace('\r', '')
+            return ''.join(self[0]).replace('\r', '')
 
     output = FakeOutput()
 
@@ -25,7 +36,7 @@ def fakehttp(solrconn, *fakedata):
         """ helper class to fake socket communication """
 
         def sendall(self, str):
-            output.append(str)
+            output.log(str)
 
         def makefile(self, mode, name):
             return self
@@ -47,8 +58,11 @@ def fakehttp(solrconn, *fakedata):
             HTTPConnection.__init__(self, host)
             self.fakedata = list(fakedata)
 
-        def connect(self):
-            self.sock = FakeSocket(self.fakedata.pop(0))
+        def putrequest(self, *args, **kw):
+            response = self.fakedata.pop(0)     # get first response
+            self.sock = FakeSocket(response)    # and set up a fake socket
+            output.new()                        # and create a new output buffer
+            HTTPConnection.putrequest(self, *args, **kw)
 
     solrconn.conn = FakeHTTPConnection(solrconn.conn.host, *fakedata)
     return output
