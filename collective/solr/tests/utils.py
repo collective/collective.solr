@@ -10,7 +10,7 @@ def getData(filename):
     return open(filename, 'r').read()
 
 
-def fakehttp(solrconn, fakedata):
+def fakehttp(solrconn, *fakedata):
     """ helper function to set up a fake http request on a SolrConnection """
 
     class FakeOutput(list):
@@ -43,9 +43,13 @@ def fakehttp(solrconn, fakedata):
     class FakeHTTPConnection(HTTPConnection):
         """ helper class to fake a http connection object from httplib.py """
 
-        def connect(self):
-            self.sock = FakeSocket(fakedata)
+        def __init__(self, host, *fakedata):
+            HTTPConnection.__init__(self, host)
+            self.fakedata = list(fakedata)
 
-    solrconn.conn = FakeHTTPConnection(solrconn.conn.host)
+        def connect(self):
+            self.sock = FakeSocket(self.fakedata.pop(0))
+
+    solrconn.conn = FakeHTTPConnection(solrconn.conn.host, *fakedata)
     return output
 
