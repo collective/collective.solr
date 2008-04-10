@@ -30,6 +30,7 @@ from zope.component import queryUtility, getUtilitiesFor
 from collective.indexing.interfaces import IIndexQueueProcessor
 from collective.solr.interfaces import ISolrIndexQueueProcessor
 from collective.solr.tests.utils import getData, fakehttp
+from transaction import commit
 
 
 class TestCase(ptc.PloneTestCase):
@@ -66,10 +67,12 @@ class TestCase(ptc.PloneTestCase):
     def testIndexObject(self):
         output = []
         connection = self.proc.getConnection()
-        response = getData('add_response.txt')
-        output = fakehttp(connection, response)             # fake add response
+        responses = getData('add_response.txt'), getData('commit_response.txt')
+        output = fakehttp(connection, *responses)           # fake responses
         self.folder.processForm(values={'title': 'Foo'})    # updating sends data
         self.assertEqual(self.folder.Title(), 'Foo')
+        self.assertEqual(str(output), '', 'reindexed unqueued!')
+        commit()                        # indexing happens on commit
         required = '<field name="Title">Foo</field>'
         self.assert_(str(output).find(required) > 0, '"title" data not found')
 

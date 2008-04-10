@@ -28,7 +28,10 @@ def fakehttp(solrconn, *fakedata):
             self.append(self.current)
 
         def __str__(self):
-            return ''.join(self[0]).replace('\r', '')
+            if self:
+                return ''.join(self[0]).replace('\r', '')
+            else:
+                return ''
 
     output = FakeOutput()
 
