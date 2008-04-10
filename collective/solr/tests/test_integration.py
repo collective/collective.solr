@@ -63,6 +63,7 @@ class TestCase(ptc.PloneTestCase):
 
     def beforeTearDown(self):
         self.proc.closeConnection(clearSchema=True)
+        self.proc.setHost(active=False)
 
     def testIndexObject(self):
         output = []

@@ -25,6 +25,7 @@ class QueueIndexerTests(TestCase):
 
     def tearDown(self):
         self.proc.closeConnection()
+        self.proc.setHost(active=False)
 
     def testPrepareData(self):
         data = {'allowedRolesAndUsers': ['user:test_user_1_', 'user:portal_owner']}
@@ -167,6 +168,7 @@ class ThreadedConnectionTests(TestCase):
         fakehttp(conn, schema)              # fake schema response
         proc.getSchema()                    # read and cache the schema
         proc.closeConnection()
+        proc.setHost(active=False)
         self.assertEqual(len(log), 3)
         self.assertEqual(log[0], getData('add_request.txt'))
         self.failUnless(isinstance(log[1], SolrIndexQueueProcessor))
