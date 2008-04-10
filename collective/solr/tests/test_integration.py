@@ -75,6 +75,10 @@ class TestCase(ptc.PloneTestCase):
         commit()                        # indexing happens on commit
         required = '<field name="Title">Foo</field>'
         self.assert_(str(output).find(required) > 0, '"title" data not found')
+        # due to the `commit()` above the changes from `afterSetUp`
+        # need to be explicitly reversed...
+        self.proc.setHost(active=False)
+        commit()
 
 
 def test_suite():
