@@ -22,7 +22,7 @@ def setup_product():
     fiveconfigure.debug_mode = False
 
 setup_product()
-ptc.setupPloneSite(products=['collective.solr'])
+ptc.setupPloneSite(products=['collective.indexing', 'collective.solr'])
 
 
 # test-specific imports go here...
