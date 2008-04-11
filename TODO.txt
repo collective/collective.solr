@@ -1,8 +1,9 @@
 TODOs:
 * browser view for reindexing
-* design and hook up searching
+* gs import/export handler
 * browsertest for indexing
 
+* design and hook up searching
 * provide decorator for solr exceptions
 * error handling for stale connections
 * add signal handlers (see store.py)
