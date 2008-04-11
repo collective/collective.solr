@@ -4,6 +4,7 @@
  <utilities>
   <utility
      interface="collective.solr.interfaces.ISolrIndexQueueProcessor"
+     name="solr"
      factory="collective.solr.indexer.SolrIndexQueueProcessor"/>
  </utilities>
 </componentregistry>
