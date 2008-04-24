@@ -129,4 +129,6 @@ class SolrSchema(AttrDict):
                     if value in ('true', 'false'):
                         field[key] = value == 'true'
                 self[name] = field
+            elif elem.tag in ('uniqueKey', 'defaultSearchField'):
+                self[elem.tag] = elem.text
 
