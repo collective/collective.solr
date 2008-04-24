@@ -22,3 +22,11 @@ class ISolrIndexQueueProcessor(IIndexQueueProcessor):
     """ an index queue processor for solr """
 
 
+class ISearch(Interface):
+    """ a generic search interface
+        FIXME: this should be defined in a generic package """
+
+    def search(**query):
+        """ perform a search with the given parameters """
+
+
