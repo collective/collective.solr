@@ -28,6 +28,7 @@ ptc.setupPloneSite(products=['collective.indexing', 'collective.solr'])
 # test-specific imports go here...
 from zope.component import queryUtility, getUtilitiesFor
 from collective.indexing.interfaces import IIndexQueueProcessor
+from collective.solr.interfaces import ISolrConnectionManager
 from collective.solr.interfaces import ISolrIndexQueueProcessor
 from collective.solr.tests.utils import getData, fakehttp
 from transaction import commit
@@ -55,7 +56,7 @@ class TestCase(ptc.PloneTestCase):
 
     def afterSetUp(self):
         schema = getData('plone_schema.xml')
-        self.proc = queryUtility(ISolrIndexQueueProcessor)
+        self.proc = queryUtility(ISolrConnectionManager)
         self.proc.setHost(active=True)
         conn = self.proc.getConnection()
         fakehttp(conn, schema)          # fake schema response

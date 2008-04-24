@@ -5,15 +5,15 @@ First some initial setup code:
 
     >>> self.loginAsManager()
     >>> from zope.component import getUtility
-    >>> from collective.solr.interfaces import ISolrIndexQueueProcessor
-    >>> indexer = getUtility(ISolrIndexQueueProcessor)
-    >>> indexer.active
+    >>> from collective.solr.interfaces import ISolrConnectionManager
+    >>> manager = getUtility(ISolrConnectionManager)
+    >>> manager.active
     False
-    >>> indexer.host
+    >>> manager.host
     'localhost'
-    >>> indexer.port
+    >>> manager.port
     8983
-    >>> indexer.base
+    >>> manager.base
     '/solr'
 
 Viewing the site control panel
@@ -64,12 +64,12 @@ We should be informed that something has changed:
 
 Make sure the changes have been applied correctly to the tool:
 
-    >>> indexer.active
+    >>> manager.active
     True
-    >>> indexer.host
+    >>> manager.host
     u'example.com'
-    >>> indexer.port
+    >>> manager.port
     1234
-    >>> indexer.base
+    >>> manager.base
     '/solr'
 

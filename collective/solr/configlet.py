@@ -7,7 +7,7 @@ from Products.CMFDefault.formlib.schema import SchemaAdapterBase
 from Products.CMFPlone import PloneMessageFactory as _
 from Products.CMFPlone.interfaces import IPloneSiteRoot
 from plone.app.controlpanel.form import ControlPanelForm
-from collective.solr.interfaces import ISolrIndexQueueProcessor
+from collective.solr.interfaces import ISolrConnectionManager
 
 
 class ISolrSchema(Interface):
@@ -31,44 +31,44 @@ class SolrControlPanelAdapter(SchemaAdapterBase):
     implements(ISolrSchema)
 
     def getActive(self):
-        util = queryUtility(ISolrIndexQueueProcessor)
+        util = queryUtility(ISolrConnectionManager)
         return getattr(util, 'active', '')
 
     def setActive(self, value):
-        util = queryUtility(ISolrIndexQueueProcessor)
+        util = queryUtility(ISolrConnectionManager)
         if util is not None:
             util.active = value
 
     active = property(getActive, setActive)
 
     def getHost(self):
-        util = queryUtility(ISolrIndexQueueProcessor)
+        util = queryUtility(ISolrConnectionManager)
         return getattr(util, 'host', '')
 
     def setHost(self, value):
-        util = queryUtility(ISolrIndexQueueProcessor)
+        util = queryUtility(ISolrConnectionManager)
         if util is not None:
             util.host = value
 
     host = property(getHost, setHost)
 
     def getPort(self):
-        util = queryUtility(ISolrIndexQueueProcessor)
+        util = queryUtility(ISolrConnectionManager)
         return getattr(util, 'port', '')
 
     def setPort(self, value):
-        util = queryUtility(ISolrIndexQueueProcessor)
+        util = queryUtility(ISolrConnectionManager)
         if util is not None:
             util.port = value
 
     port = property(getPort, setPort)
 
     def getBase(self):
-        util = queryUtility(ISolrIndexQueueProcessor)
+        util = queryUtility(ISolrConnectionManager)
         return getattr(util, 'base', '')
 
     def setBase(self, value):
-        util = queryUtility(ISolrIndexQueueProcessor)
+        util = queryUtility(ISolrConnectionManager)
         if util is not None:
             util.base = value
 
