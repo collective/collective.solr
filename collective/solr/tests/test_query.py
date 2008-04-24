@@ -140,9 +140,14 @@ class SearchTests(TestCase):
         self.mngr.setHost(active=False)
 
     def testSimpleSearch(self):
+        schema = getData('schema.xml')
         search = getData('search_response.txt')
-        fakehttp(self.conn, search)             # fake search response
-        results = self.search('"id:[* TO *]"', rows=10, wt='xml', indent='on')
+        request = getData('search_request.txt')
+        output = fakehttp(self.conn, schema, search)    # fake responses
+        query = self.search.buildQuery('"id:[* TO *]"')
+        results = self.search(query, rows=10, wt='xml', indent='on')
+        normalize = lambda x: sorted(x.split('&'))      # sort request params
+        self.assertEqual(normalize(output.get(skip=1)), normalize(request))
         self.assertEqual(results.numFound, '1')
         self.assertEqual(len(results), 1)
         match = results[0]
