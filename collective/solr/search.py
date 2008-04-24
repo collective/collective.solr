@@ -5,6 +5,7 @@ from re import compile
 
 from collective.solr.interfaces import ISolrConnectionManager
 from collective.solr.interfaces import ISearch
+from collective.solr.parser import SolrResponse
 
 logger = getLogger('collective.solr.search')
 
@@ -31,9 +32,13 @@ class Search(object):
     def __init__(self):
         self.manager = queryUtility(ISolrConnectionManager)
 
-    def search(self, **query):
-        """ perform a search with the given parameters """
-        pass
+    def search(self, query, **parameters):
+        """ perform a search with the given querystring and parameters """
+        connection = self.manager.getConnection()
+        response = connection.search(q=query, **parameters)
+        return getattr(SolrResponse(response), 'response', [])
+
+    __call__ = search
 
     def buildQuery(self, default=None, **args):
         """ helper to build a querystring for simple use-cases """

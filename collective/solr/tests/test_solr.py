@@ -1,4 +1,5 @@
 from unittest import TestCase, TestSuite, makeSuite, main
+from elementtree.ElementTree import fromstring
 from collective.solr.solr import SolrConnection
 from collective.solr.tests.utils import getData, fakehttp
 
@@ -91,6 +92,7 @@ class TestSolr(TestCase):
         c = SolrConnection(host='localhost:8983', persistent=True)
         output = fakehttp(c, search_response)
         res = c.search(q='id:[* TO *]', wt='xml', rows='10',indent='on')
+        res = fromstring(res.read())
 
         self.failUnlessEqual(str(output), search_request)
 

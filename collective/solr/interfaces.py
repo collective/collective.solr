@@ -26,10 +26,11 @@ class ISearch(Interface):
     """ a generic search interface
         FIXME: this should be defined in a generic package """
 
-    def search(**query):
-        """ perform a search with the given parameters """
+    def search(query, parameters):
+        """ perform a search with the given querystring and extra parameters
+            (see http://wiki.apache.org/solr/CommonQueryParameters) """
 
-    def __call__(**query):
+    def __call__(query, **parameters):
         """ convenience alias for `search` """
 
 

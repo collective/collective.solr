@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from unittest import TestCase, TestSuite, makeSuite, main
+from DateTime import DateTime
 
 from collective.solr.manager import SolrConnectionManager
 from collective.solr.tests.utils import getData, fakehttp
@@ -125,10 +126,38 @@ class QueryTests(TestCase):
             '+foo +name:herb* +cat:("b\xc3\xa4r" -hmm)')
 
 
+class SearchTests(TestCase):
+
+    def setUp(self):
+        self.mngr = SolrConnectionManager()
+        self.mngr.setHost(active=True)
+        self.conn = self.mngr.getConnection()
+        self.search = Search()
+        self.search.manager = self.mngr
+
+    def tearDown(self):
+        self.mngr.closeConnection()
+        self.mngr.setHost(active=False)
+
+    def testSimpleSearch(self):
+        search = getData('search_response.txt')
+        fakehttp(self.conn, search)             # fake search response
+        results = self.search('"id:[* TO *]"', rows=10, wt='xml', indent='on')
+        self.assertEqual(results.numFound, '1')
+        self.assertEqual(len(results), 1)
+        match = results[0]
+        self.assertEqual(match.id, '500')
+        self.assertEqual(match.name, 'python test doc')
+        self.assertEqual(match.popularity, 0)
+        self.assertEqual(match.sku, '500')
+        self.assertEqual(match.timestamp, DateTime('2008-02-29 16:11:46.998 GMT'))
+
+
 def test_suite():
     return TestSuite((
         makeSuite(QuoteTests),
         makeSuite(QueryTests),
+        makeSuite(SearchTests),
     ))
 
 if __name__ == '__main__':

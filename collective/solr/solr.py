@@ -185,12 +185,10 @@ class SolrConnection:
     def search(self, **params):
         request = urllib.urlencode(params, doseq=True)
         try:
-            rsp = self.doPost('%s/select' % self.solrBase, request, self.formheaders)
-            data = rsp.read()
+            response = self.doPost('%s/select' % self.solrBase, request, self.formheaders)
         finally:
             if not self.persistent: self.conn.close()
-        parsed = fromstring(data)
-        return parsed
+        return response
 
     def getSchema(self):
         url = '%s/admin/get-file.jsp?file=schema.xml' % self.solrBase
