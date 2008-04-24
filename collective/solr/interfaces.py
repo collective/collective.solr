@@ -29,4 +29,7 @@ class ISearch(Interface):
     def search(**query):
         """ perform a search with the given parameters """
 
+    def __call__(**query):
+        """ convenience alias for `search` """
+
 
