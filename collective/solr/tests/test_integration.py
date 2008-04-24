@@ -36,13 +36,13 @@ from transaction import commit
 class TestCase(ptc.PloneTestCase):
 
     def testGenericInterface(self):
-        proc = queryUtility(IIndexQueueProcessor)
+        proc = queryUtility(IIndexQueueProcessor, name='solr')
         self.failUnless(proc, 'utility not found')
         self.failUnless(IIndexQueueProcessor.providedBy(proc))
         self.failUnless(ISolrIndexQueueProcessor.providedBy(proc))
 
     def testSolrInterface(self):
-        proc = queryUtility(ISolrIndexQueueProcessor)
+        proc = queryUtility(ISolrIndexQueueProcessor, name='solr')
         self.failUnless(proc, 'utility not found')
         self.failUnless(IIndexQueueProcessor.providedBy(proc))
         self.failUnless(ISolrIndexQueueProcessor.providedBy(proc))
@@ -50,7 +50,7 @@ class TestCase(ptc.PloneTestCase):
     def testRegisteredProcessors(self):
         procs = list(getUtilitiesFor(IIndexQueueProcessor))
         self.failUnless(procs, 'no utilities found')
-        solr = queryUtility(ISolrIndexQueueProcessor)
+        solr = queryUtility(ISolrIndexQueueProcessor, name='solr')
         self.failUnless(solr in [util for name, util in procs], 'solr utility not found')
 
     def afterSetUp(self):
