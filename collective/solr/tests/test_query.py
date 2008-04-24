@@ -22,6 +22,7 @@ class QuoteTests(TestCase):
         self.assertEqual(quote('...""'), '"...\\"\\""')
         self.assertEqual(quote('\\'), '"\\"')
         self.assertEqual(quote('-+&|!^~*?:'), '"\\-\\+\\&\\|\\!\\^\\~\\*\\?\\:"')
+        self.assertEqual(quote('john@foo.com'), '"john@foo.com"')
 
     def testQuoted(self):
         self.assertEqual(quote('"'), '')
@@ -40,6 +41,7 @@ class QuoteTests(TestCase):
         self.assertEqual(quote('[ø]'), '"\[\xc3\xb8\]"')
         self.assertEqual(quote('"foø*"'), 'fo\xc3\xb8*')
         self.assertEqual(quote('"foø bar?"'), 'fo\xc3\xb8 bar?')
+        self.assertEqual(quote(u'john@foo.com'), '"john@foo.com"')
 
 
 class QueryTests(TestCase):
@@ -63,9 +65,11 @@ class QueryTests(TestCase):
         self.assertEqual(bq('foo*'), '+"foo\\*"')
         self.assertEqual(bq('foo!'), '+"foo\\!"')
         self.assertEqual(bq('foo bar'), '+"foo bar"')
+        self.assertEqual(bq('john@foo.com'), '+"john@foo.com"')
         self.assertEqual(bq(name='foo'), '+name:foo')
         self.assertEqual(bq(name='foo*'), '+name:"foo\\*"')
         self.assertEqual(bq(name='foo bar'), '+name:"foo bar"')
+        self.assertEqual(bq(name='john@foo.com'), '+name:"john@foo.com"')
 
     def testMultiValueQueries(self):
         bq = self.search.buildQuery
@@ -93,10 +97,12 @@ class QueryTests(TestCase):
         bq = self.search.buildQuery
         self.assertEqual(bq(u'foo'), '+foo')
         self.assertEqual(bq(u'foø'), '+"fo\xc3\xb8"')
+        self.assertEqual(bq(u'john@foo.com'), '+"john@foo.com"')
         self.assertEqual(bq(name=['foo', u'bar']), '+name:(foo bar)')
         self.assertEqual(bq(name=['foo', u'bär']), '+name:(foo "b\xc3\xa4r")')
         self.assertEqual(bq(name='foo', cat=(u'bar', 'hmm')), '+name:foo +cat:(bar hmm)')
         self.assertEqual(bq(name='foo', cat=(u'bär', 'hmm')), '+name:foo +cat:("b\xc3\xa4r" hmm)')
+        self.assertEqual(bq(name=u'john@foo.com', cat='spammer'), '+name:"john@foo.com" +cat:spammer')
 
     def testQuotedQueries(self):
         bq = self.search.buildQuery
@@ -111,6 +117,7 @@ class QueryTests(TestCase):
         self.assertEqual(bq(name='"foo bar*'), '+name:"\\"foo bar\\*"')
         self.assertEqual(bq(name='"-foo"', timestamp='"[* TO NOW]"'),
             '+timestamp:[* TO NOW] +name:-foo')
+        self.assertEqual(bq(name='"john@foo.com"'), '+name:john@foo.com')
 
     def testComplexQueries(self):
         bq = self.search.buildQuery
