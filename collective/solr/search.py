@@ -12,7 +12,9 @@ special = compile('([-+&|!(){}[\]^"~*?\\:])')
 def quote(term):
     """ quote a given term according to the solr/lucene query syntax;
         see http://lucene.apache.org/java/docs/queryparsersyntax.html """
-    if not word.match(term):
+    if term.startswith('"') and term.endswith('"'):
+        term = term[1:-1]
+    elif not word.match(term):
         term = '"%s"' % special.sub(r'\\\1', term)
     return term
 
