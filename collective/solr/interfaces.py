@@ -33,4 +33,6 @@ class ISearch(Interface):
     def __call__(query, **parameters):
         """ convenience alias for `search` """
 
+    def buildQuery(default=None, **args):
+        """ helper to build a querystring for simple use-cases """
 
