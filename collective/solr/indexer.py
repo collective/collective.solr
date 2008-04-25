@@ -31,7 +31,7 @@ class SolrIndexQueueProcessor(Persistent):
         self.manager = manager      # for testing purposes only
 
     def index(self, obj, attributes=None):
-        conn = self.manager.getConnection()
+        conn = self.getConnection()
         if conn is not None:
             data = self.getData(obj, attributes)
             self.prepareData(data)
@@ -45,7 +45,7 @@ class SolrIndexQueueProcessor(Persistent):
         self.index(obj, attributes)
 
     def unindex(self, obj):
-        conn = self.manager.getConnection()
+        conn = self.getConnection()
         if conn is not None:
             data = self.getData(obj, attributes=['id'])
             self.prepareData(data)
@@ -61,7 +61,7 @@ class SolrIndexQueueProcessor(Persistent):
         self.manager = queryUtility(ISolrConnectionManager)
 
     def commit(self):
-        conn = self.manager.getConnection()
+        conn = self.getConnection()
         if conn is not None:
             try:
                 logger.debug('committing')
@@ -71,6 +71,12 @@ class SolrIndexQueueProcessor(Persistent):
             self.manager.closeConnection()
 
     # helper methods
+
+    def getConnection(self):
+        if self.manager is None:
+            self.manager = queryUtility(ISolrConnectionManager)
+        if self.manager is not None:
+            return self.manager.getConnection()
 
     def getData(self, obj, attributes=None):
         schema = self.manager.getSchema()
