@@ -30,11 +30,16 @@ class Search(object):
     implements(ISearch)
 
     def __init__(self):
-        self.manager = queryUtility(ISolrConnectionManager)
+        self.manager = None
+
+    def getManager(self):
+        if self.manager is None:
+            self.manager = queryUtility(ISolrConnectionManager)
+        return self.manager
 
     def search(self, query, **parameters):
         """ perform a search with the given querystring and parameters """
-        connection = self.manager.getConnection()
+        connection = self.getManager().getConnection()
         response = connection.search(q=query, **parameters)
         return getattr(SolrResponse(response), 'response', [])
 
@@ -42,7 +47,7 @@ class Search(object):
 
     def buildQuery(self, default=None, **args):
         """ helper to build a querystring for simple use-cases """
-        schema = self.manager.getSchema() or {}
+        schema = self.getManager().getSchema() or {}
         args[None] = default
         query = []
         for name, value in args.items():
