@@ -84,6 +84,8 @@ class SolrIndexQueueProcessor(Persistent):
             return {}
         if attributes is None:
             attributes = schema.keys()
+        else:
+            attributes = set(schema.keys()).intersection(set(attributes))
         data, marker = {}, []
         for name in attributes:
             value = getattr(obj, name, marker)
