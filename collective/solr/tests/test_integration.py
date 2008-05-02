@@ -34,7 +34,7 @@ from collective.solr.tests.utils import getData, fakehttp
 from transaction import commit
 
 
-class TestCase(ptc.PloneTestCase):
+class UtilityTests(ptc.PloneTestCase):
 
     def testGenericInterface(self):
         proc = queryUtility(IIndexQueueProcessor, name='solr')
@@ -53,6 +53,9 @@ class TestCase(ptc.PloneTestCase):
         self.failUnless(procs, 'no utilities found')
         solr = queryUtility(ISolrIndexQueueProcessor, name='solr')
         self.failUnless(solr in [util for name, util in procs], 'solr utility not found')
+
+
+class IndexingTests(ptc.PloneTestCase):
 
     def afterSetUp(self):
         schema = getData('plone_schema.xml')
@@ -85,7 +88,8 @@ class TestCase(ptc.PloneTestCase):
 
 def test_suite():
     return TestSuite([
-        makeSuite(TestCase),
+        makeSuite(UtilityTests),
+        makeSuite(IndexingTests),
         FunctionalDocFileSuite('configlet.txt',
             optionflags=ELLIPSIS | NORMALIZE_WHITESPACE,
             package='collective.solr.tests',
