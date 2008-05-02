@@ -94,9 +94,12 @@ class SolrIndexQueueProcessor(Persistent):
                 continue
             if callable(value):
                 value = value()
-            handler = handlers.get(schema[name].class_, None)
+            field = schema[name]
+            handler = handlers.get(field.class_, None)
             if handler is not None:
                 value = handler(value)
+            elif isinstance(value, (list, tuple)) and not field.multiValued:
+                value = ' '.join(value)
             data[name] = value
         return data
 
