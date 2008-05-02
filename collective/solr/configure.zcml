@@ -7,6 +7,10 @@
 
   <include file="profiles.zcml" />
 
+  <utility
+    factory=".search.Search"
+    provides=".interfaces.ISearch" />
+
   <configure zcml:condition="installed plone.app.controlpanel">
 
     <include package=".browser" />

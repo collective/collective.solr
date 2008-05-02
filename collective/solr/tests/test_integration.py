@@ -30,6 +30,7 @@ from zope.component import queryUtility, getUtilitiesFor
 from collective.indexing.interfaces import IIndexQueueProcessor
 from collective.solr.interfaces import ISolrConnectionManager
 from collective.solr.interfaces import ISolrIndexQueueProcessor
+from collective.solr.interfaces import ISearch
 from collective.solr.tests.utils import getData, fakehttp
 from transaction import commit
 
@@ -53,6 +54,11 @@ class UtilityTests(ptc.PloneTestCase):
         self.failUnless(procs, 'no utilities found')
         solr = queryUtility(ISolrIndexQueueProcessor, name='solr')
         self.failUnless(solr in [util for name, util in procs], 'solr utility not found')
+
+    def testSearchInterface(self):
+        search = queryUtility(ISearch)
+        self.failUnless(search, 'search utility not found')
+        self.failUnless(ISearch.providedBy(search))
 
 
 class IndexingTests(ptc.PloneTestCase):
