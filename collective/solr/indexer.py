@@ -99,7 +99,8 @@ class SolrIndexQueueProcessor(Persistent):
             if handler is not None:
                 value = handler(value)
             elif isinstance(value, (list, tuple)) and not field.multiValued:
-                value = ' '.join(value)
+                separator = getattr(field, 'separator', ' ')
+                value = separator.join(value)
             data[name] = value
         return data
 
