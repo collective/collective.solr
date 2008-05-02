@@ -47,13 +47,14 @@ class SolrIndexQueueProcessor(Persistent):
     def unindex(self, obj):
         conn = self.getConnection()
         if conn is not None:
-            data = self.getData(obj, attributes=['id'])
+            schema = self.manager.getSchema()
+            uniqueKey = schema['uniqueKey']
+            data = self.getData(obj, attributes=[uniqueKey])
             self.prepareData(data)
-            # TODO: perhaps we should consider <uniqueKey> here
-            assert data.has_key('id'), "no id in object data"
+            assert data.has_key(uniqueKey), "no value for <uniqueKey> in object data"
             try:
                 logger.debug('unindexing %r (%r)', obj, data)
-                conn.delete(id=data['id'])
+                conn.delete(id=data[uniqueKey])
             except SolrException, e:
                 logger.exception('exception during delete')
 
