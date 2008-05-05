@@ -4,7 +4,7 @@ from DateTime import DateTime
 
 from collective.solr.manager import SolrConnectionManager
 from collective.solr.indexer import SolrIndexQueueProcessor
-from collective.solr.tests.utils import getData, fakehttp
+from collective.solr.tests.utils import getData, fakehttp, fakemore
 from collective.solr.solr import SolrConnection
 
 
@@ -135,6 +135,23 @@ class FakeHTTPConnectionTests(TestCase):
         self.assertEqual(output.get(), getData('add_request.txt'))
         self.assertEqual(output.get(), getData('delete_request.txt'))
         self.assertEqual(output.get(), getData('commit_request.txt'))
+
+    def testExtraRequest(self):
+        # basically the same as `testThreeRequests`, except it
+        # tests adding fake responses consecutively
+        mngr = SolrConnectionManager(active=True)
+        proc = SolrIndexQueueProcessor(mngr)
+        conn = mngr.getConnection()
+        output = fakehttp(conn, getData('schema.xml'))
+        fakemore(conn, getData('add_response.txt'))
+        proc.index(self.foo)
+        fakemore(conn, getData('delete_response.txt'))
+        proc.unindex(self.foo)
+        mngr.closeConnection()
+        self.assertEqual(len(output), 3)
+        self.failUnless(output.get().startswith(self.schema_request))
+        self.assertEqual(output.get(), getData('add_request.txt'))
+        self.assertEqual(output.get(), getData('delete_request.txt'))
 
 
 class ThreadedConnectionTests(TestCase):

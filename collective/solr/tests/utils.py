@@ -70,3 +70,9 @@ def fakehttp(solrconn, *fakedata):
     solrconn.conn = FakeHTTPConnection(solrconn.conn.host, *fakedata)
     return output
 
+
+def fakemore(solrconn, *fakedata):
+    """ helper function to add more fake http requests to a SolrConnection """
+    assert hasattr(solrconn.conn, 'fakedata')   # `isinstance()` doesn't work?
+    solrconn.conn.fakedata.extend(fakedata)
+
