@@ -1,4 +1,5 @@
 TODOs:
+* site search integration
 * browser view for reindexing
 * gs import/export handler
 * browsertest for indexing
