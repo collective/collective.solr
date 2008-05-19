@@ -51,6 +51,6 @@ class SolrMaintenanceView(BrowserView):
             apply_func=index)
         proc.commit()   # make sure to commit in the end...
         now, cpu = time() - now, clock() - cpu
-        log('solr index rebuilt.')
+        log('solr index rebuilt.\n')
         log('indexed %d object(s) in %.3f seconds (%.3f cpu time).' % (self.count, now, cpu))
 
