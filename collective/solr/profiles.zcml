@@ -8,6 +8,7 @@
       title="collective.solr"
       directory="profiles/default"
       description='Solr integration for Plone'
+      for="Products.CMFPlone.interfaces.IPloneSiteRoot"
       provides="Products.GenericSetup.interfaces.EXTENSION"
       />
 
