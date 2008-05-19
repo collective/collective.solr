@@ -1,31 +1,8 @@
-# integration and functional tests
-# see http://plone.org/documentation/tutorial/testing/writing-a-plonetestcase-unit-integration-test
-# for more information about the following setup
-
 from unittest import TestSuite, makeSuite, main
 from zope.testing.doctest import ELLIPSIS, NORMALIZE_WHITESPACE
 from Testing.ZopeTestCase import FunctionalDocFileSuite
-from Products.Five import zcml
-from Products.Five import fiveconfigure
-from Products.PloneTestCase import PloneTestCase as ptc
-from Products.PloneTestCase.layer import onsetup
+from collective.solr.tests.base import SolrTestCase
 from plone.app.controlpanel.tests.cptc import ControlPanelTestCase
-
-
-@onsetup
-def setup_product():
-    fiveconfigure.debug_mode = True
-    import collective.indexing
-    zcml.load_config('configure.zcml', collective.indexing)
-    import collective.solr
-    zcml.load_config('configure.zcml', collective.solr)
-    fiveconfigure.debug_mode = False
-
-setup_product()
-ptc.setupPloneSite(extension_profiles=(
-    'collective.indexing:default',
-    'collective.solr:default',
-))
 
 
 # test-specific imports go here...
@@ -38,7 +15,7 @@ from collective.solr.tests.utils import getData, fakehttp
 from transaction import commit
 
 
-class UtilityTests(ptc.PloneTestCase):
+class UtilityTests(SolrTestCase):
 
     def testGenericInterface(self):
         proc = queryUtility(IIndexQueueProcessor, name='solr')
@@ -64,7 +41,7 @@ class UtilityTests(ptc.PloneTestCase):
         self.failUnless(ISearch.providedBy(search))
 
 
-class IndexingTests(ptc.PloneTestCase):
+class IndexingTests(SolrTestCase):
 
     def afterSetUp(self):
         schema = getData('plone_schema.xml')
