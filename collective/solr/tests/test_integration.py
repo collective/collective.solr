@@ -71,6 +71,25 @@ class IndexingTests(SolrTestCase):
         self.proc.setHost(active=False)
         commit()
 
+    def testNoIndexingWithoutUniqueKey(self):
+        self.setRoles(('Manager',))
+        output = []
+        connection = self.proc.getConnection()
+        responses = [getData('dummy_response.txt')] * 42    # set up enough...
+        output = fakehttp(connection, *responses)           # fake responses
+        self.folder.invokeFactory('Topic', id='coll', title='a collection')
+        self.folder.coll.addCriterion('Type', 'ATPortalTypeCriterion')
+        self.assertEqual(str(output), '', 'reindexed unqueued!')
+        commit()                        # indexing happens on commit
+        self.assert_(repr(output).find('a collection') > 0, '"title" data not found')
+        self.assert_(repr(output).find('crit') == -1, 'criterion indexed?')
+        objs = self.portal.portal_catalog(portal_type='ATPortalTypeCriterion')
+        self.assertEqual(list(objs), [])
+        # due to the `commit()` above the changes from `afterSetUp`
+        # need to be explicitly reversed...
+        self.proc.setHost(active=False)
+        commit()
+
 
 def test_suite():
     return TestSuite([

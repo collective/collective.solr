@@ -35,11 +35,13 @@ class SolrIndexQueueProcessor(Persistent):
         if conn is not None:
             data = self.getData(obj, attributes)
             self.prepareData(data)
-            try:
-                logger.debug('indexing %r (%r)', obj, data)
-                conn.add(**data)
-            except SolrException, e:
-                logger.exception('exception during index')
+            schema = self.manager.getSchema()
+            if data.get(schema['uniqueKey'], None) is not None:
+                try:
+                    logger.debug('indexing %r (%r)', obj, data)
+                    conn.add(**data)
+                except SolrException, e:
+                    logger.exception('exception during index')
 
     def reindex(self, obj, attributes=None):
         self.index(obj, attributes)
