@@ -1,3 +1,4 @@
+from time import time, clock
 from zope.interface import implements
 from zope.component import queryUtility
 from Products.Five.browser import BrowserView
@@ -21,12 +22,20 @@ class SolrMaintenanceView(BrowserView):
         """ find all contentish objects (meaning all objects derived from one
             of the catalog mixin classes) and (re)indexes them """
         proc = queryUtility(ISolrIndexQueueProcessor, name='solr')
+        log = self.request.RESPONSE.write
+        self.count = 0
         def index(obj, path):
+            global count
             if indexable(obj):
+                log('indexing %r\n' %  obj)
+                self.count += 1
                 proc.begin()
                 proc.index(obj)
                 proc.commit()
+        now, cpu = time(), clock()
         self.context.ZopeFindAndApply(self.context, search_sub=True,
             apply_func=index)
-        return 'solr reindexing finished.'
+        now, cpu = time() - now, clock() - cpu
+        log('solr index rebuilt.')
+        log('indexed %d object(s) in %.3f seconds (%.3f cpu time).' % (self.count, now, cpu))
 
