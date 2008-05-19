@@ -48,10 +48,11 @@ class Search(object):
     def buildQuery(self, default=None, **args):
         """ helper to build a querystring for simple use-cases """
         schema = self.getManager().getSchema() or {}
+        defaultSearchField = getattr(schema, 'defaultSearchField', None)
         args[None] = default
         query = []
         for name, value in args.items():
-            field = schema.get(name or schema.defaultSearchField, None)
+            field = schema.get(name or defaultSearchField, None)
             if field is None or not field.indexed:
                 continue
             if isinstance(value, (tuple, list)):

@@ -126,6 +126,15 @@ class QueryTests(TestCase):
             '+foo +name:herb* +cat:("b\xc3\xa4r" -hmm)')
 
 
+class InactiveQueryTests(TestCase):
+
+    def testUnavailableSchema(self):
+        search = Search()
+        search.manager = SolrConnectionManager()
+        self.assertEqual(search.buildQuery('foo'), '')
+        self.assertEqual(search.buildQuery(name='foo'), '')
+
+
 class SearchTests(TestCase):
 
     def setUp(self):
@@ -162,6 +171,7 @@ def test_suite():
     return TestSuite((
         makeSuite(QuoteTests),
         makeSuite(QueryTests),
+        makeSuite(InactiveQueryTests),
         makeSuite(SearchTests),
     ))
 
