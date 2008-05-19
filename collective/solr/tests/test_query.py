@@ -65,6 +65,8 @@ class QueryTests(TestCase):
         self.assertEqual(bq('foo'), '+foo')
         self.assertEqual(bq('foo*'), '+"foo\\*"')
         self.assertEqual(bq('foo!'), '+"foo\\!"')
+        self.assertEqual(bq('(foo)'), '+"\\(foo\\)"')
+        self.assertEqual(bq('(foo...'), '+"\\(foo..."')
         self.assertEqual(bq('foo bar'), '+"foo bar"')
         self.assertEqual(bq('john@foo.com'), '+"john@foo.com"')
         self.assertEqual(bq(name='foo'), '+name:foo')
