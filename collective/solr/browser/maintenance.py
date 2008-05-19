@@ -18,23 +18,27 @@ class SolrMaintenanceView(BrowserView):
     """ helper view for indexing all portal content in Solr """
     implements(ISolrMaintenanceView)
 
-    def reindex(self):
+    def reindex(self, batch=100):
         """ find all contentish objects (meaning all objects derived from one
             of the catalog mixin classes) and (re)indexes them """
         proc = queryUtility(ISolrIndexQueueProcessor, name='solr')
         log = self.request.RESPONSE.write
         self.count = 0
+        self.commit = batch
         def index(obj, path):
             global count
             if indexable(obj):
                 log('indexing %r\n' %  obj)
-                self.count += 1
-                proc.begin()
                 proc.index(obj)
-                proc.commit()
+                self.count += 1
+                self.commit -= 1
+                if self.commit == 0:
+                    proc.commit()
+                    self.commit = batch
         now, cpu = time(), clock()
         self.context.ZopeFindAndApply(self.context, search_sub=True,
             apply_func=index)
+        proc.commit()   # make sure to commit in the end...
         now, cpu = time() - now, clock() - cpu
         log('solr index rebuilt.')
         log('indexed %d object(s) in %.3f seconds (%.3f cpu time).' % (self.count, now, cpu))
