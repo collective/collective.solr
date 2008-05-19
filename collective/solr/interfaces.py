@@ -36,3 +36,11 @@ class ISearch(Interface):
     def buildQuery(default=None, **args):
         """ helper to build a querystring for simple use-cases """
 
+
+class ISolrMaintenanceView(Interface):
+    """ solr maintenance view for clearing, re-indexing content etc """
+
+    def reindex():
+        """ find all contentish objects (meaning all objects derived from one
+            of the catalog mixin classes) and (re)indexes them """
+
