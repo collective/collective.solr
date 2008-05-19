@@ -13,6 +13,8 @@ logger = getLogger('collective.solr.indexer')
 def datehandler(value):
     # TODO: we might want to handle datetime and time as well;
     # check the enfold.solr implementation
+    if isinstance(value, str) and not value.endswith('Z'):
+        value = DateTime(value)
     if isinstance(value, DateTime):
         v = value.toZone('UTC')
         value = '%04d-%02d-%02dT%02d:%02d:%06.3fZ' % (v.year(),
