@@ -4,6 +4,8 @@ from zope.component import queryUtility
 from Products.Five.browser import BrowserView
 from Products.CMFCore.CMFCatalogAware import CMFCatalogAware
 from Products.Archetypes.CatalogMultiplex import CatalogMultiplex
+
+from collective.solr.interfaces import ISolrConnectionManager
 from collective.solr.interfaces import ISolrIndexQueueProcessor
 from collective.solr.interfaces import ISolrMaintenanceView
 
@@ -17,6 +19,15 @@ def indexable(obj):
 class SolrMaintenanceView(BrowserView):
     """ helper view for indexing all portal content in Solr """
     implements(ISolrMaintenanceView)
+
+    def clear(self):
+        """ clear all data from solr, i.e. delete all indexed objects """
+        manager = queryUtility(ISolrConnectionManager)
+        uniqueKey = manager.getSchema().uniqueKey
+        conn = manager.getConnection()
+        conn.deleteByQuery('%s:[* TO *]' % uniqueKey)
+        conn.commit()
+        return 'solr index cleared.'
 
     def reindex(self, batch=100):
         """ find all contentish objects (meaning all objects derived from one

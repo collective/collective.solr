@@ -40,6 +40,9 @@ class ISearch(Interface):
 class ISolrMaintenanceView(Interface):
     """ solr maintenance view for clearing, re-indexing content etc """
 
+    def clear(self):
+        """ clear all data from solr, i.e. delete all indexed objects """
+
     def reindex():
         """ find all contentish objects (meaning all objects derived from one
             of the catalog mixin classes) and (re)indexes them """
