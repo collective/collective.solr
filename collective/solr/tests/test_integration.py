@@ -53,7 +53,10 @@ class IndexingTests(SolrTestCase):
 
     def beforeTearDown(self):
         self.proc.closeConnection(clearSchema=True)
+        # due to the `commit()` in the tests below from `afterSetUp` need
+        # to be explicitly reversed (and committed)...
         self.proc.setHost(active=False)
+        commit()
 
     def testIndexObject(self):
         output = []
@@ -66,10 +69,6 @@ class IndexingTests(SolrTestCase):
         commit()                        # indexing happens on commit
         required = '<field name="Title">Foo</field>'
         self.assert_(str(output).find(required) > 0, '"title" data not found')
-        # due to the `commit()` above the changes from `afterSetUp`
-        # need to be explicitly reversed...
-        self.proc.setHost(active=False)
-        commit()
 
     def testNoIndexingWithoutUniqueKey(self):
         self.setRoles(('Manager',))
@@ -85,10 +84,6 @@ class IndexingTests(SolrTestCase):
         self.assert_(repr(output).find('crit') == -1, 'criterion indexed?')
         objs = self.portal.portal_catalog(portal_type='ATPortalTypeCriterion')
         self.assertEqual(list(objs), [])
-        # due to the `commit()` above the changes from `afterSetUp`
-        # need to be explicitly reversed...
-        self.proc.setHost(active=False)
-        commit()
 
 
 def test_suite():
