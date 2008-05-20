@@ -86,10 +86,18 @@ class IndexingTests(SolrTestCase):
         self.assertEqual(list(objs), [])
 
 
+class SiteSearchTests(SolrTestCase):
+
+    def testSkinSetup(self):
+        skins = self.portal.portal_skins.objectIds()
+        self.failUnless('solr_site_search' in skins, 'no solr skin?')
+
+
 def test_suite():
     return TestSuite([
         makeSuite(UtilityTests),
         makeSuite(IndexingTests),
+        makeSuite(SiteSearchTests),
         FunctionalDocFileSuite('configlet.txt',
             optionflags=ELLIPSIS | NORMALIZE_WHITESPACE,
             package='collective.solr.tests',

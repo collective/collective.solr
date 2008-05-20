@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<metadata>
+  <version>0.1</version>
+  <dependencies>
+    <dependency>profile-collective.indexing:default</dependency>
+    <dependency>profile-collective.solr:default</dependency>
+  </dependencies>
+</metadata>
