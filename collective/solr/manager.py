@@ -15,6 +15,10 @@ class SolrConnectionManager(Persistent):
     def __init__(self, active=False):
         self.setHost(active=active)
 
+    def isActive(self):
+        """ indicate if the solr connection should/can be used """
+        return self.active
+
     def setHost(self, active=False, host='localhost', port=8983, base='/solr'):
         """ set connection parameters """
         self.active = active
