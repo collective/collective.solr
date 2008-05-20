@@ -11,9 +11,22 @@
     factory=".search.Search"
     provides=".interfaces.ISearch" />
 
-  <configure zcml:condition="installed plone.app.controlpanel">
+  <five:implements
+    class="Products.CMFPlone.CatalogTool.CatalogTool"
+    interface=".interfaces.ICatalogTool" />
+
+  <configure zcml:condition="installed Products.CMFPlone">
 
     <include package=".browser" />
+
+    <adapter
+        for=".interfaces.ICatalogTool"
+        provides=".interfaces.ISearchDispatcher"
+        factory=".dispatcher.SearchDispatcher" />
+
+  </configure>
+
+  <configure zcml:condition="installed plone.app.controlpanel">
 
     <adapter factory=".configlet.SolrControlPanelAdapter" />
 

@@ -37,6 +37,19 @@ class ISearch(Interface):
         """ helper to build a querystring for simple use-cases """
 
 
+class ICatalogTool(Interface):
+    """ marker interface for plone's catalog tool """
+
+
+class ISearchDispatcher(Interface):
+    """ adapter for potentially dispatching a given query to an
+        alternative search backend (instead of the portal catalog) """
+
+    def __call__(request, **keywords):
+        """ decide if an alternative search backend is capable of performing
+            the given query and use it or fall back to the portal catalog """
+
+
 class ISolrMaintenanceView(Interface):
     """ solr maintenance view for clearing, re-indexing content etc """
 
