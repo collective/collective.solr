@@ -1,8 +1,10 @@
 from logging import getLogger
 from persistent import Persistent
 from DateTime import DateTime
-from zope.component import queryUtility
+from zope.component import queryUtility, queryMultiAdapter
 from zope.interface import implements
+from Products.CMFCore.utils import getToolByName
+from plone.app.content.interfaces import IIndexableObjectWrapper
 from collective.solr.interfaces import ISolrConnectionManager
 from collective.solr.interfaces import ISolrIndexQueueProcessor
 from collective.solr.solr import SolrException
@@ -83,6 +85,21 @@ class SolrIndexQueueProcessor(Persistent):
         if self.manager is not None:
             return self.manager.getConnection()
 
+    def wrapObject(self, obj):
+        """ wrap object with an "IndexableObjectWrapper`, see
+            `CatalogTool.catalog_object` for some background """
+        portal = getToolByName(obj, 'portal_url', None)
+        if portal is None:
+            return obj
+        portal = portal.getPortalObject()
+        wrapper = queryMultiAdapter((obj, portal), IIndexableObjectWrapper)
+        if wrapper is None:
+            return obj
+        wft = getToolByName(obj, 'portal_workflow', None)
+        if wft is not None:
+            wrapper.update(wft.getCatalogVariablesFor(obj))
+        return wrapper
+
     def getData(self, obj, attributes=None):
         schema = self.manager.getSchema()
         if schema is None:
@@ -91,6 +108,7 @@ class SolrIndexQueueProcessor(Persistent):
             attributes = schema.keys()
         else:
             attributes = set(schema.keys()).intersection(set(attributes))
+        obj = self.wrapObject(obj)
         data, marker = {}, []
         for name in attributes:
             value = getattr(obj, name, marker)
