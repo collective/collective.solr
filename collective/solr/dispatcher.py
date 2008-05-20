@@ -1,9 +1,10 @@
 from zope.interface import implements
-from zope.component import queryUtility
+from zope.component import queryUtility, queryMultiAdapter
 from Products.ZCatalog.ZCatalog import ZCatalog
 
 from collective.solr.interfaces import ISearchDispatcher
 from collective.solr.interfaces import ISearch
+from collective.solr.interfaces import IFlare
 from collective.solr.utils import isActive, prepareData
 
 from collective.solr.monkey import patchCatalogTool
@@ -44,5 +45,10 @@ def solrSearchResults(request, **keywords):
         raise FallBackException
     prepareData(keywords)
     query = search.buildQuery(**keywords)
-    return search(query)
+    results = search(query, fl='* score')
+    def wrap(flare):
+        """ wrap a flare object with a helper class """
+        adapter = queryMultiAdapter((flare, request), IFlare)
+        return adapter is not None and adapter or flare
+    return map(wrap, results)
 

@@ -24,6 +24,16 @@
         provides=".interfaces.ISearchDispatcher"
         factory=".dispatcher.SearchDispatcher" />
 
+    <adapter
+        factory=".flare.PloneFlare" />
+
+    <adapter
+        for="*
+             zope.publisher.interfaces.browser.IBrowserRequest
+             .flare.PloneFlare"
+           factory="plone.app.layout.icons.icons.CatalogBrainContentIcon"
+           provides="plone.app.layout.icons.interfaces.IContentIcon" />
+
   </configure>
 
   <configure zcml:condition="installed plone.app.controlpanel">

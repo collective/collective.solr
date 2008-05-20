@@ -10,6 +10,8 @@ class SolrFlare(object):
     """ a sol(a)r brain, i.e. a data container for search results """
     implements(ISolrFlare)
 
+    __allow_access_to_unprotected_subobjects__ = True
+
 
 class SolrResults(list):
     """ a list of results returned from solr, i.e. sol(a)r flares """

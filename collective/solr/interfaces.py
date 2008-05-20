@@ -26,6 +26,11 @@ class ISolrFlare(Interface):
     """ a sol(a)r brain, i.e. a data container for search results """
 
 
+class IFlare(Interface):
+    """ marker interface for pluggable brain wrapper classes, providing
+        additional helper methods like `getURL` etc """
+
+
 class ISearch(Interface):
     """ a generic search interface
         FIXME: this should be defined in a generic package """
