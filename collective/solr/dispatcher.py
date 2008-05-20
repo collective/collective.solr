@@ -10,6 +10,11 @@ from collective.solr.monkey import patchCatalogTool
 patchCatalogTool()      # patch catalog tool to use the dispatcher...
 
 
+class FallBackException(Exception):
+    """ exception indicating the dispatcher should fall back to searching
+        the portal catalog """
+
+
 class SearchDispatcher(object):
     """ adapter for potentially dispatching a given query to an
         alternative search backend (instead of the portal catalog) """
@@ -21,9 +26,11 @@ class SearchDispatcher(object):
     def __call__(self, request, **keywords):
         """ decide on a search backend and perform the given query """
         if isActive():
-            return solrSearchResults(request, **keywords)
-        else:
-            return ZCatalog.searchResults(self.context, request, **keywords)
+            try:
+                return solrSearchResults(request, **keywords)
+            except FallBackException:
+                pass
+        return ZCatalog.searchResults(self.context, request, **keywords)
 
 
 def solrSearchResults(request, **keywords):
@@ -33,6 +40,8 @@ def solrSearchResults(request, **keywords):
     # FIXME: add translation/mangling of parameters
     if request is not None:
         keywords.update(request)
+    if not keywords.has_key('SearchableText'):
+        raise FallBackException
     prepareData(keywords)
     query = search.buildQuery(**keywords)
     return search(query)
