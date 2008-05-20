@@ -22,6 +22,10 @@ class ISolrIndexQueueProcessor(IIndexQueueProcessor):
     """ an index queue processor for solr """
 
 
+class ISolrFlare(Interface):
+    """ a sol(a)r brain, i.e. a data container for search results """
+
+
 class ISearch(Interface):
     """ a generic search interface
         FIXME: this should be defined in a generic package """

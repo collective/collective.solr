@@ -1,15 +1,18 @@
+from zope.interface import implements
 from elementtree.ElementTree import iterparse
 from StringIO import StringIO
 from DateTime import DateTime
 
+from collective.solr.interfaces import ISolrFlare
+
 
 class SolrFlare(object):
-    """ a sol(a)r brain; TODO: this should get an interface!! """
+    """ a sol(a)r brain, i.e. a data container for search results """
+    implements(ISolrFlare)
 
 
 class SolrResults(list):
-    """ a list of results returned from solr, i.e. sol(a)r flares
-        TODO: this should get an interface!! """
+    """ a list of results returned from solr, i.e. sol(a)r flares """
 
 
 # unmarshallers for basic types
