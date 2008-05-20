@@ -10,3 +10,11 @@ def isActive():
         return manager.isActive()
     return False
 
+
+def prepareData(data):
+    """ modify data according to solr specifics, i.e. replace ':' by '$'
+        for "allowedRolesAndUsers" etc """
+    allowed = data.get('allowedRolesAndUsers', None)
+    if allowed is not None:
+        data['allowedRolesAndUsers'] = [r.replace(':','$') for r in allowed]
+

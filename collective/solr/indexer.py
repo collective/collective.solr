@@ -8,6 +8,7 @@ from plone.app.content.interfaces import IIndexableObjectWrapper
 from collective.solr.interfaces import ISolrConnectionManager
 from collective.solr.interfaces import ISolrIndexQueueProcessor
 from collective.solr.solr import SolrException
+from collective.solr.utils import prepareData
 
 logger = getLogger('collective.solr.indexer')
 
@@ -38,7 +39,7 @@ class SolrIndexQueueProcessor(Persistent):
         conn = self.getConnection()
         if conn is not None:
             data = self.getData(obj, attributes)
-            self.prepareData(data)
+            prepareData(data)
             schema = self.manager.getSchema()
             if data.get(schema['uniqueKey'], None) is not None:
                 try:
@@ -56,7 +57,7 @@ class SolrIndexQueueProcessor(Persistent):
             schema = self.manager.getSchema()
             uniqueKey = schema['uniqueKey']
             data = self.getData(obj, attributes=[uniqueKey])
-            self.prepareData(data)
+            prepareData(data)
             assert data.has_key(uniqueKey), "no value for <uniqueKey> in object data"
             try:
                 logger.debug('unindexing %r (%r)', obj, data)
@@ -125,11 +126,4 @@ class SolrIndexQueueProcessor(Persistent):
                 value = separator.join(value)
             data[name] = value
         return data
-
-    def prepareData(self, data):
-        """ modify data according to solr specifics, i.e. replace ':' by '$'
-            for "allowedRolesAndUsers" etc """
-        allowed = data.get('allowedRolesAndUsers', None)
-        if allowed is not None:
-            data['allowedRolesAndUsers'] = [r.replace(':','$') for r in allowed]
 

@@ -6,6 +6,7 @@ from collective.solr.manager import SolrConnectionManager
 from collective.solr.indexer import SolrIndexQueueProcessor
 from collective.solr.tests.utils import getData, fakehttp, fakemore
 from collective.solr.solr import SolrConnection
+from collective.solr.utils import prepareData
 
 
 class Foo:
@@ -31,7 +32,7 @@ class QueueIndexerTests(TestCase):
 
     def testPrepareData(self):
         data = {'allowedRolesAndUsers': ['user:test_user_1_', 'user:portal_owner']}
-        SolrIndexQueueProcessor().prepareData(data)
+        prepareData(data)
         self.assertEqual(data, {'allowedRolesAndUsers': ['user$test_user_1_', 'user$portal_owner']})
 
     def testIndexObject(self):
