@@ -1,6 +1,7 @@
 from zope.interface import implements
 from zope.component import queryUtility, queryMultiAdapter
 from Products.ZCatalog.ZCatalog import ZCatalog
+from DateTime import DateTime
 
 from collective.solr.interfaces import ISearchDispatcher
 from collective.solr.interfaces import ISearch
@@ -38,11 +39,12 @@ def solrSearchResults(request, **keywords):
     """ perform a query using solr after translating the passed in
         parameters with portal catalog semantics """
     search = queryUtility(ISearch)
-    # FIXME: add translation/mangling of parameters
     if request is not None:
+        # TODO: check precedence request vs extra parameters in ZCatalog
         keywords.update(request.form)
     if not keywords.has_key('SearchableText'):
         raise FallBackException
+    mangleQuery(keywords)
     prepareData(keywords)
     query = search.buildQuery(**keywords)
     results = search(query, fl='* score')
@@ -51,4 +53,39 @@ def solrSearchResults(request, **keywords):
         adapter = queryMultiAdapter((flare, request), IFlare)
         return adapter is not None and adapter or flare
     return map(wrap, results)
+
+
+usages = {
+    'range': {
+        'min': '"[%s TO *]"',
+        'max': '"[* TO %s]"',
+        'min:max': '"[%s TO %s]"',
+    },
+}
+
+
+def convert(value):
+    """ convert values, which need a special format, i.e. dates """
+    if isinstance(value, DateTime):
+        v = value.toZone('UTC')
+        value = '%04d-%02d-%02dT%02d:%02d:%06.3fZ' % (v.year(),
+            v.month(), v.day(), v.hour(), v.minute(), v.second())
+    return value
+
+
+def mangleQuery(keywords):
+    """ translate / mangle query parameters to replace zope specifics
+        with equivalent constructs for solr """
+    for key, value in keywords.items():
+        value = convert(value)
+        if key.endswith('_usage'):
+            category, spec = value.split(':', 1)
+            mapping = usages.get(category, None)
+            if mapping is not None:
+                name = key[:-6]
+                payload = map(convert, keywords[name])
+                keywords[name] = mapping[spec] % tuple(payload)
+                del keywords[key]
+            else:
+                raise AttributeError, 'unsupported usage: %r' % key
 
