@@ -1,14 +1,11 @@
 TODOs:
-* site search integration
-* gs import/export handler
+* genericsetup import/export handler
 * browsertest for indexing
 
-* design and hook up searching
 * provide decorator for solr exceptions
 * error handling for stale connections
 * add signal handlers (see store.py)
 * what about http timeouts?
-* genericsetup support for configuration
 * add a configurable queue limit for large transactions
 * mapping from accessor name to attribute name, i.e. getTitle -> title,
   preferably via <copyField> tags in the solr schema
