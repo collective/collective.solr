@@ -58,7 +58,9 @@ class Search(object):
             if field is None or not field.indexed:
                 logger.info('dropping unknown search attribute "%s" (%r)', name, value)
                 continue
-            if isinstance(value, (tuple, list)):
+            if not value:       # solr doesn't like empty fields (+foo:"")
+                continue
+            elif isinstance(value, (tuple, list)):
                 quoted = False
                 value = '(%s)' % ' '.join(map(quote, value))
             elif isinstance(value, basestring):
