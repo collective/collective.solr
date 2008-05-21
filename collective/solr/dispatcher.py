@@ -40,7 +40,7 @@ def solrSearchResults(request, **keywords):
     search = queryUtility(ISearch)
     # FIXME: add translation/mangling of parameters
     if request is not None:
-        keywords.update(request)
+        keywords.update(request.form)
     if not keywords.has_key('SearchableText'):
         raise FallBackException
     prepareData(keywords)
