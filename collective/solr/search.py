@@ -40,6 +40,7 @@ class Search(object):
     def search(self, query, **parameters):
         """ perform a search with the given querystring and parameters """
         connection = self.getManager().getConnection()
+        logger.debug('searching for %r (%r)', query, parameters)
         response = connection.search(q=query, **parameters)
         return getattr(SolrResponse(response), 'response', [])
 
@@ -47,6 +48,7 @@ class Search(object):
 
     def buildQuery(self, default=None, **args):
         """ helper to build a querystring for simple use-cases """
+        logger.debug('building query for "%r", %r', default, args)
         schema = self.getManager().getSchema() or {}
         defaultSearchField = getattr(schema, 'defaultSearchField', None)
         args[None] = default
@@ -54,6 +56,7 @@ class Search(object):
         for name, value in args.items():
             field = schema.get(name or defaultSearchField, None)
             if field is None or not field.indexed:
+                logger.info('dropping unknown search attribute "%s" (%r)', name, value)
                 continue
             if isinstance(value, (tuple, list)):
                 quoted = False
@@ -62,6 +65,7 @@ class Search(object):
                 quoted = value.startswith('"') and value.endswith('"')
                 value = quote(value)
             else:
+                logger.info('skipping unsupported value "%r" (%s)', value, name)
                 continue
             if name is None:
                 if not quoted:      # don't prefix when value was quoted...
@@ -69,5 +73,7 @@ class Search(object):
                 query.append(value)
             else:
                 query.append('+%s:%s' % (name, value))
-        return ' '.join(query)
+        query = ' '.join(query)
+        logger.debug('built query "%s"', query)
+        return query
 
