@@ -1,5 +1,6 @@
 from zope.interface import implements
 from zope.component import queryUtility, queryMultiAdapter
+from zope.publisher.interfaces.http import IHTTPRequest
 from Products.ZCatalog.ZCatalog import ZCatalog
 from DateTime import DateTime
 
@@ -39,14 +40,20 @@ def solrSearchResults(request, **keywords):
     """ perform a query using solr after translating the passed in
         parameters with portal catalog semantics """
     search = queryUtility(ISearch)
-    if request is not None:
-        # TODO: check precedence request vs extra parameters in ZCatalog
-        keywords.update(request.form)
-    if not keywords.has_key('SearchableText'):
+    if request is None:
+        args = keywords
+    elif IHTTPRequest.providedBy(request):
+        args = request.form.copy()  # ignore headers and other stuff
+        args.update(keywords)       # keywords take precedence
+    else:
+        assert isinstance(request, dict), request
+        args = request.copy()
+        args.update(keywords)       # keywords take precedence
+    if not args.has_key('SearchableText'):
         raise FallBackException
-    mangleQuery(keywords)
-    prepareData(keywords)
-    query = search.buildQuery(**keywords)
+    mangleQuery(args)
+    prepareData(args)
+    query = search.buildQuery(**args)
     results = search(query, fl='* score')
     def wrap(flare):
         """ wrap a flare object with a helper class """
