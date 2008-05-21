@@ -1,4 +1,7 @@
 TODOs:
+* additional keyword index for parent paths and depth index
+* result iterator (with __len__ on results object)
+* support for order, limit etc parameters
 * genericsetup import/export handler
 * browsertest for indexing
 
