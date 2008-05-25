@@ -27,9 +27,9 @@ class PloneFlare(AttrDict):
         """ convert the physical path into a url, if it was stored;
             the code is copied from `OFS/Traversable.py` """
         url = 'unknown'
-        path = self.get('getPhysicalPath', None)
+        path = self.get('physicalPath', None)
         if path is not None:
-            spp = path.split()
+            spp = path.split('/')
             try:
                 url = self.request.physicalPathToURL(spp)
             except AttributeError:

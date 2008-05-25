@@ -12,6 +12,9 @@ from collective.solr.utils import isActive, prepareData
 from collective.solr.monkey import patchCatalogTool
 patchCatalogTool()      # patch catalog tool to use the dispatcher...
 
+from collective.solr.attributes import registerAttributes
+registerAttributes()    # register additional indexable attributes
+
 
 class FallBackException(Exception):
     """ exception indicating the dispatcher should fall back to searching
