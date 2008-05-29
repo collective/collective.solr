@@ -6,6 +6,7 @@ from re import compile
 from collective.solr.interfaces import ISolrConnectionManager
 from collective.solr.interfaces import ISearch
 from collective.solr.parser import SolrResponse
+from collective.solr.exceptions import SolrInactiveException
 
 logger = getLogger('collective.solr.search')
 
@@ -40,6 +41,8 @@ class Search(object):
     def search(self, query, **parameters):
         """ perform a search with the given querystring and parameters """
         connection = self.getManager().getConnection()
+        if connection is None:
+            raise SolrInactiveException
         logger.debug('searching for %r (%r)', query, parameters)
         response = connection.search(q=query, **parameters)
         return getattr(SolrResponse(response), 'response', [])

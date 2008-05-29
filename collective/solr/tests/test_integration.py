@@ -11,6 +11,7 @@ from collective.indexing.interfaces import IIndexQueueProcessor
 from collective.solr.interfaces import ISolrConnectionManager
 from collective.solr.interfaces import ISolrIndexQueueProcessor
 from collective.solr.interfaces import ISearch
+from collective.solr.exceptions import SolrInactiveException
 from collective.solr.tests.utils import getData, fakehttp
 from transaction import commit
 
@@ -91,6 +92,10 @@ class SiteSearchTests(SolrTestCase):
     def testSkinSetup(self):
         skins = self.portal.portal_skins.objectIds()
         self.failUnless('solr_site_search' in skins, 'no solr skin?')
+
+    def testInactiveException(self):
+        search = queryUtility(ISearch)
+        self.assertRaises(SolrInactiveException, search, 'foo')
 
 
 def test_suite():
