@@ -1,7 +1,10 @@
 from unittest import TestCase, TestSuite, makeSuite, main
 from threading import Thread
 from DateTime import DateTime
+from zope.component import provideUtility
 
+from collective.solr.interfaces import ISolrConnectionConfig
+from collective.solr.manager import SolrConnectionConfig
 from collective.solr.manager import SolrConnectionManager
 from collective.solr.indexer import SolrIndexQueueProcessor
 from collective.solr.tests.utils import getData, fakehttp, fakemore
@@ -19,6 +22,7 @@ class Foo:
 class QueueIndexerTests(TestCase):
 
     def setUp(self):
+        provideUtility(SolrConnectionConfig(), ISolrConnectionConfig)
         self.mngr = SolrConnectionManager()
         self.mngr.setHost(active=True)
         conn = self.mngr.getConnection()
@@ -87,6 +91,7 @@ class QueueIndexerTests(TestCase):
 class FakeHTTPConnectionTests(TestCase):
 
     def setUp(self):
+        provideUtility(SolrConnectionConfig(), ISolrConnectionConfig)
         self.foo = Foo(id='500', name='python test doc')
         self.schema_request = 'GET /solr/admin/get-file.jsp?file=schema.xml'
 
@@ -158,6 +163,7 @@ class FakeHTTPConnectionTests(TestCase):
 class ThreadedConnectionTests(TestCase):
 
     def testLocalConnections(self):
+        provideUtility(SolrConnectionConfig(), ISolrConnectionConfig)
         mngr = SolrConnectionManager(active=True)
         proc = SolrIndexQueueProcessor(mngr)
         mngr.setHost(active=True)

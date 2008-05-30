@@ -1,6 +1,8 @@
 from logging import getLogger
 from persistent import Persistent
 from zope.interface import implements
+from zope.component import getUtility
+from collective.solr.interfaces import ISolrConnectionConfig
 from collective.solr.interfaces import ISolrConnectionManager
 from collective.solr.solr import SolrConnection
 from collective.solr.local import getLocal, setLocal
@@ -8,7 +10,12 @@ from collective.solr.local import getLocal, setLocal
 logger = getLogger('collective.solr.manager')
 
 
-class SolrConnectionManager(Persistent):
+class SolrConnectionConfig(Persistent):
+    """ utility to hold the connection configuration for the solr server """
+    implements(ISolrConnectionConfig)
+
+
+class SolrConnectionManager(object):
     """ a thread-local connection manager for solr """
     implements(ISolrConnectionManager)
 
@@ -17,14 +24,16 @@ class SolrConnectionManager(Persistent):
 
     def isActive(self):
         """ indicate if the solr connection should/can be used """
-        return self.active
+        config = getUtility(ISolrConnectionConfig)
+        return config.active
 
     def setHost(self, active=False, host='localhost', port=8983, base='/solr'):
         """ set connection parameters """
-        self.active = active
-        self.host = host
-        self.port = port
-        self.base = base
+        config = getUtility(ISolrConnectionConfig)
+        config.active = active
+        config.host = host
+        config.port = port
+        config.base = base
         self.closeConnection(clearSchema=True)
 
     def closeConnection(self, clearSchema=False):
@@ -39,13 +48,14 @@ class SolrConnectionManager(Persistent):
 
     def getConnection(self):
         """ returns an existing connection or opens one """
-        if not self.active:
+        config = getUtility(ISolrConnectionConfig)
+        if not config.active:
             return None
         conn = getLocal('connection')
-        if conn is None and self.host is not None:
-            host = '%s:%d' % (self.host, self.port)
+        if conn is None and config.host is not None:
+            host = '%s:%d' % (config.host, config.port)
             logger.debug('opening connection to %s', host)
-            conn = SolrConnection(host=host, solrBase=self.base, persistent=True)
+            conn = SolrConnection(host=host, solrBase=config.base, persistent=True)
             setLocal('connection', conn)
         return conn
 

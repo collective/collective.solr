@@ -1,5 +1,29 @@
 from zope.interface import Interface
+from zope.schema import Bool, TextLine, Int
+from zope.i18nmessageid import MessageFactory
 from collective.indexing.interfaces import IIndexQueueProcessor
+
+_ = MessageFactory('collective.solr')
+
+
+class ISolrSchema(Interface):
+
+    active = Bool(title=_(u'Active'), default=False,
+        description=_(u'Check this to enable the Solr integration, i.e. '
+                       'indexing and searching using the below settings.'))
+
+    host = TextLine(title=_(u'Host'),
+        description=_(u'The host name of the Solr instance to be used.'))
+
+    port = Int(title=_(u'Port'),
+        description=_(u'The port of the Solr instance to be used.'))
+
+    base = TextLine(title=_(u'Base'),
+        description=_(u'The base prefix of the Solr instance to be used.'))
+
+
+class ISolrConnectionConfig(ISolrSchema):
+    """ utility to hold the connection configuration for the solr server """
 
 
 class ISolrConnectionManager(Interface):

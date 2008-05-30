@@ -2,7 +2,10 @@
 
 from unittest import TestCase, TestSuite, makeSuite, main
 from DateTime import DateTime
+from zope.component import provideUtility
 
+from collective.solr.interfaces import ISolrConnectionConfig
+from collective.solr.manager import SolrConnectionConfig
 from collective.solr.manager import SolrConnectionManager
 from collective.solr.tests.utils import getData, fakehttp
 from collective.solr.search import quote, Search
@@ -48,6 +51,7 @@ class QuoteTests(TestCase):
 class QueryTests(TestCase):
 
     def setUp(self):
+        provideUtility(SolrConnectionConfig(), ISolrConnectionConfig)
         self.mngr = SolrConnectionManager()
         self.mngr.setHost(active=True)
         conn = self.mngr.getConnection()
@@ -131,6 +135,7 @@ class QueryTests(TestCase):
 class InactiveQueryTests(TestCase):
 
     def testUnavailableSchema(self):
+        provideUtility(SolrConnectionConfig(), ISolrConnectionConfig)
         search = Search()
         search.manager = SolrConnectionManager()
         self.assertEqual(search.buildQuery('foo'), '')
@@ -140,6 +145,7 @@ class InactiveQueryTests(TestCase):
 class SearchTests(TestCase):
 
     def setUp(self):
+        provideUtility(SolrConnectionConfig(), ISolrConnectionConfig)
         self.mngr = SolrConnectionManager()
         self.mngr.setHost(active=True)
         self.conn = self.mngr.getConnection()

@@ -5,8 +5,8 @@ First some initial setup code:
 
     >>> self.loginAsManager()
     >>> from zope.component import getUtility
-    >>> from collective.solr.interfaces import ISolrConnectionManager
-    >>> manager = getUtility(ISolrConnectionManager)
+    >>> from collective.solr.interfaces import ISolrConnectionConfig
+    >>> manager = getUtility(ISolrConnectionConfig)
     >>> manager.active
     False
     >>> manager.host
