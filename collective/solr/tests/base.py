@@ -26,7 +26,9 @@ ptc.setupPloneSite(extension_profiles=(
 
 
 class SolrTestCase(ptc.PloneTestCase):
-    """ test case for solr integration tests """
+    """ base class for integration tests """
 
-    pass
+
+class SolrFunctionalTestCase(ptc.FunctionalTestCase):
+    """ base class for functional tests """
 

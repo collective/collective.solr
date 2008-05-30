@@ -1,7 +1,7 @@
 from unittest import TestSuite, makeSuite, main
 from zope.testing.doctest import ELLIPSIS, NORMALIZE_WHITESPACE
 from Testing.ZopeTestCase import FunctionalDocFileSuite
-from collective.solr.tests.base import SolrTestCase
+from collective.solr.tests.base import SolrTestCase, SolrFunctionalTestCase
 from plone.app.controlpanel.tests.cptc import ControlPanelTestCase
 
 
@@ -89,6 +89,13 @@ class IndexingTests(SolrTestCase):
 
 class SiteSearchTests(SolrTestCase):
 
+    def beforeTearDown(self):
+        # resetting the solr configuration after each test isn't strictly
+        # needed at the moment, but it triggers the `ConnectionStateError`
+        # when the other tests (in `errors.txt`) is trying to perform an
+        # actual solr search...
+        queryUtility(ISolrConnectionManager).setHost(active=False)
+
     def testSkinSetup(self):
         skins = self.portal.portal_skins.objectIds()
         self.failUnless('solr_site_search' in skins, 'no solr skin?')
@@ -107,6 +114,10 @@ def test_suite():
             optionflags=ELLIPSIS | NORMALIZE_WHITESPACE,
             package='collective.solr.tests',
             test_class=ControlPanelTestCase),
+        FunctionalDocFileSuite('errors.txt',
+            optionflags=ELLIPSIS | NORMALIZE_WHITESPACE,
+            package='collective.solr.tests',
+            test_class=SolrFunctionalTestCase),
     ])
 
 if __name__ == '__main__':

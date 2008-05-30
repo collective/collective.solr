@@ -1,0 +1,25 @@
+Error Handling
+--------------
+
+These tests try to make sure the error handling for searches via Solr is more
+or less sane, i.e. misconfigurations, connection errors and other things are
+handled gracefully.  We'll use a testbrowser to verify these issues:
+
+  >>> from Products.Five.testbrowser import Browser
+  >>> browser = Browser()
+
+First let's make sure an appropriate exceptions is raised if Solr hasn't even
+been configured in our Plone site yet.  This basically tests the same as
+`testInactiveException` (in `test_integration.py`), but another aspect of
+having two separate tests trying to open a real connection is to make sure
+the `ConnectionStateErrors` that occurred for the connection manager don't
+bite anymore:
+
+  >>> from zope.component import getUtility
+  >>> from collective.solr.interfaces import ISearch
+  >>> search = getUtility(ISearch)
+  >>> search('foo')
+  Traceback (most recent call last):
+  ...
+  SolrInactiveException
+
