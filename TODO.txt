@@ -3,10 +3,8 @@ TODOs:
 * result iterator (with __len__ on results object)
 * support for order, limit etc parameters
 * genericsetup import/export handler
-* browsertest for indexing
 
 * provide decorator for solr exceptions
-* error handling for stale connections
 * add signal handlers (see store.py)
 * what about http timeouts?
 * add a configurable queue limit for large transactions
