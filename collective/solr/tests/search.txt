@@ -1,0 +1,26 @@
+Site Search
+-----------
+
+This tests the Solr-based replacement for Plone's site search feature.  We'll
+use a testbrowser to created an object and then search for it:
+
+  >>> self.setRoles(('Manager',))
+  >>> browser = self.getBrowser()
+  >>> browser.open('http://nohost/plone/')
+  >>> browser.getLink('Page').click()
+  >>> browser.getControl('Title').value = 'Foo'
+  >>> browser.getControl('Save').click()
+  >>> browser.url
+  'http://nohost/plone/foo'
+  >>> browser.contents
+  '...Info...Changes saved...
+   ...Foo...This item does not have any body text...'
+
+  >>> browser.getControl('Search Site').value = 'Foo'
+  >>> browser.getForm(name='searchform').submit()
+  >>> browser.contents
+  '...Search results...1...items matching your search terms...
+   ...http://nohost/plone/foo...Foo...'
+  >>> browser.getLink('Foo')
+  <Link text='Foo' url='http://nohost/plone/foo'>
+
