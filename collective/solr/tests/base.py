@@ -4,6 +4,7 @@
 
 from Products.Five import zcml
 from Products.Five import fiveconfigure
+from Products.Five.testbrowser import Browser
 from Products.PloneTestCase import PloneTestCase as ptc
 from Products.PloneTestCase.layer import onsetup
 
@@ -31,4 +32,13 @@ class SolrTestCase(ptc.PloneTestCase):
 
 class SolrFunctionalTestCase(ptc.FunctionalTestCase):
     """ base class for functional tests """
+
+    def getBrowser(self, loggedIn=True):
+        """ instantiate and return a testbrowser for convenience """
+        browser = Browser()
+        if loggedIn:
+            user = ptc.default_user
+            pwd = ptc.default_password
+            browser.addHeader('Authorization', 'Basic %s:%s' % (user, pwd))
+        return browser
 
