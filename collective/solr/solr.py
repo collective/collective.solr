@@ -99,11 +99,12 @@ class SolrConnection:
         try:
             self.conn.request('POST', url, body, headers)
             return self.__errcheck(self.conn.getresponse())
-        except (socket.error,httplib.CannotSendRequest) :
+        except (socket.error,httplib.CannotSendRequest,httplib.ResponseNotReady) :
             #Reconnect in case the connection was broken from the server going down,
             #the server timing out our persistent connection, or another
-            #network failure. Also catch httplib.CannotSendRequest because the
-            #HTTPConnection object can get in a bad state.
+            #network failure. Also catch httplib.CannotSendRequest and
+            #httlib.ResponseNotReady because the HTTPConnection object can get
+            #in a bad state (seems like they might be "ghosted" in the zodb).
             self.__reconnect()
             self.conn.request('POST', url, body, headers)
             return self.__errcheck(self.conn.getresponse())
