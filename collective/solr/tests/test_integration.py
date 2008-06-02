@@ -8,12 +8,14 @@ from plone.app.controlpanel.tests.cptc import ControlPanelTestCase
 # test-specific imports go here...
 from zope.component import queryUtility, getUtilitiesFor
 from collective.indexing.interfaces import IIndexQueueProcessor
+from collective.solr.interfaces import ISolrConnectionConfig
 from collective.solr.interfaces import ISolrConnectionManager
 from collective.solr.interfaces import ISolrIndexQueueProcessor
 from collective.solr.interfaces import ISearch
 from collective.solr.exceptions import SolrInactiveException
 from collective.solr.tests.utils import getData, fakehttp
 from transaction import commit
+from socket import error
 
 
 class UtilityTests(SolrTestCase):
@@ -103,6 +105,13 @@ class SiteSearchTests(SolrTestCase):
     def testInactiveException(self):
         search = queryUtility(ISearch)
         self.assertRaises(SolrInactiveException, search, 'foo')
+
+    def testSearchWithoutServer(self):
+        config = queryUtility(ISolrConnectionConfig)
+        config.active = True
+        config.port = 55555     # random port so the real solr might still run
+        search = queryUtility(ISearch)
+        self.assertRaises(error, search, 'foo')
 
 
 def test_suite():
