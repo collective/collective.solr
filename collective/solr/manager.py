@@ -22,11 +22,6 @@ class SolrConnectionManager(object):
     def __init__(self, active=False):
         self.setHost(active=active)
 
-    def isActive(self):
-        """ indicate if the solr connection should/can be used """
-        config = getUtility(ISolrConnectionConfig)
-        return config.active
-
     def setHost(self, active=False, host='localhost', port=8983, base='/solr'):
         """ set connection parameters """
         config = getUtility(ISolrConnectionConfig)
