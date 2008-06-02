@@ -1,9 +1,5 @@
-from unittest import TestSuite, makeSuite, main
-from zope.testing.doctest import ELLIPSIS, NORMALIZE_WHITESPACE
-from Testing.ZopeTestCase import FunctionalDocFileSuite
-from collective.solr.tests.base import SolrTestCase, SolrFunctionalTestCase
-from plone.app.controlpanel.tests.cptc import ControlPanelTestCase
-
+from unittest import defaultTestLoader
+from collective.solr.tests.base import SolrTestCase
 
 # test-specific imports go here...
 from zope.component import queryUtility, getUtilitiesFor
@@ -115,20 +111,5 @@ class SiteSearchTests(SolrTestCase):
 
 
 def test_suite():
-    return TestSuite([
-        makeSuite(UtilityTests),
-        makeSuite(IndexingTests),
-        makeSuite(SiteSearchTests),
-        FunctionalDocFileSuite('configlet.txt',
-            optionflags=ELLIPSIS | NORMALIZE_WHITESPACE,
-            package='collective.solr.tests',
-            test_class=ControlPanelTestCase),
-        FunctionalDocFileSuite('errors.txt',
-            optionflags=ELLIPSIS | NORMALIZE_WHITESPACE,
-            package='collective.solr.tests',
-            test_class=SolrFunctionalTestCase),
-    ])
-
-if __name__ == '__main__':
-    main(defaultTest='test_suite')
+    return defaultTestLoader.loadTestsFromName(__name__)
 
