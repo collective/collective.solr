@@ -56,8 +56,8 @@ class IndexingTests(SolrTestCase):
 
     def beforeTearDown(self):
         self.proc.closeConnection(clearSchema=True)
-        # due to the `commit()` in the tests below from `afterSetUp` need
-        # to be explicitly reversed (and committed)...
+        # due to the `commit()` in the tests below the activation of the
+        # solr support in `afterSetUp` needs to be explicitly reversed...
         self.proc.setHost(active=False)
         commit()
 
