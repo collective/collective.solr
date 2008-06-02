@@ -78,13 +78,19 @@ def fakemore(solrconn, *fakedata):
     solrconn.conn.fakedata.extend(fakedata)
 
 
-def solrStatus():
+def pingSolr():
     """ test if the solr server is available """
     conn = HTTPConnection('localhost', 8983)
     try:
         conn.request('GET', '/solr/admin/ping')
         response = conn.getresponse()
-        return ''
+        status = response.status == 200
     except error, e:
-        return e
+        status = False
+        msg = 'WARNING: solr tests could not be run: "%s".' % e
+    if not status:
+        print '*' * len(msg)
+        print msg
+        print '*' * len(msg)
+    return status
 

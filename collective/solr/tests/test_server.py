@@ -1,9 +1,9 @@
-from unittest import makeSuite, defaultTestLoader
+from unittest import TestSuite, defaultTestLoader
 from zope.component import getUtility
 from transaction import commit
 from re import search
 
-from collective.solr.tests.utils import solrStatus
+from collective.solr.tests.utils import pingSolr
 from collective.solr.tests.base import SolrTestCase
 from collective.solr.interfaces import ISolrConnectionManager
 from collective.solr.interfaces import ISearch
@@ -108,10 +108,8 @@ class SolrServerTests(SolrTestCase):
 
 
 def test_suite():
-    status = solrStatus()
-    if status:
-        print 'WARNING: solr tests could not be run: "%s".' % status
-        return makeSuite()
-    else:
+    if pingSolr():
         return defaultTestLoader.loadTestsFromName(__name__)
+    else:
+        return TestSuite()
 
