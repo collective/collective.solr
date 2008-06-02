@@ -2,6 +2,8 @@ from os.path import dirname, join
 from httplib import HTTPConnection
 from StringIO import StringIO
 from socket import error
+from re import search
+
 from collective.solr import tests
 
 
@@ -93,4 +95,11 @@ def pingSolr():
         print msg
         print '*' * len(msg)
     return status
+
+
+def numFound(result):
+    match = search(r'numFound="(\d+)"', result)
+    if match is not None:
+        match = int(match.group(1))
+    return match
 
