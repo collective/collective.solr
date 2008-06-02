@@ -1,6 +1,7 @@
 from os.path import dirname, join
 from httplib import HTTPConnection
 from StringIO import StringIO
+from socket import error
 from collective.solr import tests
 
 
@@ -75,4 +76,15 @@ def fakemore(solrconn, *fakedata):
     """ helper function to add more fake http requests to a SolrConnection """
     assert hasattr(solrconn.conn, 'fakedata')   # `isinstance()` doesn't work?
     solrconn.conn.fakedata.extend(fakedata)
+
+
+def solrStatus():
+    """ test if the solr server is available """
+    conn = HTTPConnection('localhost', 8983)
+    try:
+        conn.request('GET', '/solr/admin/ping')
+        response = conn.getresponse()
+        return ''
+    except error, e:
+        return e
 

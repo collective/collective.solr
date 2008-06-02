@@ -1,10 +1,9 @@
 from unittest import makeSuite, defaultTestLoader
 from zope.component import getUtility
-from httplib import HTTPConnection
 from transaction import commit
-from socket import error
 from re import search
 
+from collective.solr.tests.utils import solrStatus
 from collective.solr.tests.base import SolrTestCase
 from collective.solr.interfaces import ISolrConnectionManager
 from collective.solr.interfaces import ISearch
@@ -106,17 +105,6 @@ class SolrServerTests(SolrTestCase):
         self.assertEqual(results.numFound, '1')
         self.assertEqual(results[0].Title, 'Foo')
         self.assertEqual(results[0].UID, self.folder.UID())
-
-
-def solrStatus():
-    """ test if the solr server is available """
-    conn = HTTPConnection('localhost', 8983)
-    try:
-        conn.request('GET', '/solr/admin/ping')
-        response = conn.getresponse()
-        return ''
-    except error, e:
-        return e
 
 
 def test_suite():
