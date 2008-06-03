@@ -97,6 +97,12 @@ class QueueIndexerTests(TestCase):
         self.proc.commit()                                       # committing sends data
         self.assertEqual(str(output), getData('commit_request.txt'))
 
+    def testNoIndexingWithoutAllRequiredFields(self):
+        response = getData('dummy_response.txt')
+        output = fakehttp(self.mngr.getConnection(), response)   # fake add response
+        self.proc.index(Foo(id='500'))                           # indexing sends data
+        self.assertEqual(str(output), '')
+
 
 class FakeHTTPConnectionTests(TestCase):
 

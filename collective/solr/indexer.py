@@ -46,10 +46,10 @@ class SolrIndexQueueProcessor(Persistent):
     def index(self, obj, attributes=None):
         conn = self.getConnection()
         if conn is not None and indexable(obj):
-            data = self.getData(obj, attributes)
+            data, missing = self.getData(obj, attributes)
             prepareData(data)
             schema = self.manager.getSchema()
-            if data.get(schema['uniqueKey'], None) is not None:
+            if data.get(schema['uniqueKey'], None) is not None and not missing:
                 try:
                     logger.debug('indexing %r (%r)', obj, data)
                     conn.add(**data)
@@ -64,7 +64,7 @@ class SolrIndexQueueProcessor(Persistent):
         if conn is not None:
             schema = self.manager.getSchema()
             uniqueKey = schema['uniqueKey']
-            data = self.getData(obj, attributes=[uniqueKey])
+            data, missing = self.getData(obj, attributes=[uniqueKey])
             prepareData(data)
             assert data.has_key(uniqueKey), "no value for <uniqueKey> in object data"
             try:
@@ -133,5 +133,6 @@ class SolrIndexQueueProcessor(Persistent):
                 separator = getattr(field, 'separator', ' ')
                 value = separator.join(value)
             data[name] = value
-        return data
+        missing = set(schema.requiredFields) - set(data.keys())
+        return data, missing
 

@@ -84,9 +84,10 @@ class ParserTests(TestCase):
     def testParseConfig(self):
         schema_xml = getData('schema.xml')
         schema = SolrSchema(schema_xml.split('\n\n', 1)[1])
-        self.assertEqual(len(schema), 19) # 19 items defined in schema.xml
+        self.assertEqual(len(schema), 20) # 20 items defined in schema.xml
         self.assertEqual(schema['defaultSearchField'], 'text')
         self.assertEqual(schema['uniqueKey'], 'id')
+        self.assertEqual(schema['requiredFields'], ['id', 'name'])
         self.assertEqual(schema['id'].type, 'string')
         self.assertEqual(schema['id'].class_, 'solr.StrField')
         self.assertEqual(schema['id'].required, True)
@@ -105,7 +106,7 @@ class ParserTests(TestCase):
         self.assertEqual(schema.timestamp.default, 'NOW')
         self.assertEqual(schema.timestamp.multiValued, False)
         fields = schema.values()
-        self.assertEqual(len([f for f in fields if getattr(f, 'required', False)]), 1)
+        self.assertEqual(len([f for f in fields if getattr(f, 'required', False)]), 2)
         self.assertEqual(len([f for f in fields if getattr(f, 'multiValued', False)]), 3)
 
 

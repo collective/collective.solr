@@ -121,6 +121,7 @@ class SolrSchema(AttrDict):
             search and indexing queries later on """
         if isinstance(data, basestring):
             data = StringIO(data)
+        self['requiredFields'] = required = []
         types = {}
         for action, elem in iterparse(data):
             name = elem.get('name')
@@ -134,6 +135,8 @@ class SolrSchema(AttrDict):
                     if value in ('true', 'false'):
                         field[key] = value == 'true'
                 self[name] = field
+                if field.get('required', False):
+                    required.append(name)
             elif elem.tag in ('uniqueKey', 'defaultSearchField'):
                 self[elem.tag] = elem.text
 
