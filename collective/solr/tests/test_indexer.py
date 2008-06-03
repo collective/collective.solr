@@ -1,5 +1,6 @@
 from unittest import TestCase, TestSuite, makeSuite
 from threading import Thread
+from re import search, findall, DOTALL
 from DateTime import DateTime
 from zope.component import provideUtility
 from Products.CMFCore.CMFCatalogAware import CMFCatalogAware
@@ -18,6 +19,14 @@ class Foo(CMFCatalogAware):
     def __init__(self, **kw):
         for key, value in kw.items():
             setattr(self, key, value)
+
+
+def sortFields(output):
+    """ helper to sort `<field>` tags in output for testing """
+    pattern = r'^(.*<doc>)(<field .*</field>)(</doc>.*)'
+    prefix, fields, suffix = search(pattern, output, DOTALL).groups()
+    tags = r'(<field [^>]*>[^<]*</field>)'
+    return prefix + ''.join(sorted(findall(tags, fields))) + suffix
 
 
 class QueueIndexerTests(TestCase):
@@ -44,7 +53,7 @@ class QueueIndexerTests(TestCase):
         response = getData('add_response.txt')
         output = fakehttp(self.mngr.getConnection(), response)   # fake add response
         self.proc.index(Foo(id='500', name='python test doc'))   # indexing sends data
-        self.assertEqual(str(output), getData('add_request.txt'))
+        self.assertEqual(sortFields(str(output)), getData('add_request.txt'))
 
     def testPartialIndexObject(self):
         foo = Foo(id='500', name='foo', price=42.0)
@@ -74,7 +83,7 @@ class QueueIndexerTests(TestCase):
         response = getData('add_response.txt')
         output = fakehttp(self.mngr.getConnection(), response)   # fake add response
         self.proc.reindex(Foo(id='500', name='python test doc')) # reindexing sends data
-        self.assertEqual(str(output), getData('add_request.txt'))
+        self.assertEqual(sortFields(str(output)), getData('add_request.txt'))
 
     def testUnindexObject(self):
         response = getData('delete_response.txt')
@@ -112,7 +121,7 @@ class FakeHTTPConnectionTests(TestCase):
         mngr.closeConnection()
         self.assertEqual(len(output), 2)
         self.failUnless(output.get().startswith(self.schema_request))
-        self.assertEqual(output.get(), getData('add_request.txt'))
+        self.assertEqual(sortFields(output.get()), getData('add_request.txt'))
 
     def testThreeRequests(self):
         mngr = SolrConnectionManager(active=True)
@@ -124,7 +133,7 @@ class FakeHTTPConnectionTests(TestCase):
         mngr.closeConnection()
         self.assertEqual(len(output), 3)
         self.failUnless(output.get().startswith(self.schema_request))
-        self.assertEqual(output.get(), getData('add_request.txt'))
+        self.assertEqual(sortFields(output.get()), getData('add_request.txt'))
         self.assertEqual(output.get(), getData('delete_request.txt'))
 
     def testFourRequests(self):
@@ -139,7 +148,7 @@ class FakeHTTPConnectionTests(TestCase):
         mngr.closeConnection()
         self.assertEqual(len(output), 4)
         self.failUnless(output.get().startswith(self.schema_request))
-        self.assertEqual(output.get(), getData('add_request.txt'))
+        self.assertEqual(sortFields(output.get()), getData('add_request.txt'))
         self.assertEqual(output.get(), getData('delete_request.txt'))
         self.assertEqual(output.get(), getData('commit_request.txt'))
 
@@ -157,7 +166,7 @@ class FakeHTTPConnectionTests(TestCase):
         mngr.closeConnection()
         self.assertEqual(len(output), 3)
         self.failUnless(output.get().startswith(self.schema_request))
-        self.assertEqual(output.get(), getData('add_request.txt'))
+        self.assertEqual(sortFields(output.get()), getData('add_request.txt'))
         self.assertEqual(output.get(), getData('delete_request.txt'))
 
 
@@ -195,7 +204,7 @@ class ThreadedConnectionTests(TestCase):
         mngr.closeConnection()
         mngr.setHost(active=False)
         self.assertEqual(len(log), 3)
-        self.assertEqual(log[0], getData('add_request.txt'))
+        self.assertEqual(sortFields(log[0]), getData('add_request.txt'))
         self.failUnless(isinstance(log[1], SolrIndexQueueProcessor))
         self.failUnless(isinstance(log[2], SolrConnection))
         self.failUnless(isinstance(proc, SolrIndexQueueProcessor))
