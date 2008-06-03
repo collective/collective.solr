@@ -69,7 +69,7 @@ class IndexingTests(SolrTestCase):
         required = '<field name="Title">Foo</field>'
         self.assert_(str(output).find(required) > 0, '"title" data not found')
 
-    def testNoIndexingWithoutUniqueKey(self):
+    def testNoIndexingWithMethodOverride(self):
         self.setRoles(('Manager',))
         output = []
         connection = self.proc.getConnection()
@@ -91,8 +91,9 @@ class IndexingTests(SolrTestCase):
         responses = [getData('dummy_response.txt')] * 42    # set up enough...
         output = fakehttp(connection, *responses)           # fake responses
         ref = self.folder.addReference(self.portal.news, 'referencing')
-        self.folder.processForm({'title': 'Foo'})
+        self.folder.processForm(values={'title': 'Foo'})
         commit()                        # indexing happens on commit
+        self.assertNotEqual(repr(output).find('Foo'), -1, 'title not found')
         self.assertEqual(repr(output).find(ref.UID()), -1, 'reference found?')
         self.assertEqual(repr(output).find('at_references'), -1, '`at_references` found?')
 
