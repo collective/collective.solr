@@ -1,7 +1,8 @@
-from unittest import TestCase, TestSuite, makeSuite, main
+from unittest import TestCase, TestSuite, makeSuite
 from threading import Thread
 from DateTime import DateTime
 from zope.component import provideUtility
+from Products.CMFCore.CMFCatalogAware import CMFCatalogAware
 
 from collective.solr.interfaces import ISolrConnectionConfig
 from collective.solr.manager import SolrConnectionConfig
@@ -12,7 +13,7 @@ from collective.solr.solr import SolrConnection
 from collective.solr.utils import prepareData
 
 
-class Foo:
+class Foo(CMFCatalogAware):
     """ dummy test object """
     def __init__(self, **kw):
         for key, value in kw.items():
@@ -209,7 +210,4 @@ def test_suite():
         makeSuite(FakeHTTPConnectionTests),
         makeSuite(ThreadedConnectionTests),
     ])
-
-if __name__ == '__main__':
-    main(defaultTest='test_suite')
 

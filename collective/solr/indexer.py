@@ -4,6 +4,8 @@ from DateTime import DateTime
 from zope.component import queryUtility, queryMultiAdapter
 from zope.interface import implements
 from Products.CMFCore.utils import getToolByName
+from Products.CMFCore.CMFCatalogAware import CMFCatalogAware
+from Products.Archetypes.CatalogMultiplex import CatalogMultiplex
 from plone.app.content.interfaces import IIndexableObjectWrapper
 from collective.solr.interfaces import ISolrConnectionManager
 from collective.solr.interfaces import ISolrIndexQueueProcessor
@@ -11,6 +13,12 @@ from collective.solr.solr import SolrException
 from collective.solr.utils import prepareData
 
 logger = getLogger('collective.solr.indexer')
+
+
+def indexable(obj):
+    """ indicate whether a given object should be indexed; for now only
+        objects inheriting one of the catalog mixin classes are considerd """
+    return isinstance(obj, CatalogMultiplex) or isinstance(obj, CMFCatalogAware)
 
 
 def datehandler(value):
@@ -37,7 +45,7 @@ class SolrIndexQueueProcessor(Persistent):
 
     def index(self, obj, attributes=None):
         conn = self.getConnection()
-        if conn is not None:
+        if conn is not None and indexable(obj):
             data = self.getData(obj, attributes)
             prepareData(data)
             schema = self.manager.getSchema()

@@ -84,6 +84,18 @@ class IndexingTests(SolrTestCase):
         objs = self.portal.portal_catalog(portal_type='ATPortalTypeCriterion')
         self.assertEqual(list(objs), [])
 
+    def testNoIndexingForNonCatalogAwareContent(self):
+        self.setRoles(('Manager',))
+        output = []
+        connection = self.proc.getConnection()
+        responses = [getData('dummy_response.txt')] * 42    # set up enough...
+        output = fakehttp(connection, *responses)           # fake responses
+        ref = self.folder.addReference(self.portal.news, 'referencing')
+        self.folder.processForm({'title': 'Foo'})
+        commit()                        # indexing happens on commit
+        self.assertEqual(repr(output).find(ref.UID()), -1, 'reference found?')
+        self.assertEqual(repr(output).find('at_references'), -1, '`at_references` found?')
+
 
 class SiteSearchTests(SolrTestCase):
 

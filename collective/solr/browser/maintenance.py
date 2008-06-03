@@ -2,18 +2,11 @@ from time import time, clock
 from zope.interface import implements
 from zope.component import queryUtility
 from Products.Five.browser import BrowserView
-from Products.CMFCore.CMFCatalogAware import CMFCatalogAware
-from Products.Archetypes.CatalogMultiplex import CatalogMultiplex
 
 from collective.solr.interfaces import ISolrConnectionManager
 from collective.solr.interfaces import ISolrIndexQueueProcessor
 from collective.solr.interfaces import ISolrMaintenanceView
-
-
-def indexable(obj):
-    """ indicate whether a given object should be indexed; for now only
-        objects inheriting one of the catalog mixin classes are considerd """
-    return isinstance(obj, CatalogMultiplex) or isinstance(obj, CMFCatalogAware)
+from collective.solr.indexer import indexable
 
 
 class SolrMaintenanceView(BrowserView):
