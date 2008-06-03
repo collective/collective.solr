@@ -14,7 +14,7 @@ from Products.CMFPlone.browser.navtree import getNavigationRoot
 
 results=[]
 catalog=context.portal_catalog
-indexes=catalog.indexes()
+indexes=catalog.indexes() + quote_logic_indexes
 query={}
 show_query=show_all
 second_pass = {}

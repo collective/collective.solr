@@ -109,6 +109,18 @@ class SiteSearchTests(SolrTestCase):
         search = queryUtility(ISearch)
         self.assertRaises(error, search, 'foo')
 
+    def testSearchWithoutSearchableTextInPortalCatalog(self):
+        config = queryUtility(ISolrConnectionConfig)
+        config.active = True
+        config.port = 55555     # random port so the real solr might still run
+        search = queryUtility(ISearch)
+        catalog = self.portal.portal_catalog
+        catalog.delIndex('SearchableText')
+        self.failIf('SearchableText' in catalog.indexes())
+        query = self.portal.restrictedTraverse('queryCatalog')
+        request = dict(SearchableText='foo')
+        self.assertRaises(error, query, request)
+
 
 def test_suite():
     return defaultTestLoader.loadTestsFromName(__name__)
