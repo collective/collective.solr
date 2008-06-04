@@ -32,8 +32,10 @@ class SolrMaintenanceView(BrowserView):
         def index(obj, path):
             global count
             if indexable(obj):
-                log('indexing %r\n' %  obj)
+                log('indexing %r' %  obj)
+                lap = time()
                 proc.index(obj)
+                log(' (%.4fs)\n' % (time() - lap))
                 self.count += 1
                 self.commit -= 1
                 if self.commit == 0:
