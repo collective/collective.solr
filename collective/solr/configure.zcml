@@ -51,4 +51,10 @@
 
   </configure>
 
+  <adapter
+      factory=".exportimport.SolrConfigXMLAdapter"
+      provides="Products.GenericSetup.interfaces.IBody"
+      for=".interfaces.ISolrConnectionConfig
+           Products.GenericSetup.interfaces.ISetupEnviron" />
+
 </configure>

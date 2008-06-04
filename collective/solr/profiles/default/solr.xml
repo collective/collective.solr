@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<object name="solr">
+  <connection>
+    <active value="False" />
+    <host value="localhost" />
+    <port value="8983" />
+    <port base="/solr" />
+  </connection>
+</object>

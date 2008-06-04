@@ -4,7 +4,6 @@ TODOs:
 * support path searches (i.e. translate "range")
 * result iterator (with __len__ on results object)
 * support for order, limit etc parameters
-* genericsetup import/export handler
 
 * provide decorator for solr exceptions
 * add signal handlers (see store.py)
