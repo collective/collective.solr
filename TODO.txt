@@ -2,6 +2,7 @@ TODOs:
 * remove temporary fix for issue with ex-persistent utility again
 * support boolean attributes
 * support path searches (i.e. translate "range")
+* gracefully handle error cause by 404s (and the search triggered by it)
 * result iterator (with __len__ on results object)
 * support for order, limit etc parameters
 
