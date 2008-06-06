@@ -26,40 +26,43 @@ class SolrMaintenanceView(BrowserView):
         conn.commit()
         return 'solr index cleared.'
 
-    def reindex(self, batch=100):
+    def reindex(self, batch=100, skip=0):
         """ find all contentish objects (meaning all objects derived from one
             of the catalog mixin classes) and (re)indexes them """
         manager = queryUtility(ISolrConnectionManager)
         proc = queryUtility(ISolrIndexQueueProcessor, name='solr')
         log = self.request.RESPONSE.write
         self.count = 0
+        self.indexed = 0
         self.commit = batch
         def index(obj, path):
-            global count
-            if indexable(obj):
+            self.count += 1
+            if self.count > skip and indexable(obj):
                 log('indexing %r' % obj)
                 lap = time()
                 try:
                     proc.index(obj)
+                    self.indexed += 1
                 except BadStatusLine:
                     log('WARNING: error while indexing %r' % obj)
                     logger.exception('error while indexing %r', obj)
                     manager.getConnection().reset()     # force new connection
                 log(' (%.4fs)\n' % (time() - lap))
-                self.count += 1
                 self.commit -= 1
                 if self.commit == 0:
-                    log('intermediate commit (%d objects indexed)...\n' % self.count)
+                    log('intermediate commit (%d objects indexed)...\n' % self.indexed)
                     proc.commit()
                     self.commit = batch
                     manager.getConnection().reset()     # force new connection
+        if skip:
+            log('skipping indexing of %d object(s)...\n' % skip)
         now, cpu = time(), clock()
         self.context.ZopeFindAndApply(self.context, search_sub=True,
             apply_func=index)
         proc.commit()   # make sure to commit in the end...
         now, cpu = time() - now, clock() - cpu
         log('solr index rebuilt.\n')
-        msg = 'indexed %d object(s) in %.3f seconds (%.3f cpu time).' % (self.count, now, cpu)
+        msg = 'indexed %d object(s) in %.3f seconds (%.3f cpu time).' % (self.indexed, now, cpu)
         log(msg)
         logger.info(msg)
 
