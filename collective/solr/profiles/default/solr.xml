@@ -2,8 +2,8 @@
 <object name="solr">
   <connection>
     <active value="False" />
-    <host value="localhost" />
+    <host value="127.0.0.1" />
     <port value="8983" />
-    <port base="/solr" />
+    <base value="/solr" />
   </connection>
 </object>

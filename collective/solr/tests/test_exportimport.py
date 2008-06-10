@@ -23,7 +23,7 @@ class SetupToolTests(SolrTestCase, TarballTester):
         self.failUnless(result['messages']['solr'].endswith('collective.solr: settings imported.'))
         config = getUtility(ISolrConnectionConfig)
         self.assertEqual(config.active, False)
-        self.assertEqual(config.host, 'localhost')
+        self.assertEqual(config.host, '127.0.0.1')
         self.assertEqual(config.port, 8983)
         self.assertEqual(config.base, '/solr')
 

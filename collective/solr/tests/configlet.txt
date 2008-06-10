@@ -10,7 +10,7 @@ First some initial setup code:
     >>> manager.active
     False
     >>> manager.host
-    'localhost'
+    '127.0.0.1'
     >>> manager.port
     8983
     >>> manager.base

@@ -30,14 +30,18 @@ class SolrConfigXMLAdapter(XMLAdapterBase):
         self.context.base = ''
 
     def _initProperties(self, node):
-        for child in node.childNodes:
+        conn = node.getElementsByTagName('connection')[0]
+        for child in conn.childNodes:
             if child.nodeName == 'active':
-                value = self._convertToBoolean(child.getAttribute('value'))
+                value = self._convertToBoolean(str(child.getAttribute('value')))
                 self.context.active = value
             elif child.nodeName == 'port':
-                value = int(child.getAttribute('value'))
-            elif child.nodeName in ('host', 'base'):
-                self.context.active = value
+                value = int(str(child.getAttribute('value')))
+                self.context.port = value
+            elif child.nodeName == 'host':
+                self.context.host = str(child.getAttribute('value'))
+            elif child.nodeName == 'base':
+                self.context.base = str(child.getAttribute('value'))
 
     def _createNode(self, name, value):
         node = self._doc.createElement(name)
