@@ -36,32 +36,32 @@ class SolrMaintenanceView(BrowserView):
         if skip:
             log('skipping indexing of %d object(s)...\n' % skip)
         now, cpu = time(), clock()
-        self.count = 0
-        self.indexed = 0
-        self.commit = batch
+        count = 0
+        indexed = 0
+        commit = batch
         for path, obj in findObjects(self.context):
-            self.count += 1
-            if self.count > skip and indexable(obj):
+            count += 1
+            if count > skip and indexable(obj):
                 log('indexing %r' % obj)
                 lap = time()
                 try:
                     proc.index(obj)
-                    self.indexed += 1
+                    indexed += 1
                 except BadStatusLine:
                     log('WARNING: error while indexing %r' % obj)
                     logger.exception('error while indexing %r', obj)
                     manager.getConnection().reset()     # force new connection
                 log(' (%.4fs)\n' % (time() - lap))
-                self.commit -= 1
-                if self.commit == 0:
-                    log('intermediate commit (%d objects indexed)...\n' % self.indexed)
+                commit -= 1
+                if commit == 0:
+                    log('intermediate commit (%d objects indexed)...\n' % indexed)
                     proc.commit()
-                    self.commit = batch
+                    commit = batch
                     manager.getConnection().reset()     # force new connection
         proc.commit()   # make sure to commit in the end...
         now, cpu = time() - now, clock() - cpu
         log('solr index rebuilt.\n')
-        msg = 'indexed %d object(s) in %.3f seconds (%.3f cpu time).' % (self.indexed, now, cpu)
+        msg = 'indexed %d object(s) in %.3f seconds (%.3f cpu time).' % (indexed, now, cpu)
         log(msg)
         logger.info(msg)
 
