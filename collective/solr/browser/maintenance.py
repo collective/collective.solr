@@ -40,8 +40,10 @@ class SolrMaintenanceView(BrowserView):
         indexed = 0
         commit = batch
         for path, obj in findObjects(self.context):
-            count += 1
-            if count > skip and indexable(obj):
+            if indexable(obj):
+                count += 1
+                if count <= skip:
+                    continue
                 log('indexing %r' % obj)
                 lap = time()
                 try:
