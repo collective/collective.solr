@@ -9,6 +9,7 @@ from collective.solr.interfaces import ISolrConnectionManager
 from collective.solr.interfaces import ISolrIndexQueueProcessor
 from collective.solr.interfaces import ISolrMaintenanceView
 from collective.solr.indexer import indexable
+from collective.solr.utils import findObjects
 
 logger = getLogger('collective.solr.maintenance')
 
@@ -32,10 +33,13 @@ class SolrMaintenanceView(BrowserView):
         manager = queryUtility(ISolrConnectionManager)
         proc = queryUtility(ISolrIndexQueueProcessor, name='solr')
         log = self.request.RESPONSE.write
+        if skip:
+            log('skipping indexing of %d object(s)...\n' % skip)
+        now, cpu = time(), clock()
         self.count = 0
         self.indexed = 0
         self.commit = batch
-        def index(obj, path):
+        for path, obj in findObjects(self.context):
             self.count += 1
             if self.count > skip and indexable(obj):
                 log('indexing %r' % obj)
@@ -54,11 +58,6 @@ class SolrMaintenanceView(BrowserView):
                     proc.commit()
                     self.commit = batch
                     manager.getConnection().reset()     # force new connection
-        if skip:
-            log('skipping indexing of %d object(s)...\n' % skip)
-        now, cpu = time(), clock()
-        self.context.ZopeFindAndApply(self.context, search_sub=True,
-            apply_func=index)
         proc.commit()   # make sure to commit in the end...
         now, cpu = time() - now, clock() - cpu
         log('solr index rebuilt.\n')

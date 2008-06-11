@@ -1,4 +1,5 @@
 from zope.component import queryUtility
+from Acquisition import aq_base
 
 from collective.solr.interfaces import ISolrConnectionConfig
 
@@ -23,4 +24,19 @@ def prepareData(data):
     allowed = data.get('allowedRolesAndUsers', None)
     if allowed is not None:
         data['allowedRolesAndUsers'] = [r.replace(':','$') for r in allowed]
+
+
+def findObjects(origin):
+    """ generator to recursively find and yield all zope objects below
+        the given start point """
+    traverse = origin.unrestrictedTraverse
+    base = '/'.join(origin.getPhysicalPath())
+    cut = len(base) + 1
+    paths = [ base ]
+    for path in paths:
+        obj = traverse(path)
+        yield path[cut:], obj
+        if hasattr(aq_base(obj), 'objectIds'):
+            for id in obj.objectIds():
+                paths.append(path + '/' + id)
 

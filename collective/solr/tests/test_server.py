@@ -64,7 +64,7 @@ class SolrMaintenanceTests(SolrTestCase):
         maintenance = self.portal.unrestrictedTraverse('news/solr-maintenance')
         maintenance.reindex()
         result = connection.search(q='[* TO *]').read()
-        self.assertEqual(numFound(result), 1)
+        self.assertEqual(numFound(result), 2)
 
 
 class SolrServerTests(SolrTestCase):
