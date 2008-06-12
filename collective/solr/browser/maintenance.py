@@ -27,7 +27,7 @@ class SolrMaintenanceView(BrowserView):
         conn.commit()
         return 'solr index cleared.'
 
-    def reindex(self, batch=100, skip=0):
+    def reindex(self, batch=100, skip=0, cache=1000):
         """ find all contentish objects (meaning all objects derived from one
             of the catalog mixin classes) and (re)indexes them """
         manager = queryUtility(ISolrConnectionManager)
@@ -56,10 +56,17 @@ class SolrMaintenanceView(BrowserView):
                 log(' (%.4fs)\n' % (time() - lap))
                 commit -= 1
                 if commit == 0:
-                    log('intermediate commit (%d objects indexed)...\n' % indexed)
+                    msg = 'intermediate commit (%d objects indexed in %.4fs)...\n'
+                    log(msg %  (indexed, time() - now))
                     proc.commit()
                     commit = batch
                     manager.getConnection().reset()     # force new connection
+                    if cache:
+                        db = self.context.getPhysicalRoot()._p_jar.db()
+                        size = db.cacheSize()
+                        if size > cache:
+                            log('minimizing zodb cache with %d objects...\n' % size)
+                            db.cacheMinimize()
         proc.commit()   # make sure to commit in the end...
         now, cpu = time() - now, clock() - cpu
         log('solr index rebuilt.\n')
