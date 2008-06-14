@@ -43,5 +43,7 @@ def mangleQuery(keywords):
             payload = map(convert, value)
             keywords[key] = ranges[args['range']] % tuple(payload)
             del args['range']
+        else:
+            keywords[key] = convert(value)
         assert not args, 'unsupported usage: %r' % args
 

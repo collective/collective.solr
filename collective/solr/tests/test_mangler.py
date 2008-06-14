@@ -39,6 +39,8 @@ class QueryManglerTests(TestCase):
 
     def testDateConversion(self):
         day = DateTime('1972/05/11 UTC')
+        keywords = mangle(foo=day)
+        self.assertEqual(keywords, {'foo': '1972-05-11T00:00:00.000Z'})
         keywords = mangle(foo=(day, day + 7), foo_usage='range:min:max')
         self.assertEqual(keywords, {'foo':
             '"[1972-05-11T00:00:00.000Z TO 1972-05-18T00:00:00.000Z]"'})
