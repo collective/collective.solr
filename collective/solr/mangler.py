@@ -1,4 +1,5 @@
 from DateTime import DateTime
+from collective.solr.search import quote
 
 
 ranges = {
@@ -14,6 +15,8 @@ def convert(value):
         v = value.toZone('UTC')
         value = '%04d-%02d-%02dT%02d:%02d:%06.3fZ' % (v.year(),
             v.month(), v.day(), v.hour(), v.minute(), v.second())
+    elif isinstance(value, basestring):
+        value = quote(value)
     return value
 
 
@@ -43,6 +46,12 @@ def mangleQuery(keywords):
             payload = map(convert, value)
             keywords[key] = ranges[args['range']] % tuple(payload)
             del args['range']
+        elif args.has_key('operator'):
+            if isinstance(value, (list, tuple)) and len(value) > 1:
+                sep = ' %s ' % args['operator'].upper()
+                value = sep.join(map(str, map(convert, value)))
+                keywords[key] = '"(%s)"' % value
+            del args['operator']
         else:
             keywords[key] = convert(value)
         assert not args, 'unsupported usage: %r' % args

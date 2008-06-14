@@ -1,6 +1,6 @@
 from unittest import TestSuite, defaultTestLoader
 from zope.component import getUtility
-from transaction import commit
+from transaction import commit, abort
 
 from collective.solr.tests.utils import pingSolr, numFound
 from collective.solr.tests.base import SolrTestCase
@@ -109,7 +109,7 @@ class SolrServerTests(SolrTestCase):
         self.assertEqual([ (r.Title, r.physicalPath) for r in results ],
             [('News', '/plone/news'), ('News', '/plone/news/aggregator')])
 
-    def testPathSearch(self):
+    def testPathSearches(self):
         self.maintenance.reindex()
         request = dict(SearchableText='"[* TO *]"')
         results = solrSearchResults(request, path='/plone')
@@ -127,6 +127,24 @@ class SolrServerTests(SolrTestCase):
             path={'query': '/plone', 'depth': 1})
         self.assertEqual(sorted([ r.physicalPath for r in results ]),
             ['/plone/Members', '/plone/events', '/plone/front-page', '/plone/news'])
+
+    def testLogicalOperators(self):
+        self.portal.news.setSubject(('News',))
+        self.portal.events.setSubject(('Events',))
+        self.portal['front-page'].setSubject(('News', 'Events',))
+        self.maintenance.reindex()
+        request = dict(SearchableText='"[* TO *]"')
+        search = lambda subject: sorted([ r.physicalPath for r in
+            solrSearchResults(request, Subject=subject) ])
+        self.assertEqual(search(dict(operator='and', query=('News',))),
+            ['/plone/front-page', '/plone/news'])
+        self.assertEqual(search(dict(operator='or', query=('News',))),
+            ['/plone/front-page', '/plone/news'])
+        self.assertEqual(search(dict(operator='or', query=('News', 'Events'))),
+            ['/plone/events', '/plone/front-page', '/plone/news'])
+        self.assertEqual(search(dict(operator='and', query=('News', 'Events'))),
+            ['/plone/front-page'])
+        abort()     # undo the keyword changes
 
 
 def test_suite():

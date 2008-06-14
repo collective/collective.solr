@@ -51,6 +51,20 @@ class QueryManglerTests(TestCase):
         self.assertEqual(keywords, {'foo':
             '"[1972-05-11T00:00:00.000Z TO *]"'})
 
+    def testOperatorConversion(self):
+        keywords = mangle(foo=(23,42), foo_usage='operator:or')
+        self.assertEqual(keywords, {'foo': '"(23 OR 42)"'})
+        keywords = mangle(foo=dict(query=(23,42), operator='or'))
+        self.assertEqual(keywords, {'foo': '"(23 OR 42)"'})
+        keywords = mangle(foo=(23,42), foo_usage='operator:and')
+        self.assertEqual(keywords, {'foo': '"(23 AND 42)"'})
+        keywords = mangle(foo=dict(query=(23,42), operator='and'))
+        self.assertEqual(keywords, {'foo': '"(23 AND 42)"'})
+        day = DateTime('1972/05/11 UTC')
+        keywords = mangle(foo=dict(query=(day, day + 7), operator='or'))
+        self.assertEqual(keywords, {'foo':
+            '"(1972-05-11T00:00:00.000Z OR 1972-05-18T00:00:00.000Z)"'})
+
 
 class PathManglerTests(TestCase):
 
