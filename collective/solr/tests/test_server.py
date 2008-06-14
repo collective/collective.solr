@@ -6,6 +6,7 @@ from collective.solr.tests.utils import pingSolr, numFound
 from collective.solr.tests.base import SolrTestCase
 from collective.solr.interfaces import ISolrConnectionManager
 from collective.solr.interfaces import ISearch
+from collective.solr.dispatcher import solrSearchResults, FallBackException
 from collective.solr.utils import activate
 
 
@@ -71,8 +72,9 @@ class SolrServerTests(SolrTestCase):
 
     def afterSetUp(self):
         activate()
-        maintenance = self.portal.unrestrictedTraverse('solr-maintenance')
-        maintenance.clear()
+        self.portal.REQUEST.RESPONSE.write = lambda x: x    # ignore output
+        self.maintenance = self.portal.unrestrictedTraverse('solr-maintenance')
+        self.maintenance.clear()
         self.search = getUtility(ISearch)
 
     def beforeTearDown(self):
@@ -97,6 +99,15 @@ class SolrServerTests(SolrTestCase):
         self.assertEqual(results.numFound, '1')
         self.assertEqual(results[0].Title, 'Foo')
         self.assertEqual(results[0].UID, self.folder.UID())
+
+    def testSolrSearchResultsFallback(self):
+        self.assertRaises(FallBackException, solrSearchResults, dict(foo='bar'))
+
+    def testSolrSearchResults(self):
+        self.maintenance.reindex()
+        results = solrSearchResults(SearchableText='News')
+        self.assertEqual([ (r.Title, r.physicalPath) for r in results ],
+            [('News', '/plone/news'), ('News', '/plone/news/aggregator')])
 
 
 def test_suite():

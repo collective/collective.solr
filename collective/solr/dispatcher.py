@@ -39,7 +39,7 @@ class SearchDispatcher(object):
         return ZCatalog.searchResults(self.context, request, **keywords)
 
 
-def solrSearchResults(request, **keywords):
+def solrSearchResults(request=None, **keywords):
     """ perform a query using solr after translating the passed in
         parameters with portal catalog semantics """
     search = queryUtility(ISearch)
