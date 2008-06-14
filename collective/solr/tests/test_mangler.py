@@ -4,11 +4,15 @@ from DateTime import DateTime
 from collective.solr.mangler import mangleQuery
 
 
+def mangle(**keywords):
+    mangleQuery(keywords)
+    return keywords
+
+
 class QueryManglerTests(TestCase):
 
     def testPassUnknownArguments(self):
-        keywords = dict(foo=23, bar=42)
-        mangleQuery(keywords)
+        keywords = mangle(foo=23, bar=42)
         self.assertEqual(keywords, {'foo': 23, 'bar': 42})
 
     def testComplainAboutUnknownUsages(self):
@@ -16,26 +20,22 @@ class QueryManglerTests(TestCase):
         self.assertRaises(AttributeError, mangleQuery, keywords)
 
     def testMinRange(self):
-        keywords = dict(foo=(23,), foo_usage='range:min')
-        mangleQuery(keywords)
+        keywords = mangle(foo=(23,), foo_usage='range:min')
         self.assertEqual(keywords, {'foo': '"[23 TO *]"'})
 
     def testMaxRange(self):
-        keywords = dict(foo=(23,), foo_usage='range:max')
-        mangleQuery(keywords)
+        keywords = mangle(foo=(23,), foo_usage='range:max')
         self.assertEqual(keywords, {'foo': '"[* TO 23]"'})
 
     def testMinMaxRange(self):
-        keywords = dict(foo=(23,42), foo_usage='range:min:max')
-        mangleQuery(keywords)
+        keywords = mangle(foo=(23,42), foo_usage='range:min:max')
         self.assertEqual(keywords, {'foo': '"[23 TO 42]"'})
 
     def testDateConversion(self):
-        start = DateTime('1972/05/11 UTC')
-        end = start + 7
-        keywords = dict(foo=(start, end), foo_usage='range:min:max')
-        mangleQuery(keywords)
-        self.assertEqual(keywords, {'foo': '"[1972-05-11T00:00:00.000Z TO 1972-05-18T00:00:00.000Z]"'})
+        day = DateTime('1972/05/11 UTC')
+        keywords = mangle(foo=(day, day + 7), foo_usage='range:min:max')
+        self.assertEqual(keywords, {'foo':
+            '"[1972-05-11T00:00:00.000Z TO 1972-05-18T00:00:00.000Z]"'})
 
 
 def test_suite():
