@@ -2,12 +2,12 @@ from zope.interface import implements
 from zope.component import queryUtility, queryMultiAdapter
 from zope.publisher.interfaces.http import IHTTPRequest
 from Products.ZCatalog.ZCatalog import ZCatalog
-from DateTime import DateTime
 
 from collective.solr.interfaces import ISearchDispatcher
 from collective.solr.interfaces import ISearch
 from collective.solr.interfaces import IFlare
 from collective.solr.utils import isActive, prepareData
+from collective.solr.mangler import mangleQuery
 
 from collective.solr.monkey import patchCatalogTool
 patchCatalogTool()      # patch catalog tool to use the dispatcher...
@@ -63,39 +63,4 @@ def solrSearchResults(request, **keywords):
         adapter = queryMultiAdapter((flare, request), IFlare)
         return adapter is not None and adapter or flare
     return map(wrap, results)
-
-
-usages = {
-    'range': {
-        'min': '"[%s TO *]"',
-        'max': '"[* TO %s]"',
-        'min:max': '"[%s TO %s]"',
-    },
-}
-
-
-def convert(value):
-    """ convert values, which need a special format, i.e. dates """
-    if isinstance(value, DateTime):
-        v = value.toZone('UTC')
-        value = '%04d-%02d-%02dT%02d:%02d:%06.3fZ' % (v.year(),
-            v.month(), v.day(), v.hour(), v.minute(), v.second())
-    return value
-
-
-def mangleQuery(keywords):
-    """ translate / mangle query parameters to replace zope specifics
-        with equivalent constructs for solr """
-    for key, value in keywords.items():
-        value = convert(value)
-        if key.endswith('_usage'):
-            category, spec = value.split(':', 1)
-            mapping = usages.get(category, None)
-            if mapping is not None:
-                name = key[:-6]
-                payload = map(convert, keywords[name])
-                keywords[name] = mapping[spec] % tuple(payload)
-                del keywords[key]
-            else:
-                raise AttributeError, 'unsupported usage: %r' % key
 
