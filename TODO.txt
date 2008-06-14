@@ -1,6 +1,4 @@
 TODOs:
-* support path searches (i.e. translate "range")
-* support boolean attributes
 * support for order, limit etc parameters
 * gracefully handle error cause by 404s (and the search triggered by it)
 * fix connection handling regarding schema in `indexer.py` (in `index`, `unindex`)
