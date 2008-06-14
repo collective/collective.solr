@@ -23,7 +23,6 @@ def mangleQuery(keywords):
     """ translate / mangle query parameters to replace zope specifics
         with equivalent constructs for solr """
     for key, value in keywords.items():
-        value = convert(value)
         if key.endswith('_usage'):
             category, spec = value.split(':', 1)
             mapping = usages.get(category, None)
