@@ -83,6 +83,7 @@ class IndexingTests(SolrTestCase):
         self.assert_(repr(output).find('crit') == -1, 'criterion indexed?')
         objs = self.portal.portal_catalog(portal_type='ATPortalTypeCriterion')
         self.assertEqual(list(objs), [])
+        self.folder.manage_delObjects('coll')               # clean up again
 
     def testNoIndexingForNonCatalogAwareContent(self):
         self.setRoles(('Manager',))

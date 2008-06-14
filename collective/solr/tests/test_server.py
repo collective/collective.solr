@@ -50,7 +50,7 @@ class SolrMaintenanceTests(SolrTestCase):
         maintenance = self.portal.unrestrictedTraverse('solr-maintenance')
         maintenance.reindex()
         result = connection.search(q='[* TO *]').read()
-        self.assertEqual(numFound(result), 9)
+        self.assertEqual(numFound(result), 8)
 
     def testPartialReindex(self):
         manager = getUtility(ISolrConnectionManager)
@@ -113,7 +113,7 @@ class SolrServerTests(SolrTestCase):
         self.maintenance.reindex()
         request = dict(SearchableText='"[* TO *]"')
         results = solrSearchResults(request, path='/plone')
-        self.assertEqual(len(results), 9)
+        self.assertEqual(len(results), 8)
         results = solrSearchResults(request, path='/plone/news')
         self.assertEqual([ r.physicalPath for r in results ],
             ['/plone/news', '/plone/news/aggregator'])
