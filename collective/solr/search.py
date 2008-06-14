@@ -59,7 +59,7 @@ class Search(object):
         for name, value in args.items():
             field = schema.get(name or defaultSearchField, None)
             if field is None or not field.indexed:
-                logger.info('dropping unknown search attribute "%s" (%r)', name, value)
+                logger.debug('dropping unknown search attribute "%s" (%r)', name, value)
                 continue
             if not value:       # solr doesn't like empty fields (+foo:"")
                 continue
