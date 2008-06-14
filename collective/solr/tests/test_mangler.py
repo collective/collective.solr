@@ -38,6 +38,25 @@ class QueryManglerTests(TestCase):
             '"[1972-05-11T00:00:00.000Z TO 1972-05-18T00:00:00.000Z]"'})
 
 
+class PathManglerTests(TestCase):
+
+    def testSimplePathQuery(self):
+        keywords = mangle(path='/foo')
+        self.assertEqual(keywords, {'parentPaths': '/foo'})
+
+    def testSimplePathQueryAsDictionary(self):
+        keywords = mangle(path=dict(query='/foo'))
+        self.assertEqual(keywords, {'parentPaths': '/foo'})
+
+    def testPathQueryWithLevel(self):
+        keywords = mangle(path=dict(query='/foo', depth=0))
+        self.assertEqual(keywords, {'parentPaths': '/foo',
+            'physicalDepth': '"[* TO 2]"'})
+        keywords = mangle(path=dict(query='/foo', depth=2))
+        self.assertEqual(keywords, {'parentPaths': '/foo',
+            'physicalDepth': '"[* TO 4]"'})
+
+
 def test_suite():
     return defaultTestLoader.loadTestsFromName(__name__)
 

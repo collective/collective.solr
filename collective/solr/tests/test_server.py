@@ -109,6 +109,25 @@ class SolrServerTests(SolrTestCase):
         self.assertEqual([ (r.Title, r.physicalPath) for r in results ],
             [('News', '/plone/news'), ('News', '/plone/news/aggregator')])
 
+    def testPathSearch(self):
+        self.maintenance.reindex()
+        request = dict(SearchableText='"[* TO *]"')
+        results = solrSearchResults(request, path='/plone')
+        self.assertEqual(len(results), 9)
+        results = solrSearchResults(request, path='/plone/news')
+        self.assertEqual([ r.physicalPath for r in results ],
+            ['/plone/news', '/plone/news/aggregator'])
+        results = solrSearchResults(request, path={'query': '/plone/news'})
+        self.assertEqual([ r.physicalPath for r in results ],
+            ['/plone/news', '/plone/news/aggregator'])
+        results = solrSearchResults(request,
+            path={'query': '/plone/news', 'depth': 0})
+        self.assertEqual([ r.physicalPath for r in results ], ['/plone/news'])
+        results = solrSearchResults(request,
+            path={'query': '/plone', 'depth': 1})
+        self.assertEqual(sorted([ r.physicalPath for r in results ]),
+            ['/plone/Members', '/plone/events', '/plone/front-page', '/plone/news'])
+
 
 def test_suite():
     if pingSolr():

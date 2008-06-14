@@ -22,6 +22,15 @@ def convert(value):
 def mangleQuery(keywords):
     """ translate / mangle query parameters to replace zope specifics
         with equivalent constructs for solr """
+    if keywords.has_key('path'):
+        path = value = keywords['path']
+        if isinstance(value, dict):
+            path = value['query']
+            if value.has_key('depth'):
+                depth = len(path.split('/')) + int(value['depth'])
+                keywords['physicalDepth'] = '"[* TO %d]"' % depth
+        keywords['parentPaths'] = path
+        del keywords['path']
     for key, value in keywords.items():
         if key.endswith('_usage'):
             category, spec = value.split(':', 1)
