@@ -38,7 +38,7 @@ def mangleQuery(keywords):
     for key, value in keywords.items():
         args = extras.get(key, {})
         if key == 'path':
-            path = keywords['parentPaths'] = keywords[key]
+            path = keywords['parentPaths'] = value
             del keywords[key]
             if args.has_key('depth'):
                 depth = len(path.split('/')) + int(args['depth'])
