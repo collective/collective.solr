@@ -1,12 +1,10 @@
 from DateTime import DateTime
 
 
-usages = {
-    'range': {
-        'min': '"[%s TO *]"',
-        'max': '"[* TO %s]"',
-        'min:max': '"[%s TO %s]"',
-    },
+ranges = {
+    'min': '"[%s TO *]"',
+    'max': '"[* TO %s]"',
+    'min:max': '"[%s TO %s]"',
 }
 
 
@@ -22,24 +20,28 @@ def convert(value):
 def mangleQuery(keywords):
     """ translate / mangle query parameters to replace zope specifics
         with equivalent constructs for solr """
-    if keywords.has_key('path'):
-        path = value = keywords['path']
-        if isinstance(value, dict):
-            path = value['query']
-            if value.has_key('depth'):
-                depth = len(path.split('/')) + int(value['depth'])
-                keywords['physicalDepth'] = '"[* TO %d]"' % depth
-        keywords['parentPaths'] = path
-        del keywords['path']
+    extras = {}
     for key, value in keywords.items():
-        if key.endswith('_usage'):
+        if key.endswith('_usage'):          # convert old-style parameters
             category, spec = value.split(':', 1)
-            mapping = usages.get(category, None)
-            if mapping is not None:
-                name = key[:-6]
-                payload = map(convert, keywords[name])
-                keywords[name] = mapping[spec] % tuple(payload)
-                del keywords[key]
-            else:
-                raise AttributeError, 'unsupported usage: %r' % key
+            extras[key[:-6]] = { category: spec }
+            del keywords[key]
+        elif isinstance(value, dict):       # unify parameters
+            keywords[key] = value['query']
+            del value['query']
+            extras[key] = value
+    for key, value in keywords.items():
+        args = extras.get(key, {})
+        if key == 'path':
+            path = keywords['parentPaths'] = keywords[key]
+            del keywords[key]
+            if args.has_key('depth'):
+                depth = len(path.split('/')) + int(args['depth'])
+                keywords['physicalDepth'] = '"[* TO %d]"' % depth
+                del args['depth']
+        elif args.has_key('range'):
+            payload = map(convert, value)
+            keywords[key] = ranges[args['range']] % tuple(payload)
+            del args['range']
+        assert not args, 'unsupported usage: %r' % args
 
