@@ -156,6 +156,24 @@ class SolrServerTests(SolrTestCase):
         self.assertEqual(sorted([ r.physicalPath for r in results ]),
             ['/plone/front-page'])
 
+    def testSearchSecurity(self):
+        self.setRoles(('Manager',))
+        wfAction = self.portal.portal_workflow.doActionFor
+        wfAction(self.portal.news, 'retract')
+        wfAction(self.portal.news.aggregator, 'retract')
+        wfAction(self.portal.events, 'retract')
+        wfAction(self.portal.events.aggregator, 'retract')
+        wfAction(self.portal.events.aggregator.previous, 'retract')
+        self.maintenance.reindex()
+        request = dict(SearchableText='"[* TO *]"')
+        results = self.portal.portal_catalog(request)
+        self.assertEqual(len(results), 8)
+        self.setRoles(())                   # again as anonymous user
+        results = self.portal.portal_catalog(request)
+        self.assertEqual(sorted([ r.physicalPath for r in results ]),
+            ['/plone/Members', '/plone/Members/test_user_1_', '/plone/front-page'])
+        abort()     # undo the workflow changes
+
 
 def test_suite():
     if pingSolr():
