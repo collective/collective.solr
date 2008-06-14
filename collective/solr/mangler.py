@@ -44,6 +44,11 @@ def mangleQuery(keywords):
                 depth = len(path.split('/')) + int(args['depth'])
                 keywords['physicalDepth'] = '"[* TO %d]"' % depth
                 del args['depth']
+        elif key == 'effectiveRange':
+            value = convert(value)
+            del keywords[key]
+            keywords['effective'] = '"[* TO %s]"' % value
+            keywords['expires'] = '"[%s TO *]"' % value
         elif args.has_key('range'):
             payload = map(convert, value)
             keywords[key] = ranges[args['range']] % tuple(payload)

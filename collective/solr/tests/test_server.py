@@ -1,6 +1,7 @@
 from unittest import TestSuite, defaultTestLoader
 from zope.component import getUtility
 from transaction import commit, abort
+from DateTime import DateTime
 
 from collective.solr.tests.utils import pingSolr, numFound
 from collective.solr.tests.base import SolrTestCase
@@ -172,6 +173,27 @@ class SolrServerTests(SolrTestCase):
         results = self.portal.portal_catalog(request)
         self.assertEqual(sorted([ r.physicalPath for r in results ]),
             ['/plone/Members', '/plone/Members/test_user_1_', '/plone/front-page'])
+        abort()     # undo the workflow changes
+
+    def testEffectiveRange(self):
+        self.setRoles(('Manager',))
+        self.portal.news.setEffectiveDate(DateTime() + 1)
+        self.portal.events.setExpirationDate(DateTime() - 1)
+        self.maintenance.reindex()
+        request = dict(SearchableText='"[* TO *]"')
+        results = self.portal.portal_catalog(request)
+        self.assertEqual(len(results), 8)
+        self.setRoles(())                   # again as anonymous user
+        results = self.portal.portal_catalog(request)
+        self.assertEqual(len(results), 6)
+        paths = [ r.physicalPath for r in results ]
+        self.failIf('/plone/news' in paths)
+        self.failIf('/plone/events' in paths)
+        results = self.portal.portal_catalog(request, show_inactive=True)
+        self.assertEqual(len(results), 8)
+        paths = [ r.physicalPath for r in results ]
+        self.failUnless('/plone/news' in paths)
+        self.failUnless('/plone/events' in paths)
         abort()     # undo the workflow changes
 
 
