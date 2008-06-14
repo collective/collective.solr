@@ -80,7 +80,9 @@ class SolrServerTests(SolrTestCase):
 
     def beforeTearDown(self):
         # due to the `commit()` in the tests below the activation of the
-        # solr support in `afterSetUp` needs to be explicitly reversed...
+        # solr support in `afterSetUp` needs to be explicitly reversed,
+        # but first all uncommitted changes made in the tests are aborted...
+        abort()
         activate(active=False)
         commit()
 
@@ -113,20 +115,16 @@ class SolrServerTests(SolrTestCase):
     def testPathSearches(self):
         self.maintenance.reindex()
         request = dict(SearchableText='"[* TO *]"')
-        results = solrSearchResults(request, path='/plone')
-        self.assertEqual(len(results), 8)
-        results = solrSearchResults(request, path='/plone/news')
-        self.assertEqual([ r.physicalPath for r in results ],
+        search = lambda path: sorted([ r.physicalPath for r in
+            solrSearchResults(request, path=path) ])
+        self.assertEqual(len(search(path='/plone')), 8)
+        self.assertEqual(search(path='/plone/news'),
             ['/plone/news', '/plone/news/aggregator'])
-        results = solrSearchResults(request, path={'query': '/plone/news'})
-        self.assertEqual([ r.physicalPath for r in results ],
+        self.assertEqual(search(path={'query': '/plone/news'}),
             ['/plone/news', '/plone/news/aggregator'])
-        results = solrSearchResults(request,
-            path={'query': '/plone/news', 'depth': 0})
-        self.assertEqual([ r.physicalPath for r in results ], ['/plone/news'])
-        results = solrSearchResults(request,
-            path={'query': '/plone', 'depth': 1})
-        self.assertEqual(sorted([ r.physicalPath for r in results ]),
+        self.assertEqual(search(path={'query': '/plone/news', 'depth': 0}),
+            ['/plone/news'])
+        self.assertEqual(search(path={'query': '/plone', 'depth': 1}),
             ['/plone/Members', '/plone/events', '/plone/front-page', '/plone/news'])
 
     def testLogicalOperators(self):
@@ -145,7 +143,6 @@ class SolrServerTests(SolrTestCase):
             ['/plone/events', '/plone/front-page', '/plone/news'])
         self.assertEqual(search(dict(operator='and', query=('News', 'Events'))),
             ['/plone/front-page'])
-        abort()     # undo the keyword changes
 
     def testBooleanValues(self):
         self.maintenance.reindex()
@@ -173,7 +170,6 @@ class SolrServerTests(SolrTestCase):
         results = self.portal.portal_catalog(request)
         self.assertEqual(sorted([ r.physicalPath for r in results ]),
             ['/plone/Members', '/plone/Members/test_user_1_', '/plone/front-page'])
-        abort()     # undo the workflow changes
 
     def testEffectiveRange(self):
         self.setRoles(('Manager',))
@@ -194,7 +190,6 @@ class SolrServerTests(SolrTestCase):
         paths = [ r.physicalPath for r in results ]
         self.failUnless('/plone/news' in paths)
         self.failUnless('/plone/events' in paths)
-        abort()     # undo the workflow changes
 
 
 def test_suite():
