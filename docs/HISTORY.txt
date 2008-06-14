@@ -1,8 +1,9 @@
 Changelog
 =========
 
-0.1 - Unreleased
-----------------
+1.0a1 - Unreleased
+------------------
 
 * Initial release
+  [witsch]
 

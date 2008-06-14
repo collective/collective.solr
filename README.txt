@@ -1,5 +1,8 @@
+collective.solr
+===============
+
 Introduction
-============
+------------
 
 This code is inspired by enfold.solr by Enfold Systems.
 
