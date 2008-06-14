@@ -146,6 +146,16 @@ class SolrServerTests(SolrTestCase):
             ['/plone/front-page'])
         abort()     # undo the keyword changes
 
+    def testBooleanValues(self):
+        self.maintenance.reindex()
+        request = dict(SearchableText='"[* TO *]"')
+        results = solrSearchResults(request, is_folderish=True)
+        self.assertEqual(len(results), 7)
+        self.failIf('/plone/front-page' in [ r.physicalPath for r in results ])
+        results = solrSearchResults(request, is_folderish=False)
+        self.assertEqual(sorted([ r.physicalPath for r in results ]),
+            ['/plone/front-page'])
+
 
 def test_suite():
     if pingSolr():

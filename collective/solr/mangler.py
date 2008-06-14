@@ -17,6 +17,8 @@ def convert(value):
             v.month(), v.day(), v.hour(), v.minute(), v.second())
     elif isinstance(value, basestring):
         value = quote(value)
+    elif isinstance(value, bool):
+        value = str(value).lower()
     return value
 
 

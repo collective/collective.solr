@@ -65,6 +65,12 @@ class QueryManglerTests(TestCase):
         self.assertEqual(keywords, {'foo':
             '"(1972-05-11T00:00:00.000Z OR 1972-05-18T00:00:00.000Z)"'})
 
+    def testBooleanConversion(self):
+        keywords = mangle(foo=False)
+        self.assertEqual(keywords, {'foo': 'false'})
+        keywords = mangle(foo=True)
+        self.assertEqual(keywords, {'foo': 'true'})
+
 
 class PathManglerTests(TestCase):
 
