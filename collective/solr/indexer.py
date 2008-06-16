@@ -112,7 +112,7 @@ class SolrIndexQueueProcessor(Persistent):
     def getData(self, obj, attributes=None):
         schema = self.manager.getSchema()
         if schema is None:
-            return {}
+            return {}, ()
         if attributes is None:
             attributes = schema.keys()
         else:
