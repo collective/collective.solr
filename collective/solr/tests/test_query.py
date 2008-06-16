@@ -131,6 +131,11 @@ class QueryTests(TestCase):
         self.assertEqual(bq('foo', name='"herb*"', cat=(u'bär', '"-hmm"')),
             '+foo +name:herb* +cat:("b\xc3\xa4r" -hmm)')
 
+    def testBooleanQueries(self):
+        bq = self.search.buildQuery
+        self.assertEqual(bq(inStock=True), '+inStock:true')
+        self.assertEqual(bq(inStock=False), '+inStock:false')
+
 
 class InactiveQueryTests(TestCase):
 
