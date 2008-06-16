@@ -1,5 +1,5 @@
 from zope.interface import implements
-from zope.component import queryUtility, queryMultiAdapter
+from zope.component import queryUtility, queryMultiAdapter, getSiteManager
 from zope.publisher.interfaces.http import IHTTPRequest
 from Products.ZCatalog.ZCatalog import ZCatalog
 
@@ -44,6 +44,10 @@ def solrSearchResults(request=None, **keywords):
         parameters with portal catalog semantics """
     search = queryUtility(ISearch)
     if request is None:
+        # try to get a request instance, so that flares can be adapted to
+        # ploneflares and urls can be converted into absolute ones etc;
+        # however, in this case any arguments from the request are ignored
+        request = getattr(getSiteManager(), 'REQUEST', None)
         args = keywords
     elif IHTTPRequest.providedBy(request):
         args = request.form.copy()  # ignore headers and other stuff
