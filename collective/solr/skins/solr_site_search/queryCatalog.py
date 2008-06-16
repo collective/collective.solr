@@ -110,7 +110,7 @@ if show_query:
         if use_navigation_root:
             rootAtNavigationRoot(query)
         query['show_inactive'] = show_inactive
-        results = catalog(REQUEST, **query)
+        results = catalog(**query)
     except ParseError:
         pass
 
