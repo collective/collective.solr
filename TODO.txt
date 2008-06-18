@@ -1,4 +1,5 @@
 TODOs:
+* maintenance view for syncing catalog and solr indexes
 * support for order, limit etc parameters
 * fix connection handling regarding schema in `indexer.py` (in `index`, `unindex`)
 * remove temporary fix for issue with ex-persistent utility again
