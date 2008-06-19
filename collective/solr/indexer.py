@@ -66,10 +66,18 @@ class SolrIndexQueueProcessor(Persistent):
             uniqueKey = schema['uniqueKey']
             data, missing = self.getData(obj, attributes=[uniqueKey])
             prepareData(data)
-            assert data.has_key(uniqueKey), "no value for <uniqueKey> in object data"
+            if not data.has_key(uniqueKey):
+                logger.info("Can not unindex: no unique key for object %r" % obj)
+                return
+
+            data_key=data[uniqueKey]
+            if data_key is None:
+                logger.info("Can not unindex: None unique key for object %r" % obj)
+                return
+
             try:
                 logger.debug('unindexing %r (%r)', obj, data)
-                conn.delete(id=data[uniqueKey])
+                conn.delete(id=data_key)
             except SolrException, e:
                 logger.exception('exception during delete')
 
