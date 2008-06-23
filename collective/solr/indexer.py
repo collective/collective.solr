@@ -82,7 +82,7 @@ class SolrIndexQueueProcessor(Persistent):
                 logger.exception('exception during delete')
 
     def begin(self):
-        self.manager = queryUtility(ISolrConnectionManager)
+        pass
 
     def commit(self):
         conn = self.getConnection()
