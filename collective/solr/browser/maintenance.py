@@ -3,15 +3,35 @@ from time import time, clock
 from zope.interface import implements
 from zope.component import queryUtility
 from Products.Five.browser import BrowserView
+from Products.CMFCore.utils import getToolByName
 from httplib import BadStatusLine
 
 from collective.solr.interfaces import ISolrConnectionManager
 from collective.solr.interfaces import ISolrIndexQueueProcessor
 from collective.solr.interfaces import ISolrMaintenanceView
+from collective.solr.interfaces import ISearch
 from collective.solr.indexer import indexable
 from collective.solr.utils import findObjects
 
 logger = getLogger('collective.solr.maintenance')
+
+
+def timer(func=time):
+    def gen(last=func()):
+        while True:
+            elapsed = func() - last
+            last = func()
+            yield '%.3fs' % elapsed
+    return gen()
+
+
+def checkpointIterator(function, interval=100):
+    counter = 0
+    while True:
+        counter += 1
+        if counter % interval == 0:
+            function()
+        yield None
 
 
 class SolrMaintenanceView(BrowserView):
@@ -71,6 +91,93 @@ class SolrMaintenanceView(BrowserView):
         now, cpu = time() - now, clock() - cpu
         log('solr index rebuilt.\n')
         msg = 'indexed %d object(s) in %.3f seconds (%.3f cpu time).' % (indexed, now, cpu)
+        log(msg)
+        logger.info(msg)
+
+    def diff(self):
+        """ determine objects that need to be indexed/reindex/unindexed by
+            diff'ing the records in the portal catalog and solr """
+        catalog = getToolByName(self.context, 'portal_catalog')
+        uids = {}
+        for brain in catalog():
+            if brain.UID and brain.modified is not None:
+                uids[brain.UID] = brain.modified.millis()
+        search = queryUtility(ISearch)
+        reindex = []
+        unindex = []
+        rows = len(uids) * 10               # sys.maxint makes solr choke :(
+        for flare in search('UID:[* TO *]', rows=rows, fl='UID modified'):
+            uid = flare.UID
+            assert uid, 'empty UID?'
+            if uids.has_key(uid):
+                if uids[uid] > flare.modified.millis():
+                    reindex.append(uid)     # item isn't current
+                del uids[uid]               # remove from the list in any case
+            else:
+                unindex.append(uid)         # item doesn't exist in catalog
+        index = uids.keys()
+        return index, reindex, unindex
+
+    def sync(self, batch=100, cache=1000):
+        """ sync the solr index with the portal catalog;  records contained
+            in the catalog but not in solr will be indexed and records not
+            contained in the catalog can be optionally removed;  this can
+            be used to ensure consistency between zope and solr after the
+            solr server has been unavailable etc """
+        manager = queryUtility(ISolrConnectionManager)
+        proc = queryUtility(ISolrIndexQueueProcessor, name='solr')
+        db = self.context.getPhysicalRoot()._p_jar.db()
+        log = self.request.RESPONSE.write
+        real = timer()          # real time
+        lap = timer()           # real lap time (for intermediate timings)
+        cpu = timer(clock)      # cpu time
+        log('determining differences between portal catalog and solr...')
+        index, reindex, unindex = self.diff()
+        log(' (%s).\n' % lap.next())
+        processed = 0
+        def checkPoint():
+            msg = 'intermediate commit (%d objects processed in %s)...\n'
+            log(msg % (processed, lap.next()))
+            proc.commit()
+            manager.getConnection().reset()     # force new connection
+            if cache:
+                size = db.cacheSize()
+                if size > cache:
+                    log('minimizing zodb cache with %d objects...\n' % size)
+                    db.cacheMinimize()
+        cpi = checkpointIterator(checkPoint, batch)
+        lookup = getToolByName(self.context, 'reference_catalog').lookupObject
+        for uid in index:
+            obj = lookup(uid)
+            if indexable(obj):
+                log('indexing %r' % obj)
+                proc.index(obj)
+                processed += 1
+                log(' (%s).\n' % lap.next())
+                cpi.next()
+        for uid in reindex:
+            obj = lookup(uid)
+            if indexable(obj):
+                log('reindexing %r' % obj)
+                proc.reindex(obj)
+                processed += 1
+                log(' (%s).\n' % lap.next())
+                cpi.next()
+        conn = proc.getConnection()
+        for uid in unindex:
+            obj = lookup(uid)
+            if obj is None:
+                log('unindexing %r' % uid)
+                conn.delete(id=uid)
+                processed += 1
+                log(' (%s).\n' % lap.next())
+                cpi.next()
+            else:
+                log('not unindexing existing object %r (%r).\n' % (obj, uid))
+        proc.commit()   # make sure to commit in the end...
+        log('solr index synced.\n')
+        msg = 'processed %d object(s) in %s (%s cpu time).'
+        msg = msg % (processed, real.next(), cpu.next())
         log(msg)
         logger.info(msg)
 
