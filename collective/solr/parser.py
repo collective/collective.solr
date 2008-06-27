@@ -69,12 +69,12 @@ class SolrResponse(object):
                         if not key == 'name':   # set extra attributes
                             setattr(data, key, value)
                     stack.append(data)
-                elif unmarshallers.has_key(tag):
-                    data = unmarshallers[tag](elem.text)
-                    setter(stack[-1], elem.get('name'), data)
             elif action == 'end':
                 if nested.has_key(tag):
                     data = stack.pop()
+                    setter(stack[-1], elem.get('name'), data)
+                elif unmarshallers.has_key(tag):
+                    data = unmarshallers[tag](elem.text)
                     setter(stack[-1], elem.get('name'), data)
         return self
 

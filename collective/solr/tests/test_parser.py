@@ -109,6 +109,13 @@ class ParserTests(TestCase):
         self.assertEqual(len([f for f in fields if getattr(f, 'required', False)]), 2)
         self.assertEqual(len([f for f in fields if getattr(f, 'multiValued', False)]), 3)
 
+    def testParseQuirkyResponse(self):
+        quirky_response = getData('quirky_response.txt')
+        response = SolrResponse(quirky_response)
+        results = response.response     # the result set is named 'response'
+        empty_uid = [ r for r in results if r.UID == '' ]
+        self.assertEqual(empty_uid, [])
+
 
 def test_suite():
     return TestSuite((

@@ -1,0 +1,564 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<response>
+
+<lst name="responseHeader">
+ <int name="status">0</int>
+ <int name="QTime">0</int>
+ <lst name="params">
+  <str name="indent">on</str>
+  <str name="rows">137</str>
+  <str name="q">UID:[* TO *]</str>
+  <str name="fl">UID modified</str>
+ </lst>
+</lst>
+<result name="response" numFound="1204" start="0">
+ <doc>
+  <str name="UID">7c31adb20d5eee314233abfe48515cf3</str>
+  <date name="modified">2008-06-26T17:14:19.392Z</date>
+ </doc>
+ <doc>
+  <str name="UID">8080f27cb3ed84b22f152c1e4917901f</str>
+  <date name="modified">2008-06-26T17:14:36.344Z</date>
+ </doc>
+ <doc>
+  <str name="UID">28717c87b44c415914815e6790e0afbd</str>
+  <date name="modified">2008-06-26T17:14:53.258Z</date>
+ </doc>
+ <doc>
+  <str name="UID">ba495049c6603fe11860635cd00ae93c</str>
+  <date name="modified">2008-06-26T17:14:43.245Z</date>
+ </doc>
+ <doc>
+  <str name="UID">8fb5a7a0a02bcf0e7afdb0c3f963d37a</str>
+  <date name="modified">2008-06-26T17:14:42.694Z</date>
+ </doc>
+ <doc>
+  <str name="UID">3adc833655f7555ef613f74f67784607</str>
+  <date name="modified">2008-06-26T17:14:43.031Z</date>
+ </doc>
+ <doc>
+  <str name="UID">2c97c4e6401a7b6341a143ab567cd464</str>
+  <date name="modified">2008-06-26T17:14:43.177Z</date>
+ </doc>
+ <doc>
+  <str name="UID">039d66a3f5273b13dc2224389e12bec8</str>
+  <date name="modified">2008-06-26T17:14:43.154Z</date>
+ </doc>
+ <doc>
+  <str name="UID">5c3f4c2d1cba61f718a0bd9af0d837a3</str>
+  <date name="modified">2008-06-26T17:14:43.132Z</date>
+ </doc>
+ <doc>
+  <str name="UID">0244269d0b7b72ec5283fb6dbfd1f38c</str>
+  <date name="modified">2008-06-26T17:14:43.109Z</date>
+ </doc>
+ <doc>
+  <str name="UID">32be2675ee433b097f2ee920134e1be1</str>
+  <date name="modified">2008-06-26T17:14:43.087Z</date>
+ </doc>
+ <doc>
+  <str name="UID">82309f88df0de6c8607250f8e19b46c9</str>
+  <date name="modified">2008-06-26T17:14:43.054Z</date>
+ </doc>
+ <doc>
+  <str name="UID">d4275c20bc6567c899b30e7500e2ec87</str>
+  <date name="modified">2008-06-26T17:14:43.001Z</date>
+ </doc>
+ <doc>
+  <str name="UID">857af7dbf92018aa1f52a4b8218bd677</str>
+  <date name="modified">2008-06-26T17:14:42.972Z</date>
+ </doc>
+ <doc>
+  <str name="UID">e0e7b896fc462a5dc7dd4e65f3cb0d34</str>
+  <date name="modified">2008-06-26T17:14:42.845Z</date>
+ </doc>
+ <doc>
+  <str name="UID">58cb0dc3adb7df57691ec00087e0e459</str>
+  <date name="modified">2008-06-26T17:14:49.072Z</date>
+ </doc>
+ <doc>
+  <str name="UID">3e18e0cde845a8d11f7790ebcf11628f</str>
+  <date name="modified">2008-06-26T17:14:46.749Z</date>
+ </doc>
+ <doc>
+  <str name="UID">27f6c406f34a5585cb3173772c71f832</str>
+  <date name="modified">2008-06-26T17:14:42.925Z</date>
+ </doc>
+ <doc>
+  <str name="UID">8607a4f363c6f02b9b6803c1cd899df9</str>
+  <date name="modified">2008-06-26T17:14:52.063Z</date>
+ </doc>
+ <doc>
+  <str name="UID">50c0079e17df431904b06fc8f2c12703</str>
+  <date name="modified">2008-06-26T17:14:45.332Z</date>
+ </doc>
+ <doc>
+  <str name="UID">b12e2d2baa1f6ece0bed8a6850faf8db</str>
+  <date name="modified">2008-06-26T17:14:53.086Z</date>
+ </doc>
+ <doc>
+  <str name="UID">c79183e594a2ca090f4fd22e4c9ba1e7</str>
+  <date name="modified">2008-06-26T17:14:43.343Z</date>
+ </doc>
+ <doc>
+  <str name="UID">8d741c0ff9570a5a34eb304afa39f54c</str>
+  <date name="modified">2008-06-26T17:14:48.152Z</date>
+ </doc>
+ <doc>
+  <str name="UID">fdd1efd2be2d7612452d7f52e0f3034d</str>
+  <date name="modified">2008-06-26T17:14:49.949Z</date>
+ </doc>
+ <doc>
+  <str name="UID">36148aa844126f17e3a389c653e297fc</str>
+  <date name="modified">2008-06-26T17:14:42.764Z</date>
+ </doc>
+ <doc>
+  <str name="UID">aeea443b6e4a62ba7d9e15e0386214e6</str>
+  <date name="modified">2008-06-26T17:14:42.719Z</date>
+ </doc>
+ <doc>
+  <str name="UID">dd8ffa118675ba90f625ef4ae27df9c8</str>
+  <date name="modified">2008-06-26T17:14:41.967Z</date>
+ </doc>
+ <doc>
+  <str name="UID">6373ba8bbef91e936d94509d995f2d09</str>
+  <date name="modified">2008-06-26T17:14:42.591Z</date>
+ </doc>
+ <doc>
+  <str name="UID">9a36da07f86cf38d72455b76aad3ef79</str>
+  <date name="modified">2008-06-26T17:14:42.639Z</date>
+ </doc>
+ <doc>
+  <str name="UID">4e016474057a3c1deedbde20942fe6a6</str>
+  <date name="modified">2008-06-26T17:14:42.561Z</date>
+ </doc>
+ <doc>
+  <str name="UID">cf56f8c9345addd778e733ff7e581937</str>
+  <date name="modified">2008-06-26T17:14:42.349Z</date>
+ </doc>
+ <doc>
+  <str name="UID">3f6fbba36398a1c446c4ce7adc7f2809</str>
+  <date name="modified">2008-06-26T17:14:42.540Z</date>
+ </doc>
+ <doc>
+  <str name="UID">276b2faa04298f89280956c2e4171d6d</str>
+  <date name="modified">2008-06-26T17:14:42.517Z</date>
+ </doc>
+ <doc>
+  <str name="UID">a730941bc9611a74df81f8beb7562f09</str>
+  <date name="modified">2008-06-26T17:14:42.494Z</date>
+ </doc>
+ <doc>
+  <str name="UID">f0960bb06f7d56440a5298ccfc30388a</str>
+  <date name="modified">2008-06-26T17:14:42.472Z</date>
+ </doc>
+ <doc>
+  <str name="UID">cbcc86300be73f31aea9a4dbe1fb9f75</str>
+  <date name="modified">2008-06-26T17:14:42.449Z</date>
+ </doc>
+ <doc>
+  <str name="UID">b4f2fdc9c026eb7304c3141f786ea797</str>
+  <date name="modified">2008-06-26T17:14:42.427Z</date>
+ </doc>
+ <doc>
+  <str name="UID">e6a20b60cd31ac7a7f37e888b77cfc74</str>
+  <date name="modified">2008-06-26T17:14:42.405Z</date>
+ </doc>
+ <doc>
+  <str name="UID">72a2045399bc173f738b87ca2bac99af</str>
+  <date name="modified">2008-06-26T17:14:42.372Z</date>
+ </doc>
+ <doc>
+  <str name="UID">01af0c1e8a04ac803ab8ba84d5ebf16d</str>
+  <date name="modified">2008-06-26T17:14:42.320Z</date>
+ </doc>
+ <doc>
+  <str name="UID">2f1ddf399f0a3b00dd9cb60b0cd061b6</str>
+  <date name="modified">2008-06-26T17:14:41.991Z</date>
+ </doc>
+ <doc>
+  <str name="UID">02ea9207a0afdd5a6ddc5ecd3804b95a</str>
+  <date name="modified">2008-06-26T17:14:42.299Z</date>
+ </doc>
+ <doc>
+  <str name="UID">10d75decd6276830e539dbb89b857fa4</str>
+  <date name="modified">2008-06-26T17:14:42.275Z</date>
+ </doc>
+ <doc>
+  <str name="UID">f33ef331b9047000fc28b758ec8bb5cd</str>
+  <date name="modified">2008-06-26T17:14:42.249Z</date>
+ </doc>
+ <doc>
+  <str name="UID">2fdf5dbbe2b2fdca3b4e8a36a2e31636</str>
+  <date name="modified">2008-06-26T17:14:42.226Z</date>
+ </doc>
+ <doc>
+  <str name="UID">52953af5f268c5f5c981f4d5f4a7408d</str>
+  <date name="modified">2008-06-26T17:14:42.203Z</date>
+ </doc>
+ <doc>
+  <str name="UID">1340d97a206ad3fbf6f25a7bb1bd28fe</str>
+  <date name="modified">2008-06-26T17:14:42.181Z</date>
+ </doc>
+ <doc>
+  <str name="UID">ed46f0b52aec98e812cdce345a5c9474</str>
+  <date name="modified">2008-06-26T17:14:42.158Z</date>
+ </doc>
+ <doc>
+  <str name="UID">a8cc6a51a137d2e980ea2f1d8fee988f</str>
+  <date name="modified">2008-06-26T17:14:42.136Z</date>
+ </doc>
+ <doc>
+  <str name="UID">32f35cca7a006e81102643d9d04bb8f2</str>
+  <date name="modified">2008-06-26T17:14:42.113Z</date>
+ </doc>
+ <doc>
+  <str name="UID">1e5e1f7325462955a1084d4dc261e36d</str>
+  <date name="modified">2008-06-26T17:14:42.090Z</date>
+ </doc>
+ <doc>
+  <str name="UID">d6833b12a2995b985a73b7baa584e952</str>
+  <date name="modified">2008-06-26T17:14:42.068Z</date>
+ </doc>
+ <doc>
+  <str name="UID">d2c18c7f6acb5d79c9692602f11576f5</str>
+  <date name="modified">2008-06-26T17:14:42.046Z</date>
+ </doc>
+ <doc>
+  <str name="UID">09d4905de2ca5c4418aaf7bc97cbd997</str>
+  <date name="modified">2008-06-26T17:14:42.013Z</date>
+ </doc>
+ <doc>
+  <str name="UID">b20cc39e7460830ad2453ef8b8440640</str>
+  <date name="modified">2008-06-26T17:14:39.854Z</date>
+ </doc>
+ <doc>
+  <str name="UID">b6f06b674911a2e8a847f7d4e4763a7e</str>
+  <date name="modified">2008-06-26T17:14:41.866Z</date>
+ </doc>
+ <doc>
+  <str name="UID">255fc48ac3100c2b7607e312b2722817</str>
+  <date name="modified">2008-06-26T17:14:41.913Z</date>
+ </doc>
+ <doc>
+  <str name="UID">727c58474448695635c3551376eeb2ef</str>
+  <date name="modified">2008-06-26T17:14:41.677Z</date>
+ </doc>
+ <doc>
+  <str name="UID">dc44d60d681592b561004fa6d1184d59</str>
+  <date name="modified">2008-06-26T17:14:41.843Z</date>
+ </doc>
+ <doc>
+  <str name="UID">0fd9f407fe56cda189b810e5dd493d2d</str>
+  <date name="modified">2008-06-26T17:14:41.821Z</date>
+ </doc>
+ <doc>
+  <str name="UID">1468815916cefeb67d80bf877c0046dc</str>
+  <date name="modified">2008-06-26T17:14:41.799Z</date>
+ </doc>
+ <doc>
+  <str name="UID">43f2c59f31469e29d5098ec1293e1212</str>
+  <date name="modified">2008-06-26T17:14:41.776Z</date>
+ </doc>
+ <doc>
+  <str name="UID">7708b9fbf214b4301d7aa2ddef197ad6</str>
+  <date name="modified">2008-06-26T17:14:41.754Z</date>
+ </doc>
+ <doc>
+  <str name="UID">c182127067304cd2b4f89839a991a08a</str>
+  <date name="modified">2008-06-26T17:14:41.732Z</date>
+ </doc>
+ <doc>
+  <str name="UID">253bef81cf9a663ae5027e21f9f3efb4</str>
+  <date name="modified">2008-06-26T17:14:41.699Z</date>
+ </doc>
+ <doc>
+  <str name="UID">9a0b0c06f42759e3d4c0ded8da14d818</str>
+  <date name="modified">2008-06-26T17:14:41.463Z</date>
+ </doc>
+ <doc>
+  <str name="UID">bbfd59ee68370b4ec8446c83bd2d30f3</str>
+  <date name="modified">2008-06-26T17:14:41.653Z</date>
+ </doc>
+ <doc>
+  <str name="UID">2b19b36b1ecfab7c1ef96919a90c876f</str>
+  <date name="modified">2008-06-26T17:14:41.631Z</date>
+ </doc>
+ <doc>
+  <str name="UID">aa77a27d713b5d851f7439988b291a1b</str>
+  <date name="modified">2008-06-26T17:14:41.608Z</date>
+ </doc>
+ <doc>
+  <str name="UID">0c330470bbd23cc809d7ec17f1ade3e4</str>
+  <date name="modified">2008-06-26T17:14:41.585Z</date>
+ </doc>
+ <doc>
+  <str name="UID">de2aaf735a0f7ef078fd7c5c2e7b79e1</str>
+  <date name="modified">2008-06-26T17:14:41.563Z</date>
+ </doc>
+ <doc>
+  <str name="UID">eabc8ae3e596c586cbe152665ed0d30f</str>
+  <date name="modified">2008-06-26T17:14:41.540Z</date>
+ </doc>
+ <doc>
+  <str name="UID">8bb03d02e0bc4ad0ed1514cfc299b590</str>
+  <date name="modified">2008-06-26T17:14:41.518Z</date>
+ </doc>
+ <doc>
+  <str name="UID">1891a7160f3f83b95d6d2d31b9728d66</str>
+  <date name="modified">2008-06-26T17:14:41.485Z</date>
+ </doc>
+ <doc>
+  <str name="UID">ab4b19de48f998f134547b4242d189d5</str>
+  <date name="modified">2008-06-26T17:14:41.180Z</date>
+ </doc>
+ <doc>
+  <str name="UID">e5b19a63e78a2a956e04cf91a75ae2f7</str>
+  <date name="modified">2008-06-26T17:14:41.439Z</date>
+ </doc>
+ <doc>
+  <str name="UID">9240afcbea57aa3ee77d68ac02d8ea97</str>
+  <date name="modified">2008-06-26T17:14:41.416Z</date>
+ </doc>
+ <doc>
+  <str name="UID">ca54534c3b507a4a44a30deab3d915f5</str>
+  <date name="modified">2008-06-26T17:14:41.393Z</date>
+ </doc>
+ <doc>
+  <str name="UID">f707ad6152cc9f3af562437b812a4e9e</str>
+  <date name="modified">2008-06-26T17:14:41.371Z</date>
+ </doc>
+ <doc>
+  <str name="UID">67bb82333062604801afee713a577342</str>
+  <date name="modified">2008-06-26T17:14:41.348Z</date>
+ </doc>
+ <doc>
+  <str name="UID">882632aaaba97143bd63ef3f9aea1460</str>
+  <date name="modified">2008-06-26T17:14:41.326Z</date>
+ </doc>
+ <doc>
+  <str name="UID">7e607af8a2c8038f43eeb0ea9307b71b</str>
+  <date name="modified">2008-06-26T17:14:41.303Z</date>
+ </doc>
+ <doc>
+  <str name="UID">983f60eee1fe1c43a7747ed8e56e399f</str>
+  <date name="modified">2008-06-26T17:14:41.281Z</date>
+ </doc>
+ <doc>
+  <str name="UID">2ae35dcb960e5d6596d4133663ead10f</str>
+  <date name="modified">2008-06-26T17:14:41.258Z</date>
+ </doc>
+ <doc>
+  <str name="UID">bbcbb46386223636fc9c8176d61e0fdc</str>
+  <date name="modified">2008-06-26T17:14:41.236Z</date>
+ </doc>
+ <doc>
+  <str name="UID">47d629bcc912e7fa0bb840a315e0e419</str>
+  <date name="modified">2008-06-26T17:14:41.203Z</date>
+ </doc>
+ <doc>
+  <str name="UID">f31bf84252caa757234d8e0402e87dbf</str>
+  <date name="modified">2008-06-26T17:14:40.877Z</date>
+ </doc>
+ <doc>
+  <str name="UID">861932b65f47435e23086bfc7542e4e8</str>
+  <date name="modified">2008-06-26T17:14:41.158Z</date>
+ </doc>
+ <doc>
+  <str name="UID">044ee685564dd44ace5e4e48fd175b59</str>
+  <date name="modified">2008-06-26T17:14:41.135Z</date>
+ </doc>
+ <doc>
+  <str name="UID">f292e4b479c57eaaa498269681d676e4</str>
+  <date name="modified">2008-06-26T17:14:41.112Z</date>
+ </doc>
+ <doc>
+  <str name="UID">00e2e294be31ab28a47479f513aa32c9</str>
+  <date name="modified">2008-06-26T17:14:41.089Z</date>
+ </doc>
+ <doc>
+  <str name="UID">9104c647fb20cf715a19941bebb6c045</str>
+  <date name="modified">2008-06-26T17:14:41.066Z</date>
+ </doc>
+ <doc>
+  <str name="UID">fb55a2a68db2f4578e88f0bb85f8d270</str>
+  <date name="modified">2008-06-26T17:14:41.044Z</date>
+ </doc>
+ <doc>
+  <str name="UID">79f14ef2ebc6d1972f82c94decf2ea28</str>
+  <date name="modified">2008-06-26T17:14:41.021Z</date>
+ </doc>
+ <doc>
+  <str name="UID">a1630a62eed32d05b8a222fd08480146</str>
+  <date name="modified">2008-06-26T17:14:40.998Z</date>
+ </doc>
+ <doc>
+  <str name="UID">f07a5c9c7e3ef307cb491c58a5fce727</str>
+  <date name="modified">2008-06-26T17:14:40.976Z</date>
+ </doc>
+ <doc>
+  <str name="UID">c5229d4f49b1fa8ae064920648a8f5aa</str>
+  <date name="modified">2008-06-26T17:14:40.954Z</date>
+ </doc>
+ <doc>
+  <str name="UID">df389b53690c0c597e435c7f8810eb0e</str>
+  <date name="modified">2008-06-26T17:14:40.932Z</date>
+ </doc>
+ <doc>
+  <str name="UID">a8c85a4ede7a9c476527086bac94169c</str>
+  <date name="modified">2008-06-26T17:14:40.899Z</date>
+ </doc>
+ <doc>
+  <str name="UID">d1b9023e6fd43a9ad5d22099e610c4fb</str>
+  <date name="modified">2008-06-26T17:14:40.618Z</date>
+ </doc>
+ <doc>
+  <str name="UID">6270f49bd82e350eadb1d95f5c478f42</str>
+  <date name="modified">2008-06-26T17:14:40.854Z</date>
+ </doc>
+ <doc>
+  <str name="UID">751b60546f0b54cc901c40432e5e049b</str>
+  <date name="modified">2008-06-26T17:14:40.831Z</date>
+ </doc>
+ <doc>
+  <str name="UID">8b1fd4f0ee5ba9a4d5c62f11dbbb3fe6</str>
+  <date name="modified">2008-06-26T17:14:40.808Z</date>
+ </doc>
+ <doc>
+  <str name="UID">a5c130b68def85200390792c5b488ed6</str>
+  <date name="modified">2008-06-26T17:14:40.786Z</date>
+ </doc>
+ <doc>
+  <str name="UID">eb541c799391ca19fe78a13f80cca25f</str>
+  <date name="modified">2008-06-26T17:14:40.763Z</date>
+ </doc>
+ <doc>
+  <str name="UID">96e9f27f5f991a46d3dde9087572a377</str>
+  <date name="modified">2008-06-26T17:14:40.741Z</date>
+ </doc>
+ <doc>
+  <str name="UID">80a173c1650d04feca467e9506257e19</str>
+  <date name="modified">2008-06-26T17:14:40.719Z</date>
+ </doc>
+ <doc>
+  <str name="UID">6bdb9a50e8729d877ac98cc921d9d705</str>
+  <date name="modified">2008-06-26T17:14:40.696Z</date>
+ </doc>
+ <doc>
+  <str name="UID">403108b5cc79d01c562a836b903267fd</str>
+  <date name="modified">2008-06-26T17:14:40.673Z</date>
+ </doc>
+ <doc>
+  <str name="UID">fa39893054fd799859a419eefb70e07a</str>
+  <date name="modified">2008-06-26T17:14:40.641Z</date>
+ </doc>
+ <doc>
+  <str name="UID">3bd4ae5c49a69dc8a483a8353aa3f49a</str>
+  <date name="modified">2008-06-26T17:14:40.373Z</date>
+ </doc>
+ <doc>
+  <str name="UID">b1fb68e40a3dd8fd5ab26b6548e3a0a3</str>
+  <date name="modified">2008-06-26T17:14:40.595Z</date>
+ </doc>
+ <doc>
+  <str name="UID">e187f292cff2b1c435b9b7282d9fc359</str>
+  <date name="modified">2008-06-26T17:14:40.572Z</date>
+ </doc>
+ <doc>
+  <str name="UID">ccfca794c33a8ecbd5dfc56f4460fb0b</str>
+  <date name="modified">2008-06-26T17:14:40.549Z</date>
+ </doc>
+ <doc>
+  <str name="UID">54bb7e5eaec41e8a339ca3a58ca60efb</str>
+  <date name="modified">2008-06-26T17:14:40.527Z</date>
+ </doc>
+ <doc>
+  <str name="UID">38c3fd9ade3222a1950051d3e700d2cc</str>
+  <date name="modified">2008-06-26T17:14:40.504Z</date>
+ </doc>
+ <doc>
+  <str name="UID">986906cd54be705cf5f115311c38481e</str>
+  <date name="modified">2008-06-26T17:14:40.473Z</date>
+ </doc>
+ <doc>
+  <str name="UID">6fda37ce78c5612a54d6405a169d4a53</str>
+  <date name="modified">2008-06-26T17:14:40.451Z</date>
+ </doc>
+ <doc>
+  <str name="UID">bd0f3a006e7a0a0eda4868cb8a663299</str>
+  <date name="modified">2008-06-26T17:14:40.429Z</date>
+ </doc>
+ <doc>
+  <str name="UID">b7782608e7527b216666907a69610f1e</str>
+  <date name="modified">2008-06-26T17:14:40.396Z</date>
+ </doc>
+ <doc>
+  <str name="UID">5f91b5a5b65109007dbc72f564d55fc4</str>
+  <date name="modified">2008-06-26T17:14:40.114Z</date>
+ </doc>
+ <doc>
+  <str name="UID">cbdb77b8b210204e7054b50103093430</str>
+  <date name="modified">2008-06-26T17:14:40.350Z</date>
+ </doc>
+ <doc>
+  <str name="UID">aecd1852b1640e07518b5a7b84966286</str>
+  <date name="modified">2008-06-26T17:14:40.327Z</date>
+ </doc>
+ <doc>
+  <str name="UID">6a4d60fdfdbcb9f2ba3142715d6f1fb6</str>
+  <date name="modified">2008-06-26T17:14:40.305Z</date>
+ </doc>
+ <doc>
+  <str name="UID">6410013e49515875075236691d8a7bf8</str>
+  <date name="modified">2008-06-26T17:14:40.282Z</date>
+ </doc>
+ <doc>
+  <str name="UID">478a6f1612a455fd1b6a1f125018d680</str>
+  <date name="modified">2008-06-26T17:14:40.259Z</date>
+ </doc>
+ <doc>
+  <str name="UID">db4d8d8c39cf0f2b711e6ccff1e8a22a</str>
+  <date name="modified">2008-06-26T17:14:40.236Z</date>
+ </doc>
+ <doc>
+  <str name="UID">a55014f331607f846dfc1839ef1baa79</str>
+  <date name="modified">2008-06-26T17:14:40.214Z</date>
+ </doc>
+ <doc>
+  <str name="UID">fe9b91816b4b166e1d6bcc2bf267fc43</str>
+  <date name="modified">2008-06-26T17:14:40.192Z</date>
+ </doc>
+ <doc>
+  <str name="UID">3b10938acbf0fe044bd9002ea76431dd</str>
+  <date name="modified">2008-06-26T17:14:40.170Z</date>
+ </doc>
+ <doc>
+  <str name="UID">84cc93c02807637899d15bd216c21e77</str>
+  <date name="modified">2008-06-26T17:14:40.137Z</date>
+ </doc>
+ <doc>
+  <str name="UID">9e273068617f240b5bd38cc3a1b8747c</str>
+  <date name="modified">2008-06-26T17:14:39.878Z</date>
+ </doc>
+ <doc>
+  <str name="UID">8c0f0e974e7dcd1c07f74f2c4b72cd29</str>
+  <date name="modified">2008-06-26T17:14:40.091Z</date>
+ </doc>
+ <doc>
+  <str name="UID">500b8f80f15dfa662eb791d82f265468</str>
+  <date name="modified">2008-06-26T17:14:40.068Z</date>
+ </doc>
+ <doc>
+  <str name="UID">2f845fe3d6d73b2e84060a49f785a9d6</str>
+  <date name="modified">2008-06-26T17:14:39.551Z</date>
+ </doc>
+ <doc>
+  <str name="UID">cdb27f29e8e2ac56a9c9851a2d3d3e42</str>
+  <date name="modified">2008-06-26T17:14:39.495Z</date>
+ </doc>
+ <doc>
+  <str name="UID">db54a5904944f4be5350e9cc45903c03</str>
+  <date name="modified">2008-06-26T17:14:39.218Z</date>
+ </doc>
+</result>
+</response>
