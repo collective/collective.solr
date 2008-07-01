@@ -86,7 +86,10 @@ class ISearchDispatcher(Interface):
 class ISolrMaintenanceView(Interface):
     """ solr maintenance view for clearing, re-indexing content etc """
 
-    def clear(self):
+    def optimize():
+        """ optimize solr indexes """
+
+    def clear():
         """ clear all data from solr, i.e. delete all indexed objects """
 
     def reindex(batch=100, skip=0, cache=1000):

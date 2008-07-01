@@ -38,6 +38,12 @@ class SolrMaintenanceView(BrowserView):
     """ helper view for indexing all portal content in Solr """
     implements(ISolrMaintenanceView)
 
+    def optimize(self):
+        """ optimize solr indexes """
+        manager = queryUtility(ISolrConnectionManager)
+        manager.getConnection().commit(optimize=True)
+        return 'solr indexes optimized.'
+
     def clear(self):
         """ clear all data from solr, i.e. delete all indexed objects """
         manager = queryUtility(ISolrConnectionManager)
