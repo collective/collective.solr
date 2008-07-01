@@ -165,7 +165,7 @@ class SolrMaintenanceView(BrowserView):
                 processed += 1
                 log(' (%s).\n' % single.next())
                 cpi.next()
-        log('processing %d "reindex" operations next...\n' % len(index))
+        log('processing %d "reindex" operations next...\n' % len(reindex))
         for uid in reindex:
             obj = lookup(uid)
             if indexable(obj):
@@ -174,7 +174,7 @@ class SolrMaintenanceView(BrowserView):
                 processed += 1
                 log(' (%s).\n' % single.next())
                 cpi.next()
-        log('processing %d "unindex" operations next...\n' % len(index))
+        log('processing %d "unindex" operations next...\n' % len(unindex))
         conn = proc.getConnection()
         for uid in unindex:
             obj = lookup(uid)
