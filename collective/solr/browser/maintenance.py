@@ -129,11 +129,13 @@ class SolrMaintenanceView(BrowserView):
         db = self.context.getPhysicalRoot()._p_jar.db()
         log = self.request.RESPONSE.write
         real = timer()          # real time
-        lap = timer()           # real lap time (for intermediate timings)
+        lap = timer()           # real lap time (for intermediate commits)
         cpu = timer(clock)      # cpu time
         log('determining differences between portal catalog and solr...')
         index, reindex, unindex = self.diff()
         log(' (%s).\n' % lap.next())
+        log('operations needed: %d "index", %d "reindex", %d "unindex"\n' % (
+            len(index), len(reindex), len(unindex)))
         processed = 0
         def checkPoint():
             msg = 'intermediate commit (%d objects processed in %s)...\n'
@@ -145,24 +147,28 @@ class SolrMaintenanceView(BrowserView):
                 if size > cache:
                     log('minimizing zodb cache with %d objects...\n' % size)
                     db.cacheMinimize()
+        single = timer()        # real time for single object
         cpi = checkpointIterator(checkPoint, batch)
         lookup = getToolByName(self.context, 'reference_catalog').lookupObject
+        log('processing %d "index" operations next...\n' % len(index))
         for uid in index:
             obj = lookup(uid)
             if indexable(obj):
                 log('indexing %r' % obj)
                 proc.index(obj)
                 processed += 1
-                log(' (%s).\n' % lap.next())
+                log(' (%s).\n' % single.next())
                 cpi.next()
+        log('processing %d "reindex" operations next...\n' % len(index))
         for uid in reindex:
             obj = lookup(uid)
             if indexable(obj):
                 log('reindexing %r' % obj)
                 proc.reindex(obj)
                 processed += 1
-                log(' (%s).\n' % lap.next())
+                log(' (%s).\n' % single.next())
                 cpi.next()
+        log('processing %d "unindex" operations next...\n' % len(index))
         conn = proc.getConnection()
         for uid in unindex:
             obj = lookup(uid)
@@ -170,7 +176,7 @@ class SolrMaintenanceView(BrowserView):
                 log('unindexing %r' % uid)
                 conn.delete(id=uid)
                 processed += 1
-                log(' (%s).\n' % lap.next())
+                log(' (%s).\n' % single.next())
                 cpi.next()
             else:
                 log('not unindexing existing object %r (%r).\n' % (obj, uid))
