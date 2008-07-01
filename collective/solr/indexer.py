@@ -1,12 +1,13 @@
 from logging import getLogger
 from persistent import Persistent
 from DateTime import DateTime
-from zope.component import queryUtility, queryMultiAdapter
+from zope.component import getUtility, queryUtility, queryMultiAdapter
 from zope.interface import implements
 from Products.CMFCore.utils import getToolByName
 from Products.CMFCore.CMFCatalogAware import CMFCatalogAware
 from Products.Archetypes.CatalogMultiplex import CatalogMultiplex
 from plone.app.content.interfaces import IIndexableObjectWrapper
+from collective.solr.interfaces import ISolrConnectionConfig
 from collective.solr.interfaces import ISolrConnectionManager
 from collective.solr.interfaces import ISolrIndexQueueProcessor
 from collective.solr.solr import SolrException
@@ -82,12 +83,14 @@ class SolrIndexQueueProcessor(Persistent):
     def begin(self):
         pass
 
-    def commit(self):
+    def commit(self, wait=None):
         conn = self.getConnection()
         if conn is not None:
+            if not isinstance(wait, bool):
+                wait = not getUtility(ISolrConnectionConfig).async
             try:
                 logger.debug('committing')
-                conn.commit(waitFlush=False, waitSearcher=False)
+                conn.commit(waitFlush=wait, waitSearcher=wait)
             except SolrException, e:
                 logger.exception('exception during commit')
             self.manager.closeConnection()

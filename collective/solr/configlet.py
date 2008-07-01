@@ -57,6 +57,17 @@ class SolrControlPanelAdapter(SchemaAdapterBase):
 
     base = property(getBase, setBase)
 
+    def getAsync(self):
+        util = queryUtility(ISolrConnectionConfig)
+        return getattr(util, 'async', '')
+
+    def setAsync(self, value):
+        util = queryUtility(ISolrConnectionConfig)
+        if util is not None:
+            util.async = value
+
+    async = property(getAsync, setAsync)
+
 
 class SolrControlPanel(ControlPanelForm):
 

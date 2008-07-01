@@ -28,6 +28,7 @@ class SolrConfigXMLAdapter(XMLAdapterBase):
         self.context.host = ''
         self.context.port = 0
         self.context.base = ''
+        self.context.async = False
 
     def _initProperties(self, node):
         conn = node.getElementsByTagName('connection')[0]
@@ -42,6 +43,11 @@ class SolrConfigXMLAdapter(XMLAdapterBase):
                 self.context.host = str(child.getAttribute('value'))
             elif child.nodeName == 'base':
                 self.context.base = str(child.getAttribute('value'))
+        settings = node.getElementsByTagName('settings')[0]
+        for child in settings.childNodes:
+            if child.nodeName == 'async':
+                value = self._convertToBoolean(str(child.getAttribute('value')))
+                self.context.async = value
 
     def _createNode(self, name, value):
         node = self._doc.createElement(name)
@@ -57,6 +63,9 @@ class SolrConfigXMLAdapter(XMLAdapterBase):
         conn.appendChild(self._createNode('host', self.context.host))
         conn.appendChild(self._createNode('port', str(self.context.port)))
         conn.appendChild(self._createNode('base', self.context.base))
+        settings = self._doc.createElement('settings')
+        node.appendChild(settings)
+        settings.appendChild(self._createNode('async', str(bool(self.context.async))))
         return node
 
 

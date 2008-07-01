@@ -84,7 +84,7 @@ class SolrMaintenanceView(BrowserView):
                 if commit == 0:
                     msg = 'intermediate commit (%d objects indexed in %.4fs)...\n'
                     log(msg %  (indexed, time() - now))
-                    proc.commit()
+                    proc.commit(wait=True)
                     commit = batch
                     manager.getConnection().reset()     # force new connection
                     if cache:
@@ -93,7 +93,7 @@ class SolrMaintenanceView(BrowserView):
                         if size > cache:
                             log('minimizing zodb cache with %d objects...\n' % size)
                             db.cacheMinimize()
-        proc.commit()   # make sure to commit in the end...
+        proc.commit(wait=True)      # make sure to commit in the end...
         now, cpu = time() - now, clock() - cpu
         log('solr index rebuilt.\n')
         msg = 'indexed %d object(s) in %.3f seconds (%.3f cpu time).' % (indexed, now, cpu)
@@ -146,7 +146,7 @@ class SolrMaintenanceView(BrowserView):
         def checkPoint():
             msg = 'intermediate commit (%d objects processed in %s)...\n'
             log(msg % (processed, lap.next()))
-            proc.commit()
+            proc.commit(wait=True)
             manager.getConnection().reset()     # force new connection
             if cache:
                 size = db.cacheSize()
@@ -186,7 +186,7 @@ class SolrMaintenanceView(BrowserView):
                 cpi.next()
             else:
                 log('not unindexing existing object %r (%r).\n' % (obj, uid))
-        proc.commit()   # make sure to commit in the end...
+        proc.commit(wait=True)      # make sure to commit in the end...
         log('solr index synced.\n')
         msg = 'processed %d object(s) in %s (%s cpu time).'
         msg = msg % (processed, real.next(), cpu.next())

@@ -14,6 +14,13 @@ class SolrConnectionConfig(Persistent):
     """ utility to hold the connection configuration for the solr server """
     implements(ISolrConnectionConfig)
 
+    def __init__(self):
+        self.active = False
+        self.host = None
+        self.port = None
+        self.base = None
+        self.async = False
+
     def getId(self):
         """ return a unique id to be used with GenericSetup """
         return 'solr'

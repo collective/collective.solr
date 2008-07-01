@@ -2,9 +2,11 @@ from unittest import TestSuite, defaultTestLoader
 from zope.component import getUtility
 from transaction import commit, abort
 from DateTime import DateTime
+from time import sleep
 
 from collective.solr.tests.utils import pingSolr, numFound
 from collective.solr.tests.base import SolrTestCase
+from collective.solr.interfaces import ISolrConnectionConfig
 from collective.solr.interfaces import ISolrConnectionManager
 from collective.solr.interfaces import ISearch
 from collective.solr.dispatcher import solrSearchResults, FallBackException
@@ -76,6 +78,7 @@ class SolrServerTests(SolrTestCase):
         self.portal.REQUEST.RESPONSE.write = lambda x: x    # ignore output
         self.maintenance = self.portal.unrestrictedTraverse('solr-maintenance')
         self.maintenance.clear()
+        self.config = getUtility(ISolrConnectionConfig)
         self.search = getUtility(ISearch)
 
     def beforeTearDown(self):
@@ -83,7 +86,8 @@ class SolrServerTests(SolrTestCase):
         # solr support in `afterSetUp` needs to be explicitly reversed,
         # but first all uncommitted changes made in the tests are aborted...
         abort()
-        activate(active=False)
+        self.config.active = False
+        self.config.async = False
         commit()
 
     def testReindexObject(self):
@@ -190,6 +194,22 @@ class SolrServerTests(SolrTestCase):
         paths = [ r.physicalPath for r in results ]
         self.failUnless('/plone/news' in paths)
         self.failUnless('/plone/events' in paths)
+
+    def testAsyncIndexing(self):
+        connection = getUtility(ISolrConnectionManager).getConnection()
+        self.config.async = True        # enable async indexing
+        self.folder.processForm(values={'title': 'Foo'})
+        commit()
+        # indexing normally happens on commit, but with async indexing
+        # enabled search results won't be up-to-date immediately...
+        result = connection.search(q='+Title:Foo').read()
+        self.assertEqual(numFound(result), 0, 'this test might fail, '
+            'especially when run standalone, because the solr indexing '
+            'happens too quickly even though it is done asynchronously...')
+        # so we'll have to wait a moment for solr to process the update...
+        sleep(2)
+        result = connection.search(q='+Title:Foo').read()
+        self.assertEqual(numFound(result), 1)
 
 
 def test_suite():

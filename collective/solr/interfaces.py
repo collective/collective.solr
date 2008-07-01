@@ -21,6 +21,11 @@ class ISolrSchema(Interface):
     base = TextLine(title=_(u'Base'),
         description=_(u'The base prefix of the Solr instance to be used.'))
 
+    async = Bool(title=_(u'Asynchronous indexing'), default=False,
+        description=_(u'Check this to enable asynchronous indexing operations, '
+                       'which will improve zope response times in return for '
+                       'not having the Solr index updated immediately.'))
+
 
 class ISolrConnectionConfig(ISolrSchema):
     """ utility to hold the connection configuration for the solr server """

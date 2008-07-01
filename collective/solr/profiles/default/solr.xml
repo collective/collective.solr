@@ -6,4 +6,7 @@
     <port value="8983" />
     <base value="/solr" />
   </connection>
+  <settings>
+    <async value="False" />
+  </settings>
 </object>

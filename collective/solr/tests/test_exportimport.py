@@ -15,6 +15,7 @@ class SetupToolTests(SolrTestCase, TarballTester):
         config.host = 'foo'
         config.port = 23
         config.base = '/bar'
+        config.async = False
 
     def testImportStep(self):
         tool = self.portal.portal_setup
@@ -26,6 +27,7 @@ class SetupToolTests(SolrTestCase, TarballTester):
         self.assertEqual(config.host, '127.0.0.1')
         self.assertEqual(config.port, 8983)
         self.assertEqual(config.base, '/solr')
+        self.assertEqual(config.async, False)
 
     def testExportStep(self):
         tool = self.portal.portal_setup
@@ -46,6 +48,9 @@ SOLR_XML = """\
     <port value="23" />
     <base value="/bar" />
   </connection>
+  <settings>
+    <async value="False" />
+  </settings>
 </object>
 """
 
