@@ -89,7 +89,7 @@ class SolrIndexQueueProcessor(Persistent):
         if conn is not None:
             try:
                 logger.debug('committing')
-                conn.commit()
+                conn.commit(waitFlush=False, waitSearcher=False)
             except SolrException, e:
                 logger.exception('exception during commit')
             self.manager.closeConnection()
