@@ -1,6 +1,6 @@
 HTTP/1.1 200 OK
 Content-Type: text/xml; charset=utf-8
-Content-Length: 1274
+Content-Length: 1350
 Server: Jetty(6.1.3)
 
 <?xml version="1.0" encoding="UTF-8"?>
@@ -20,6 +20,7 @@ Server: Jetty(6.1.3)
     <field name="physicalPath" type="string" indexed="false" stored="true"/>
     <field name="physicalDepth" type="integer" indexed="true" stored="false"/>
     <field name="parentPaths" type="string" indexed="true" stored="false" multiValued="true"/>
+    <field name="review_state" type="string" indexed="true" stored="true"/>
   </fields>
   <uniqueKey>UID</uniqueKey>
   <copyField source="Title" dest="default"/>

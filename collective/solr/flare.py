@@ -57,3 +57,9 @@ class PloneFlare(AttrDict):
             return 'n.a.'
         return score
 
+    @property
+    def review_state(self):
+        if self.has_key('review_state'):
+            return self['review_state']
+        return ''
+

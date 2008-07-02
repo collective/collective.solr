@@ -33,6 +33,7 @@ to activate Solr support and reindex the site's content, though:
   >>> browser.getLink('Foo')
   <Link text='Foo' url='http://nohost/plone/foo'>
 
+
 We also test that searching for suggestions when a page hasn't been found,
 a.k.a. a 404 response, still works:
 
@@ -45,4 +46,22 @@ a.k.a. a 404 response, still works:
     ...You might have been looking for...
     ...href="http://nohost/plone/"...Plone site...
     ...href="http://nohost/plone/front-page/"...Welcome to Plone...
+
+
+Some content items, for example files and image, don't have an associated
+workflow state.  Hence they cannot provide data for a `review_state` index
+as well.  However, Plone's search results listing template (`search.pt`)
+contains the string expression "state-${result/review_state}", and the TAL
+engine will attempt to traverse `result` in case dictionary and attribute
+lookups for `review_state` weren't successful.  Let's make sure this
+behaviour won't break things:
+
+  >>> portal.invokeFactory('File', id='file', title='my first file')
+  'file'
+  >>> browser.open('http://nohost/plone/')
+  >>> browser.getControl('Search Site').value = 'my first file'
+  >>> browser.getForm(name='searchform').submit()
+  >>> browser.contents
+  '...Search results...1...items matching your search terms...
+   ...http://nohost/plone/file...my first file...'
 
