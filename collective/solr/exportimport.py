@@ -31,23 +31,29 @@ class SolrConfigXMLAdapter(XMLAdapterBase):
         self.context.async = False
 
     def _initProperties(self, node):
-        conn = node.getElementsByTagName('connection')[0]
-        for child in conn.childNodes:
-            if child.nodeName == 'active':
-                value = self._convertToBoolean(str(child.getAttribute('value')))
-                self.context.active = value
-            elif child.nodeName == 'port':
-                value = int(str(child.getAttribute('value')))
-                self.context.port = value
-            elif child.nodeName == 'host':
-                self.context.host = str(child.getAttribute('value'))
-            elif child.nodeName == 'base':
-                self.context.base = str(child.getAttribute('value'))
-        settings = node.getElementsByTagName('settings')[0]
-        for child in settings.childNodes:
-            if child.nodeName == 'async':
-                value = self._convertToBoolean(str(child.getAttribute('value')))
-                self.context.async = value
+        elems = node.getElementsByTagName('connection')
+        if elems:
+            assert len(elems) == 1
+            conn = elems[0]
+            for child in conn.childNodes:
+                if child.nodeName == 'active':
+                    value = self._convertToBoolean(str(child.getAttribute('value')))
+                    self.context.active = value
+                elif child.nodeName == 'port':
+                    value = int(str(child.getAttribute('value')))
+                    self.context.port = value
+                elif child.nodeName == 'host':
+                    self.context.host = str(child.getAttribute('value'))
+                elif child.nodeName == 'base':
+                    self.context.base = str(child.getAttribute('value'))
+        elems = node.getElementsByTagName('settings')
+        if elems:
+            assert len(elems) == 1
+            settings = elems[0]
+            for child in settings.childNodes:
+                if child.nodeName == 'async':
+                    value = self._convertToBoolean(str(child.getAttribute('value')))
+                    self.context.async = value
 
     def _createNode(self, name, value):
         node = self._doc.createElement(name)
