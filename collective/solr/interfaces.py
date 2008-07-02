@@ -23,7 +23,7 @@ class ISolrSchema(Interface):
 
     async = Bool(title=_(u'Asynchronous indexing'), default=False,
         description=_(u'Check this to enable asynchronous indexing operations, '
-                       'which will improve zope response times in return for '
+                       'which will improve Zope response times in return for '
                        'not having the Solr index updated immediately.'))
 
 
