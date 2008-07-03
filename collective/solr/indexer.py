@@ -12,6 +12,7 @@ from collective.solr.interfaces import ISolrConnectionManager
 from collective.solr.interfaces import ISolrIndexQueueProcessor
 from collective.solr.solr import SolrException
 from collective.solr.utils import prepareData
+from socket import error
 
 logger = getLogger('collective.solr.indexer')
 
@@ -54,7 +55,7 @@ class SolrIndexQueueProcessor(Persistent):
                 try:
                     logger.debug('indexing %r (%r)', obj, data)
                     conn.add(**data)
-                except SolrException, e:
+                except (SolrException, error):
                     logger.exception('exception during index')
 
     def reindex(self, obj, attributes=None):
@@ -77,7 +78,7 @@ class SolrIndexQueueProcessor(Persistent):
             try:
                 logger.debug('unindexing %r (%r)', obj, data)
                 conn.delete(id=data_key)
-            except SolrException, e:
+            except (SolrException, error):
                 logger.exception('exception during delete')
 
     def begin(self):
@@ -91,7 +92,7 @@ class SolrIndexQueueProcessor(Persistent):
             try:
                 logger.debug('committing')
                 conn.commit(waitFlush=wait, waitSearcher=wait)
-            except SolrException, e:
+            except (SolrException, error):
                 logger.exception('exception during commit')
             self.manager.closeConnection()
 

@@ -10,6 +10,7 @@ from collective.solr.interfaces import ISolrConnectionConfig
 from collective.solr.interfaces import ISolrConnectionManager
 from collective.solr.interfaces import ISearch
 from collective.solr.dispatcher import solrSearchResults, FallBackException
+from collective.solr.indexer import logger
 from collective.solr.utils import activate
 
 
@@ -69,6 +70,27 @@ class SolrMaintenanceTests(SolrTestCase):
         maintenance.reindex()
         result = connection.search(q='[* TO *]').read()
         self.assertEqual(numFound(result), 2)
+
+
+class SolrErrorHandlingTests(SolrTestCase):
+
+    def testNetworkFailure(self):
+        log = []
+        logger.exception = lambda msg: log.append(msg)
+        config = getUtility(ISolrConnectionConfig)
+        config.active = True
+        self.folder.processForm(values={'title': 'Foo'})
+        commit()                    # indexing on commit, schema gets cached
+        port = config.port          # remember previous port setting and...
+        config.port = 55555         # fake a broken connection or a down server
+        manager = getUtility(ISolrConnectionManager)
+        manager.closeConnection()   # which would trigger a reconnect
+        self.folder.processForm(values={'title': 'Bar'})
+        commit()                    # indexing (doesn't) happen on commit
+        self.assertEqual(log, ['exception during index', 'exception during commit'])
+        config.active = False       # undo changes...
+        config.port = port
+        commit()
 
 
 class SolrServerTests(SolrTestCase):
