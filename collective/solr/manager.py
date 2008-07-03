@@ -6,6 +6,8 @@ from collective.solr.interfaces import ISolrConnectionConfig
 from collective.solr.interfaces import ISolrConnectionManager
 from collective.solr.solr import SolrConnection
 from collective.solr.local import getLocal, setLocal
+from httplib import CannotSendRequest
+from socket import error
 
 logger = getLogger('collective.solr.manager')
 
@@ -72,7 +74,10 @@ class SolrConnectionManager(object):
             conn = self.getConnection()
             if conn is not None:
                 logger.debug('getting schema from solr')
-                schema = conn.getSchema()
-                setLocal('schema', schema)
+                try:
+                    schema = conn.getSchema()
+                    setLocal('schema', schema)
+                except (error, CannotSendRequest):
+                    logger.exception('exception while getting schema')
         return schema
 

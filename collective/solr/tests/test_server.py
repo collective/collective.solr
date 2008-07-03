@@ -10,7 +10,8 @@ from collective.solr.interfaces import ISolrConnectionConfig
 from collective.solr.interfaces import ISolrConnectionManager
 from collective.solr.interfaces import ISearch
 from collective.solr.dispatcher import solrSearchResults, FallBackException
-from collective.solr.indexer import logger
+from collective.solr.indexer import logger as logger_indexer
+from collective.solr.manager import logger as logger_manager
 from collective.solr.utils import activate
 
 
@@ -76,7 +77,7 @@ class SolrErrorHandlingTests(SolrTestCase):
 
     def testNetworkFailure(self):
         log = []
-        logger.exception = lambda msg: log.append(msg)
+        logger_indexer.exception = lambda msg: log.append(msg)
         config = getUtility(ISolrConnectionConfig)
         config.active = True
         self.folder.processForm(values={'title': 'Foo'})
@@ -87,10 +88,32 @@ class SolrErrorHandlingTests(SolrTestCase):
         manager.closeConnection()   # which would trigger a reconnect
         self.folder.processForm(values={'title': 'Bar'})
         commit()                    # indexing (doesn't) happen on commit
-        self.assertEqual(log, ['exception during index', 'exception during commit'])
-        config.active = False       # undo changes...
-        config.port = port
-        commit()
+        self.assertEqual(log, ['exception during index',
+            'exception during commit'])
+        manager.setHost(active=False, port=port)
+        commit()                    # undo changes...
+
+    def testNetworkFailureBeforeSchemaCanBeLoaded(self):
+        log = []
+        logger_indexer.warning = lambda msg, obj: log.append((msg, obj))
+        logger_indexer.exception = lambda msg: log.append(msg)
+        logger_manager.exception = lambda msg: log.append(msg)
+        config = getUtility(ISolrConnectionConfig)
+        config.active = True
+        manager = getUtility(ISolrConnectionManager)
+        manager.getConnection()     # we already have an open connection...
+        port = config.port          # remember previous port setting and...
+        config.port = 55555         # fake a broken connection or a down server
+        manager = getUtility(ISolrConnectionManager)
+        manager.closeConnection()   # which would trigger a reconnect
+        self.folder.processForm(values={'title': 'Bar'})
+        commit()                    # indexing (doesn't) happen on commit
+        self.assertEqual(log, ['exception while getting schema',
+            'exception while getting schema',
+            ('unable to fetch schema, skipping indexing of %r', self.folder),
+            'exception during commit'])
+        manager.setHost(active=False, port=port)
+        commit()                    # undo changes...
 
 
 class SolrServerTests(SolrTestCase):
