@@ -56,7 +56,7 @@ def solrSearchResults(request=None, **keywords):
         assert isinstance(request, dict), request
         args = request.copy()
         args.update(keywords)       # keywords take precedence
-    if not args.has_key('SearchableText'):
+    if not args.has_key('SearchableText') or not args['SearchableText']:
         raise FallBackException
     mangleQuery(args)
     prepareData(args)
