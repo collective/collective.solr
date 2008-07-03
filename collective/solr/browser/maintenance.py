@@ -53,7 +53,7 @@ class SolrMaintenanceView(BrowserView):
         conn.commit()
         return 'solr index cleared.'
 
-    def reindex(self, batch=100, skip=0, cache=1000):
+    def reindex(self, batch=100, skip=0, cache=1000, attributes=None):
         """ find all contentish objects (meaning all objects derived from one
             of the catalog mixin classes) and (re)indexes them """
         manager = queryUtility(ISolrConnectionManager)
@@ -73,7 +73,7 @@ class SolrMaintenanceView(BrowserView):
                 log('indexing %r' % obj)
                 lap = time()
                 try:
-                    proc.index(obj)
+                    proc.index(obj, attributes)
                     indexed += 1
                 except BadStatusLine:
                     log('WARNING: error while indexing %r' % obj)
