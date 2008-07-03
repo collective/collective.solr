@@ -1,0 +1,55 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+      metal:use-macro="context/main_template/macros/master"
+      i18n:domain="eli">
+
+<body>
+
+<div metal:fill-slot="main"
+     class="solr-error"
+     tal:define="info view/errorInfo; type info/type; value info/value">
+
+  <div tal:replace="structure provider:plone.abovecontenttitle" />
+
+  <h1 class="documentFirstHeading"
+      i18n:translate="heading_solr_error">
+    Solr Error
+  </h1>
+
+  <div tal:condition="python: type == 'socket.error'">
+    <tal:marker define="global handled python: True" />
+    <p>
+      <strong i18n:translate="description_solr_unreachable">
+        The Solr server is currently unreachable, so no results could be found.
+      </strong> <br />
+      <span i18n:translate="description_solr_unreachable_hint">
+        Please try again later or contact your system administration.
+      </span>
+    </p>
+  </div>
+
+  <div tal:condition="not:exists: handled">
+    <p>
+      <strong i18n:translate="description_solr_unknown error">
+        Unknown error while trying to search using Solr.
+      </strong>
+      <span i18n:translate="description_solr_unknown_error_hint">
+        Please contact you system administration.
+      </span>
+    </p>
+  </div>
+
+  <tal:comment replace="structure string:<!--" />
+    solr error info:
+    type:  <span tal:replace="type" />
+    value: <span tal:replace="value" />
+  <tal:comment replace="structure string:-->" />
+
+  <div tal:replace="structure provider:plone.belowcontentbody" />
+
+</div>
+
+</body>
+</html>

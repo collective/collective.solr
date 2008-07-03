@@ -14,4 +14,11 @@
       allowed_interface="..interfaces.ISolrMaintenanceView"
       permission="cmf.ManagePortal" />
 
+  <browser:page
+      name="index.html"
+      for="socket.error"
+      template="errors.pt"
+      class=".errors.ErrorView"
+      permission="zope2.Public" />
+
 </configure>
