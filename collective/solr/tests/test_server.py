@@ -77,7 +77,9 @@ class SolrErrorHandlingTests(SolrTestCase):
 
     def testNetworkFailure(self):
         log = []
-        logger_indexer.exception = lambda msg: log.append(msg)
+        def logger(*args):
+            log.extend(args)
+        logger_indexer.exception = logger
         config = getUtility(ISolrConnectionConfig)
         config.active = True
         self.folder.processForm(values={'title': 'Foo'})
@@ -88,16 +90,18 @@ class SolrErrorHandlingTests(SolrTestCase):
         manager.closeConnection()   # which would trigger a reconnect
         self.folder.processForm(values={'title': 'Bar'})
         commit()                    # indexing (doesn't) happen on commit
-        self.assertEqual(log, ['exception during index',
+        self.assertEqual(log, ['exception during indexing %r', self.folder,
             'exception during commit'])
         manager.setHost(active=False, port=port)
         commit()                    # undo changes...
 
     def testNetworkFailureBeforeSchemaCanBeLoaded(self):
         log = []
-        logger_indexer.warning = lambda msg, obj: log.append((msg, obj))
-        logger_indexer.exception = lambda msg: log.append(msg)
-        logger_manager.exception = lambda msg: log.append(msg)
+        def logger(*args):
+            log.extend(args)
+        logger_indexer.warning = logger
+        logger_indexer.exception = logger
+        logger_manager.exception = logger
         config = getUtility(ISolrConnectionConfig)
         config.active = True
         manager = getUtility(ISolrConnectionManager)
@@ -110,7 +114,7 @@ class SolrErrorHandlingTests(SolrTestCase):
         commit()                    # indexing (doesn't) happen on commit
         self.assertEqual(log, ['exception while getting schema',
             'exception while getting schema',
-            ('unable to fetch schema, skipping indexing of %r', self.folder),
+            'unable to fetch schema, skipping indexing of %r', self.folder,
             'exception during commit'])
         manager.setHost(active=False, port=port)
         commit()                    # undo changes...

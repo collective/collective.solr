@@ -59,7 +59,7 @@ class SolrIndexQueueProcessor(Persistent):
                     logger.debug('indexing %r (%r)', obj, data)
                     conn.add(**data)
                 except (SolrException, error):
-                    logger.exception('exception during index')
+                    logger.exception('exception during indexing %r', obj)
 
     def reindex(self, obj, attributes=None):
         self.index(obj, attributes)
@@ -85,7 +85,7 @@ class SolrIndexQueueProcessor(Persistent):
                 logger.debug('unindexing %r (%r)', obj, data)
                 conn.delete(id=data_key)
             except (SolrException, error):
-                logger.exception('exception during delete')
+                logger.exception('exception during unindexing %r', obj)
 
     def begin(self):
         pass
