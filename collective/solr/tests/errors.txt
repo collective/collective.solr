@@ -52,6 +52,7 @@ would essentially come down to the same, of course:
 
   >>> from collective.solr.interfaces import ISolrConnectionConfig
   >>> from collective.solr.interfaces import ISolrConnectionManager
+  >>> port = getUtility(ISolrConnectionConfig).port
   >>> getUtility(ISolrConnectionConfig).port = 55555
   >>> getUtility(ISolrConnectionManager).closeConnection()
 
@@ -82,4 +83,9 @@ Now we can finally try to search again:
   '...Solr Error...
    ...The Solr server is currently unreachable, so no results could be found...
    ...Please try again later or contact your system administration...'
+
+In the end we need to clean up our changes to avoid having ill effects on
+other tests:
+
+  >>> getUtility(ISolrConnectionManager).setHost(active=False, port=port)
 
