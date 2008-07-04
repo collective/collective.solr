@@ -14,11 +14,13 @@ def test_suite():
         ztc.FunctionalDocFileSuite(
            'configlet.txt', package='collective.solr.tests',
            test_class=ControlPanelTestCase, optionflags=optionflags),
-        ztc.FunctionalDocFileSuite(
-           'errors.txt', package='collective.solr.tests',
-           test_class=SolrFunctionalTestCase, optionflags=optionflags),
     ])
     if pingSolr():
+        suite.addTest(
+            ztc.FunctionalDocFileSuite(
+               'errors.txt', package='collective.solr.tests',
+               test_class=SolrFunctionalTestCase, optionflags=optionflags),
+        )
         suite.addTest(
             ztc.FunctionalDocFileSuite(
                'search.txt', package='collective.solr.tests',

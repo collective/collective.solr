@@ -42,3 +42,7 @@ class SolrFunctionalTestCase(ptc.FunctionalTestCase):
             browser.addHeader('Authorization', 'Basic %s:%s' % (user, pwd))
         return browser
 
+    def setStatusCode(self, key, value):
+        from ZPublisher import HTTPResponse
+        HTTPResponse.status_codes[key.lower()] = value
+
