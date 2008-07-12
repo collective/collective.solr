@@ -50,6 +50,8 @@ def mangleQuery(keywords):
             keywords['effective'] = '"[* TO %s]"' % value
             keywords['expires'] = '"[%s TO *]"' % value
         elif args.has_key('range'):
+            if not isinstance(value, (list, tuple)):
+                value = [ value ]
             payload = map(convert, value)
             keywords[key] = ranges[args['range']] % tuple(payload)
             del args['range']

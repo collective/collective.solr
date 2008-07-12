@@ -30,6 +30,8 @@ class QueryManglerTests(TestCase):
         self.assertEqual(keywords, {'foo': '"[* TO 23]"'})
         keywords = mangle(foo=dict(query=(23,), range='max'))
         self.assertEqual(keywords, {'foo': '"[* TO 23]"'})
+        keywords = mangle(foo=dict(query=23, range='max'))
+        self.assertEqual(keywords, {'foo': '"[* TO 23]"'})
 
     def testMinMaxRange(self):
         keywords = mangle(foo=(23,42), foo_usage='range:min:max')
