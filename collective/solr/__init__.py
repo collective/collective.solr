@@ -3,11 +3,15 @@
 
 # temporary fix for not having the formerly persistent utility cause trouble...
 
+from logging import getLogger
+logger = getLogger('collective.solr')
+
 def _persistent_load(self, reference):
     if isinstance(reference, tuple):
         try:
             return self.load_persistent(*reference)
         except TypeError:
+            logger.exception('exception while loading object %r', reference)
             return None
     elif isinstance(reference, str):
         return self.load_oid(reference)
