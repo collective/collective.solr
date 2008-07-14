@@ -23,6 +23,10 @@ class PloneFlare(AttrDict):
         self.request = request
         self.update(context.__dict__)  # copy data
 
+    def getPath(self):
+        """ convenience alias """
+        return self['physicalPath']
+
     def getURL(self):
         """ convert the physical path into a url, if it was stored;
             the code is copied from `OFS/Traversable.py` """
