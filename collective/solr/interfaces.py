@@ -1,5 +1,5 @@
 from zope.interface import Interface
-from zope.schema import Bool, TextLine, Int
+from zope.schema import Bool, TextLine, Int, Float
 from zope.i18nmessageid import MessageFactory
 from collective.indexing.interfaces import IIndexQueueProcessor
 
@@ -25,6 +25,14 @@ class ISolrSchema(Interface):
         description=_(u'Check this to enable asynchronous indexing operations, '
                        'which will improve Zope response times in return for '
                        'not having the Solr index updated immediately.'))
+
+    index_timeout = Float(title=_(u'Index Timeout'),
+        description=_(u'Number of seconds after which an index request will time out. '
+                       'Set to "0" to disable timeouts.'))
+
+    search_timeout = Float(title=_(u'Search Timeout'),
+        description=_(u'Number of seconds after which a search request will time out. '
+                       'Set to "0" to disable timeouts.'))
 
 
 class ISolrConnectionConfig(ISolrSchema):

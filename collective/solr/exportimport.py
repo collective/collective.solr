@@ -29,6 +29,8 @@ class SolrConfigXMLAdapter(XMLAdapterBase):
         self.context.port = 0
         self.context.base = ''
         self.context.async = False
+        self.context.index_timeout = 0
+        self.context.search_timeout = 0
 
     def _initProperties(self, node):
         elems = node.getElementsByTagName('connection')
@@ -54,6 +56,12 @@ class SolrConfigXMLAdapter(XMLAdapterBase):
                 if child.nodeName == 'async':
                     value = self._convertToBoolean(str(child.getAttribute('value')))
                     self.context.async = value
+                elif child.nodeName == 'index-timeout':
+                    value = float(str(child.getAttribute('value')))
+                    self.context.index_timeout = value
+                elif child.nodeName == 'search-timeout':
+                    value = float(str(child.getAttribute('value')))
+                    self.context.search_timeout = value
 
     def _createNode(self, name, value):
         node = self._doc.createElement(name)
@@ -72,6 +80,8 @@ class SolrConfigXMLAdapter(XMLAdapterBase):
         settings = self._doc.createElement('settings')
         node.appendChild(settings)
         settings.appendChild(self._createNode('async', str(bool(self.context.async))))
+        settings.appendChild(self._createNode('index-timeout', str(self.context.index_timeout)))
+        settings.appendChild(self._createNode('search-timeout', str(self.context.search_timeout)))
         return node
 
 

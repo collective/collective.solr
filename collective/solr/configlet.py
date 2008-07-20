@@ -68,6 +68,28 @@ class SolrControlPanelAdapter(SchemaAdapterBase):
 
     async = property(getAsync, setAsync)
 
+    def getIndexTimeout(self):
+        util = queryUtility(ISolrConnectionConfig)
+        return getattr(util, 'index_timeout', '')
+
+    def setIndexTimeout(self, value):
+        util = queryUtility(ISolrConnectionConfig)
+        if util is not None:
+            util.index_timeout = value
+
+    index_timeout = property(getIndexTimeout, setIndexTimeout)
+
+    def getSearchTimeout(self):
+        util = queryUtility(ISolrConnectionConfig)
+        return getattr(util, 'search_timeout', '')
+
+    def setSearchTimeout(self, value):
+        util = queryUtility(ISolrConnectionConfig)
+        if util is not None:
+            util.search_timeout = value
+
+    search_timeout = property(getSearchTimeout, setSearchTimeout)
+
 
 class SolrControlPanel(ControlPanelForm):
 

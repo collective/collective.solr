@@ -8,5 +8,7 @@
   </connection>
   <settings>
     <async value="False" />
+    <index-timeout value="0" />
+    <search-timeout value="0" />
   </settings>
 </object>

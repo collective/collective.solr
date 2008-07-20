@@ -22,6 +22,8 @@ class SolrConnectionConfig(Persistent):
         self.port = None
         self.base = None
         self.async = False
+        self.index_timeout = 0
+        self.search_timeout = 0
 
     def getId(self):
         """ return a unique id to be used with GenericSetup """
