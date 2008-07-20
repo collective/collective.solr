@@ -34,6 +34,7 @@ from xml.sax.saxutils import escape
 import codecs
 import urllib
 from collective.solr.parser import SolrSchema
+from collective.solr.timeout import HTTPConnectionWithTimeout
 
 
 class SolrException(Exception):
@@ -54,7 +55,7 @@ class SolrException(Exception):
 
 class SolrConnection:
 
-    def __init__(self, host='localhost:8983', solrBase='/solr', persistent=True, postHeaders={}):
+    def __init__(self, host='localhost:8983', solrBase='/solr', persistent=True, postHeaders={}, timeout=5):
         self.host = host
         self.solrBase = solrBase
         self.persistent = persistent
@@ -63,7 +64,7 @@ class SolrConnection:
         # responses from Solr will always be in UTF-8
         self.decoder = codecs.getdecoder('utf-8')  
         # a real connection to the server is not opened at this point.
-        self.conn = httplib.HTTPConnection(self.host)
+        self.conn = HTTPConnectionWithTimeout(self.host, timeout=timeout)
         # self.conn.set_debuglevel(1000000)
         self.xmlheaders = {'Content-Type': 'text/xml; charset=utf-8'}
         self.xmlheaders.update(postHeaders)
