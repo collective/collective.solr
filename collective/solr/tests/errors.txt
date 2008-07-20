@@ -84,6 +84,24 @@ Now we can finally try to search again:
    ...The Solr server is currently unreachable, so no results could be found...
    ...Please try again later or contact your system administration...'
 
+Next let's set up a fake server which will respond rather slowly, so that a
+timeout error is provoked:
+
+  >>> from collective.solr.tests.utils import fakeServer
+  >>> from time import sleep
+  >>> def action(handler):
+  ...   sleep(7)
+  >>> thread = fakeServer([action,], port=55555)
+  >>> self.setStatusCode('timeout', 200)
+
+And try the search again:
+
+  >>> browser.reload()
+  >>> browser.contents
+  '...Solr Error...
+   ...The request to the Solr server has timed out.  No search results could be found...
+   ...Please try again later or contact your system administration...'
+
 In the end we need to clean up our changes to avoid having ill effects on
 other tests:
 

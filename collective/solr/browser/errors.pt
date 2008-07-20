@@ -30,6 +30,18 @@
     </p>
   </div>
 
+  <div tal:condition="python: type == 'socket.timeout'">
+    <tal:marker define="global handled python: True" />
+    <p>
+      <strong i18n:translate="description_solr_timeout">
+        The request to the Solr server has timed out.  No search results could be found.
+      </strong> <br />
+      <span i18n:translate="description_solr_unreachable_hint">
+        Please try again later or contact your system administration.
+      </span>
+    </p>
+  </div>
+
   <div tal:condition="not:exists: handled">
     <p>
       <strong i18n:translate="description_solr_unknown error">
