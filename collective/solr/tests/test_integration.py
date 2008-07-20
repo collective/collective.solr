@@ -140,13 +140,17 @@ class SiteSearchTests(SolrTestCase):
         config = queryUtility(ISolrConnectionConfig)
         config.active = True
         config.port = 55555         # don't let the real solr disturb us
-        def action(handler):        # set up fake http response
-            sleep(7)                # but wait a bit before sending it
+        def quick(handler):         # set up fake http response
+            sleep(3)                # and wait a bit before sending it
             handler.send_response(200, getData('search_response.txt'))
-        thread = fakeServer([action,], port=55555)
+        def slow(handler):          # set up another http response
+            sleep(7)                # but wait longer before sending it
+            handler.send_response(200, getData('search_response.txt'))
+        thread = fakeServer([quick, slow], port=55555)
         search = queryUtility(ISearch)
+        search('foo')               # the first search should succeed
         try:
-            self.assertRaises(timeout, search, 'foo')   # searching should time out...
+            self.assertRaises(timeout, search, 'foo')   # but not the second
         finally:
             thread.join()           # the server thread must always be joined
 
