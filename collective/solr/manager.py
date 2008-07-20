@@ -10,6 +10,7 @@ from httplib import CannotSendRequest
 from socket import error
 
 logger = getLogger('collective.solr.manager')
+marker = object()
 
 
 class SolrConnectionConfig(Persistent):
@@ -56,8 +57,9 @@ class SolrConnectionManager(object):
         if clearSchema:
             setLocal('schema', None)
 
-    def getConnection(self):
-        """ returns an existing connection or opens one """
+    def getConnection(self, timeout=marker):
+        """ returns an existing connection or opens one, optionally
+            allowing to directly specify a timeout value """
         config = getUtility(ISolrConnectionConfig)
         if not config.active:
             return None
@@ -67,6 +69,8 @@ class SolrConnectionManager(object):
             logger.debug('opening connection to %s', host)
             conn = SolrConnection(host=host, solrBase=config.base, persistent=True)
             setLocal('connection', conn)
+        if conn is not None and timeout is not marker:
+            conn.setTimeout(timeout)
         return conn
 
     def getSchema(self):
