@@ -40,7 +40,9 @@ class Search(object):
 
     def search(self, query, **parameters):
         """ perform a search with the given querystring and parameters """
-        connection = self.getManager().getConnection()
+        manager = self.getManager()
+        manager.setSearchTimeout()
+        connection = manager.getConnection()
         if connection is None:
             raise SolrInactiveException
         logger.debug('searching for %r (%r)', query, parameters)

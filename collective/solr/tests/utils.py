@@ -72,6 +72,9 @@ def fakehttp(solrconn, *fakedata):
             output.new()                        # and create a new output buffer
             HTTPConnection.putrequest(self, *args, **kw)
 
+        def setTimeout(self, timeout):
+            pass
+
     solrconn.conn = FakeHTTPConnection(solrconn.conn.host, *fakedata)
     return output
 

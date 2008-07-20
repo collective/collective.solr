@@ -108,6 +108,7 @@ class SolrIndexQueueProcessor(Persistent):
         if self.manager is None:
             self.manager = queryUtility(ISolrConnectionManager)
         if self.manager is not None:
+            self.manager.setIndexTimeout()
             return self.manager.getConnection()
 
     def wrapObject(self, obj):

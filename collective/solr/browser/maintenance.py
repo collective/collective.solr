@@ -41,14 +41,14 @@ class SolrMaintenanceView(BrowserView):
     def optimize(self):
         """ optimize solr indexes """
         manager = queryUtility(ISolrConnectionManager)
-        manager.getConnection().commit(optimize=True)
+        manager.getConnection(timeout=None).commit(optimize=True)
         return 'solr indexes optimized.'
 
     def clear(self):
         """ clear all data from solr, i.e. delete all indexed objects """
         manager = queryUtility(ISolrConnectionManager)
         uniqueKey = manager.getSchema().uniqueKey
-        conn = manager.getConnection()
+        conn = manager.getConnection(timeout=None)
         conn.deleteByQuery('%s:[* TO *]' % uniqueKey)
         conn.commit()
         return 'solr index cleared.'
@@ -57,6 +57,7 @@ class SolrMaintenanceView(BrowserView):
         """ find all contentish objects (meaning all objects derived from one
             of the catalog mixin classes) and (re)indexes them """
         manager = queryUtility(ISolrConnectionManager)
+        manager.setTimeout(None)        # don't time out during reindexing
         proc = queryUtility(ISolrIndexQueueProcessor, name='solr')
         log = self.request.RESPONSE.write
         if skip:
@@ -131,6 +132,7 @@ class SolrMaintenanceView(BrowserView):
             be used to ensure consistency between zope and solr after the
             solr server has been unavailable etc """
         manager = queryUtility(ISolrConnectionManager)
+        manager.setTimeout(None)        # don't time out during syncing
         proc = queryUtility(ISolrIndexQueueProcessor, name='solr')
         db = self.context.getPhysicalRoot()._p_jar.db()
         log = self.request.RESPONSE.write

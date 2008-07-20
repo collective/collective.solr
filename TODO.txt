@@ -7,7 +7,6 @@ TODOs:
 
 * provide decorator for solr exceptions
 * add signal handlers (see store.py)
-* what about http timeouts?
 * add a configurable queue limit for large transactions
 * mapping from accessor name to attribute name, i.e. getTitle -> title,
   preferably via <copyField> tags in the solr schema

@@ -139,6 +139,7 @@ class SiteSearchTests(SolrTestCase):
     def testSearchTimeout(self):
         config = queryUtility(ISolrConnectionConfig)
         config.active = True
+        config.search_timeout = 5   # specify the timeout
         config.port = 55555         # don't let the real solr disturb us
         def quick(handler):         # set up fake http response
             sleep(3)                # and wait a bit before sending it
