@@ -1,5 +1,7 @@
 from os.path import dirname, join
 from httplib import HTTPConnection
+from threading import Thread
+from BaseHTTPServer import HTTPServer, BaseHTTPRequestHandler
 from StringIO import StringIO
 from socket import error
 from re import search
@@ -78,6 +80,27 @@ def fakemore(solrconn, *fakedata):
     """ helper function to add more fake http requests to a SolrConnection """
     assert hasattr(solrconn.conn, 'fakedata')   # `isinstance()` doesn't work?
     solrconn.conn.fakedata.extend(fakedata)
+
+
+def fakeServer(actions, port=55555):
+    """ helper to set up and activate a fake http server used for testing
+        purposes; <actions> must be a list of handler functions, which will
+        receive the base handler as their only argument and are used to
+        process the incoming requests in turn; returns a thread that should
+        be 'joined' when done """
+    class Handler(BaseHTTPRequestHandler):
+        def do_POST(self):
+            action = actions.pop(0)             # get next action
+            action(self)                        # and process it...
+        def log_request(*args, **kw):
+            pass
+    def runner():
+        while actions:
+            server.handle_request()
+    server = HTTPServer(('', port), Handler)
+    thread = Thread(target=runner)
+    thread.start()
+    return thread
 
 
 def pingSolr():

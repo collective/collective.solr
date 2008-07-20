@@ -9,9 +9,10 @@ from collective.solr.interfaces import ISolrConnectionManager
 from collective.solr.interfaces import ISolrIndexQueueProcessor
 from collective.solr.interfaces import ISearch
 from collective.solr.exceptions import SolrInactiveException
-from collective.solr.tests.utils import getData, fakehttp
+from collective.solr.tests.utils import getData, fakehttp, fakeServer
 from transaction import commit
-from socket import error
+from socket import error, timeout
+from time import sleep
 
 
 class UtilityTests(SolrTestCase):
@@ -134,6 +135,20 @@ class SiteSearchTests(SolrTestCase):
         query = self.portal.restrictedTraverse('queryCatalog')
         request = dict(SearchableText='foo')
         self.assertRaises(error, query, request)
+
+    def testSearchTimeout(self):
+        config = queryUtility(ISolrConnectionConfig)
+        config.active = True
+        config.port = 55555         # don't let the real solr disturb us
+        def action(handler):        # set up fake http response
+            sleep(7)                # but wait a bit before sending it
+            handler.send_response(200, getData('search_response.txt'))
+        thread = fakeServer([action,], port=55555)
+        search = queryUtility(ISearch)
+        try:
+            self.assertRaises(timeout, search, 'foo')   # searching should time out...
+        finally:
+            thread.join()           # the server thread must always be joined
 
 
 def test_suite():
