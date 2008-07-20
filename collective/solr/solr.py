@@ -96,6 +96,10 @@ class SolrConnection:
             raise ex
         return rsp
 
+    def setTimeout(self, timeout):
+        """ set a timeout value for the currently open connection """
+        self.conn.setTimeout(timeout)
+
     def doPost(self,url,body,headers):
         try:
             self.conn.request('POST', url, body, headers)

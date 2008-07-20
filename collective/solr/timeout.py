@@ -33,6 +33,13 @@ class HTTPConnectionWithTimeout(HTTPConnection):
         if not self.sock:
             raise error, msg
 
+    def setTimeout(self, timeout):
+        """ set a timeout value for the currently open connection as well
+            as for future ones """
+        self.timeout = timeout
+        if self.sock is not None:
+            self.sock.settimeout(timeout)
+
 
 class HTTPHandlerWithTimeout(HTTPHandler):
     """ an http handler supporting timeouts on the underlying socket """

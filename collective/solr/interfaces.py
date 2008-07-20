@@ -54,6 +54,18 @@ class ISolrConnectionManager(Interface):
     def getSchema():
         """ returns the currently used schema or fetches it """
 
+    def setTimeout(timeout):
+        """ set the timeout on the current (or to be opened) connection
+            to the given value """
+
+    def setIndexTimeout():
+        """ set the timeout on the current (or to be opened) connection
+            to the value specified for indexing operations """
+
+    def setSearchTimeout():
+        """ set the timeout on the current (or to be opened) connection
+            to the value specified for search operations """
+
 
 class ISolrIndexQueueProcessor(IIndexQueueProcessor):
     """ an index queue processor for solr """

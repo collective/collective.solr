@@ -83,3 +83,22 @@ class SolrConnectionManager(object):
                     logger.exception('exception while getting schema')
         return schema
 
+    def setTimeout(self, timeout):
+        """ set the timeout on the current (or to be opened) connection
+            to the given value """
+        conn = self.getConnection()
+        if conn is not None:
+            conn.setTimeout(timeout)
+
+    def setIndexTimeout(self):
+        """ set the timeout on the current (or to be opened) connection
+            to the value specified for indexing operations """
+        config = getUtility(ISolrConnectionConfig)
+        self.setTimeout(config.index_timeout or None)
+
+    def setSearchTimeout(self):
+        """ set the timeout on the current (or to be opened) connection
+            to the value specified for search operations """
+        config = getUtility(ISolrConnectionConfig)
+        self.setTimeout(config.search_timeout or None)
+
