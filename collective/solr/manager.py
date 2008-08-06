@@ -17,6 +17,8 @@ class SolrConnectionConfig(Persistent):
     """ utility to hold the connection configuration for the solr server """
     implements(ISolrConnectionConfig)
 
+    max_results = 0             # provide backwards compatibility
+
     def __init__(self):
         self.active = False
         self.host = None
@@ -25,6 +27,7 @@ class SolrConnectionConfig(Persistent):
         self.async = False
         self.index_timeout = 0
         self.search_timeout = 0
+        self.max_results = 0
 
     def getId(self):
         """ return a unique id to be used with GenericSetup """

@@ -260,6 +260,22 @@ class SolrServerTests(SolrTestCase):
         result = connection.search(q='+Title:Foo').read()
         self.assertEqual(numFound(result), 1)
 
+    def testLimitSearchResults(self):
+        self.maintenance.reindex()
+        results = self.search('+parentPaths:/plone')
+        self.assertEqual(results.numFound, '8')
+        self.assertEqual(len(results), 8)
+        # now let's limit the returned results
+        config = getUtility(ISolrConnectionConfig)
+        config.max_results = 2
+        results = self.search('+parentPaths:/plone')
+        self.assertEqual(results.numFound, '8')
+        self.assertEqual(len(results), 2)
+        # an explicit value should still override things
+        results = self.search('+parentPaths:/plone', rows=5)
+        self.assertEqual(results.numFound, '8')
+        self.assertEqual(len(results), 5)
+
 
 def test_suite():
     if pingSolr():

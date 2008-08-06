@@ -31,6 +31,7 @@ class SolrConfigXMLAdapter(XMLAdapterBase):
         self.context.async = False
         self.context.index_timeout = 0
         self.context.search_timeout = 0
+        self.context.max_results = 0
 
     def _initProperties(self, node):
         elems = node.getElementsByTagName('connection')
@@ -62,6 +63,9 @@ class SolrConfigXMLAdapter(XMLAdapterBase):
                 elif child.nodeName == 'search-timeout':
                     value = float(str(child.getAttribute('value')))
                     self.context.search_timeout = value
+                elif child.nodeName == 'max-results':
+                    value = int(str(child.getAttribute('value')))
+                    self.context.max_results = value
 
     def _createNode(self, name, value):
         node = self._doc.createElement(name)
@@ -82,6 +86,7 @@ class SolrConfigXMLAdapter(XMLAdapterBase):
         settings.appendChild(self._createNode('async', str(bool(self.context.async))))
         settings.appendChild(self._createNode('index-timeout', str(self.context.index_timeout)))
         settings.appendChild(self._createNode('search-timeout', str(self.context.search_timeout)))
+        settings.appendChild(self._createNode('max-results', str(self.context.max_results)))
         return node
 
 

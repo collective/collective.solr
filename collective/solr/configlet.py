@@ -90,6 +90,17 @@ class SolrControlPanelAdapter(SchemaAdapterBase):
 
     search_timeout = property(getSearchTimeout, setSearchTimeout)
 
+    def getMaxResults(self):
+        util = queryUtility(ISolrConnectionConfig)
+        return getattr(util, 'max_results', '')
+
+    def setMaxResults(self, value):
+        util = queryUtility(ISolrConnectionConfig)
+        if util is not None:
+            util.max_results = value
+
+    max_results = property(getMaxResults, setMaxResults)
+
 
 class SolrControlPanel(ControlPanelForm):
 

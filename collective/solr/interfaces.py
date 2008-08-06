@@ -34,6 +34,10 @@ class ISolrSchema(Interface):
         description=_(u'Number of seconds after which a search request will time out. '
                        'Set to "0" to disable timeouts.'))
 
+    max_results = Int(title=_(u'Maximum search results'),
+        description=_(u'Specify the maximum number of matches to be returned when '
+                       'searching.  Set to "0" to always return all results.'))
+
 
 class ISolrConnectionConfig(ISolrSchema):
     """ utility to hold the connection configuration for the solr server """

@@ -3,6 +3,7 @@ from zope.interface import implements
 from zope.component import queryUtility
 from re import compile
 
+from collective.solr.interfaces import ISolrConnectionConfig
 from collective.solr.interfaces import ISolrConnectionManager
 from collective.solr.interfaces import ISearch
 from collective.solr.parser import SolrResponse
@@ -45,6 +46,9 @@ class Search(object):
         connection = manager.getConnection()
         if connection is None:
             raise SolrInactiveException
+        if not parameters.has_key('rows'):
+            config = queryUtility(ISolrConnectionConfig)
+            parameters['rows'] = config.max_results or ''
         logger.debug('searching for %r (%r)', query, parameters)
         response = connection.search(q=query, **parameters)
         return getattr(SolrResponse(response), 'response', [])

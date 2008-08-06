@@ -18,6 +18,7 @@ class SetupToolTests(SolrTestCase, TarballTester):
         config.async = False
         config.index_timeout = 7
         config.search_timeout = 3.1415
+        config.max_results = 42
 
     def testImportStep(self):
         tool = self.portal.portal_setup
@@ -32,6 +33,7 @@ class SetupToolTests(SolrTestCase, TarballTester):
         self.assertEqual(config.async, False)
         self.assertEqual(config.index_timeout, 0)
         self.assertEqual(config.search_timeout, 0)
+        self.assertEqual(config.max_results, 0)
 
     def testExportStep(self):
         tool = self.portal.portal_setup
@@ -56,6 +58,7 @@ SOLR_XML = """\
     <async value="False" />
     <index-timeout value="7" />
     <search-timeout value="3.1415" />
+    <max-results value="42" />
   </settings>
 </object>
 """
