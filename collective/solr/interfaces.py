@@ -26,11 +26,11 @@ class ISolrSchema(Interface):
                        'which will improve Zope response times in return for '
                        'not having the Solr index updated immediately.'))
 
-    index_timeout = Float(title=_(u'Index Timeout'),
+    index_timeout = Float(title=_(u'Index timeout'),
         description=_(u'Number of seconds after which an index request will time out. '
                        'Set to "0" to disable timeouts.'))
 
-    search_timeout = Float(title=_(u'Search Timeout'),
+    search_timeout = Float(title=_(u'Search timeout'),
         description=_(u'Number of seconds after which a search request will time out. '
                        'Set to "0" to disable timeouts.'))
 
