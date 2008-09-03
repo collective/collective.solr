@@ -1,7 +1,7 @@
 from unittest import TestCase, defaultTestLoader, main
 from DateTime import DateTime
 
-from collective.solr.mangler import mangleQuery
+from collective.solr.mangler import mangleQuery, extractQueryParameters
 
 
 def mangle(**keywords):
@@ -99,6 +99,59 @@ class PathManglerTests(TestCase):
         keywords = mangle(path=dict(query='/foo', depth=2))
         self.assertEqual(keywords, {'parentPaths': '/foo',
             'physicalDepth': '"[* TO 4]"'})
+
+
+class QueryParameterTests(TestCase):
+
+    def testSortIndex(self):
+        extract = extractQueryParameters
+        params = extract({'sort_on': 'foo'})
+        self.assertEqual(params, dict(sort='foo asc'))
+        # again with dashed instead of underscores
+        params = extract({'sort-on': 'foo'})
+        self.assertEqual(params, dict(sort='foo asc'))
+
+    def testSortOrder(self):
+        extract = extractQueryParameters
+        params = extract({'sort_on': 'foo', 'sort_order': 'ascending'})
+        self.assertEqual(params, dict(sort='foo asc'))
+        params = extract({'sort_on': 'foo', 'sort_order': 'descending'})
+        self.assertEqual(params, dict(sort='foo desc'))
+        params = extract({'sort_on': 'foo', 'sort_order': 'reverse'})
+        self.assertEqual(params, dict(sort='foo desc'))
+        params = extract({'sort_on': 'foo', 'sort_order': 'bar'})
+        self.assertEqual(params, dict(sort='foo asc'))
+        # again with dashed instead of underscores
+        params = extract({'sort-on': 'foo', 'sort-order': 'ascending'})
+        self.assertEqual(params, dict(sort='foo asc'))
+        params = extract({'sort-on': 'foo', 'sort-order': 'descending'})
+        self.assertEqual(params, dict(sort='foo desc'))
+        params = extract({'sort-on': 'foo', 'sort-order': 'reverse'})
+        self.assertEqual(params, dict(sort='foo desc'))
+        params = extract({'sort-on': 'foo', 'sort-order': 'bar'})
+        self.assertEqual(params, dict(sort='foo asc'))
+
+    def testSortLimit(self):
+        extract = extractQueryParameters
+        params = extract({'sort_limit': 5})
+        self.assertEqual(params, dict(rows=5))
+        params = extract({'sort_limit': '10'})
+        self.assertEqual(params, dict(rows=10))
+        # again with dashed instead of underscores
+        params = extract({'sort-limit': 5})
+        self.assertEqual(params, dict(rows=5))
+        params = extract({'sort-limit': '10'})
+        self.assertEqual(params, dict(rows=10))
+
+    def testCombined(self):
+        extract = extractQueryParameters
+        params = extract({'sort_on': 'foo', 'sort_limit': 5})
+        self.assertEqual(params, dict(sort='foo asc', rows=5))
+        params = extract({'sort_on': 'foo', 'sort_order': 'reverse',
+                          'sort_limit': 5})
+        self.assertEqual(params, dict(sort='foo desc', rows=5))
+        params = extract({'sort_order': 'reverse', 'sort_limit': 5})
+        self.assertEqual(params, dict(rows=5))
 
 
 def test_suite():

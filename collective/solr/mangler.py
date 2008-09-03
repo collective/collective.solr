@@ -65,3 +65,25 @@ def mangleQuery(keywords):
             keywords[key] = convert(value)
         assert not args, 'unsupported usage: %r' % args
 
+
+def extractQueryParameters(args):
+    """ extract parameters related to sorting and limiting search results
+        from a given set of arguments """
+    def get(name):
+        for prefix in 'sort_', 'sort-':
+            value = args.get('%s%s' % (prefix, name), None)
+            if value is not None:
+                return value
+        return None
+    params = {}
+    index = get('on')
+    if index:
+        reverse = get('order') or ''
+        reverse = reverse.lower() in ('reverse', 'descending')
+        order = reverse and 'desc' or 'asc'
+        params['sort'] = '%s %s' % (index, order)
+    limit = get('limit')
+    if limit:
+        params['rows'] = int(limit)
+    return params
+
