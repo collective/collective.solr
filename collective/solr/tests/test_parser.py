@@ -105,6 +105,8 @@ class ParserTests(TestCase):
         self.assertEqual(schema.timestamp.class_, 'solr.DateField')
         self.assertEqual(schema.timestamp.default, 'NOW')
         self.assertEqual(schema.timestamp.multiValued, False)
+        self.assertEqual(schema.timestamp.indexed, True)
+        self.assertEqual(schema.word.indexed, False)
         fields = schema.values()
         self.assertEqual(len([f for f in fields if getattr(f, 'required', False)]), 2)
         self.assertEqual(len([f for f in fields if getattr(f, 'multiValued', False)]), 3)
