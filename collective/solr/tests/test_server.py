@@ -300,6 +300,14 @@ class SolrServerTests(SolrTestCase):
         self.failIf(schema.has_key('foo'))
         self.assertEqual(len(search('Title', sort_on='foo').split(', ')), 4)
 
+    def testGetObjectFromFlare(self):
+        self.folder.processForm(values={'title': 'Foo'})
+        commit()                        # indexing happens on commit
+        results = solrSearchResults(SearchableText='Foo')
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0].Title, 'Foo')
+        self.assertEqual(results[0].getObject(), self.folder)
+
 
 def test_suite():
     if pingSolr():

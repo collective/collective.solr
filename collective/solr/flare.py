@@ -1,5 +1,5 @@
 from zope.interface import implements
-from zope.component import adapts
+from zope.component import adapts, getSiteManager
 from zope.publisher.interfaces.http import IHTTPRequest
 from OFS.Traversable import path2url
 from DateTime import DateTime
@@ -26,6 +26,14 @@ class PloneFlare(AttrDict):
     def getPath(self):
         """ convenience alias """
         return self['physicalPath']
+
+    def getObject(self, REQUEST=None):
+        """ return the actual object corresponding to this flare """
+        site = getSiteManager()
+        path = self.getPath()
+        if not path:
+            return None
+        return site.unrestrictedTraverse(path)
 
     def getURL(self):
         """ convert the physical path into a url, if it was stored;
