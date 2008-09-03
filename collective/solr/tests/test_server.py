@@ -276,6 +276,22 @@ class SolrServerTests(SolrTestCase):
         self.assertEqual(results.numFound, '8')
         self.assertEqual(len(results), 5)
 
+    def testSortParameters(self):
+        self.maintenance.reindex()
+        search = lambda attr, **kw: ', '.join([ getattr(r, attr) for r in
+            solrSearchResults(request=dict(SearchableText='"[* TO *]"',
+                              path=dict(query='/plone', depth=1)), **kw) ])
+        self.assertEqual(search('Title', sort_on='Title'),
+            'Events, News, Users, Welcome to Plone')
+        self.assertEqual(search('Title', sort_on='Title', sort_order='reverse'),
+            'Welcome to Plone, Users, News, Events')
+        self.assertEqual(search('getId', sort_on='Title', sort_order='descending'),
+            'front-page, Members, news, events')
+        self.assertEqual(search('Title', sort_on='Title', sort_limit=2),
+            'Events, News')
+        self.assertEqual(search('Title', sort_on='Title', sort_order='reverse',
+            sort_limit='3'), 'Welcome to Plone, Users, News')
+
 
 def test_suite():
     if pingSolr():

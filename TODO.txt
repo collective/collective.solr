@@ -1,6 +1,5 @@
 TODOs:
 * tests for maintenance view for syncing catalog and solr indexes
-* support for order, limit etc parameters
 * remove temporary fix for issue with ex-persistent utility again
 * result iterator (with __len__ on results object)
 * batch support for searching
