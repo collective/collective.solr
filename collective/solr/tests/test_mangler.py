@@ -1,7 +1,10 @@
 from unittest import TestCase, defaultTestLoader, main
 from DateTime import DateTime
 
-from collective.solr.mangler import mangleQuery, extractQueryParameters
+from collective.solr.mangler import mangleQuery
+from collective.solr.mangler import extractQueryParameters
+from collective.solr.mangler import cleanupQueryParameters
+from collective.solr.parser import SolrSchema, SolrField
 
 
 def mangle(**keywords):
@@ -152,6 +155,27 @@ class QueryParameterTests(TestCase):
         self.assertEqual(params, dict(sort='foo desc', rows=5))
         params = extract({'sort_order': 'reverse', 'sort_limit': 5})
         self.assertEqual(params, dict(rows=5))
+
+    def testSortIndexCleanup(self):
+        cleanup = cleanupQueryParameters
+        schema = SolrSchema()
+        # a non-existing sort index should be removed
+        params = cleanup(dict(sort='foo asc'), schema)
+        self.assertEqual(params, dict())
+        # the same goes when the given index isn't indexed
+        schema['foo'] = SolrField(indexed=False)
+        params = cleanup(dict(sort='foo asc'), schema)
+        self.assertEqual(params, dict())
+        # a suitable index will be left intact, of course...
+        schema['foo'].indexed = True
+        params = cleanup(dict(sort='foo asc'), schema)
+        self.assertEqual(params, dict(sort='foo asc'))
+        # also make sure sort index aliases work, if the alias index exists
+        params = cleanup(dict(sort='sortable_title asc'), schema)
+        self.assertEqual(params, dict())
+        schema['Title'] = SolrField(indexed=True)
+        params = cleanup(dict(sort='sortable_title asc'), schema)
+        self.assertEqual(params, dict(sort='Title asc'))
 
 
 def test_suite():

@@ -7,7 +7,9 @@ from collective.solr.interfaces import ISearchDispatcher
 from collective.solr.interfaces import ISearch
 from collective.solr.interfaces import IFlare
 from collective.solr.utils import isActive, prepareData
-from collective.solr.mangler import mangleQuery, extractQueryParameters
+from collective.solr.mangler import mangleQuery
+from collective.solr.mangler import extractQueryParameters
+from collective.solr.mangler import cleanupQueryParameters
 
 from collective.solr.monkey import patchCatalogTool
 patchCatalogTool()      # patch catalog tool to use the dispatcher...
@@ -61,7 +63,8 @@ def solrSearchResults(request=None, **keywords):
     mangleQuery(args)
     prepareData(args)
     query = search.buildQuery(**args)
-    params = extractQueryParameters(args)
+    schema = search.getManager().getSchema() or {}
+    params = cleanupQueryParameters(extractQueryParameters(args), schema)
     results = search(query, fl='* score', **params)
     def wrap(flare):
         """ wrap a flare object with a helper class """

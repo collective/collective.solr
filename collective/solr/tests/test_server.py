@@ -291,6 +291,14 @@ class SolrServerTests(SolrTestCase):
             'Events, News')
         self.assertEqual(search('Title', sort_on='Title', sort_order='reverse',
             sort_limit='3'), 'Welcome to Plone, Users, News')
+        # test sort index aliases
+        schema = self.search.getManager().getSchema()
+        self.failIf(schema.has_key('sortable_title'))
+        self.assertEqual(search('Title', sort_on='sortable_title'),
+            'Events, News, Users, Welcome to Plone')
+        # also make sure a non-existing sort index doesn't break things
+        self.failIf(schema.has_key('foo'))
+        self.assertEqual(len(search('Title', sort_on='foo').split(', ')), 4)
 
 
 def test_suite():

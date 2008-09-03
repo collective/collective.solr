@@ -8,6 +8,10 @@ ranges = {
     'min:max': '"[%s TO %s]"',
 }
 
+sort_aliases = {
+    'sortable_title': 'Title',
+}
+
 
 def convert(value):
     """ convert values, which need a special format, i.e. dates """
@@ -86,4 +90,20 @@ def extractQueryParameters(args):
     if limit:
         params['rows'] = int(limit)
     return params
+
+
+def cleanupQueryParameters(args, schema):
+    """ validate and possibly clean up the given query parameters using
+        the given solr schema """
+    sort = args.get('sort', None)
+    if sort is not None:
+        field, order = sort.split(' ', 1)
+        if not schema.has_key(field):
+            field = sort_aliases.get(field, None)
+        fld = schema.get(field, None)
+        if fld is not None and fld.indexed:
+            args['sort'] = '%s %s' % (field, order)
+        else:
+            del args['sort']
+    return args
 
