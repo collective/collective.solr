@@ -308,6 +308,15 @@ class SolrServerTests(SolrTestCase):
         self.assertEqual(results[0].Title, 'Foo')
         self.assertEqual(results[0].getObject(), self.folder)
 
+    def testWildcardSearches(self):
+        self.maintenance.reindex()
+        self.folder.processForm(values={'title': 'Newbie!'})
+        commit()                        # indexing happens on commit
+        results = solrSearchResults(SearchableText='New*')
+        self.assertEqual(len(results), 4)
+        self.assertEqual(sorted([ i.Title for i in results ]),
+            ['Newbie!', 'News', 'News', 'Welcome to Plone'])
+
 
 def test_suite():
     if pingSolr():
