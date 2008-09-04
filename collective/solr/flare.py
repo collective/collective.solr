@@ -43,7 +43,6 @@ class PloneFlare(AttrDict):
         """ convert the physical path into a url, if it was stored """
         return self.request.physicalPathToURL(self.getPath(), relative)
 
-    @property
     def pretty_title_or_id(self):
         for attr in 'Title', 'getId', 'id':
             if self.has_key(attr):
