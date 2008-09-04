@@ -19,6 +19,7 @@ class SetupToolTests(SolrTestCase, TarballTester):
         config.index_timeout = 7
         config.search_timeout = 3.1415
         config.max_results = 42
+        config.required = ('foo', 'bar')
 
     def testImportStep(self):
         tool = self.portal.portal_setup
@@ -34,6 +35,7 @@ class SetupToolTests(SolrTestCase, TarballTester):
         self.assertEqual(config.index_timeout, 0)
         self.assertEqual(config.search_timeout, 0)
         self.assertEqual(config.max_results, 0)
+        self.assertEqual(config.required, ('SearchableText',))
 
     def testExportStep(self):
         tool = self.portal.portal_setup
@@ -59,6 +61,10 @@ SOLR_XML = """\
     <index-timeout value="7" />
     <search-timeout value="3.1415" />
     <max-results value="42" />
+    <required-query-parameters>
+      <parameter name="foo" />
+      <parameter name="bar" />
+    </required-query-parameters>
   </settings>
 </object>
 """

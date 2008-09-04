@@ -11,5 +11,8 @@
     <index-timeout value="0" />
     <search-timeout value="0" />
     <max-results value="0" />
+    <required-query-parameters>
+      <parameter name="SearchableText" />
+    </required-query-parameters>
   </settings>
 </object>

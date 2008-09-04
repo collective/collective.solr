@@ -1,5 +1,5 @@
 from zope.interface import Interface
-from zope.schema import Bool, TextLine, Int, Float
+from zope.schema import Bool, TextLine, Int, Float, List
 from zope.i18nmessageid import MessageFactory
 from collective.indexing.interfaces import IIndexQueueProcessor
 
@@ -37,6 +37,13 @@ class ISolrSchema(Interface):
     max_results = Int(title=_(u'Maximum search results'),
         description=_(u'Specify the maximum number of matches to be returned when '
                        'searching.  Set to "0" to always return all results.'))
+
+    required = List(title=_(u'Required query parameters'),
+        description = _(u'Specify required query parameters, one per line. '
+                          'Searches will only get dispatched to Solr if any of '
+                          'the listed parameters is present in the query.  '
+                          'Leave empty to dispatch all searches.'),
+        value_type = TextLine(), default = [], required = False)
 
 
 class ISolrConnectionConfig(ISolrSchema):

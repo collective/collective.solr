@@ -101,6 +101,17 @@ class SolrControlPanelAdapter(SchemaAdapterBase):
 
     max_results = property(getMaxResults, setMaxResults)
 
+    def getRequiredParameters(self):
+        util = queryUtility(ISolrConnectionConfig)
+        return getattr(util, 'required', '')
+
+    def setRequiredParameters(self, value):
+        util = queryUtility(ISolrConnectionConfig)
+        if util is not None:
+            util.required = value
+
+    required = property(getRequiredParameters, setRequiredParameters)
+
 
 class SolrControlPanel(ControlPanelForm):
 
