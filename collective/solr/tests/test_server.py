@@ -300,13 +300,17 @@ class SolrServerTests(SolrTestCase):
         self.failIf(schema.has_key('foo'))
         self.assertEqual(len(search('Title', sort_on='foo').split(', ')), 4)
 
-    def testGetObjectFromFlare(self):
-        self.folder.processForm(values={'title': 'Foo'})
+    def testFlareHelpers(self):
+        folder = self.folder
+        folder.processForm(values={'title': 'Foo'})
         commit()                        # indexing happens on commit
         results = solrSearchResults(SearchableText='Foo')
         self.assertEqual(len(results), 1)
-        self.assertEqual(results[0].Title, 'Foo')
-        self.assertEqual(results[0].getObject(), self.folder)
+        flare = results[0]
+        self.assertEqual(flare.Title, 'Foo')
+        self.assertEqual(flare.getObject(), folder)
+        self.assertEqual(flare.getPath(), '/'.join(folder.getPhysicalPath()))
+        self.assertEqual(flare.getURL(), folder.absolute_url())
 
     def testWildcardSearches(self):
         self.maintenance.reindex()
