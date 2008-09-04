@@ -165,6 +165,24 @@ class SolrServerTests(SolrTestCase):
         self.assertEqual([ (r.Title, r.physicalPath) for r in results ],
             [('News', '/plone/news'), ('News', '/plone/news/aggregator')])
 
+    def testRequiredParameters(self):
+        self.maintenance.reindex()
+        self.assertRaises(FallBackException, solrSearchResults, dict(Title='News'))
+        # now let's remove all required parameters and try again
+        config = getUtility(ISolrConnectionConfig)
+        config.required = []
+        results = solrSearchResults(Title='News')
+        self.assertEqual([ (r.Title, r.physicalPath) for r in results ],
+            [('News', '/plone/news'), ('News', '/plone/news/aggregator')])
+        # specifying multiple values should required only one of them...
+        config.required = ['Title', 'foo']
+        results = solrSearchResults(Title='News')
+        self.assertEqual([ (r.Title, r.physicalPath) for r in results ],
+            [('News', '/plone/news'), ('News', '/plone/news/aggregator')])
+        # but solr won't be used if none of them is present...
+        config.required = ['foo', 'bar']
+        self.assertRaises(FallBackException, solrSearchResults, dict(Title='News'))
+
     def testPathSearches(self):
         self.maintenance.reindex()
         request = dict(SearchableText='"[* TO *]"')

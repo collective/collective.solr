@@ -3,6 +3,7 @@ from zope.component import queryUtility, queryMultiAdapter, getSiteManager
 from zope.publisher.interfaces.http import IHTTPRequest
 from Products.ZCatalog.ZCatalog import ZCatalog
 
+from collective.solr.interfaces import ISolrConnectionConfig
 from collective.solr.interfaces import ISearchDispatcher
 from collective.solr.interfaces import ISearch
 from collective.solr.interfaces import IFlare
@@ -45,6 +46,7 @@ def solrSearchResults(request=None, **keywords):
     """ perform a query using solr after translating the passed in
         parameters with portal catalog semantics """
     search = queryUtility(ISearch)
+    config = queryUtility(ISolrConnectionConfig)
     if request is None:
         # try to get a request instance, so that flares can be adapted to
         # ploneflares and urls can be converted into absolute ones etc;
@@ -58,8 +60,14 @@ def solrSearchResults(request=None, **keywords):
         assert isinstance(request, dict), request
         args = request.copy()
         args.update(keywords)       # keywords take precedence
-    if not args.has_key('SearchableText') or not args['SearchableText']:
-        raise FallBackException
+    if config.required:
+        required = set(config.required).intersection(args)
+        if required:
+            for key in required:
+                if not args[key]:
+                    raise FallBackException
+        else:
+            raise FallBackException
     mangleQuery(args)
     prepareData(args)
     query = search.buildQuery(**args)
