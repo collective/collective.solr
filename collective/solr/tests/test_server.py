@@ -307,10 +307,15 @@ class SolrServerTests(SolrTestCase):
         results = solrSearchResults(SearchableText='Foo')
         self.assertEqual(len(results), 1)
         flare = results[0]
+        path = '/'.join(folder.getPhysicalPath())
         self.assertEqual(flare.Title, 'Foo')
         self.assertEqual(flare.getObject(), folder)
-        self.assertEqual(flare.getPath(), '/'.join(folder.getPhysicalPath()))
+        self.assertEqual(flare.getPath(), path)
+        self.failUnless(flare.getURL().startswith('http://'))
         self.assertEqual(flare.getURL(), folder.absolute_url())
+        self.failUnless(flare.getURL(relative=True).startswith('/'))
+        self.assertEqual(flare.getURL(relative=True), path)
+        self.failUnless(flare.getURL().endswith(flare.getURL(relative=True)))
         self.assertEqual(flare.getId, folder.getId())
         self.assertEqual(flare.id, folder.getId())
 

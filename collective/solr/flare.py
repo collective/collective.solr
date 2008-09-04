@@ -1,7 +1,6 @@
 from zope.interface import implements
 from zope.component import adapts, getSiteManager
 from zope.publisher.interfaces.http import IHTTPRequest
-from OFS.Traversable import path2url
 from DateTime import DateTime
 
 from collective.solr.interfaces import ISolrFlare
@@ -40,18 +39,9 @@ class PloneFlare(AttrDict):
             return None
         return site.unrestrictedTraverse(path)
 
-    def getURL(self):
-        """ convert the physical path into a url, if it was stored;
-            the code is copied from `OFS/Traversable.py` """
-        url = 'unknown'
-        path = self.get('physicalPath', None)
-        if path is not None:
-            spp = path.split('/')
-            try:
-                url = self.request.physicalPathToURL(spp)
-            except AttributeError:
-                url = path2url(spp[1:])
-        return url
+    def getURL(self, relative=False):
+        """ convert the physical path into a url, if it was stored """
+        return self.request.physicalPathToURL(self.getPath(), relative)
 
     @property
     def pretty_title_or_id(self):
