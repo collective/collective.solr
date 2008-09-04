@@ -311,6 +311,8 @@ class SolrServerTests(SolrTestCase):
         self.assertEqual(flare.getObject(), folder)
         self.assertEqual(flare.getPath(), '/'.join(folder.getPhysicalPath()))
         self.assertEqual(flare.getURL(), folder.absolute_url())
+        self.assertEqual(flare.getId, folder.getId())
+        self.assertEqual(flare.id, folder.getId())
 
     def testWildcardSearches(self):
         self.maintenance.reindex()

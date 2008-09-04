@@ -23,6 +23,11 @@ class PloneFlare(AttrDict):
         self.request = request
         self.update(context.__dict__)  # copy data
 
+    @property
+    def id(self):
+        """ convenience alias """
+        return self.get('id', self.get('getId'))
+
     def getPath(self):
         """ convenience alias """
         return self['physicalPath']
