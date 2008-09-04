@@ -104,8 +104,6 @@ class SolrConfigXMLAdapter(XMLAdapterBase):
 
 def importSolrSettings(context):
     """ import settings for solr integration from an XML file """
-    if context.readDataFile('solr-various.txt') is None:
-        return
     site = context.getSite()
     utility = getUtility(ISolrConnectionConfig, context=site)
     importObjects(utility, '', context)
