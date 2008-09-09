@@ -1,4 +1,4 @@
-from zope.component import getUtility
+from zope.component import queryUtility
 from Products.GenericSetup.utils import exportObjects
 from Products.GenericSetup.utils import importObjects
 from Products.GenericSetup.utils import XMLAdapterBase
@@ -105,14 +105,17 @@ class SolrConfigXMLAdapter(XMLAdapterBase):
 def importSolrSettings(context):
     """ import settings for solr integration from an XML file """
     site = context.getSite()
-    utility = getUtility(ISolrConnectionConfig, context=site)
+    utility = queryUtility(ISolrConnectionConfig, context=site)
+    if utility is None:
+        logger = context.getLogger('collective.solr')
+        logger.info('Nothing to import.')
+        return
     importObjects(utility, '', context)
-
 
 def exportSolrSettings(context):
     """ export settings for solr integration as an XML file """
     site = context.getSite()
-    utility = getUtility(ISolrConnectionConfig, context=site)
+    utility = queryUtility(ISolrConnectionConfig, context=site)
     if utility is None:
         logger = context.getLogger('collective.solr')
         logger.info('Nothing to export.')
