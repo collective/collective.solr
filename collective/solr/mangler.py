@@ -65,9 +65,7 @@ def mangleQuery(keywords):
                 value = sep.join(map(str, map(convert, value)))
                 keywords[key] = '"(%s)"' % value
             del args['operator']
-        elif isinstance(value, basestring) and \
-                value.endswith('*') and \
-                value[:-1] == convert(value[:-1]):
+        elif isinstance(value, basestring) and value.endswith('*'):
             keywords[key] = '"%s"' % value.lower()  # quote for wildcard searching
         else:
             keywords[key] = convert(value)

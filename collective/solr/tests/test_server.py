@@ -346,6 +346,15 @@ class SolrServerTests(SolrTestCase):
         self.assertEqual(sorted([ i.Title for i in results ]),
             ['Newbie!', 'News', 'News', 'Welcome to Plone'])
 
+    def testWildcardSearchesMultipleWords(self):
+        self.maintenance.reindex()
+        self.folder.processForm(values={'title': 'Brazil Germany'})
+        commit()                        # indexing happens on commit
+        results = solrSearchResults(SearchableText='Braz*')
+        self.assertEqual(len(results), 1)
+        results = solrSearchResults(SearchableText='Brazil Germa*')
+        self.assertEqual(len(results), 1)
+
 
 def test_suite():
     if pingSolr():
