@@ -4,6 +4,7 @@ from threading import Thread
 from BaseHTTPServer import HTTPServer, BaseHTTPRequestHandler
 from StringIO import StringIO
 from socket import error
+from sys import stderr
 from re import search
 
 from collective.solr import tests
@@ -117,9 +118,9 @@ def pingSolr():
         status = False
         msg = 'WARNING: solr tests could not be run: "%s".' % e
     if not status:
-        print '*' * len(msg)
-        print msg
-        print '*' * len(msg)
+        print >> stderr, '*' * len(msg)
+        print >> stderr, msg
+        print >> stderr, '*' * len(msg)
     return status
 
 
