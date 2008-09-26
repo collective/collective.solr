@@ -118,6 +118,7 @@ def pingSolr():
         status = False
         msg = 'WARNING: solr tests could not be run: "%s".' % e
     if not status:
+        print >> stderr
         print >> stderr, '*' * len(msg)
         print >> stderr, msg
         print >> stderr, '*' * len(msg)
