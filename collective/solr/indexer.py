@@ -102,6 +102,11 @@ class SolrIndexQueueProcessor(Persistent):
                 logger.exception('exception during commit')
             self.manager.closeConnection()
 
+    def abort(self):
+        # solr will support abort/rollback only from version 1.4,
+        # see http://issues.apache.org/jira/browse/SOLR-670
+        logger.warning('solr does not support <rollback/> yet.')
+
     # helper methods
 
     def getConnection(self):
