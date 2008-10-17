@@ -57,7 +57,7 @@ Make some changes
     True
 
     >>> self.browser.getControl(name='form.active').value = True
-    >>> self.browser.getControl(name='form.host').value = 'example.com'
+    >>> self.browser.getControl(name='form.host').value = 'foo.bar'
     >>> self.browser.getControl(name='form.port').value = '1234'
     >>> self.browser.getControl(name='form.base').value = '/solr'
     >>> self.browser.getControl(name='form.async').value = True
@@ -84,7 +84,7 @@ Make sure the changes have been applied correctly to the tool:
     >>> config.active
     True
     >>> config.host
-    u'example.com'
+    u'foo.bar'
     >>> config.port
     1234
     >>> config.base
