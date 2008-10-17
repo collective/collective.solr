@@ -7,6 +7,7 @@ from Products.CMFCore.utils import _checkPermission
 from Products.CMFPlone.CatalogTool import CatalogTool
 
 from collective.solr.interfaces import ISearchDispatcher
+from collective.indexing.utils import autoFlushQueue
 
 
 def searchResults(self, REQUEST=None, **kw):
@@ -17,6 +18,10 @@ def searchResults(self, REQUEST=None, **kw):
     kw['allowedRolesAndUsers'] = self._listAllowedRolesAndUsers(user)
     if not show_inactive and not _checkPermission(AccessInactivePortalContent, self):
         kw['effectiveRange'] = DateTime()
+
+    # support collective.indexing's "auto-flush" feature
+    # see http://dev.plone.org/collective/changeset/73602
+    autoFlushQueue()
 
     adapter = queryAdapter(self, ISearchDispatcher)
     if adapter is not None:
