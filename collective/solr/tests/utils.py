@@ -114,6 +114,7 @@ def pingSolr():
         conn.request('GET', '/solr/admin/ping')
         response = conn.getresponse()
         status = response.status == 200
+        msg = "INFO: solr return status '%s'" % response.status
     except error, e:
         status = False
         msg = 'WARNING: solr tests could not be run: "%s".' % e
