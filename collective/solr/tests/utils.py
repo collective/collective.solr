@@ -22,6 +22,8 @@ def fakehttp(solrconn, *fakedata):
     class FakeOutput(list):
         """ helper class to organize output from fake connections """
 
+        conn = solrconn
+
         def log(self, item):
             self.current.append(item)
 
@@ -33,7 +35,12 @@ def fakehttp(solrconn, *fakedata):
             self.current = []
             self.append(self.current)
 
+        def __len__(self):
+            self.conn.flush()   # send out all pending xml
+            return super(FakeOutput, self).__len__()
+
         def __str__(self):
+            self.conn.flush()   # send out all pending xml
             if self:
                 return ''.join(self[0]).replace('\r', '')
             else:

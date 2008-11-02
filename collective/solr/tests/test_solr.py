@@ -12,7 +12,10 @@ class TestSolr(TestCase):
 
         c = SolrConnection(host='localhost:8983', persistent=True)
         output = fakehttp(c, add_response)
-        res = c.add(id='500',name='python test doc')
+        c.add(id='500',name='python test doc')
+        res = c.flush()
+        self.assertEqual(len(res), 1)   # one request was sent
+        res = res[0]
 
         self.failUnlessEqual(str(output), add_request)
         # Status
@@ -32,6 +35,8 @@ class TestSolr(TestCase):
         c = SolrConnection(host='localhost:8983', persistent=True)
         output = fakehttp(c, commit_response)
         res = c.commit()
+        self.assertEqual(len(res), 1)   # one request was sent
+        res = res[0]
 
         self.failUnlessEqual(str(output), commit_request)
 
@@ -104,7 +109,10 @@ class TestSolr(TestCase):
 
         c = SolrConnection(host='localhost:8983', persistent=True)
         output = fakehttp(c, delete_response)
-        res = c.delete('500')
+        c.delete('500')
+        res = c.flush()
+        self.assertEqual(len(res), 1)   # one request was sent
+        res = res[0]
 
         self.failUnlessEqual(str(output), delete_request)
 

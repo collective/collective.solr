@@ -66,6 +66,7 @@ class SolrConnection:
         # a real connection to the server is not opened at this point.
         self.conn = HTTPConnectionWithTimeout(self.host, timeout=timeout)
         # self.conn.set_debuglevel(1000000)
+        self.xmlbody = []
         self.xmlheaders = {'Content-Type': 'text/xml; charset=utf-8'}
         self.xmlheaders.update(postHeaders)
         if not self.persistent: self.xmlheaders['Connection']='close'
@@ -116,6 +117,20 @@ class SolrConnection:
             return self.__errcheck(self.conn.getresponse())
 
     def doUpdateXML(self, request):
+        # solr will support abort/rollback only from version 1.4, so
+        # for now we delay sending the xml until the commit...
+        # see http://issues.apache.org/jira/browse/SOLR-670
+        self.xmlbody.append(request)
+
+    def flush(self):
+        """ send out the stored requests to solr """
+        responses = []
+        for request in self.xmlbody:
+            responses.append(self.doSendXML(request))
+        del self.xmlbody[:]
+        return responses
+
+    def doSendXML(self, request):
         try:
             rsp = self.doPost(self.solrBase+'/update', request, self.xmlheaders)
             data = rsp.read()
@@ -187,7 +202,15 @@ class SolrConnection:
                , 'nowait':not waitSearcher and ' waitSearcher="false"' or ''
                , 'noflush':not waitFlush and not waitSearcher and ' waitFlush="false"' or ''}
         xstr = '<%(committype)s%(noflush)s%(nowait)s/>' % data
-        return self.doUpdateXML(xstr)
+        self.doUpdateXML(xstr)
+        return self.flush()
+
+    def abort(self):
+        # solr will support abort/rollback only from version 1.4, so
+        # for now we delay sending the xml until the commit (see above),
+        # which is why we don't have to send anything to abort...
+        # see http://issues.apache.org/jira/browse/SOLR-670
+        del self.xmlbody[:]
 
     def search(self, **params):
         request = urllib.urlencode(params, doseq=True)

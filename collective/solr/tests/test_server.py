@@ -13,6 +13,7 @@ from collective.solr.dispatcher import solrSearchResults, FallBackException
 from collective.solr.indexer import logger as logger_indexer
 from collective.solr.manager import logger as logger_manager
 from collective.solr.utils import activate
+from collective.indexing.utils import getIndexer
 
 
 class SolrMaintenanceTests(SolrTestCase):
@@ -355,6 +356,32 @@ class SolrServerTests(SolrTestCase):
         self.assertEqual(len(results), 1)
         results = solrSearchResults(SearchableText='Brazil Germa*')
         self.assertEqual(len(results), 1)
+
+    def testAbortedTransaction(self):
+        connection = getUtility(ISolrConnectionManager).getConnection()
+        # we cannot use `commit` here, since the transaction should get
+        # aborted, so let's make sure processing the queue directly works...
+        self.folder.processForm(values={'title': 'Foo'})
+        indexer = getIndexer()
+        indexer.process()
+        result = connection.search(q='+Title:Foo').read()
+        self.assertEqual(numFound(result), 0)
+        indexer.commit()
+        result = connection.search(q='+Title:Foo').read()
+        self.assertEqual(numFound(result), 1)
+        # now let's test aborting, but make sure there's nothing left in
+        # the queue (by calling `commit`)
+        self.folder.processForm(values={'title': 'Bar'})
+        indexer.process()
+        result = connection.search(q='+Title:Bar').read()
+        self.assertEqual(numFound(result), 0)
+        indexer.abort()
+        commit()
+        result = connection.search(q='+Title:Bar').read()
+        self.assertEqual(numFound(result), 0)
+        # the old title should still be exist...
+        result = connection.search(q='+Title:Foo').read()
+        self.assertEqual(numFound(result), 1)
 
 
 def test_suite():
