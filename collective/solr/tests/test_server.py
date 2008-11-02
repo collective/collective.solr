@@ -12,6 +12,7 @@ from collective.solr.interfaces import ISearch
 from collective.solr.dispatcher import solrSearchResults, FallBackException
 from collective.solr.indexer import logger as logger_indexer
 from collective.solr.manager import logger as logger_manager
+from collective.solr.solr import logger as logger_solr
 from collective.solr.utils import activate
 from collective.indexing.utils import getIndexer
 
@@ -90,6 +91,7 @@ class SolrErrorHandlingTests(SolrTestCase):
         def logger(*args):
             log.extend(args)
         logger_indexer.exception = logger
+        logger_solr.exception = logger
         config = getUtility(ISolrConnectionConfig)
         self.config.active = True
         self.folder.processForm(values={'title': 'Foo'})
@@ -99,8 +101,10 @@ class SolrErrorHandlingTests(SolrTestCase):
         manager.closeConnection()   # which would trigger a reconnect
         self.folder.processForm(values={'title': 'Bar'})
         commit()                    # indexing (doesn't) happen on commit
-        self.assertEqual(log, ['exception during indexing %r', self.folder,
-            'exception during commit'])
+        self.assertEqual(log, ['exception during request %r', log[1],
+            'exception during request %r', '<commit/>'])
+        self.failUnless('/plone/Members/test_user_1_' in log[1])
+        self.failUnless('Bar' in log[1])
 
     def testNetworkFailureBeforeSchemaCanBeLoaded(self):
         log = []
@@ -109,6 +113,7 @@ class SolrErrorHandlingTests(SolrTestCase):
         logger_indexer.warning = logger
         logger_indexer.exception = logger
         logger_manager.exception = logger
+        logger_solr.exception = logger
         self.config.active = True
         manager = getUtility(ISolrConnectionManager)
         manager.getConnection()     # we already have an open connection...
@@ -119,7 +124,7 @@ class SolrErrorHandlingTests(SolrTestCase):
         self.assertEqual(log, ['exception while getting schema',
             'exception while getting schema',
             'unable to fetch schema, skipping indexing of %r', self.folder,
-            'exception during commit'])
+            'exception during request %r', '<commit/>'])
 
 
 class SolrServerTests(SolrTestCase):

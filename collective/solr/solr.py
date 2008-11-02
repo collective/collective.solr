@@ -36,6 +36,9 @@ import urllib
 from collective.solr.parser import SolrSchema
 from collective.solr.timeout import HTTPConnectionWithTimeout
 
+from logging import getLogger
+logger = getLogger(__name__)
+
 
 class SolrException(Exception):
     """ An exception thrown by solr connections """
@@ -120,13 +123,20 @@ class SolrConnection:
         # solr will support abort/rollback only from version 1.4, so
         # for now we delay sending the xml until the commit...
         # see http://issues.apache.org/jira/browse/SOLR-670
+        logger.debug('storing xml request for later: %r', request)
         self.xmlbody.append(request)
 
     def flush(self):
         """ send out the stored requests to solr """
+        count = 0
         responses = []
         for request in self.xmlbody:
-            responses.append(self.doSendXML(request))
+            try:
+                responses.append(self.doSendXML(request))
+            except (SolrException, socket.error):
+                logger.exception('exception during request %r', request)
+            count += len(request)
+        logger.debug('flushed out %d bytes in %d requests', count, len(self.xmlbody))
         del self.xmlbody[:]
         return responses
 
@@ -210,6 +220,7 @@ class SolrConnection:
         # for now we delay sending the xml until the commit (see above),
         # which is why we don't have to send anything to abort...
         # see http://issues.apache.org/jira/browse/SOLR-670
+        logger.debug('aborting %d requests: %r', len(self.xmlbody), self.xmlbody)
         del self.xmlbody[:]
 
     def search(self, **params):
