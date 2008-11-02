@@ -26,5 +26,10 @@ def test_suite():
                'search.txt', package='collective.solr.tests',
                test_class=SolrFunctionalTestCase, optionflags=optionflags),
         )
+        suite.addTest(
+            ztc.FunctionalDocFileSuite(
+               'conflicts.txt', package='collective.solr.tests',
+               test_class=SolrFunctionalTestCase, optionflags=optionflags),
+        )
     return suite
 
