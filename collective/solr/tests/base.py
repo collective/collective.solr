@@ -50,8 +50,11 @@ class SolrFunctionalTestCase(ptc.FunctionalTestCase):
     def activateAndReindex(self):
         """ activate solr indexing and reindex the existing content """
         activate()
-        self.portal.REQUEST.RESPONSE.write = lambda x: x    # ignore output
+        response = self.portal.REQUEST.RESPONSE
+        original = response.write
+        response.write = lambda x: x    # temporarily ignore output
         maintenance = self.portal.unrestrictedTraverse('@@solr-maintenance')
         maintenance.clear()
         maintenance.reindex()
+        response.write = original
 
