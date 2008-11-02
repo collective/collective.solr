@@ -7,6 +7,7 @@ from Products.Five import fiveconfigure
 from Products.Five.testbrowser import Browser
 from Products.PloneTestCase import PloneTestCase as ptc
 from Products.PloneTestCase.layer import onsetup
+from collective.solr.utils import activate
 
 
 @onsetup
@@ -45,4 +46,12 @@ class SolrFunctionalTestCase(ptc.FunctionalTestCase):
     def setStatusCode(self, key, value):
         from ZPublisher import HTTPResponse
         HTTPResponse.status_codes[key.lower()] = value
+
+    def activateAndReindex(self):
+        """ activate solr indexing and reindex the existing content """
+        activate()
+        self.portal.REQUEST.RESPONSE.write = lambda x: x    # ignore output
+        maintenance = self.portal.unrestrictedTraverse('@@solr-maintenance')
+        maintenance.clear()
+        maintenance.reindex()
 
