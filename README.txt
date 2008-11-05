@@ -35,7 +35,9 @@ convenience.
   .. _buildout: http://svn.plone.org/svn/collective/collective.solr/buildout
 
 The code was written with emphasis on minimalism, clarity and maintainability.
-It comes with extensive tests covering the code base at more than 95%.
+It comes with extensive tests covering the code base.
+
+  .. at more than 95%.  XXX: make coverage run pick up all modules!
 
 For outstanding issues and features remaining to be implemented please see the
 `to-do list`__ included in the package.
