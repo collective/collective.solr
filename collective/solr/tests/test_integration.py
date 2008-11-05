@@ -155,6 +155,24 @@ class SiteSearchTests(SolrTestCase):
         finally:
             thread.join()           # the server thread must always be joined
 
+    def testSchemaUrlFallback(self):
+        config = queryUtility(ISolrConnectionConfig)
+        config.active = True
+        def notfound(handler):      # set up fake 404 response
+            self.assertEqual(handler.path,
+                '/solr/admin/file/?file=schema.xml')
+            handler.send_response(404, getData('not_found.txt'))
+        def solr12(handler):        # set up response with the schema
+            self.assertEqual(handler.path,
+                '/solr/admin/get-file.jsp?file=schema.xml')
+            handler.send_response(200, getData('schema.xml'))
+        responses = [notfound, solr12]
+        thread = fakeServer(responses, config.port)
+        schema = queryUtility(ISolrConnectionManager).getSchema()
+        thread.join()               # the server thread must always be joined
+        self.assertEqual(responses, [])
+        self.assertEqual(len(schema), 20)   # 20 items defined in schema.xml
+
 
 def test_suite():
     return defaultTestLoader.loadTestsFromName(__name__)

@@ -109,7 +109,7 @@ class FakeHTTPConnectionTests(TestCase):
     def setUp(self):
         provideUtility(SolrConnectionConfig(), ISolrConnectionConfig)
         self.foo = Foo(id='500', name='python test doc')
-        self.schema_request = 'GET /solr/admin/get-file.jsp?file=schema.xml'
+        self.schema_request = 'GET /solr/admin/file/?file=schema.xml'
 
     def testSingleRequest(self):
         mngr = SolrConnectionManager(active=True)

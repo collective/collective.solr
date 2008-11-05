@@ -232,8 +232,14 @@ class SolrConnection:
         return response
 
     def getSchema(self):
-        url = '%s/admin/get-file.jsp?file=schema.xml' % self.solrBase
-        self.conn.request('GET', url)
-        xml = self.__errcheck(self.conn.getresponse()).read()
-        return SolrSchema(xml.strip())
+        schema_urls = ('%s/admin/file/?file=schema.xml',        # solr 1.3
+                       '%s/admin/get-file.jsp?file=schema.xml') # solr 1.2
+        for url in schema_urls:
+            logger.debug('getting schema from: %s', url % self.solrBase)
+            self.conn.request('GET', url % self.solrBase)
+            response = self.conn.getresponse()
+            if response.status == 200:
+                xml = response.read()
+                return SolrSchema(xml.strip())
+        self.__errcheck(response)       # raise a solrexception
 

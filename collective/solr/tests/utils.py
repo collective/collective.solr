@@ -103,6 +103,9 @@ def fakeServer(actions, port=55555):
         def do_POST(self):
             action = actions.pop(0)             # get next action
             action(self)                        # and process it...
+        def do_GET(self):
+            action = actions.pop(0)             # get next action
+            action(self)                        # and process it...
         def log_request(*args, **kw):
             pass
     def runner():
