@@ -10,7 +10,7 @@ setup(name = 'collective.solr',
       description = 'Solr integration for external indexing and searching.',
       long_description = readme[readme.find('\n\n'):] + '\n' + history,
       classifiers = [
-        'Development Status :: 3 - Alpha',
+        'Development Status :: 4 - Beta',
         'Environment :: Web Environment',
         'Framework :: Plone',
         'Intended Audience :: Developers',
