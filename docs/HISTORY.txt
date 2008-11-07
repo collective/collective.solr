@@ -1,8 +1,12 @@
 Changelog
 =========
 
-1.0b2 - Unreleased
+1.0b3 - Unreleased
 ------------------
+
+
+1.0b2 - Released November 7, 2008
+---------------------------------
 
 * Make schema retrieval slightly more robust to not let network failures
   prevent access to the site.
