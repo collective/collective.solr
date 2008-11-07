@@ -4,6 +4,10 @@ Changelog
 1.0b2 - Unreleased
 ------------------
 
+* Make schema retrieval slightly more robust to not let network failures
+  prevent access to the site.
+  [witsch]
+
 
 1.0b1 - Released November 5, 2008
 ---------------------------------
