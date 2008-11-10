@@ -113,6 +113,7 @@ class SolrSchema(AttrDict):
         search or indexing queries """
 
     def __init__(self, data=None):
+        self['uniqueKey'] = None
         if data is not None:
             self.parse(data)
 

@@ -9,6 +9,7 @@ from collective.solr.interfaces import ISolrConnectionConfig
 from collective.solr.manager import SolrConnectionConfig
 from collective.solr.manager import SolrConnectionManager
 from collective.solr.indexer import SolrIndexQueueProcessor
+from collective.solr.indexer import logger as logger_indexer
 from collective.solr.tests.utils import getData, fakehttp, fakemore
 from collective.solr.solr import SolrConnection
 from collective.solr.utils import prepareData
@@ -102,6 +103,46 @@ class QueueIndexerTests(TestCase):
         output = fakehttp(self.mngr.getConnection(), response)   # fake add response
         self.proc.index(Foo(id='500'))                           # indexing sends data
         self.assertEqual(str(output), '')
+
+
+class RobustnessTests(TestCase):
+
+    def setUp(self):
+        provideUtility(SolrConnectionConfig(), ISolrConnectionConfig)
+        self.mngr = SolrConnectionManager()
+        self.mngr.setHost(active=True)
+        self.conn = self.mngr.getConnection()
+        self.proc = SolrIndexQueueProcessor(self.mngr)
+        self.log = []                   # catch log messages...
+        def logger(*args):
+            self.log.extend(args)
+        logger_indexer.warning = logger
+
+    def tearDown(self):
+        self.mngr.closeConnection()
+        self.mngr.setHost(active=False)
+
+    def testIndexingWithUniqueKeyMissing(self):
+        fakehttp(self.conn, getData('simple_schema.xml'))   # fake schema response
+        schema = self.mngr.getSchema()                      # read and cache the schema
+        response = getData('add_response.txt')
+        output = fakehttp(self.conn, response)              # fake add response
+        foo = Foo(id='500', name='foo')
+        self.proc.index(foo)                                # indexing sends data
+        self.assertEqual(len(output), 0)                    # nothing happened...
+        self.assertEqual(self.log, [
+            'schema is missing unique key, skipping indexing of %r', foo])
+
+    def testUnindexingWithUniqueKeyMissing(self):
+        fakehttp(self.conn, getData('simple_schema.xml'))   # fake schema response
+        schema = self.mngr.getSchema()                      # read and cache the schema
+        response = getData('delete_response.txt')
+        output = fakehttp(self.conn, response)              # fake delete response
+        foo = Foo(id='500', name='foo')
+        self.proc.unindex(foo)                              # unindexing sends data
+        self.assertEqual(len(output), 0)                    # nothing happened...
+        self.assertEqual(self.log, [
+            'schema is missing unique key, skipping unindexing of %r', foo])
 
 
 class FakeHTTPConnectionTests(TestCase):

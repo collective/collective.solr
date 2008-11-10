@@ -4,6 +4,10 @@ Changelog
 1.0b3 - Unreleased
 ------------------
 
+* Make indexing operations more robust in case the schema is missing a
+  unique key or couldn't be parsed.
+  [witsch]
+
 
 1.0b2 - Released November 7, 2008
 ---------------------------------
