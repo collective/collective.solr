@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from unittest import TestCase, TestSuite, makeSuite, main
+from unittest import TestCase, defaultTestLoader, main
 from DateTime import DateTime
 from zope.component import provideUtility
 
@@ -181,12 +181,7 @@ class SearchTests(TestCase):
 
 
 def test_suite():
-    return TestSuite((
-        makeSuite(QuoteTests),
-        makeSuite(QueryTests),
-        makeSuite(InactiveQueryTests),
-        makeSuite(SearchTests),
-    ))
+    return defaultTestLoader.loadTestsFromName(__name__)
 
 if __name__ == '__main__':
     main(defaultTest='test_suite')

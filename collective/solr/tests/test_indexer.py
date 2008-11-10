@@ -1,4 +1,4 @@
-from unittest import TestCase, TestSuite, makeSuite
+from unittest import TestCase, defaultTestLoader
 from threading import Thread
 from re import search, findall, DOTALL
 from DateTime import DateTime
@@ -220,9 +220,5 @@ class ThreadedConnectionTests(TestCase):
 
 
 def test_suite():
-    return TestSuite([
-        makeSuite(QueueIndexerTests),
-        makeSuite(FakeHTTPConnectionTests),
-        makeSuite(ThreadedConnectionTests),
-    ])
+    return defaultTestLoader.loadTestsFromName(__name__)
 

@@ -1,4 +1,4 @@
-from unittest import TestCase, TestSuite, makeSuite, main
+from unittest import TestCase, defaultTestLoader, main
 from elementtree.ElementTree import fromstring
 from collective.solr.solr import SolrConnection
 from collective.solr.tests.utils import getData, fakehttp
@@ -128,9 +128,7 @@ class TestSolr(TestCase):
 
 
 def test_suite():
-    return TestSuite((
-        makeSuite(TestSolr),
-    ))
+    return defaultTestLoader.loadTestsFromName(__name__)
 
 if __name__ == '__main__':
     main(defaultTest='test_suite')

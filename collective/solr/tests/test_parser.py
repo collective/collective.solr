@@ -1,4 +1,4 @@
-from unittest import TestCase, TestSuite, makeSuite, main
+from unittest import TestCase, defaultTestLoader, main
 from DateTime import DateTime
 
 from collective.solr.parser import SolrResponse
@@ -120,9 +120,7 @@ class ParserTests(TestCase):
 
 
 def test_suite():
-    return TestSuite((
-        makeSuite(ParserTests),
-    ))
+    return defaultTestLoader.loadTestsFromName(__name__)
 
 if __name__ == '__main__':
     main(defaultTest='test_suite')
