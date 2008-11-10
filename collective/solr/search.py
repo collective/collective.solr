@@ -13,6 +13,7 @@ logger = getLogger('collective.solr.search')
 
 
 word = compile('^\w+$')
+white = compile('^\s+$')
 special = compile('([-+&|!(){}[\]^"~*?\\:])')
 
 def quote(term):
@@ -22,6 +23,8 @@ def quote(term):
         term = term.encode('utf-8')
     if term.startswith('"') and term.endswith('"'):
         term = term[1:-1]
+        if white.match(term):
+            term = '"%s"' % term
     elif not word.match(term):
         term = '"%s"' % special.sub(r'\\\1', term)
     return term
@@ -78,6 +81,8 @@ class Search(object):
             elif isinstance(value, basestring):
                 quoted = value.startswith('"') and value.endswith('"')
                 value = quote(value)
+                if not value:       # don't search for an empty string, even if quoted
+                    continue
             else:
                 logger.info('skipping unsupported value "%r" (%s)', value, name)
                 continue

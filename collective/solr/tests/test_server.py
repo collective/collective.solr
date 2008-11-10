@@ -388,6 +388,11 @@ class SolrServerTests(SolrTestCase):
         result = connection.search(q='+Title:Foo').read()
         self.assertEqual(numFound(result), 1)
 
+    def testEmptyStringSearch(self):
+        self.maintenance.reindex()
+        results = solrSearchResults(SearchableText=' ', path='/plone')
+        self.assertEqual(len(results), 8)
+
 
 def test_suite():
     if pingSolr():
