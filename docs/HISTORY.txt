@@ -1,8 +1,12 @@
 Changelog
 =========
 
-1.0b3 - Unreleased
+1.0b4 - Unreleased
 ------------------
+
+
+1.0b3 - Released November 12, 2008
+----------------------------------
 
 * Fix url fallback during schema retrieval.
   [witsch]
