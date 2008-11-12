@@ -241,5 +241,6 @@ class SolrConnection:
             if response.status == 200:
                 xml = response.read()
                 return SolrSchema(xml.strip())
+            self.__reconnect()          # force a new connection for each url
         self.__errcheck(response)       # raise a solrexception
 

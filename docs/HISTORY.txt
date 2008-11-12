@@ -4,6 +4,9 @@ Changelog
 1.0b3 - Unreleased
 ------------------
 
+* Fix url fallback during schema retrieval.
+  [witsch]
+
 * Fix issue regarding quoting of white space when searching.
   [witsch]
 
