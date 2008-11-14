@@ -114,10 +114,14 @@ class SolrMaintenanceView(BrowserView):
         """ determine objects that need to be indexed/reindex/unindexed by
             diff'ing the records in the portal catalog and solr """
         catalog = getToolByName(self.context, 'portal_catalog')
+        cat = catalog._catalog      # get the real catalog...
+        pos = cat.schema['modified']
         uids = {}
-        for brain in catalog():
-            if brain.UID and brain.modified is not None:
-                uids[brain.UID] = brain.modified.millis()
+        for uid, rids in cat.getIndex('UID').items():
+            for rid in rids:
+                modified = cat.data[rid][pos]
+                if modified is not None:
+                    uids[uid] = modified.millis()
         search = queryUtility(ISearch)
         reindex = []
         unindex = []
