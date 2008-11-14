@@ -1,5 +1,5 @@
 from logging import getLogger
-from time import time, clock
+from time import time, clock, strftime
 from zope.interface import implements
 from zope.component import queryUtility
 from Products.Five.browser import BrowserView
@@ -38,6 +38,15 @@ class SolrMaintenanceView(BrowserView):
     """ helper view for indexing all portal content in Solr """
     implements(ISolrMaintenanceView)
 
+    def mklog(self):
+        """ helper to prepend a time stamp to the output """
+        write = self.request.RESPONSE.write
+        def log(msg, timestamp=True):
+            if timestamp:
+                msg = strftime('%Y/%m/%d-%H:%M:%S ') + msg
+            write(msg)
+        return log
+
     def optimize(self):
         """ optimize solr indexes """
         manager = queryUtility(ISolrConnectionManager)
@@ -59,7 +68,7 @@ class SolrMaintenanceView(BrowserView):
         manager = queryUtility(ISolrConnectionManager)
         manager.setTimeout(None)        # don't time out during reindexing
         proc = queryUtility(ISolrIndexQueueProcessor, name='solr')
-        log = self.request.RESPONSE.write
+        log = self.mklog()
         if skip:
             log('skipping indexing of %d object(s)...\n' % skip)
         now, cpu = time(), clock()
@@ -80,7 +89,7 @@ class SolrMaintenanceView(BrowserView):
                     log('WARNING: error while indexing %r' % obj)
                     logger.exception('error while indexing %r', obj)
                     manager.getConnection().reset()     # force new connection
-                log(' (%.4fs)\n' % (time() - lap))
+                log(' (%.4fs)\n' % (time() - lap), timestamp=False)
                 commit -= 1
                 if commit == 0:
                     msg = 'intermediate commit (%d objects indexed in %.4fs)...\n'
@@ -135,13 +144,13 @@ class SolrMaintenanceView(BrowserView):
         manager.setTimeout(None)        # don't time out during syncing
         proc = queryUtility(ISolrIndexQueueProcessor, name='solr')
         db = self.context.getPhysicalRoot()._p_jar.db()
-        log = self.request.RESPONSE.write
+        log = self.mklog()
         real = timer()          # real time
         lap = timer()           # real lap time (for intermediate commits)
         cpu = timer(clock)      # cpu time
         log('determining differences between portal catalog and solr...')
         index, reindex, unindex = self.diff()
-        log(' (%s).\n' % lap.next())
+        log(' (%s).\n' % lap.next(), timestamp=False)
         log('operations needed: %d "index", %d "reindex", %d "unindex"\n' % (
             len(index), len(reindex), len(unindex)))
         processed = 0
@@ -165,7 +174,7 @@ class SolrMaintenanceView(BrowserView):
                 log('indexing %r' % obj)
                 proc.index(obj)
                 processed += 1
-                log(' (%s).\n' % single.next())
+                log(' (%s).\n' % single.next(), timestamp=False)
                 cpi.next()
         log('processing %d "reindex" operations next...\n' % len(reindex))
         for uid in reindex:

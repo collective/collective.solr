@@ -4,6 +4,9 @@ Changelog
 1.0b4 - Unreleased
 ------------------
 
+* Prefix output from maintenance views with a time-stamp.
+  [witsch]
+
 
 1.0b3 - Released November 12, 2008
 ----------------------------------
