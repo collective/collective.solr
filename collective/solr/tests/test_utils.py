@@ -1,7 +1,8 @@
-from unittest import defaultTestLoader, main
+from unittest import TestCase, defaultTestLoader, main
 from Testing import ZopeTestCase as ztc
 
 from collective.solr.utils import findObjects
+from collective.solr.utils import setupTranslationMap, prepareData
 
 
 class UtilsTests(ztc.ZopeTestCase):
@@ -33,6 +34,20 @@ class UtilsTests(ztc.ZopeTestCase):
         self.assertEqual(found[0], ('', self.portal))
         # but the rest should be the same...
         self.assertEqual(self.ids(found[1:]), self.good)
+
+
+class TranslationTests(TestCase):
+
+    def testTranslationMap(self):
+        tm = setupTranslationMap()
+        self.assertEqual('\f\a\b'.translate(tm), ' ' * 3)
+        self.assertEqual('foo\nbar'.translate(tm), 'foo\nbar')
+        self.assertEqual('foo\n\tbar\a\f\r'.translate(tm), 'foo\n\tbar  \r')
+
+    def testRemoveControlCharacters(self):
+        data = {'SearchableText': 'foo\n\tbar\a\f\r'}
+        prepareData(data)
+        self.assertEqual(data, {'SearchableText': 'foo\n\tbar  \r'})
 
 
 def test_suite():

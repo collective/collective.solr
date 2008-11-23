@@ -1,5 +1,6 @@
 from zope.component import queryUtility
 from Acquisition import aq_base
+from string import maketrans
 
 from collective.solr.interfaces import ISolrConnectionConfig
 
@@ -18,12 +19,31 @@ def activate(active=True):
     config.active = active
 
 
+def setupTranslationMap():
+    """ prepare translation map to remove all control characters except
+        tab, new-line and carriage-return """
+    ctrls = trans = ''
+    for n in range(0, 32):
+        char = chr(n)
+        ctrls += char
+        if char in '\t\n\r':
+            trans += char
+        else:
+            trans += ' '
+    return maketrans(ctrls, trans)
+
+translation_map = setupTranslationMap()
+
+
 def prepareData(data):
     """ modify data according to solr specifics, i.e. replace ':' by '$'
         for "allowedRolesAndUsers" etc """
     allowed = data.get('allowedRolesAndUsers', None)
     if allowed is not None:
         data['allowedRolesAndUsers'] = [r.replace(':','$') for r in allowed]
+    searchable = data.get('SearchableText', None)
+    if searchable is not None:
+        data['SearchableText'] = searchable.translate(translation_map)
 
 
 def findObjects(origin):

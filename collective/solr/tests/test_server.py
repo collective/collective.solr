@@ -155,6 +155,27 @@ class SolrServerTests(SolrTestCase):
         result = connection.search(q='+Title:Foo').read()
         self.assertEqual(numFound(result), 1)
 
+    def testFilterInvalidCharacters(self):
+        log = []
+        def logger(*args):
+            log.extend(args)
+        logger_indexer.exception = logger
+        logger_solr.exception = logger
+        # some control characters make solr choke, for example a form feed
+        self.folder.invokeFactory('File', 'foo', title='some text',
+            file='page 1 \f page 2 \a')
+        commit()                        # indexing happens on commit
+        # make sure the file was indexed okay...
+        self.assertEqual(log, [])
+        # and the contents can be searched
+        results = self.search('+portal_type:File')
+        self.assertEqual(results.numFound, '1')
+        self.assertEqual(results[0].Title, 'some text')
+        self.assertEqual(results[0].UID, self.folder.foo.UID())
+        # clean up in the end...
+        self.folder.manage_delObjects('foo')
+        commit()
+
     def testSearchObject(self):
         self.folder.processForm(values={'title': 'Foo'})
         commit()                        # indexing happens on commit

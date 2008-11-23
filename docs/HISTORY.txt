@@ -4,6 +4,10 @@ Changelog
 1.0b4 - Unreleased
 ------------------
 
+* Filter control characters to prevent indexing errors.  This fixes
+  http://plone.org/products/collective.solr/issues/1
+  [witsch]
+
 * Avoid using brains when getting all objects from the catalog for sync runs.
   [witsch]
 
