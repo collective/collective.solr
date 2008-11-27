@@ -4,6 +4,9 @@ Changelog
 1.0b5 - Unreleased
 ------------------
 
+* Fix and extend logging in "sync" maintenance view.
+  [witsch]
+
 
 1.0b4 - Released November 23, 2008
 ----------------------------------

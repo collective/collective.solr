@@ -181,6 +181,8 @@ class SolrMaintenanceView(BrowserView):
                 log(' (%s).\n' % single.next(), timestamp=False)
                 cpi.next()
                 single.next()   # don't count commit time here...
+            else:
+                log('not indexing unindexable object %r.\n' % obj)
         log('processing %d "reindex" operations next...\n' % len(reindex))
         for uid in reindex:
             obj = lookup(uid)
@@ -191,6 +193,8 @@ class SolrMaintenanceView(BrowserView):
                 log(' (%s).\n' % single.next(), timestamp=False)
                 cpi.next()
                 single.next()   # don't count commit time here...
+            else:
+                log('not reindexing unindexable object %r.\n' % obj)
         log('processing %d "unindex" operations next...\n' % len(unindex))
         conn = proc.getConnection()
         for uid in unindex:
