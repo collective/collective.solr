@@ -159,7 +159,7 @@ class SolrMaintenanceView(BrowserView):
             len(index), len(reindex), len(unindex)))
         processed = 0
         def checkPoint():
-            msg = 'intermediate commit (%d objects processed in %s)...\n'
+            msg = 'intermediate commit (%d objects processed, last batch in %s)...\n'
             log(msg % (processed, lap.next()))
             proc.commit(wait=True)
             manager.getConnection().reset()     # force new connection
@@ -180,6 +180,7 @@ class SolrMaintenanceView(BrowserView):
                 processed += 1
                 log(' (%s).\n' % single.next(), timestamp=False)
                 cpi.next()
+                single.next()   # don't count commit time here...
         log('processing %d "reindex" operations next...\n' % len(reindex))
         for uid in reindex:
             obj = lookup(uid)
@@ -189,6 +190,7 @@ class SolrMaintenanceView(BrowserView):
                 processed += 1
                 log(' (%s).\n' % single.next(), timestamp=False)
                 cpi.next()
+                single.next()   # don't count commit time here...
         log('processing %d "unindex" operations next...\n' % len(unindex))
         conn = proc.getConnection()
         for uid in unindex:
@@ -199,6 +201,7 @@ class SolrMaintenanceView(BrowserView):
                 processed += 1
                 log(' (%s).\n' % single.next(), timestamp=False)
                 cpi.next()
+                single.next()   # don't count commit time here...
             else:
                 log('not unindexing existing object %r (%r).\n' % (obj, uid))
         proc.commit(wait=True)      # make sure to commit in the end...
