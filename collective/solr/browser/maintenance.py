@@ -187,7 +187,7 @@ class SolrMaintenanceView(BrowserView):
                 log('reindexing %r' % obj)
                 proc.reindex(obj)
                 processed += 1
-                log(' (%s).\n' % single.next())
+                log(' (%s).\n' % single.next(), timestamp=False)
                 cpi.next()
         log('processing %d "unindex" operations next...\n' % len(unindex))
         conn = proc.getConnection()
@@ -197,7 +197,7 @@ class SolrMaintenanceView(BrowserView):
                 log('unindexing %r' % uid)
                 conn.delete(id=uid)
                 processed += 1
-                log(' (%s).\n' % single.next())
+                log(' (%s).\n' % single.next(), timestamp=False)
                 cpi.next()
             else:
                 log('not unindexing existing object %r (%r).\n' % (obj, uid))
