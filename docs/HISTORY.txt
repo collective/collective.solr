@@ -1,8 +1,12 @@
 Changelog
 =========
 
-1.0b5 - Unreleased
+1.0b6 - Unreleased
 ------------------
+
+
+1.0b5 - Released December 16, 2008
+----------------------------------
 
 * Fix and extend logging in "sync" maintenance view.
   [witsch]
