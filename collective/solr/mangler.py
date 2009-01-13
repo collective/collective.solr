@@ -12,6 +12,10 @@ sort_aliases = {
     'sortable_title': 'Title',
 }
 
+query_args = ('range',
+              'operator',
+              'depth',
+)
 
 def convert(value):
     """ convert values, which need a special format, i.e. dates """
@@ -35,10 +39,19 @@ def mangleQuery(keywords):
             category, spec = value.split(':', 1)
             extras[key[:-6]] = { category: spec }
             del keywords[key]
-        elif isinstance(value, dict):       # unify parameters
+        elif isinstance(value, dict):       # unify dict parameters
             keywords[key] = value['query']
             del value['query']
             extras[key] = value
+        elif hasattr(value, 'query'):     # unify object parameters
+            keywords[key] = value.query
+            extra = dict()
+            for arg in query_args:
+                arg_val = getattr(value, arg, None)
+                if arg_val is not None:
+                    extra[arg] = arg_val
+            extras[key] = extra
+
     for key, value in keywords.items():
         args = extras.get(key, {})
         if key == 'path':

@@ -4,6 +4,9 @@ Changelog
 1.0b6 - Unreleased
 ------------------
 
+* Added support for objects with a 'query' attribute
+  as search values. 
+  [tmog]
 
 1.0b5 - Released December 16, 2008
 ----------------------------------
