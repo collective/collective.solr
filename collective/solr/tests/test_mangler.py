@@ -57,8 +57,6 @@ class QueryManglerTests(TestCase):
         self.assertEqual(keywords, {'foo': '"[23 TO 42]"'})
 
     def testDateConversion(self):
-        keywords = mangle(foo=DateTime('1970/02/01'))
-        self.assertEqual(keywords, {'foo': '1970-01-31T23:00:00.000Z'})
         day = DateTime('1972/05/11 UTC')
         keywords = mangle(foo=day)
         self.assertEqual(keywords, {'foo': '1972-05-11T00:00:00.000Z'})
@@ -71,6 +69,8 @@ class QueryManglerTests(TestCase):
         keywords = mangle(foo=dict(query=(day,), range='min'))
         self.assertEqual(keywords, {'foo':
             '"[1972-05-11T00:00:00.000Z TO *]"'})
+        keywords = mangle(foo=Query(day))
+        self.assertEqual(keywords, {'foo': '1972-05-11T00:00:00.000Z'})
 
     def testOperatorConversion(self):
         keywords = mangle(foo=(23,42), foo_usage='operator:or')
