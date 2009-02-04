@@ -4,6 +4,10 @@ Changelog
 1.0b6 - Unreleased
 ------------------
 
+* In solrSearchResults, if the passed in request is a dict, look up 
+  request to enable adaptation into PloneFlare.
+  [tesdal]
+
 * Added support for objects with a 'query' attribute as search values.
   [tmog]
 

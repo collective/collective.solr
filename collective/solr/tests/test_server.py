@@ -12,6 +12,7 @@ from collective.solr.interfaces import ISearch
 from collective.solr.dispatcher import solrSearchResults, FallBackException
 from collective.solr.indexer import logger as logger_indexer
 from collective.solr.manager import logger as logger_manager
+from collective.solr.flare import PloneFlare
 from collective.solr.solr import logger as logger_solr
 from collective.solr.utils import activate
 from collective.indexing.utils import getIndexer
@@ -190,6 +191,13 @@ class SolrServerTests(SolrTestCase):
     def testSolrSearchResults(self):
         self.maintenance.reindex()
         results = solrSearchResults(SearchableText='News')
+        self.assertEqual([ (r.Title, r.physicalPath) for r in results ],
+            [('News', '/plone/news'), ('News', '/plone/news/aggregator')])
+
+    def testSolrSearchResultsWithDictRequest(self):
+        self.maintenance.reindex()
+        results = solrSearchResults({'SearchableText':'News'})
+        self.failUnless([r for r in results if isinstance(r, PloneFlare)])
         self.assertEqual([ (r.Title, r.physicalPath) for r in results ],
             [('News', '/plone/news'), ('News', '/plone/news/aggregator')])
 
