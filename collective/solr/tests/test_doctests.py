@@ -31,5 +31,10 @@ def test_suite():
                'conflicts.txt', package='collective.solr.tests',
                test_class=SolrFunctionalTestCase, optionflags=optionflags),
         )
+        suite.addTest(
+            ztc.FunctionalDocFileSuite(
+               'facets.txt', package='collective.solr.tests',
+               test_class=SolrFunctionalTestCase, optionflags=optionflags),
+        )
     return suite
 

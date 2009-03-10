@@ -24,6 +24,7 @@ ptc.setupPloneSite(extension_profiles=(
     'collective.indexing:default',
     'collective.solr:default',
     'collective.solr:search',
+    'collective.solr:facets',
 ))
 
 
