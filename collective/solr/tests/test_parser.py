@@ -81,6 +81,39 @@ class ParserTests(TestCase):
         self.assertEqual(counts['facet_fields']['cat']['software'], 1)
         self.assertEqual(counts['facet_fields']['inStock']['true'], 1)
 
+    def testParseDateFacetSearchResults(self):
+        facet_xml_response = getData('date_facet_xml_response.txt')
+        response = SolrResponse(facet_xml_response)
+        results = response.response     # the result set is named 'response'
+        self.assertEqual(results.numFound, '42')
+        self.assertEqual(results.start, '0')
+        self.assertEqual(len(results), 0)
+        headers = response.responseHeader
+        self.assertEqual(type(headers), type({}))
+        self.assertEqual(headers['status'], 0)
+        self.assertEqual(headers['QTime'], 5)
+        self.assertEqual(headers['params']['facet.date'], 'timestamp')
+        self.assertEqual(headers['params']['facet.date.start'], 'NOW/DAY-5DAYS')
+        self.assertEqual(headers['params']['facet.date.end'], 'NOW/DAY+1DAY')
+        self.assertEqual(headers['params']['facet.date.gap'], '+1DAY')
+        self.assertEqual(headers['params']['rows'], '0')
+        self.assertEqual(headers['params']['facet'], 'true')
+        self.assertEqual(headers['params']['indent'], 'true')
+        self.assertEqual(headers['params']['q'], '*:*')
+        counts = response.facet_counts
+        self.assertEqual(type(counts), type({}))
+        self.assertEqual(counts['facet_queries'], {})
+        self.assertEqual(counts['facet_fields'], {})
+        timestamps = counts['facet_dates']['timestamp']
+        self.assertEqual(timestamps['2007-08-11T00:00:00.000Z'], 1)
+        self.assertEqual(timestamps['2007-08-12T00:00:00.000Z'], 5)
+        self.assertEqual(timestamps['2007-08-13T00:00:00.000Z'], 3)
+        self.assertEqual(timestamps['2007-08-14T00:00:00.000Z'], 7)
+        self.assertEqual(timestamps['2007-08-15T00:00:00.000Z'], 2)
+        self.assertEqual(timestamps['2007-08-16T00:00:00.000Z'], 16)
+        self.assertEqual(timestamps['gap'], '+1DAY')
+        self.assertEqual(timestamps['end'], DateTime('2007-08-17 GMT'))
+
     def testParseConfig(self):
         schema_xml = getData('schema.xml')
         schema = SolrSchema(schema_xml.split('\n\n', 1)[1])
