@@ -78,6 +78,16 @@ class SolrResponse(object):
                     setter(stack[-1], elem.get('name'), data)
         return self
 
+    def results(self):
+        """ return only the list of results, i.e. a `SolrResults` instance """
+        return getattr(self, 'response', [])
+
+    def __len__(self):
+        return len(self.results())
+
+    def __getitem__(self, index):
+        return self.results()[index]
+
 
 class AttrDict(dict):
     """ a dictionary with attribute access """

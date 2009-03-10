@@ -4,6 +4,10 @@ Changelog
 1.0b6 - Unreleased
 ------------------
 
+* Expose additional information provided by Solr — for example about headers
+  and search facets.
+  [witsch]
+
 * In solrSearchResults, if the passed in request is a dict, look up 
   request to enable adaptation into PloneFlare.
   [tesdal]

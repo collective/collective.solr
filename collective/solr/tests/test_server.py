@@ -169,7 +169,7 @@ class SolrServerTests(SolrTestCase):
         # make sure the file was indexed okay...
         self.assertEqual(log, [])
         # and the contents can be searched
-        results = self.search('+portal_type:File')
+        results = self.search('+portal_type:File').results()
         self.assertEqual(results.numFound, '1')
         self.assertEqual(results[0].Title, 'some text')
         self.assertEqual(results[0].UID, self.folder.foo.UID())
@@ -180,7 +180,7 @@ class SolrServerTests(SolrTestCase):
     def testSearchObject(self):
         self.folder.processForm(values={'title': 'Foo'})
         commit()                        # indexing happens on commit
-        results = self.search('+Title:Foo')
+        results = self.search('+Title:Foo').results()
         self.assertEqual(results.numFound, '1')
         self.assertEqual(results[0].Title, 'Foo')
         self.assertEqual(results[0].UID, self.folder.UID())
@@ -193,6 +193,16 @@ class SolrServerTests(SolrTestCase):
         results = solrSearchResults(SearchableText='News')
         self.assertEqual([ (r.Title, r.physicalPath) for r in results ],
             [('News', '/plone/news'), ('News', '/plone/news/aggregator')])
+
+    def testSolrSearchResultsInformation(self):
+        self.maintenance.reindex()
+        response = solrSearchResults(SearchableText='News')
+        self.assertEqual(len(response), 2)
+        self.assertEqual(response.response.numFound, '2')
+        self.failUnless(isinstance(response.responseHeader, dict))
+        headers = response.responseHeader
+        self.assertEqual(sorted(headers), ['QTime', 'params', 'status'])
+        self.assertEqual(headers['params']['q'], '+SearchableText:News')
 
     def testSolrSearchResultsWithDictRequest(self):
         self.maintenance.reindex()
@@ -316,17 +326,17 @@ class SolrServerTests(SolrTestCase):
 
     def testLimitSearchResults(self):
         self.maintenance.reindex()
-        results = self.search('+parentPaths:/plone')
+        results = self.search('+parentPaths:/plone').results()
         self.assertEqual(results.numFound, '8')
         self.assertEqual(len(results), 8)
         # now let's limit the returned results
         config = getUtility(ISolrConnectionConfig)
         config.max_results = 2
-        results = self.search('+parentPaths:/plone')
+        results = self.search('+parentPaths:/plone').results()
         self.assertEqual(results.numFound, '8')
         self.assertEqual(len(results), 2)
         # an explicit value should still override things
-        results = self.search('+parentPaths:/plone', rows=5)
+        results = self.search('+parentPaths:/plone', rows=5).results()
         self.assertEqual(results.numFound, '8')
         self.assertEqual(len(results), 5)
 

@@ -76,10 +76,13 @@ def solrSearchResults(request=None, **keywords):
     schema = search.getManager().getSchema() or {}
     params = cleanupQueryParameters(extractQueryParameters(args), schema)
     __traceback_info__ = (query, params, args)
-    results = search(query, fl='* score', **params)
+    response = search(query, fl='* score', **params)
     def wrap(flare):
         """ wrap a flare object with a helper class """
         adapter = queryMultiAdapter((flare, request), IFlare)
         return adapter is not None and adapter or flare
-    return map(wrap, results)
+    results = response.results()
+    for idx, flare in enumerate(results):
+        results[idx] = wrap(flare)
+    return response
 
