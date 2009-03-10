@@ -23,15 +23,15 @@
                type="submit"
                value="Search"
                i18n:attributes="value label_search;" />
-    
+
         <div class="searchSection">
-            <input id="searchbox_currentfolder_only" 
+            <input id="searchbox_currentfolder_only"
                    class="noborder"
-                   type="checkbox" 
-                   name="path" 
+                   type="checkbox"
+                   name="path"
                    tal:attributes="value view/folder_path"
                    />
-            <label for="searchbox_currentfolder_only" 
+            <label for="searchbox_currentfolder_only"
                    i18n:translate="label_searchbox_currentfolder_only"
                    style="cursor: pointer">
                 only in current section
