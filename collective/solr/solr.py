@@ -58,27 +58,32 @@ class SolrException(Exception):
 
 class SolrConnection:
 
-    def __init__(self, host='localhost:8983', solrBase='/solr', persistent=True, postHeaders={}, timeout=None):
+    def __init__(self, host='localhost:8983', solrBase='/solr',
+                 persistent=True, postHeaders={}, timeout=None):
         self.host = host
         self.solrBase = solrBase
         self.persistent = persistent
         self.reconnects = 0
         self.encoder = codecs.getencoder('utf-8')
         # responses from Solr will always be in UTF-8
-        self.decoder = codecs.getdecoder('utf-8')  
+        self.decoder = codecs.getdecoder('utf-8')
         # a real connection to the server is not opened at this point.
         self.conn = HTTPConnectionWithTimeout(self.host, timeout=timeout)
         # self.conn.set_debuglevel(1000000)
         self.xmlbody = []
         self.xmlheaders = {'Content-Type': 'text/xml; charset=utf-8'}
         self.xmlheaders.update(postHeaders)
-        if not self.persistent: self.xmlheaders['Connection']='close'
-        self.formheaders = {'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8'}
-        if not self.persistent: self.formheaders['Connection']='close'
+        if not self.persistent:
+            self.xmlheaders['Connection']='close'
+        self.formheaders = {'Content-Type':
+            'application/x-www-form-urlencoded; charset=utf-8'}
+        if not self.persistent:
+            self.formheaders['Connection']='close'
 
     def __str__(self):
-        return 'SolrConnection{host=%s, solrBase=%s, persistent=%s, postHeaders=%s, reconnects=%s}' % \
-            (self.host, self.solrBase, self.persistent, self.xmlheaders, self.reconnects)
+        return ('SolrConnection{host=%s, solrBase=%s, persistent=%s, '
+            'postHeaders=%s, reconnects=%s}' % (self.host, self.solrBase,
+            self.persistent, self.xmlheaders, self.reconnects))
 
     def __reconnect(self):
         self.reconnects += 1
@@ -90,7 +95,7 @@ class SolrConnection:
     def close(self):
         self.conn.close()
 
-    def __errcheck(self,rsp):
+    def __errcheck(self, rsp):
         if rsp.status != 200:
             ex = SolrException(rsp.status, rsp.reason)
             try:
@@ -104,17 +109,18 @@ class SolrConnection:
         """ set a timeout value for the currently open connection """
         self.conn.setTimeout(timeout)
 
-    def doPost(self,url,body,headers):
+    def doPost(self, url, body, headers):
         try:
             self.conn.request('POST', url, body, headers)
             return self.__errcheck(self.conn.getresponse())
-        except (socket.error,httplib.CannotSendRequest,httplib.ResponseNotReady,httplib.BadStatusLine) :
-            #Reconnect in case the connection was broken from the server going down,
-            #the server timing out our persistent connection, or another
-            #network failure. Also catch httplib.CannotSendRequest,
-            #httlib.ResponseNotReady and httlib.BadStatusLine because the
-            #HTTPConnection object can get in a bad state (seems like they
-            #might be "ghosted" in the zodb).
+        except (socket.error, httplib.CannotSendRequest,
+            httplib.ResponseNotReady, httplib.BadStatusLine):
+            # Reconnect in case the connection was broken from the server
+            # going down, the server timing out our persistent connection, or
+            # another network failure. Also catch httplib.CannotSendRequest,
+            # httlib.ResponseNotReady and httlib.BadStatusLine because the
+            # HTTPConnection object can get in a bad state (seems like they
+            # might be "ghosted" in the zodb).
             self.__reconnect()
             self.conn.request('POST', url, body, headers)
             return self.__errcheck(self.conn.getresponse())
@@ -136,16 +142,19 @@ class SolrConnection:
             except (SolrException, socket.error):
                 logger.exception('exception during request %r', request)
             count += len(request)
-        logger.debug('flushed out %d bytes in %d requests', count, len(self.xmlbody))
+        logger.debug('flushed out %d bytes in %d requests',
+            count, len(self.xmlbody))
         del self.xmlbody[:]
         return responses
 
     def doSendXML(self, request):
         try:
-            rsp = self.doPost(self.solrBase+'/update', request, self.xmlheaders)
+            rsp = self.doPost(self.solrBase+'/update', request,
+                self.xmlheaders)
             data = rsp.read()
         finally:
-            if not self.persistent: self.conn.close()
+            if not self.persistent:
+                self.conn.close()
         #detect old-style error response (HTTP response code of
         #200 with a non-zero status.
         parsed = fromstring(self.decoder(data)[0])
@@ -155,18 +164,18 @@ class SolrConnection:
             raise SolrException(rsp.status, reason)
         return parsed
 
-    def escapeVal(self,val):
+    def escapeVal(self, val):
         val = escape(val)
         try:
             return self.encoder(val)[0]  #to utf8
         except UnicodeDecodeError:
             return val # Already utf-8?
 
-    def escapeKey(self,key):
+    def escapeKey(self, key):
         key = key.replace("&", "&amp;")
         key = key.replace('"', "&quot;")
         return self.encoder(key)[0]  #to utf8
-    
+
     def delete(self, id):
         xstr = '<delete><id>%s</id></delete>' % self.escapeVal(id)
         return self.doUpdateXML(xstr)
@@ -180,21 +189,22 @@ class SolrConnection:
             f = str(f)
         if not isinstance(v, basestring):
             v = str(v)
-        lst.append('<field name="%s">%s</field>' % (self.escapeKey(f), self.escapeVal(v)))
+        lst.append('<field name="%s">%s</field>' % (self.escapeKey(f),
+            self.escapeVal(v)))
 
     def __add(self, lst, fields):
         lst.append('<doc>')
-        for f,v in fields.items():
-            if isinstance(v, (list,tuple)): # multi-valued
+        for f, v in fields.items():
+            if isinstance(v, (list, tuple)): # multi-valued
                 for value in v:
                     self.__makeField(lst, f, value)
             else:
-                self.__makeField(lst, f, v) 
+                self.__makeField(lst, f, v)
         lst.append('</doc>')
 
     def add(self, **fields):
         lst=['<add>']
-        self.__add(lst,fields)
+        self.__add(lst, fields)
         lst.append('</add>')
         xstr = ''.join(lst)
         return self.doUpdateXML(xstr)
@@ -202,15 +212,16 @@ class SolrConnection:
     def addMany(self, arrOfMap):
         lst=['<add>']
         for doc in arrOfMap:
-            self.__add(lst,doc)
+            self.__add(lst, doc)
         lst.append('</add>')
         xstr = ''.join(lst)
         return self.doUpdateXML(xstr)
 
     def commit(self, waitFlush=True, waitSearcher=True, optimize=False):
-        data = { 'committype':optimize and 'optimize' or 'commit'
-               , 'nowait':not waitSearcher and ' waitSearcher="false"' or ''
-               , 'noflush':not waitFlush and not waitSearcher and ' waitFlush="false"' or ''}
+        data = {'committype': optimize and 'optimize' or 'commit',
+                'nowait': not waitSearcher and ' waitSearcher="false"' or '',
+                'noflush': not waitFlush and not waitSearcher and \
+                    ' waitFlush="false"' or ''}
         xstr = '<%(committype)s%(noflush)s%(nowait)s/>' % data
         self.doUpdateXML(xstr)
         return self.flush()
@@ -220,15 +231,18 @@ class SolrConnection:
         # for now we delay sending the xml until the commit (see above),
         # which is why we don't have to send anything to abort...
         # see http://issues.apache.org/jira/browse/SOLR-670
-        logger.debug('aborting %d requests: %r', len(self.xmlbody), self.xmlbody)
+        logger.debug('aborting %d requests: %r',
+            len(self.xmlbody), self.xmlbody)
         del self.xmlbody[:]
 
     def search(self, **params):
         request = urllib.urlencode(params, doseq=True)
         try:
-            response = self.doPost('%s/select' % self.solrBase, request, self.formheaders)
+            response = self.doPost('%s/select' % self.solrBase, request,
+                self.formheaders)
         finally:
-            if not self.persistent: self.conn.close()
+            if not self.persistent:
+                self.conn.close()
         return response
 
     def getSchema(self):
@@ -243,4 +257,3 @@ class SolrConnection:
                 return SolrSchema(xml.strip())
             self.__reconnect()          # force a new connection for each url
         self.__errcheck(response)       # raise a solrexception
-

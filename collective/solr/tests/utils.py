@@ -77,7 +77,7 @@ def fakehttp(solrconn, *fakedata):
         def putrequest(self, *args, **kw):
             response = self.fakedata.pop(0)     # get first response
             self.sock = FakeSocket(response)    # and set up a fake socket
-            output.new()                        # and create a new output buffer
+            output.new()                        # as well as an output buffer
             HTTPConnection.putrequest(self, *args, **kw)
 
         def setTimeout(self, timeout):
@@ -141,4 +141,3 @@ def numFound(result):
     if match is not None:
         match = int(match.group(1))
     return match
-

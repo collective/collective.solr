@@ -14,11 +14,10 @@ def physicalDepth(obj, **kwargs):
 def parentPaths(obj, **kwargs):
     """ return all parent paths leading up to the object """
     elements = obj.getPhysicalPath()
-    return [ '/'.join(elements[:n+1]) for n in xrange(1, len(elements)) ]
+    return ['/'.join(elements[:n+1]) for n in xrange(1, len(elements))]
 
 
 def registerAttributes():
     registerIndexableAttribute('physicalPath', physicalPath)
     registerIndexableAttribute('physicalDepth', physicalDepth)
     registerIndexableAttribute('parentPaths', parentPaths)
-

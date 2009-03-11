@@ -37,6 +37,7 @@ nested = {
     'doc': SolrFlare,
 }
 
+
 def setter(item, name, value):
     """ sets the named value on item respecting its type """
     if isinstance(item, list):
@@ -63,17 +64,17 @@ class SolrResponse(object):
         for action, elem in elements:
             tag = elem.tag
             if action == 'start':
-                if nested.has_key(tag):
+                if tag in nested:
                     data = nested[tag]()
                     for key, value in elem.attrib.items():
                         if not key == 'name':   # set extra attributes
                             setattr(data, key, value)
                     stack.append(data)
             elif action == 'end':
-                if nested.has_key(tag):
+                if tag in nested:
                     data = stack.pop()
                     setter(stack[-1], elem.get('name'), data)
-                elif unmarshallers.has_key(tag):
+                elif tag in unmarshallers:
                     data = unmarshallers[tag](elem.text)
                     setter(stack[-1], elem.get('name'), data)
         return self
@@ -92,14 +93,14 @@ class SolrResponse(object):
 class AttrDict(dict):
     """ a dictionary with attribute access """
 
-    # look up attributes in dict
     def __getattr__(self, name):
+        """ look up attributes in dict """
         marker = []
-        value = self.get(name, marker) 
+        value = self.get(name, marker)
         if value is not marker:
             return value
         else:
-            raise AttributeError, name
+            raise AttributeError(name)
 
 
 class SolrField(AttrDict):
@@ -149,4 +150,3 @@ class SolrSchema(AttrDict):
                     required.append(name)
             elif elem.tag in ('uniqueKey', 'defaultSearchField'):
                 self[elem.tag] = elem.text
-

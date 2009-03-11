@@ -22,10 +22,12 @@ class SetupToolTests(SolrTestCase, TarballTester):
         config.required = ('foo', 'bar')
 
     def testImportStep(self):
+        profile = 'profile-collective.solr:default'
         tool = self.portal.portal_setup
-        result = tool.runImportStepFromProfile('profile-collective.solr:default', 'solr')
+        result = tool.runImportStepFromProfile(profile, 'solr')
         self.assertEqual(result['steps'], [u'componentregistry', 'solr'])
-        self.failUnless(result['messages']['solr'].endswith('collective.solr: settings imported.'))
+        output = 'collective.solr: settings imported.'
+        self.failUnless(result['messages']['solr'].endswith(output))
         config = getUtility(ISolrConnectionConfig)
         self.assertEqual(config.active, False)
         self.assertEqual(config.host, '127.0.0.1')
@@ -35,7 +37,7 @@ class SetupToolTests(SolrTestCase, TarballTester):
         self.assertEqual(config.index_timeout, 0)
         self.assertEqual(config.search_timeout, 0)
         self.assertEqual(config.max_results, 0)
-        self.assertEqual(config.required, ('SearchableText',))
+        self.assertEqual(config.required, ('SearchableText', ))
 
     def testExportStep(self):
         tool = self.portal.portal_setup
@@ -72,4 +74,3 @@ SOLR_XML = """\
 
 def test_suite():
     return defaultTestLoader.loadTestsFromName(__name__)
-

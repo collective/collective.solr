@@ -17,6 +17,7 @@ logger = getLogger('collective.solr.maintenance')
 
 
 def timer(func=time):
+    """ set up a generator returning the elapsed time since the last call """
     def gen(last=func()):
         while True:
             elapsed = func() - last
@@ -26,6 +27,7 @@ def timer(func=time):
 
 
 def checkpointIterator(function, interval=100):
+    """ the iterator will call the given function for every nth invocation """
     counter = 0
     while True:
         counter += 1
@@ -92,8 +94,8 @@ class SolrMaintenanceView(BrowserView):
                 log(' (%.4fs)\n' % (time() - lap), timestamp=False)
                 commit -= 1
                 if commit == 0:
-                    msg = 'intermediate commit (%d objects indexed in %.4fs)...\n'
-                    log(msg %  (indexed, time() - now))
+                    msg = 'intermediate commit: %d objects indexed in %.4fs\n'
+                    log(msg % (indexed, time() - now))
                     proc.commit(wait=True)
                     commit = batch
                     manager.getConnection().reset()     # force new connection
@@ -101,12 +103,14 @@ class SolrMaintenanceView(BrowserView):
                         db = self.context.getPhysicalRoot()._p_jar.db()
                         size = db.cacheSize()
                         if size > cache:
-                            log('minimizing zodb cache with %d objects...\n' % size)
+                            msg = 'minimizing zodb cache with %d objects...\n'
+                            log(msg % size)
                             db.cacheMinimize()
         proc.commit(wait=True)      # make sure to commit in the end...
         now, cpu = time() - now, clock() - cpu
         log('solr index rebuilt.\n')
-        msg = 'indexed %d object(s) in %.3f seconds (%.3f cpu time).' % (indexed, now, cpu)
+        msg = 'indexed %d object(s) in %.3f seconds (%.3f cpu time).'
+        msg = msg % (indexed, now, cpu)
         log(msg)
         logger.info(msg)
 
@@ -129,7 +133,7 @@ class SolrMaintenanceView(BrowserView):
         for flare in search('UID:[* TO *]', rows=rows, fl='UID modified'):
             uid = flare.UID
             assert uid, 'empty UID?'
-            if uids.has_key(uid):
+            if uid in uids:
                 if uids[uid] > flare.modified.millis():
                     reindex.append(uid)     # item isn't current
                 del uids[uid]               # remove from the list in any case
@@ -159,8 +163,8 @@ class SolrMaintenanceView(BrowserView):
             len(index), len(reindex), len(unindex)))
         processed = 0
         def checkPoint():
-            msg = 'intermediate commit (%d objects processed, last batch in %s)...\n'
-            log(msg % (processed, lap.next()))
+            log('intermediate commit (%d objects processed, '
+                'last batch in %s)...\n' % (processed, lap.next()))
             proc.commit(wait=True)
             manager.getConnection().reset()     # force new connection
             if cache:
@@ -214,4 +218,3 @@ class SolrMaintenanceView(BrowserView):
         msg = msg % (processed, real.next(), cpu.next())
         log(msg)
         logger.info(msg)
-

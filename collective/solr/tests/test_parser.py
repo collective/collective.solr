@@ -20,7 +20,8 @@ class ParserTests(TestCase):
         self.assertEqual(match.name, 'python test doc')
         self.assertEqual(match.popularity, 0)
         self.assertEqual(match.sku, '500')
-        self.assertEqual(match.timestamp, DateTime('2008-02-29 16:11:46.998 GMT'))
+        self.assertEqual(match.timestamp,
+            DateTime('2008-02-29 16:11:46.998 GMT'))
         headers = response.responseHeader
         self.assertEqual(headers['status'], 0)
         self.assertEqual(headers['QTime'], 0)
@@ -39,7 +40,8 @@ class ParserTests(TestCase):
         first = results[0]
         self.assertEqual(first.cat, ['software', 'search'])
         self.assertEqual(len(first.features), 7)
-        self.assertEqual([type(x).__name__ for x in first.features], ['str'] * 6 + ['unicode'])
+        self.assertEqual([type(x).__name__ for x in first.features],
+            ['str'] * 6 + ['unicode'])
         self.assertEqual(first.id, 'SOLR1000')
         self.assertEqual(first.inStock, True)
         self.assertEqual(first.incubationdate_dt, DateTime('2006/01/17 GMT'))
@@ -93,7 +95,8 @@ class ParserTests(TestCase):
         self.assertEqual(headers['status'], 0)
         self.assertEqual(headers['QTime'], 5)
         self.assertEqual(headers['params']['facet.date'], 'timestamp')
-        self.assertEqual(headers['params']['facet.date.start'], 'NOW/DAY-5DAYS')
+        self.assertEqual(headers['params']['facet.date.start'],
+            'NOW/DAY-5DAYS')
         self.assertEqual(headers['params']['facet.date.end'], 'NOW/DAY+1DAY')
         self.assertEqual(headers['params']['facet.date.gap'], '+1DAY')
         self.assertEqual(headers['params']['rows'], '0')
@@ -141,14 +144,16 @@ class ParserTests(TestCase):
         self.assertEqual(schema.timestamp.indexed, True)
         self.assertEqual(schema.word.indexed, False)
         fields = schema.values()
-        self.assertEqual(len([f for f in fields if getattr(f, 'required', False)]), 2)
-        self.assertEqual(len([f for f in fields if getattr(f, 'multiValued', False)]), 3)
+        self.assertEqual(len([f for f in fields if
+            getattr(f, 'required', False)]), 2)
+        self.assertEqual(len([f for f in fields if
+            getattr(f, 'multiValued', False)]), 3)
 
     def testParseQuirkyResponse(self):
         quirky_response = getData('quirky_response.txt')
         response = SolrResponse(quirky_response)
         results = response.response     # the result set is named 'response'
-        empty_uid = [ r for r in results if r.UID == '' ]
+        empty_uid = [r for r in results if r.UID == '']
         self.assertEqual(empty_uid, [])
 
 
@@ -157,4 +162,3 @@ def test_suite():
 
 if __name__ == '__main__':
     main(defaultTest='test_suite')
-

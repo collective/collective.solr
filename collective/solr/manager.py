@@ -72,7 +72,8 @@ class SolrConnectionManager(object):
         if conn is None and config.host is not None:
             host = '%s:%d' % (config.host, config.port)
             logger.debug('opening connection to %s', host)
-            conn = SolrConnection(host=host, solrBase=config.base, persistent=True)
+            conn = SolrConnection(host=host, solrBase=config.base,
+                persistent=True)
             setLocal('connection', conn)
         if conn is not None and timeout is not marker:
             conn.setTimeout(timeout)
@@ -110,4 +111,3 @@ class SolrConnectionManager(object):
             to the value specified for search operations """
         config = getUtility(ISolrConnectionConfig)
         self.setTimeout(config.search_timeout or None)
-

@@ -17,6 +17,7 @@ from collective.solr.utils import prepareData
 
 class Foo(CMFCatalogAware):
     """ dummy test object """
+
     def __init__(self, **kw):
         for key, value in kw.items():
             setattr(self, key, value)
@@ -262,4 +263,3 @@ class ThreadedConnectionTests(TestCase):
 
 def test_suite():
     return defaultTestLoader.loadTestsFromName(__name__)
-

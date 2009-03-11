@@ -38,4 +38,3 @@ def test_suite():
                test_class=SolrFacetsTestCase, optionflags=optionflags),
         )
     return suite
-

@@ -31,7 +31,7 @@ class HTTPConnectionWithTimeout(HTTPConnection):
                 continue
             break
         if not self.sock:
-            raise error, msg
+            raise error(msg)
 
     def setTimeout(self, timeout):
         """ set a timeout value for the currently open connection as well
@@ -65,4 +65,3 @@ def http_opener(timeout=None):
         timeouts;  urls opened with the returned opener will have the
         given timeout set on any connection opened with `open` """
     return build_opener(HTTPHandlerWithTimeout(timeout=timeout))
-

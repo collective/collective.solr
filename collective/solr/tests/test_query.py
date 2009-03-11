@@ -25,7 +25,8 @@ class QuoteTests(TestCase):
         self.assertEqual(quote('{}'), '"\{\}"')
         self.assertEqual(quote('...""'), '"...\\"\\""')
         self.assertEqual(quote('\\'), '"\\"')
-        self.assertEqual(quote('-+&|!^~*?:'), '"\\-\\+\\&\\|\\!\\^\\~\\*\\?\\:"')
+        self.assertEqual(quote('-+&|!^~*?:'),
+            '"\\-\\+\\&\\|\\!\\^\\~\\*\\?\\:"')
         self.assertEqual(quote('john@foo.com'), '"john@foo.com"')
         self.assertEqual(quote(' '), '" "')
         self.assertEqual(quote(''), '""')
@@ -59,8 +60,8 @@ class QueryTests(TestCase):
         self.mngr = SolrConnectionManager()
         self.mngr.setHost(active=True)
         conn = self.mngr.getConnection()
-        fakehttp(conn, getData('schema.xml'))       # fake schema response
-        self.mngr.getSchema()                       # read and cache the schema
+        fakehttp(conn, getData('schema.xml'))   # fake schema response
+        self.mngr.getSchema()                   # read and cache the schema
         self.search = Search()
         self.search.manager = self.mngr
 
@@ -96,9 +97,11 @@ class QueryTests(TestCase):
     def testMultiArgumentQueries(self):
         bq = self.search.buildQuery
         self.assertEqual(bq('foo', name='bar'), '+foo +name:bar')
-        self.assertEqual(bq('foo', name=('bar', 'hmm')), '+foo +name:(bar hmm)')
+        self.assertEqual(bq('foo', name=('bar', 'hmm')),
+            '+foo +name:(bar hmm)')
         self.assertEqual(bq(name='foo', cat='bar'), '+name:foo +cat:bar')
-        self.assertEqual(bq(name='foo', cat=['bar', 'hmm']), '+name:foo +cat:(bar hmm)')
+        self.assertEqual(bq(name='foo', cat=['bar', 'hmm']),
+            '+name:foo +cat:(bar hmm)')
         self.assertEqual(bq('foo', name=' '), '+foo +name:" "')
         self.assertEqual(bq('foo', name=''), '+foo')
 
@@ -115,9 +118,12 @@ class QueryTests(TestCase):
         self.assertEqual(bq(u'john@foo.com'), '+"john@foo.com"')
         self.assertEqual(bq(name=['foo', u'bar']), '+name:(foo bar)')
         self.assertEqual(bq(name=['foo', u'bär']), '+name:(foo "b\xc3\xa4r")')
-        self.assertEqual(bq(name='foo', cat=(u'bar', 'hmm')), '+name:foo +cat:(bar hmm)')
-        self.assertEqual(bq(name='foo', cat=(u'bär', 'hmm')), '+name:foo +cat:("b\xc3\xa4r" hmm)')
-        self.assertEqual(bq(name=u'john@foo.com', cat='spammer'), '+name:"john@foo.com" +cat:spammer')
+        self.assertEqual(bq(name='foo', cat=(u'bar', 'hmm')),
+            '+name:foo +cat:(bar hmm)')
+        self.assertEqual(bq(name='foo', cat=(u'bär', 'hmm')),
+            '+name:foo +cat:("b\xc3\xa4r" hmm)')
+        self.assertEqual(bq(name=u'john@foo.com', cat='spammer'),
+            '+name:"john@foo.com" +cat:spammer')
 
     def testQuotedQueries(self):
         bq = self.search.buildQuery
@@ -187,7 +193,8 @@ class SearchTests(TestCase):
         self.assertEqual(match.name, 'python test doc')
         self.assertEqual(match.popularity, 0)
         self.assertEqual(match.sku, '500')
-        self.assertEqual(match.timestamp, DateTime('2008-02-29 16:11:46.998 GMT'))
+        self.assertEqual(match.timestamp,
+            DateTime('2008-02-29 16:11:46.998 GMT'))
 
 
 def test_suite():
@@ -195,4 +202,3 @@ def test_suite():
 
 if __name__ == '__main__':
     main(defaultTest='test_suite')
-

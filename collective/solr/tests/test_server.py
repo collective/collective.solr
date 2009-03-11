@@ -186,12 +186,13 @@ class SolrServerTests(SolrTestCase):
         self.assertEqual(results[0].UID, self.folder.UID())
 
     def testSolrSearchResultsFallback(self):
-        self.assertRaises(FallBackException, solrSearchResults, dict(foo='bar'))
+        self.assertRaises(FallBackException, solrSearchResults,
+            dict(foo='bar'))
 
     def testSolrSearchResults(self):
         self.maintenance.reindex()
         results = solrSearchResults(SearchableText='News')
-        self.assertEqual([ (r.Title, r.physicalPath) for r in results ],
+        self.assertEqual([(r.Title, r.physicalPath) for r in results],
             [('News', '/plone/news'), ('News', '/plone/news/aggregator')])
 
     def testSolrSearchResultsInformation(self):
@@ -206,34 +207,36 @@ class SolrServerTests(SolrTestCase):
 
     def testSolrSearchResultsWithDictRequest(self):
         self.maintenance.reindex()
-        results = solrSearchResults({'SearchableText':'News'})
+        results = solrSearchResults({'SearchableText': 'News'})
         self.failUnless([r for r in results if isinstance(r, PloneFlare)])
-        self.assertEqual([ (r.Title, r.physicalPath) for r in results ],
+        self.assertEqual([(r.Title, r.physicalPath) for r in results],
             [('News', '/plone/news'), ('News', '/plone/news/aggregator')])
 
     def testRequiredParameters(self):
         self.maintenance.reindex()
-        self.assertRaises(FallBackException, solrSearchResults, dict(Title='News'))
+        self.assertRaises(FallBackException, solrSearchResults,
+            dict(Title='News'))
         # now let's remove all required parameters and try again
         config = getUtility(ISolrConnectionConfig)
         config.required = []
         results = solrSearchResults(Title='News')
-        self.assertEqual([ (r.Title, r.physicalPath) for r in results ],
+        self.assertEqual([(r.Title, r.physicalPath) for r in results],
             [('News', '/plone/news'), ('News', '/plone/news/aggregator')])
         # specifying multiple values should required only one of them...
         config.required = ['Title', 'foo']
         results = solrSearchResults(Title='News')
-        self.assertEqual([ (r.Title, r.physicalPath) for r in results ],
+        self.assertEqual([(r.Title, r.physicalPath) for r in results],
             [('News', '/plone/news'), ('News', '/plone/news/aggregator')])
         # but solr won't be used if none of them is present...
         config.required = ['foo', 'bar']
-        self.assertRaises(FallBackException, solrSearchResults, dict(Title='News'))
+        self.assertRaises(FallBackException, solrSearchResults,
+            dict(Title='News'))
 
     def testPathSearches(self):
         self.maintenance.reindex()
         request = dict(SearchableText='"[* TO *]"')
-        search = lambda path: sorted([ r.physicalPath for r in
-            solrSearchResults(request, path=path) ])
+        search = lambda path: sorted([r.physicalPath for r in
+            solrSearchResults(request, path=path)])
         self.assertEqual(len(search(path='/plone')), 8)
         self.assertEqual(search(path='/plone/news'),
             ['/plone/news', '/plone/news/aggregator'])
@@ -242,37 +245,38 @@ class SolrServerTests(SolrTestCase):
         self.assertEqual(search(path={'query': '/plone/news', 'depth': 0}),
             ['/plone/news'])
         self.assertEqual(search(path={'query': '/plone', 'depth': 1}),
-            ['/plone/Members', '/plone/events', '/plone/front-page', '/plone/news'])
+            ['/plone/Members', '/plone/events', '/plone/front-page',
+             '/plone/news'])
 
     def testLogicalOperators(self):
-        self.portal.news.setSubject(('News',))
-        self.portal.events.setSubject(('Events',))
-        self.portal['front-page'].setSubject(('News', 'Events',))
+        self.portal.news.setSubject(['News'])
+        self.portal.events.setSubject(['Events'])
+        self.portal['front-page'].setSubject(['News', 'Events'])
         self.maintenance.reindex()
         request = dict(SearchableText='"[* TO *]"')
-        search = lambda subject: sorted([ r.physicalPath for r in
-            solrSearchResults(request, Subject=subject) ])
-        self.assertEqual(search(dict(operator='and', query=('News',))),
+        search = lambda subject: sorted([r.physicalPath for r in
+            solrSearchResults(request, Subject=subject)])
+        self.assertEqual(search(dict(operator='and', query=['News'])),
             ['/plone/front-page', '/plone/news'])
-        self.assertEqual(search(dict(operator='or', query=('News',))),
+        self.assertEqual(search(dict(operator='or', query=['News'])),
             ['/plone/front-page', '/plone/news'])
-        self.assertEqual(search(dict(operator='or', query=('News', 'Events'))),
+        self.assertEqual(search(dict(operator='or', query=['News', 'Events'])),
             ['/plone/events', '/plone/front-page', '/plone/news'])
-        self.assertEqual(search(dict(operator='and', query=('News', 'Events'))),
-            ['/plone/front-page'])
+        self.assertEqual(search(dict(operator='and',
+            query=['News', 'Events'])), ['/plone/front-page'])
 
     def testBooleanValues(self):
         self.maintenance.reindex()
         request = dict(SearchableText='"[* TO *]"')
         results = solrSearchResults(request, is_folderish=True)
         self.assertEqual(len(results), 7)
-        self.failIf('/plone/front-page' in [ r.physicalPath for r in results ])
+        self.failIf('/plone/front-page' in [r.physicalPath for r in results])
         results = solrSearchResults(request, is_folderish=False)
-        self.assertEqual(sorted([ r.physicalPath for r in results ]),
+        self.assertEqual(sorted([r.physicalPath for r in results]),
             ['/plone/front-page'])
 
     def testSearchSecurity(self):
-        self.setRoles(('Manager',))
+        self.setRoles(['Manager'])
         wfAction = self.portal.portal_workflow.doActionFor
         wfAction(self.portal.news, 'retract')
         wfAction(self.portal.news.aggregator, 'retract')
@@ -285,11 +289,12 @@ class SolrServerTests(SolrTestCase):
         self.assertEqual(len(results), 8)
         self.setRoles(())                   # again as anonymous user
         results = self.portal.portal_catalog(request)
-        self.assertEqual(sorted([ r.physicalPath for r in results ]),
-            ['/plone/Members', '/plone/Members/test_user_1_', '/plone/front-page'])
+        self.assertEqual(sorted([r.physicalPath for r in results]),
+            ['/plone/Members', '/plone/Members/test_user_1_',
+             '/plone/front-page'])
 
     def testEffectiveRange(self):
-        self.setRoles(('Manager',))
+        self.setRoles(['Manager'])
         self.portal.news.setEffectiveDate(DateTime() + 1)
         self.portal.events.setExpirationDate(DateTime() - 1)
         self.maintenance.reindex()
@@ -299,12 +304,12 @@ class SolrServerTests(SolrTestCase):
         self.setRoles(())                   # again as anonymous user
         results = self.portal.portal_catalog(request)
         self.assertEqual(len(results), 6)
-        paths = [ r.physicalPath for r in results ]
+        paths = [r.physicalPath for r in results]
         self.failIf('/plone/news' in paths)
         self.failIf('/plone/events' in paths)
         results = self.portal.portal_catalog(request, show_inactive=True)
         self.assertEqual(len(results), 8)
-        paths = [ r.physicalPath for r in results ]
+        paths = [r.physicalPath for r in results]
         self.failUnless('/plone/news' in paths)
         self.failUnless('/plone/events' in paths)
 
@@ -342,26 +347,26 @@ class SolrServerTests(SolrTestCase):
 
     def testSortParameters(self):
         self.maintenance.reindex()
-        search = lambda attr, **kw: ', '.join([ getattr(r, attr) for r in
+        search = lambda attr, **kw: ', '.join([getattr(r, attr) for r in
             solrSearchResults(request=dict(SearchableText='"[* TO *]"',
-                              path=dict(query='/plone', depth=1)), **kw) ])
+                              path=dict(query='/plone', depth=1)), **kw)])
         self.assertEqual(search('Title', sort_on='Title'),
             'Events, News, Users, Welcome to Plone')
-        self.assertEqual(search('Title', sort_on='Title', sort_order='reverse'),
-            'Welcome to Plone, Users, News, Events')
-        self.assertEqual(search('getId', sort_on='Title', sort_order='descending'),
-            'front-page, Members, news, events')
+        self.assertEqual(search('Title', sort_on='Title',
+            sort_order='reverse'), 'Welcome to Plone, Users, News, Events')
+        self.assertEqual(search('getId', sort_on='Title',
+            sort_order='descending'), 'front-page, Members, news, events')
         self.assertEqual(search('Title', sort_on='Title', sort_limit=2),
             'Events, News')
         self.assertEqual(search('Title', sort_on='Title', sort_order='reverse',
             sort_limit='3'), 'Welcome to Plone, Users, News')
         # test sort index aliases
         schema = self.search.getManager().getSchema()
-        self.failIf(schema.has_key('sortable_title'))
+        self.failIf('sortable_title' in schema)
         self.assertEqual(search('Title', sort_on='sortable_title'),
             'Events, News, Users, Welcome to Plone')
         # also make sure a non-existing sort index doesn't break things
-        self.failIf(schema.has_key('foo'))
+        self.failIf('foo' in schema)
         self.assertEqual(len(search('Title', sort_on='foo').split(', ')), 4)
 
     def testFlareHelpers(self):
@@ -389,7 +394,7 @@ class SolrServerTests(SolrTestCase):
         commit()                        # indexing happens on commit
         results = solrSearchResults(SearchableText='New*')
         self.assertEqual(len(results), 4)
-        self.assertEqual(sorted([ i.Title for i in results ]),
+        self.assertEqual(sorted([i.Title for i in results]),
             ['Newbie!', 'News', 'News', 'Welcome to Plone'])
 
     def testWildcardSearchesMultipleWords(self):
@@ -438,4 +443,3 @@ def test_suite():
         return defaultTestLoader.loadTestsFromName(__name__)
     else:
         return TestSuite()
-

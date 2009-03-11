@@ -12,7 +12,7 @@ class TestSolr(TestCase):
 
         c = SolrConnection(host='localhost:8983', persistent=True)
         output = fakehttp(c, add_response)
-        c.add(id='500',name='python test doc')
+        c.add(id='500', name='python test doc')
         res = c.flush()
         self.assertEqual(len(res), 1)   # one request was sent
         res = res[0]
@@ -96,7 +96,7 @@ class TestSolr(TestCase):
 
         c = SolrConnection(host='localhost:8983', persistent=True)
         output = fakehttp(c, search_response)
-        res = c.search(q='id:[* TO *]', wt='xml', rows='10',indent='on')
+        res = c.search(q='id:[* TO *]', wt='xml', rows='10', indent='on')
         res = fromstring(res.read())
 
         self.failUnlessEqual(str(output), search_request)
@@ -132,4 +132,3 @@ def test_suite():
 
 if __name__ == '__main__':
     main(defaultTest='test_suite')
-

@@ -1,7 +1,3 @@
-# integration and functional tests
-# see http://plone.org/documentation/tutorial/testing/writing-a-plonetestcase-unit-integration-test
-# for more information about the following setup
-
 from Products.Five.testbrowser import Browser
 from Products.PloneTestCase import PloneTestCase as ptc
 from plone.app.controlpanel.tests.cptc import ControlPanelTestCase
@@ -58,4 +54,3 @@ class SolrFacetsTestCase(SolrFunctionalTestCase):
     """ base class for functional tests with facets """
 
     layer = SolrFacetsLayer
-

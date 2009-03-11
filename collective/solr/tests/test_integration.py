@@ -33,7 +33,8 @@ class UtilityTests(SolrTestCase):
         procs = list(getUtilitiesFor(IIndexQueueProcessor))
         self.failUnless(procs, 'no utilities found')
         solr = queryUtility(ISolrIndexQueueProcessor, name='solr')
-        self.failUnless(solr in [util for name, util in procs], 'solr utility not found')
+        self.failUnless(solr in [util for name, util in procs],
+            'solr utility not found')
 
     def testSearchInterface(self):
         search = queryUtility(ISearch)
@@ -63,7 +64,7 @@ class IndexingTests(SolrTestCase):
         connection = self.proc.getConnection()
         responses = getData('add_response.txt'), getData('commit_response.txt')
         output = fakehttp(connection, *responses)           # fake responses
-        self.folder.processForm(values={'title': 'Foo'})    # updating sends data
+        self.folder.processForm(values={'title': 'Foo'})    # updating sends
         self.assertEqual(self.folder.Title(), 'Foo')
         self.assertEqual(str(output), '', 'reindexed unqueued!')
         commit()                        # indexing happens on commit
@@ -71,7 +72,7 @@ class IndexingTests(SolrTestCase):
         self.assert_(str(output).find(required) > 0, '"title" data not found')
 
     def testNoIndexingWithMethodOverride(self):
-        self.setRoles(('Manager',))
+        self.setRoles(['Manager'])
         output = []
         connection = self.proc.getConnection()
         responses = [getData('dummy_response.txt')] * 42    # set up enough...
@@ -80,14 +81,15 @@ class IndexingTests(SolrTestCase):
         self.folder.coll.addCriterion('Type', 'ATPortalTypeCriterion')
         self.assertEqual(str(output), '', 'reindexed unqueued!')
         commit()                        # indexing happens on commit
-        self.assert_(repr(output).find('a collection') > 0, '"title" data not found')
+        self.assert_(repr(output).find('a collection') > 0,
+            '"title" data not found')
         self.assert_(repr(output).find('crit') == -1, 'criterion indexed?')
         objs = self.portal.portal_catalog(portal_type='ATPortalTypeCriterion')
         self.assertEqual(list(objs), [])
         self.folder.manage_delObjects('coll')               # clean up again
 
     def testNoIndexingForNonCatalogAwareContent(self):
-        self.setRoles(('Manager',))
+        self.setRoles(['Manager'])
         output = []
         connection = self.proc.getConnection()
         responses = [getData('dummy_response.txt')] * 42    # set up enough...
@@ -97,7 +99,8 @@ class IndexingTests(SolrTestCase):
         commit()                        # indexing happens on commit
         self.assertNotEqual(repr(output).find('Foo'), -1, 'title not found')
         self.assertEqual(repr(output).find(ref.UID()), -1, 'reference found?')
-        self.assertEqual(repr(output).find('at_references'), -1, '`at_references` found?')
+        self.assertEqual(repr(output).find('at_references'), -1,
+            '`at_references` found?')
 
 
 class SiteSearchTests(SolrTestCase):
@@ -141,9 +144,11 @@ class SiteSearchTests(SolrTestCase):
         config.active = True
         config.search_timeout = 5   # specify the timeout
         config.port = 55555         # don't let the real solr disturb us
+
         def quick(handler):         # set up fake http response
             sleep(3)                # and wait a bit before sending it
             handler.send_response(200, getData('search_response.txt'))
+
         def slow(handler):          # set up another http response
             sleep(7)                # but wait longer before sending it
             handler.send_response(200, getData('search_response.txt'))
@@ -158,10 +163,12 @@ class SiteSearchTests(SolrTestCase):
     def testSchemaUrlFallback(self):
         config = queryUtility(ISolrConnectionConfig)
         config.active = True
+
         def notfound(handler):      # set up fake 404 response
             self.assertEqual(handler.path,
                 '/solr/admin/file/?file=schema.xml')
             handler.send_response(404, getData('not_found.txt'))
+
         def solr12(handler):        # set up response with the schema
             self.assertEqual(handler.path,
                 '/solr/admin/get-file.jsp?file=schema.xml')
@@ -176,4 +183,3 @@ class SiteSearchTests(SolrTestCase):
 
 def test_suite():
     return defaultTestLoader.loadTestsFromName(__name__)
-

@@ -20,5 +20,3 @@ class ErrorView(BrowserView):
             'type': str(self.exception.__class__),
             'value': self.exception.args,
         }
-
-

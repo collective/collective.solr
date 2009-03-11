@@ -49,4 +49,3 @@ class SolrFacetsLayer(SolrLayer):
     @classmethod
     def tearDown(cls):
         pass
-

@@ -118,6 +118,5 @@ class SolrControlPanel(ControlPanelForm):
     form_fields = FormFields(ISolrSchema)
 
     label = _('Solr settings')
-    description = _('Settings to enable and configure Solr integration for Plone.')
+    description = _('Settings to enable and configure Solr integration.')
     form_name = _('Solr settings')
-

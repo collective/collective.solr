@@ -13,10 +13,10 @@ from collective.indexing.utils import autoFlushQueue
 def searchResults(self, REQUEST=None, **kw):
     """ based on the version in `CMFPlone/CatalogTool.py` """
     kw = kw.copy()
-    show_inactive = kw.get('show_inactive', False)
+    only_active = not kw.get('show_inactive', False)
     user = _getAuthenticatedUser(self)
     kw['allowedRolesAndUsers'] = self._listAllowedRolesAndUsers(user)
-    if not show_inactive and not _checkPermission(AccessInactivePortalContent, self):
+    if only_active and not _checkPermission(AccessInactivePortalContent, self):
         kw['effectiveRange'] = DateTime()
 
     # support collective.indexing's "auto-flush" feature
@@ -34,4 +34,3 @@ def patchCatalogTool():
     """ monkey patch plone's catalogtool with the solr dispatcher """
     CatalogTool.searchResults = searchResults
     CatalogTool.__call__ = searchResults
-

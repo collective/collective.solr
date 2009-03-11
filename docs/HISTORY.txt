@@ -4,6 +4,9 @@ Changelog
 1.0b6 - Unreleased
 ------------------
 
+* Update code to comply to PEP8 style guide lines.
+  [witsch]
+
 * Expose additional information provided by Solr — for example about headers
   and search facets.
   [witsch]

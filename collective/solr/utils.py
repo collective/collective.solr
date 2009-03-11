@@ -40,7 +40,7 @@ def prepareData(data):
         for "allowedRolesAndUsers" etc """
     allowed = data.get('allowedRolesAndUsers', None)
     if allowed is not None:
-        data['allowedRolesAndUsers'] = [r.replace(':','$') for r in allowed]
+        data['allowedRolesAndUsers'] = [r.replace(':', '$') for r in allowed]
     searchable = data.get('SearchableText', None)
     if searchable is not None:
         data['SearchableText'] = searchable.translate(translation_map)
@@ -52,11 +52,10 @@ def findObjects(origin):
     traverse = origin.unrestrictedTraverse
     base = '/'.join(origin.getPhysicalPath())
     cut = len(base) + 1
-    paths = [ base ]
+    paths = [base]
     for idx, path in enumerate(paths):
         obj = traverse(path)
         yield path[cut:], obj
         if hasattr(aq_base(obj), 'objectIds'):
             for id in obj.objectIds():
                 paths.insert(idx + 1, path + '/' + id)
-

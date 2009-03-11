@@ -11,12 +11,15 @@ def mangle(**keywords):
     mangleQuery(keywords)
     return keywords
 
+
 class Query:
+
     def __init__(self, query, range=None, operator=None, depth=None):
         self.query = query
         self.range = range
         self.operator = operator
         self.depth = depth
+
 
 class QueryManglerTests(TestCase):
 
@@ -31,17 +34,17 @@ class QueryManglerTests(TestCase):
         self.assertRaises(AssertionError, mangleQuery, keywords)
 
     def testMinRange(self):
-        keywords = mangle(foo=(23,), foo_usage='range:min')
+        keywords = mangle(foo=[23], foo_usage='range:min')
         self.assertEqual(keywords, {'foo': '"[23 TO *]"'})
-        keywords = mangle(foo=dict(query=(23,), range='min'))
+        keywords = mangle(foo=dict(query=[23], range='min'))
         self.assertEqual(keywords, {'foo': '"[23 TO *]"'})
-        keywords = mangle(foo=Query(query=(23,), range='min'))
+        keywords = mangle(foo=Query(query=[23], range='min'))
         self.assertEqual(keywords, {'foo': '"[23 TO *]"'})
 
     def testMaxRange(self):
-        keywords = mangle(foo=(23,), foo_usage='range:max')
+        keywords = mangle(foo=[23], foo_usage='range:max')
         self.assertEqual(keywords, {'foo': '"[* TO 23]"'})
-        keywords = mangle(foo=dict(query=(23,), range='max'))
+        keywords = mangle(foo=dict(query=[23], range='max'))
         self.assertEqual(keywords, {'foo': '"[* TO 23]"'})
         keywords = mangle(foo=dict(query=23, range='max'))
         self.assertEqual(keywords, {'foo': '"[* TO 23]"'})
@@ -49,11 +52,11 @@ class QueryManglerTests(TestCase):
         self.assertEqual(keywords, {'foo': '"[* TO 23]"'})
 
     def testMinMaxRange(self):
-        keywords = mangle(foo=(23,42), foo_usage='range:min:max')
+        keywords = mangle(foo=(23, 42), foo_usage='range:min:max')
         self.assertEqual(keywords, {'foo': '"[23 TO 42]"'})
-        keywords = mangle(foo=dict(query=(23,42), range='min:max'))
+        keywords = mangle(foo=dict(query=(23, 42), range='min:max'))
         self.assertEqual(keywords, {'foo': '"[23 TO 42]"'})
-        keywords = mangle(foo=Query(query=(23,42), range='min:max'))
+        keywords = mangle(foo=Query(query=(23, 42), range='min:max'))
         self.assertEqual(keywords, {'foo': '"[23 TO 42]"'})
 
     def testDateConversion(self):
@@ -63,27 +66,27 @@ class QueryManglerTests(TestCase):
         keywords = mangle(foo=(day, day + 7), foo_usage='range:min:max')
         self.assertEqual(keywords, {'foo':
             '"[1972-05-11T00:00:00.000Z TO 1972-05-18T00:00:00.000Z]"'})
-        keywords = mangle(foo=(day,), foo_usage='range:min')
+        keywords = mangle(foo=[day], foo_usage='range:min')
         self.assertEqual(keywords, {'foo':
             '"[1972-05-11T00:00:00.000Z TO *]"'})
-        keywords = mangle(foo=dict(query=(day,), range='min'))
+        keywords = mangle(foo=dict(query=[day], range='min'))
         self.assertEqual(keywords, {'foo':
             '"[1972-05-11T00:00:00.000Z TO *]"'})
         keywords = mangle(foo=Query(day))
         self.assertEqual(keywords, {'foo': '1972-05-11T00:00:00.000Z'})
 
     def testOperatorConversion(self):
-        keywords = mangle(foo=(23,42), foo_usage='operator:or')
+        keywords = mangle(foo=(23, 42), foo_usage='operator:or')
         self.assertEqual(keywords, {'foo': '"(23 OR 42)"'})
-        keywords = mangle(foo=dict(query=(23,42), operator='or'))
+        keywords = mangle(foo=dict(query=(23, 42), operator='or'))
         self.assertEqual(keywords, {'foo': '"(23 OR 42)"'})
-        keywords = mangle(foo=Query(query=(23,42), operator='or'))
+        keywords = mangle(foo=Query(query=(23, 42), operator='or'))
         self.assertEqual(keywords, {'foo': '"(23 OR 42)"'})
-        keywords = mangle(foo=(23,42), foo_usage='operator:and')
+        keywords = mangle(foo=(23, 42), foo_usage='operator:and')
         self.assertEqual(keywords, {'foo': '"(23 AND 42)"'})
-        keywords = mangle(foo=dict(query=(23,42), operator='and'))
+        keywords = mangle(foo=dict(query=(23, 42), operator='and'))
         self.assertEqual(keywords, {'foo': '"(23 AND 42)"'})
-        keywords = mangle(foo=Query(query=(23,42), operator='and'))
+        keywords = mangle(foo=Query(query=(23, 42), operator='and'))
         self.assertEqual(keywords, {'foo': '"(23 AND 42)"'})
         day = DateTime('1972/05/11 UTC')
         keywords = mangle(foo=dict(query=(day, day + 7), operator='or'))
@@ -216,4 +219,3 @@ def test_suite():
 
 if __name__ == '__main__':
     main(defaultTest='test_suite')
-

@@ -20,7 +20,8 @@ logger = getLogger('collective.solr.indexer')
 def indexable(obj):
     """ indicate whether a given object should be indexed; for now only
         objects inheriting one of the catalog mixin classes are considerd """
-    return isinstance(obj, CatalogMultiplex) or isinstance(obj, CMFCatalogAware)
+    return isinstance(obj, CatalogMultiplex) or \
+        isinstance(obj, CMFCatalogAware)
 
 
 def datehandler(value):
@@ -52,11 +53,13 @@ class SolrIndexQueueProcessor(Persistent):
             prepareData(data)
             schema = self.manager.getSchema()
             if schema is None:
-                logger.warning('unable to fetch schema, skipping indexing of %r', obj)
+                msg = 'unable to fetch schema, skipping indexing of %r'
+                logger.warning(msg, obj)
                 return
             uniqueKey = schema.get('uniqueKey', None)
             if uniqueKey is None:
-                logger.warning('schema is missing unique key, skipping indexing of %r', obj)
+                msg = 'schema is missing unique key, skipping indexing of %r'
+                logger.warning(msg, obj)
                 return
             if data.get(uniqueKey, None) is not None and not missing:
                 try:
@@ -73,20 +76,24 @@ class SolrIndexQueueProcessor(Persistent):
         if conn is not None:
             schema = self.manager.getSchema()
             if schema is None:
-                logger.warning('unable to fetch schema, skipping unindexing of %r', obj)
+                msg = 'unable to fetch schema, skipping unindexing of %r'
+                logger.warning(msg, obj)
                 return
             uniqueKey = schema.get('uniqueKey', None)
             if uniqueKey is None:
-                logger.warning('schema is missing unique key, skipping unindexing of %r', obj)
+                msg = 'schema is missing unique key, skipping unindexing of %r'
+                logger.warning(msg, obj)
                 return
             data, missing = self.getData(obj, attributes=[uniqueKey])
             prepareData(data)
-            if not data.has_key(uniqueKey):
-                logger.info('Can not unindex: no unique key for object %r', obj)
+            if not uniqueKey in data:
+                msg = 'Can not unindex: no unique key for object %r'
+                logger.info(msg, obj)
                 return
             data_key = data[uniqueKey]
             if data_key is None:
-                logger.info('Can not unindex: `None` unique key for object %r', obj)
+                msg = 'Can not unindex: `None` unique key for object %r'
+                logger.info(msg, obj)
                 return
             try:
                 logger.debug('unindexing %r (%r)', obj, data)
@@ -166,4 +173,3 @@ class SolrIndexQueueProcessor(Persistent):
             data[name] = value
         missing = set(schema.requiredFields) - set(data.keys())
         return data, missing
-

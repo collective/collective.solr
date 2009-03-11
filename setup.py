@@ -39,4 +39,3 @@ setup(name = 'collective.solr',
       ],
       entry_points = '',
 )
-

@@ -23,7 +23,7 @@ class UtilsTests(ztc.ZopeTestCase):
 
     def ids(self, results):
         return tuple(sorted([r[0] for r in results]))
-    
+
     def testZopeFindAndApply(self):
         found = self.app.ZopeFindAndApply(self.portal, search_sub=True)
         self.assertEqual(self.ids(found), self.good)
@@ -55,4 +55,3 @@ def test_suite():
 
 if __name__ == '__main__':
     main(defaultTest='test_suite')
-

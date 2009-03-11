@@ -60,7 +60,8 @@ def solrSearchResults(request=None, **keywords):
         assert isinstance(request, dict), request
         args = request.copy()
         args.update(keywords)       # keywords take precedence
-        # If request is a dict, we need the real request to adapt to ploneflares
+        # if request is a dict, we need the real request in order to
+        # be able to adapt to plone flares
         request = getattr(getSiteManager(), 'REQUEST', args)
     if config.required:
         required = set(config.required).intersection(args)
@@ -85,4 +86,3 @@ def solrSearchResults(request=None, **keywords):
     for idx, flare in enumerate(results):
         results[idx] = wrap(flare)
     return response
-
