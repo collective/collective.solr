@@ -144,11 +144,9 @@ class SiteSearchTests(SolrTestCase):
         config.active = True
         config.search_timeout = 5   # specify the timeout
         config.port = 55555         # don't let the real solr disturb us
-
         def quick(handler):         # set up fake http response
             sleep(3)                # and wait a bit before sending it
             handler.send_response(200, getData('search_response.txt'))
-
         def slow(handler):          # set up another http response
             sleep(7)                # but wait longer before sending it
             handler.send_response(200, getData('search_response.txt'))
@@ -163,12 +161,10 @@ class SiteSearchTests(SolrTestCase):
     def testSchemaUrlFallback(self):
         config = queryUtility(ISolrConnectionConfig)
         config.active = True
-
         def notfound(handler):      # set up fake 404 response
             self.assertEqual(handler.path,
                 '/solr/admin/file/?file=schema.xml')
             handler.send_response(404, getData('not_found.txt'))
-
         def solr12(handler):        # set up response with the schema
             self.assertEqual(handler.path,
                 '/solr/admin/get-file.jsp?file=schema.xml')
