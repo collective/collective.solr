@@ -89,7 +89,6 @@ def mangleQuery(keywords):
 def extractQueryParameters(args):
     """ extract parameters related to sorting and limiting search results
         from a given set of arguments """
-
     def get(name):
         for prefix in 'sort_', 'sort-':
             value = args.get('%s%s' % (prefix, name), None)
