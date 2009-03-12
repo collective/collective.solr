@@ -4,14 +4,35 @@ Facetted searches
 This tests the integration of Solr's facetted searches into Plone.  We'll
 use a testbrowser to check the correct display of facets:
 
+The search form should contain default settings for facets to be shown:
+
   >>> self.setRoles(('Manager',))
   >>> browser = self.getBrowser()
   >>> browser.open('http://nohost/plone/')
   >>> browser.contents
   '...<input type="hidden" name="facet.field" value="portal_type" />...'
 
+Without search results there's also no information about facets, of course:
+
   >>> browser.getControl('Search Site').value = 'foo'
   >>> browser.getForm(name='searchform').submit()
   >>> browser.url
   'http://nohost/plone/search?...&facet.field=portal_type...'
+  >>> browser.contents
+  '...Search results...
+   ...No results were found...'
+  >>> 'searchfacets' in browser.contents
+  False
+
+Let's try again with some results:
+
+  >>> browser.goBack()
+  >>> browser.getControl('Search Site').value = 'news'
+  >>> browser.getForm(name='searchform').submit()
+  >>> browser.url
+  'http://nohost/plone/search?...&facet.field=portal_type...'
+  >>> browser.contents
+  '...Search results...2 items matching...
+   ...Site News...
+   ...facets foo here!...'
 

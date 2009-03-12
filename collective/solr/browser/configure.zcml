@@ -33,4 +33,12 @@
       layer=".interfaces.IThemeSpecific"
       permission="zope2.View" />
 
+  <browser:page
+      for="Products.CMFPlone.interfaces.IPloneSiteRoot"
+      name="search-facets"
+      template="facets.pt"
+      class=".facets.SearchFacetsView"
+      layer=".interfaces.IThemeSpecific"
+      permission="zope2.View" />
+
 </configure>

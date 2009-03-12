@@ -167,8 +167,12 @@
         </tal:entry>
         </tal:results>
         </dl>
-         
+
         <div metal:use-macro="here/batch_macros/macros/navigation" />
+
+        <div tal:define="view nocall: here/@@search-facets | nothing"
+             tal:condition="view"
+             tal:replace="structure python: view(batch)" />
 
     </div>
 
