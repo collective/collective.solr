@@ -1,5 +1,6 @@
 from unittest import TestSuite, defaultTestLoader
 from zope.component import getUtility
+from zope.publisher.browser import TestRequest
 from transaction import commit, abort
 from DateTime import DateTime
 from time import sleep
@@ -436,6 +437,32 @@ class SolrServerTests(SolrTestCase):
         self.maintenance.reindex()
         results = solrSearchResults(SearchableText=' ', path='/plone')
         self.assertEqual(len(results), 8)
+
+
+class SolrFacettingTests(SolrServerTests):
+
+    def testFacettedSearchWithKeywordArguments(self):
+        self.maintenance.reindex()
+        results = solrSearchResults(SearchableText='News', facet='true',
+            facet_field='portal_type')
+        self.assertEqual([r.physicalPath for r in results],
+            ['/plone/news', '/plone/news/aggregator'])
+        types = results.facet_counts['facet_fields']['portal_type']
+        self.assertEqual(len(types), 4)
+        self.assertEqual(types['Document'], 0)
+        self.assertEqual(types['Topic'], 1)
+
+    def testFacettedSearchWithRequestArguments(self):
+        self.maintenance.reindex()
+        request = TestRequest()
+        request.form['SearchableText'] = 'News'
+        request.form['facet'] = 'true'
+        request.form['facet_field'] = 'review_state'
+        results = solrSearchResults(request)
+        self.assertEqual([r.physicalPath for r in results],
+            ['/plone/news', '/plone/news/aggregator'])
+        states = results.facet_counts['facet_fields']['review_state']
+        self.assertEqual(states, dict(private=0, published=2))
 
 
 def test_suite():
