@@ -202,6 +202,10 @@ class QueryParameterTests(TestCase):
         # not 'facet*' though
         params = extract({'facetfoo': 'bar'})
         self.assertEqual(params, {})
+        # an underscore can be used instead of the '.' for conveniently
+        # passing parameters as keyword arguments...
+        params = extract(dict(facet_foo='bar'))
+        self.assertEqual(params, {'facet.foo': 'bar'})
 
     def testSortIndexCleanup(self):
         cleanup = cleanupQueryParameters

@@ -92,7 +92,7 @@ for k in REQUEST.keys():
             query[k] = int(v)
         else:
             query[k] = v
-    elif k == 'facet' or k.startswith('facet.'):
+    elif k.startswith('facet'):
         query[k] = v
 
 for k, v in second_pass.items():

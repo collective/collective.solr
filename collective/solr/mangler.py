@@ -108,6 +108,8 @@ def extractQueryParameters(args):
     for key, value in args.items():
         if key == 'facet' or key.startswith('facet.'):
             params[key] = value
+        elif key.startswith('facet_'):
+            params[key.replace('_', '.', 1)] = value
     return params
 
 
