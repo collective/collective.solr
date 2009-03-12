@@ -41,7 +41,7 @@
         <div class="LSResult" id="LSResult" style=""><div class="LSShadow" id="LSShadow"></div></div>
         </div>
 
-        <input type="hidden" name="facets" value="true" />
+        <input type="hidden" name="facet" value="true" />
         <input type="hidden" name="facet.field" value="portal_type" />
 
     </form>
