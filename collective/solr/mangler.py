@@ -105,6 +105,9 @@ def extractQueryParameters(args):
     limit = get('limit')
     if limit:
         params['rows'] = int(limit)
+    for key, value in args.items():
+        if key == 'facet' or key.startswith('facet.'):
+            params[key] = value
     return params
 
 

@@ -192,6 +192,17 @@ class QueryParameterTests(TestCase):
         params = extract({'sort_order': 'reverse', 'sort_limit': 5})
         self.assertEqual(params, dict(rows=5))
 
+    def testAllowFacetParameters(self):
+        extract = extractQueryParameters
+        # 'facet' and 'facet.*' should be passed on...
+        params = extract({'facet': 'true'})
+        self.assertEqual(params, {'facet': 'true'})
+        params = extract({'facet.field': 'foo', 'facet.foo': 'bar'})
+        self.assertEqual(params, {'facet.field': 'foo', 'facet.foo': 'bar'})
+        # not 'facet*' though
+        params = extract({'facetfoo': 'bar'})
+        self.assertEqual(params, {})
+
     def testSortIndexCleanup(self):
         cleanup = cleanupQueryParameters
         schema = SolrSchema()
