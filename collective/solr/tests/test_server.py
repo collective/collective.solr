@@ -1,5 +1,6 @@
 from unittest import TestSuite, defaultTestLoader
-from zope.component import getUtility
+from zope.interface import alsoProvides
+from zope.component import getUtility, getMultiAdapter
 from zope.publisher.browser import TestRequest
 from transaction import commit, abort
 from DateTime import DateTime
@@ -10,6 +11,7 @@ from collective.solr.tests.base import SolrTestCase
 from collective.solr.interfaces import ISolrConnectionConfig
 from collective.solr.interfaces import ISolrConnectionManager
 from collective.solr.interfaces import ISearch
+from collective.solr.browser.interfaces import IThemeSpecific
 from collective.solr.dispatcher import solrSearchResults, FallBackException
 from collective.solr.indexer import logger as logger_indexer
 from collective.solr.manager import logger as logger_manager
@@ -463,6 +465,18 @@ class SolrFacettingTests(SolrServerTests):
             ['/plone/news', '/plone/news/aggregator'])
         states = results.facet_counts['facet_fields']['review_state']
         self.assertEqual(states, dict(private=0, published=2))
+
+    def testFacetsInformationView(self):
+        self.maintenance.reindex()
+        request = TestRequest()
+        request.form['SearchableText'] = 'News'
+        request.form['facet'] = 'true'
+        request.form['facet_field'] = 'review_state'
+        alsoProvides(request, IThemeSpecific)
+        view = getMultiAdapter((self.portal, request), name='search-facets')
+        results = solrSearchResults(request)
+        output = view(results=results)
+        self.failUnless('facets foo here!' in output)
 
 
 def test_suite():
