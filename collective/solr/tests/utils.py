@@ -7,6 +7,7 @@ from socket import error
 from sys import stderr
 from re import search
 
+from collective.solr.local import getLocal, setLocal
 from collective.solr import tests
 
 
@@ -119,6 +120,9 @@ def fakeServer(actions, port=55555):
 
 def pingSolr():
     """ test if the solr server is available """
+    status = getLocal('solrStatus')
+    if status is not None:
+        return status
     conn = HTTPConnection('localhost', 8983)
     try:
         conn.request('GET', '/solr/admin/ping')
@@ -133,6 +137,8 @@ def pingSolr():
         print >> stderr, '*' * len(msg)
         print >> stderr, msg
         print >> stderr, '*' * len(msg)
+        print >> stderr
+    setLocal('solrStatus', status)
     return status
 
 
