@@ -1,6 +1,7 @@
 from Products.Five import BrowserView
 from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 from plone.app.layout.viewlets.common import SearchBoxViewlet
+from collective.solr.browser.utils import convertFacets
 
 
 class SearchBox(SearchBoxViewlet):
@@ -18,6 +19,8 @@ class SearchFacetsView(BrowserView):
     def facets(self):
         """ prepare and return facetting info for the given SolrResponse """
         results = self.kw.get('results', None)
-        if results is None:
-            return []
-        return 'facets foo here!'
+        fcs = getattr(results, 'facet_counts', None)
+        if results is not None and fcs is not None:
+            return convertFacets(fcs['facet_fields'])
+        else:
+            return None

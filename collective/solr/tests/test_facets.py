@@ -34,18 +34,26 @@ class SolrFacettingTests(SolrServerTests):
         states = results.facet_counts['facet_fields']['review_state']
         self.assertEqual(states, dict(private=0, published=2))
 
+    def checkOrder(self, html, *order):
+        for item in order:
+            position = html.find(item)
+            self.failUnless(position >= 0,
+                'menu item "%s" missing or out of order' % item)
+            html = html[position:]
+
     def testFacetsInformationView(self):
         self.maintenance.reindex()
         request = TestRequest()
         request.form['SearchableText'] = 'News'
         request.form['facet'] = 'true'
-        request.form['facet_field'] = 'review_state'
+        request.form['facet_field'] = 'portal_type'
         alsoProvides(request, IThemeSpecific)
         view = getMultiAdapter((self.portal, request), name='search-facets')
         view = view.__of__(self.portal)     # needed to traverse `view/`
         results = solrSearchResults(request)
         output = view(results=results)
-        self.failUnless('facets foo here!' in output)
+        self.checkOrder(output, 'portal-searchfacets', 'portal_type',
+            'Topic', '1', 'Large Plone Folder', '1')
 
 
 def test_suite():

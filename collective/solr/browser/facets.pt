@@ -1,6 +1,17 @@
 <div id="portal-searchfacets"
      i18n:domain="plone">
 
-   <div tal:replace="view/facets" />
+ <div tal:repeat="facet view/facets">
+   <h5 tal:content="facet/title" />
+   <dl>
+     <tal:counts repeat="item facet/counts">
+       <tal:count define="count item/count"
+                  condition="count">
+         <dt tal:content="item/name" />
+         <dt tal:content="item/count" />
+       </tal:count>
+     </tal:counts>
+   </dl>
+ </div>
 
 </div>
