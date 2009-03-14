@@ -474,6 +474,7 @@ class SolrFacettingTests(SolrServerTests):
         request.form['facet_field'] = 'review_state'
         alsoProvides(request, IThemeSpecific)
         view = getMultiAdapter((self.portal, request), name='search-facets')
+        view = view.__of__(self.portal)     # needed to traverse `view/`
         results = solrSearchResults(request)
         output = view(results=results)
         self.failUnless('facets foo here!' in output)

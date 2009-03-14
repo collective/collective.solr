@@ -1,6 +1,6 @@
 <div id="portal-searchfacets"
      i18n:domain="plone">
 
-   facets foo here!
+   <div tal:replace="view/facets" />
 
 </div>
