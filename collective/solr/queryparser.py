@@ -8,17 +8,23 @@ from re import compile
 # 4) Any special operators ([+\-!^~*?:\\\]|\&\&|\|\|))
 query_tokenizer = compile("(?:(\s+)|([^(){}\[\]+\-!^\"~*?:\\\&\|\s]+)|([(){}\[\]\"])|([+\-!^~*?:\\\]|\&\&|\|\|))")
 
+
 class Whitespace(object):
+
     def __nonzero__(self):
         return False
+
     def __str__(self):
         return ' '
 
+
 class Group(list):
+
     def __init__(self, start=None, end=None):
         self.start = start
         self.end = end
         self.isgroup = False # Set on pop
+
     def __str__(self):
         res = [x for x in self if x]
         lenres = len(res)
@@ -29,7 +35,9 @@ class Group(list):
         # Otherwise, also print whitespace
         return '%s%s%s' % (self.start, ''.join([str(x) for x in self]), self.end)
 
+
 class Quote(Group):
+
     def __str__(self):
         if not self.end:
             # No finishing quote, we have to add new group if there is whitespace
@@ -38,14 +46,16 @@ class Quote(Group):
                 self.end = ')'
         return '%s%s%s' % (self.start, ''.join([str(x) for x in self]), self.end)
 
+
 class Range(Group):
+
     def __str__(self):
         first=last='*'
         if len(self) == 0:
             return ''
         if not 'TO' in self:
             # Not valid range, quote
-            return '\\%s%s\\%s' % (self.start,''.join([str(x) for x in self]),self.end)
+            return '\\%s%s\\%s' % (self.start, ''.join([str(x) for x in self]), self.end)
         else:
             # split on 'TO'
             split = self.index('TO')
@@ -55,17 +65,23 @@ class Range(Group):
                 last = ''.join([str(x) for x in self[split+1:] if not isinstance(x, Whitespace)])
         return '%s%s TO %s%s' % (self.start, first, last, self.end)
 
+
 class Stack(list):
+
     def __init__(self):
         self.append([])
+
     def add(self, item):
         self.current.append(item)
-        self.append(item)        
+        self.append(item)
+
     @property
     def current(self):
         return self[-1]
+
     def __str__(self):
         return ''.join([str(x) for x in self[0]])
+
 
 def quote(term):
     if isinstance(term, unicode):
@@ -84,7 +100,7 @@ def quote(term):
                 stack.current.append(Whitespace())
             elif isinstance(stack.current, list):
                 # We have whitespace with no grouping, insert group
-                new = Group('(',')')
+                new = Group('(', ')')
                 new.extend(stack.current)
                 new.append(Whitespace())
                 stack.current[:] = []
@@ -112,10 +128,10 @@ def quote(term):
                 # If we're in a quote, escape and print
                 stack.current.append('\\%s'%grouping)
             elif grouping in '[{':
-                new = Range(start=grouping, end={'[':']','{':'}'}[grouping])
+                new = Range(start=grouping, end={'[': ']', '{': '}'}[grouping])
                 stack.add(new)
             elif grouping == '(':
-                new = Group(start='(',end=')')
+                new = Group(start='(', end=')')
                 stack.add(new)
             elif grouping in ']})':
                 if isinstance(stack.current, Group) and stack.current.end == grouping:
@@ -185,7 +201,7 @@ def quote(term):
             elif special in '?*':
                 # ? and * can not be the first characters of a search
                 if (stack.current \
-                    and not getattr(stack.current[-1],'isgroup',False) \
+                    and not getattr(stack.current[-1], 'isgroup', False) \
                     and (isinstance(stack.current[-1], str) and \
                          not stack.current[-1] in special)) \
                    or isinstance(stack.current, Range):
@@ -196,4 +212,3 @@ def quote(term):
                 stack.current.append('\\%s'%special)
         i += 1
     return str(stack)
-
