@@ -11,6 +11,12 @@ Changelog
   and search facets.
   [witsch]
 
+* Handle edge cases like invalid range queries by quoting
+  [tesdal]
+
+* Parse and quote the query to filter invalid query syntax.
+  [tesdal]
+
 * In solrSearchResults, if the passed in request is a dict, look up 
   request to enable adaptation into PloneFlare.
   [tesdal]

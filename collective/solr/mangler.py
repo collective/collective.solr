@@ -60,13 +60,13 @@ def mangleQuery(keywords):
             del keywords[key]
             if 'depth' in args:
                 depth = len(path.split('/')) + int(args['depth'])
-                keywords['physicalDepth'] = '"[* TO %d]"' % depth
+                keywords['physicalDepth'] = '[* TO %d]' % depth
                 del args['depth']
         elif key == 'effectiveRange':
             value = convert(value)
             del keywords[key]
-            keywords['effective'] = '"[* TO %s]"' % value
-            keywords['expires'] = '"[%s TO *]"' % value
+            keywords['effective'] = '[* TO %s]' % value
+            keywords['expires'] = '[%s TO *]' % value
         elif 'range' in args:
             if not isinstance(value, (list, tuple)):
                 value = [value]
@@ -77,10 +77,10 @@ def mangleQuery(keywords):
             if isinstance(value, (list, tuple)) and len(value) > 1:
                 sep = ' %s ' % args['operator'].upper()
                 value = sep.join(map(str, map(convert, value)))
-                keywords[key] = '"(%s)"' % value
+                keywords[key] = '(%s)' % value
             del args['operator']
         elif isinstance(value, basestring) and value.endswith('*'):
-            keywords[key] = '"%s"' % value.lower()  # quote wildcard searches
+            keywords[key] = '%s' % value.lower()
         else:
             keywords[key] = convert(value)
         assert not args, 'unsupported usage: %r' % args

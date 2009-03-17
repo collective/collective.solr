@@ -77,24 +77,24 @@ class QueryManglerTests(TestCase):
 
     def testOperatorConversion(self):
         keywords = mangle(foo=(23, 42), foo_usage='operator:or')
-        self.assertEqual(keywords, {'foo': '"(23 OR 42)"'})
+        self.assertEqual(keywords, {'foo': '(23 OR 42)'})
         keywords = mangle(foo=dict(query=(23, 42), operator='or'))
-        self.assertEqual(keywords, {'foo': '"(23 OR 42)"'})
+        self.assertEqual(keywords, {'foo': '(23 OR 42)'})
         keywords = mangle(foo=Query(query=(23, 42), operator='or'))
-        self.assertEqual(keywords, {'foo': '"(23 OR 42)"'})
+        self.assertEqual(keywords, {'foo': '(23 OR 42)'})
         keywords = mangle(foo=(23, 42), foo_usage='operator:and')
-        self.assertEqual(keywords, {'foo': '"(23 AND 42)"'})
+        self.assertEqual(keywords, {'foo': '(23 AND 42)'})
         keywords = mangle(foo=dict(query=(23, 42), operator='and'))
-        self.assertEqual(keywords, {'foo': '"(23 AND 42)"'})
+        self.assertEqual(keywords, {'foo': '(23 AND 42)'})
         keywords = mangle(foo=Query(query=(23, 42), operator='and'))
-        self.assertEqual(keywords, {'foo': '"(23 AND 42)"'})
+        self.assertEqual(keywords, {'foo': '(23 AND 42)'})
         day = DateTime('1972/05/11 UTC')
         keywords = mangle(foo=dict(query=(day, day + 7), operator='or'))
         self.assertEqual(keywords, {'foo':
-            '"(1972-05-11T00:00:00.000Z OR 1972-05-18T00:00:00.000Z)"'})
+            '(1972-05-11T00:00:00.000Z OR 1972-05-18T00:00:00.000Z)'})
         keywords = mangle(foo=Query(query=(day, day + 7), operator='or'))
         self.assertEqual(keywords, {'foo':
-            '"(1972-05-11T00:00:00.000Z OR 1972-05-18T00:00:00.000Z)"'})
+            '(1972-05-11T00:00:00.000Z OR 1972-05-18T00:00:00.000Z)'})
 
     def testBooleanConversion(self):
         keywords = mangle(foo=False)
@@ -106,8 +106,8 @@ class QueryManglerTests(TestCase):
         day = DateTime('1972/05/11 UTC')
         keywords = mangle(effectiveRange=day)
         self.assertEqual(keywords, {
-            'effective': '"[* TO 1972-05-11T00:00:00.000Z]"',
-            'expires': '"[1972-05-11T00:00:00.000Z TO *]"',
+            'effective': '[* TO 1972-05-11T00:00:00.000Z]',
+            'expires': '[1972-05-11T00:00:00.000Z TO *]',
         })
 
 
@@ -128,16 +128,16 @@ class PathManglerTests(TestCase):
     def testPathQueryWithLevel(self):
         keywords = mangle(path=dict(query='/foo', depth=0))
         self.assertEqual(keywords, {'parentPaths': '/foo',
-            'physicalDepth': '"[* TO 2]"'})
+            'physicalDepth': '[* TO 2]'})
         keywords = mangle(path=Query(query='/foo', depth=0))
         self.assertEqual(keywords, {'parentPaths': '/foo',
-            'physicalDepth': '"[* TO 2]"'})
+            'physicalDepth': '[* TO 2]'})
         keywords = mangle(path=dict(query='/foo', depth=2))
         self.assertEqual(keywords, {'parentPaths': '/foo',
-            'physicalDepth': '"[* TO 4]"'})
+            'physicalDepth': '[* TO 4]'})
         keywords = mangle(path=Query(query='/foo', depth=2))
         self.assertEqual(keywords, {'parentPaths': '/foo',
-            'physicalDepth': '"[* TO 4]"'})
+            'physicalDepth': '[* TO 4]'})
 
 
 class QueryParameterTests(TestCase):
