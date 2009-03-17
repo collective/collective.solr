@@ -1,7 +1,6 @@
 from logging import getLogger
 from zope.interface import implements
 from zope.component import queryUtility
-from re import compile
 
 from collective.solr.interfaces import ISolrConnectionConfig
 from collective.solr.interfaces import ISolrConnectionManager
