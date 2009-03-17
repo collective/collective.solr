@@ -1,0 +1,23 @@
+/* styles related to solr integration */
+
+#portal-searchfacets {
+  background-color: #ddd;
+  padding: 0.5em;
+  min-width: 20%;
+  float: right;
+}
+
+#portal-searchfacets h5 {
+  margin: 0;
+}
+
+#portal-searchfacets dt {
+  float: left;
+  clear: both;
+}
+
+#portal-searchfacets dd {
+  float: left;
+  line-height: normal;
+  margin: 0 0 0 1em;
+}

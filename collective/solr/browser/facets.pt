@@ -8,7 +8,7 @@
        <tal:count define="count item/count"
                   condition="count">
          <dt tal:content="item/name" />
-         <dt tal:content="item/count" />
+         <dd tal:content="item/count" />
        </tal:count>
      </tal:counts>
    </dl>

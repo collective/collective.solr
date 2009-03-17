@@ -3,6 +3,7 @@ from collective.solr.tests.base import SolrTestCase
 
 # test-specific imports go here...
 from zope.component import queryUtility, getUtilitiesFor
+from Products.CMFCore.utils import getToolByName
 from collective.indexing.interfaces import IIndexQueueProcessor
 from collective.solr.interfaces import ISolrConnectionConfig
 from collective.solr.interfaces import ISolrConnectionManager
@@ -175,6 +176,14 @@ class SiteSearchTests(SolrTestCase):
         thread.join()               # the server thread must always be joined
         self.assertEqual(responses, [])
         self.assertEqual(len(schema), 20)   # 20 items defined in schema.xml
+
+
+class SiteSetupTests(SolrTestCase):
+
+    def testBrowserResources(self):
+        registry = getToolByName(self.portal, 'portal_css')
+        css = '++resource++collective.solr.resources/style.css'
+        self.failUnless(css in registry.getResourceIds())
 
 
 def test_suite():

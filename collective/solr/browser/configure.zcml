@@ -7,6 +7,10 @@
       name="collective.solr.images"
       directory="images" />
 
+  <browser:resourceDirectory
+      name="collective.solr.resources"
+      directory="resources" />
+
   <browser:page
       for="*"
       name="solr-maintenance"
