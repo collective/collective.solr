@@ -28,8 +28,9 @@ class SolrFacettingTests(SolrTestCase):
         self.assertEqual([r.physicalPath for r in results],
             ['/plone/news', '/plone/news/aggregator'])
         types = results.facet_counts['facet_fields']['portal_type']
-        self.assertEqual(len(types), 4)
         self.assertEqual(types['Document'], 0)
+        self.assertEqual(types['Folder'], 0)
+        self.assertEqual(types['Large Plone Folder'], 1)
         self.assertEqual(types['Topic'], 1)
 
     def testFacettedSearchWithRequestArguments(self):
