@@ -88,6 +88,10 @@
     <div tal:condition="results"
           tal:define="batch python:Batch(results, b_size, int(b_start), orphan=1);">
 
+        <div tal:define="view nocall: here/@@search-facets | nothing"
+             tal:condition="python: view"
+             tal:replace="structure python: view(results=results)" />
+
         <dl class="searchResults">
         <tal:results repeat="result batch">
         <tal:entry define="result_url result/getURL;
@@ -169,10 +173,6 @@
         </dl>
 
         <div metal:use-macro="here/batch_macros/macros/navigation" />
-
-        <div tal:define="view nocall: here/@@search-facets | nothing"
-             tal:condition="python: view"
-             tal:replace="structure python: view(results=results)" />
 
     </div>
 
