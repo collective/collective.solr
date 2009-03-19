@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 from os.path import join
 
-version = open(join('collective', 'solr', 'version.txt')).read().strip()
+version = open(join('src', 'collective', 'solr', 'version.txt')).read().strip()
 readme = open("README.txt").read()
 history = open(join('docs', 'HISTORY.txt')).read()
 
@@ -27,7 +27,8 @@ setup(name = 'collective.solr',
       url = 'http://plone.org/products/collective.solr',
       download_url = 'http://cheeseshop.python.org/pypi/collective.solr/',
       license = 'GPL',
-      packages = find_packages(exclude=['ez_setup']),
+      packages = find_packages('src'),
+      package_dir = {'': 'src'},
       namespace_packages = ['collective'],
       include_package_data = True,
       platforms = 'Any',
