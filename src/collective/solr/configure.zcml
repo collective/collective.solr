@@ -6,6 +6,8 @@
     xmlns:browser="http://namespaces.zope.org/browser"
     i18n_domain="collective.solr">
 
+  <include package="collective.indexing" />
+
   <include file="profiles.zcml" />
 
   <cmf:registerDirectory name="solr_site_search" />
