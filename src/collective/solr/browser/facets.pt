@@ -1,6 +1,10 @@
 <div id="portal-searchfacets"
      i18n:domain="plone">
 
+ <h4 i18n:translate="heading_search_facets">
+   Limit search results...
+ </h4>
+
  <div tal:repeat="facet view/facets">
    <h5 tal:content="facet/title" />
    <dl>
