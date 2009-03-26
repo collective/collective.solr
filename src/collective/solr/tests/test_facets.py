@@ -70,7 +70,7 @@ class SolrFacettingTests(SolrTestCase):
         view = view.__of__(self.portal)     # needed to traverse `view/`
         results = solrSearchResults(request)
         output = view(results=results)
-        self.checkOrder(output, 'portal-searchfacets', 'portal_type',
+        self.checkOrder(output, 'portal-searchfacets', 'Content type',
             'Topic', '1', 'Large Plone Folder', '1')
 
 

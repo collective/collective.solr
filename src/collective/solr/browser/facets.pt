@@ -5,8 +5,8 @@
    Limit search results...
  </h4>
 
- <div tal:repeat="facet view/facets">
-   <h5 tal:content="facet/title" />
+ <div tal:repeat="facet view/facets" i18n:domain="solr">
+   <h5 tal:content="facet/title" i18n:translate="" />
    <dl>
      <tal:counts repeat="item facet/counts">
        <tal:count define="count item/count"
