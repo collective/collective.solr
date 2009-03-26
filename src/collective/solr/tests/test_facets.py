@@ -44,6 +44,15 @@ class SolrFacettingTests(SolrTestCase):
         states = results.facet_counts['facet_fields']['review_state']
         self.assertEqual(states, dict(private=0, published=2))
 
+    def testMultiFacettedSearch(self):
+        results = solrSearchResults(SearchableText='News', facet='true',
+            facet_field=['portal_type', 'review_state'])
+        self.assertEqual([r.physicalPath for r in results],
+            ['/plone/news', '/plone/news/aggregator'])
+        facets = results.facet_counts['facet_fields']
+        self.assertEqual(facets['portal_type']['Large Plone Folder'], 1)
+        self.assertEqual(facets['review_state']['published'], 2)
+
     def checkOrder(self, html, *order):
         for item in order:
             position = html.find(item)
