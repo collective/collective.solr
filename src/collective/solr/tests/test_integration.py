@@ -185,6 +185,11 @@ class SiteSetupTests(SolrTestCase):
         css = '++resource++collective.solr.resources/style.css'
         self.failUnless(css in registry.getResourceIds())
 
+    def testTranslation(self):
+        utrans = getToolByName(self.portal, 'translation_service').utranslate
+        translate = lambda msg: utrans(msgid=msg, domain='solr')
+        self.assertEqual(translate('portal_type'), u'Content type')
+
 
 def test_suite():
     return defaultTestLoader.loadTestsFromName(__name__)
