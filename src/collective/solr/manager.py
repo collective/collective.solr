@@ -19,6 +19,7 @@ class SolrConnectionConfig(Persistent):
 
     max_results = 0             # provide backwards compatibility
     required = []
+    facets = []
 
     def __init__(self):
         self.active = False
@@ -30,6 +31,7 @@ class SolrConnectionConfig(Persistent):
         self.search_timeout = 0
         self.max_results = 0
         self.required = []
+        self.facets = []
 
     def getId(self):
         """ return a unique id to be used with GenericSetup """

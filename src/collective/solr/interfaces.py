@@ -46,6 +46,11 @@ class ISolrSchema(Interface):
                          'Leave empty to dispatch all searches.'),
         value_type = TextLine(), default = [], required = False)
 
+    facets = List(title=_(u'Default search facets'),
+        description = _(u'Specify catalog indexes that should be queried for '
+                         'facet information, one per line. '),
+        value_type = TextLine(), default = [], required = False)
+
 
 class ISolrConnectionConfig(ISolrSchema):
     """ utility to hold the connection configuration for the solr server """

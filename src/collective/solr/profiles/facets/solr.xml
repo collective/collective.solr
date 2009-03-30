@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<object name="solr">
+  <settings>
+    <search-facets>
+      <parameter name="portal_type" />
+      <parameter name="review_state" />
+    </search-facets>
+  </settings>
+</object>

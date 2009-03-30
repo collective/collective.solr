@@ -33,6 +33,7 @@ class SolrConfigXMLAdapter(XMLAdapterBase):
         self.context.search_timeout = 0
         self.context.max_results = 0
         self.context.required = []
+        self.context.facets = []
 
     def _initProperties(self, node):
         elems = node.getElementsByTagName('connection')
@@ -72,6 +73,11 @@ class SolrConfigXMLAdapter(XMLAdapterBase):
                     for elem in child.getElementsByTagName('parameter'):
                         value.append(elem.getAttribute('name'))
                     self.context.required = tuple(map(str, value))
+                elif child.nodeName == 'search-facets':
+                    value = []
+                    for elem in child.getElementsByTagName('parameter'):
+                        value.append(elem.getAttribute('name'))
+                    self.context.facets = tuple(map(str, value))
 
     def _createNode(self, name, value):
         node = self._doc.createElement(name)
@@ -101,6 +107,12 @@ class SolrConfigXMLAdapter(XMLAdapterBase):
             param = self._doc.createElement('parameter')
             param.setAttribute('name', name)
             required.appendChild(param)
+        facets = self._doc.createElement('search-facets')
+        append(facets)
+        for name in self.context.facets:
+            param = self._doc.createElement('parameter')
+            param.setAttribute('name', name)
+            facets.appendChild(param)
         return node
 
 

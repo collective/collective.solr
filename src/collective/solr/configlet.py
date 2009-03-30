@@ -112,6 +112,17 @@ class SolrControlPanelAdapter(SchemaAdapterBase):
 
     required = property(getRequiredParameters, setRequiredParameters)
 
+    def getDefaultFacets(self):
+        util = queryUtility(ISolrConnectionConfig)
+        return getattr(util, 'facets', '')
+
+    def setDefaultFacets(self, value):
+        util = queryUtility(ISolrConnectionConfig)
+        if util is not None:
+            util.facets = value
+
+    facets = property(getDefaultFacets, setDefaultFacets)
+
 
 class SolrControlPanel(ControlPanelForm):
 

@@ -20,6 +20,7 @@ class SetupToolTests(SolrTestCase, TarballTester):
         config.search_timeout = 3.1415
         config.max_results = 42
         config.required = ('foo', 'bar')
+        config.facets = ('type', 'state')
 
     def testImportStep(self):
         profile = 'profile-collective.solr:default'
@@ -38,6 +39,11 @@ class SetupToolTests(SolrTestCase, TarballTester):
         self.assertEqual(config.search_timeout, 0)
         self.assertEqual(config.max_results, 0)
         self.assertEqual(config.required, ('SearchableText', ))
+        self.assertEqual(config.facets, ('type', 'state'))
+        # importing the "facet" profile should also set them up...
+        profile = 'profile-collective.solr:facets'
+        result = tool.runImportStepFromProfile(profile, 'solr')
+        self.assertEqual(config.facets, ('portal_type', 'review_state'))
 
     def testExportStep(self):
         tool = self.portal.portal_setup
@@ -67,6 +73,10 @@ SOLR_XML = """\
       <parameter name="foo" />
       <parameter name="bar" />
     </required-query-parameters>
+    <search-facets>
+      <parameter name="type" />
+      <parameter name="state" />
+    </search-facets>
   </settings>
 </object>
 """

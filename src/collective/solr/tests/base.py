@@ -17,7 +17,7 @@ class SolrTestCase(ptc.PloneTestCase):
 class SolrControlPanelTestCase(ControlPanelTestCase):
     """ base class for control panel tests """
 
-    layer = SolrLayer
+    layer = SolrFacetsLayer
 
 
 class SolrFunctionalTestCase(ptc.FunctionalTestCase):
