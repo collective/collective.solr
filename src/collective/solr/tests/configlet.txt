@@ -26,6 +26,7 @@ First some initial setup code:
     >>> config.required
     ('SearchableText',)
 
+
 Viewing the site control panel
 -----------------------------
 
@@ -48,6 +49,7 @@ There should be still no changes:
 
     >>> 'Changes canceled.' in self.browser.contents
     True
+
 
 Make some changes
 -----------------
@@ -99,4 +101,3 @@ Make sure the changes have been applied correctly to the tool:
     23
     >>> config.required
     [u'foo', u'bar']
-
