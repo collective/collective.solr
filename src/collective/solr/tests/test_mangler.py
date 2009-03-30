@@ -207,6 +207,22 @@ class QueryParameterTests(TestCase):
         params = extract(dict(facet_foo='bar'))
         self.assertEqual(params, {'facet.foo': 'bar'})
 
+    def testAllowFilterQueryParameters(self):
+        extract = extractQueryParameters
+        # 'fq' should be passed on...
+        params = extract({'fq': 'foo'})
+        self.assertEqual(params, {'fq': 'foo'})
+        params = extract({'fq': ['foo', 'bar']})
+        self.assertEqual(params, {'fq': ['foo', 'bar']})
+
+    def testAllowFieldListParameter(self):
+        extract = extractQueryParameters
+        # 'fl' should be passed on...
+        params = extract({'fl': 'foo'})
+        self.assertEqual(params, {'fl': 'foo'})
+        params = extract({'fl': ['foo', 'bar']})
+        self.assertEqual(params, {'fl': ['foo', 'bar']})
+
     def testSortIndexCleanup(self):
         cleanup = cleanupQueryParameters
         schema = SolrSchema()
