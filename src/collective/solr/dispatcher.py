@@ -71,11 +71,11 @@ def solrSearchResults(request=None, **keywords):
                     raise FallBackException
         else:
             raise FallBackException
+    schema = search.getManager().getSchema() or {}
+    params = cleanupQueryParameters(extractQueryParameters(args), schema)
     mangleQuery(args)
     prepareData(args)
     query = search.buildQuery(**args)
-    schema = search.getManager().getSchema() or {}
-    params = cleanupQueryParameters(extractQueryParameters(args), schema)
     __traceback_info__ = (query, params, args)
     response = search(query, fl='* score', **params)
     def wrap(flare):
