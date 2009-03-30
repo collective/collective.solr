@@ -53,6 +53,18 @@ class SolrFacettingTests(SolrTestCase):
         self.assertEqual(facets['portal_type']['Large Plone Folder'], 1)
         self.assertEqual(facets['review_state']['published'], 2)
 
+    def testFacettedSearchWithFilterQuery(self):
+        request = TestRequest()
+        request.form['SearchableText'] = 'News'
+        request.form['fq'] = 'portal_type:Topic'
+        request.form['facet'] = 'true'
+        request.form['facet_field'] = 'review_state'
+        results = solrSearchResults(request)
+        self.assertEqual([r.physicalPath for r in results],
+            ['/plone/news/aggregator'])
+        states = results.facet_counts['facet_fields']['review_state']
+        self.assertEqual(states, dict(private=0, published=1))
+
     def checkOrder(self, html, *order):
         for item in order:
             position = html.find(item)
