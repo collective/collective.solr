@@ -13,7 +13,7 @@ The search form should contain default settings for facets to be shown:
   >>> browser = self.getBrowser()
   >>> browser.open('http://nohost/plone/')
   >>> browser.contents
-  '...<input type="hidden" name="facet.field" value="portal_type" />...'
+  '...<input type="hidden" name="facet.field"...value="portal_type" />...'
 
 Without search results there's also no information about facets, of course:
 

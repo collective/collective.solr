@@ -1,11 +1,23 @@
+from zope.component import queryUtility
 from Products.Five import BrowserView
 from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 from plone.app.layout.viewlets.common import SearchBoxViewlet
+from collective.solr.interfaces import ISolrConnectionConfig
 from collective.solr.browser.utils import convertFacets
 
 
 class SearchBox(SearchBoxViewlet):
+
     index = ViewPageTemplateFile('searchbox.pt')
+
+    def facets(self):
+        """ determine facet fields to be queried for """
+        fields = self.request.get('facet_fields', None)
+        if fields is None:
+            fields = getattr(self.context, 'facet_fields', None)
+        if fields is None:
+            fields = queryUtility(ISolrConnectionConfig).facets
+        return fields
 
 
 class SearchFacetsView(BrowserView):

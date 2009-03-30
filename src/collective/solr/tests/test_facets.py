@@ -6,6 +6,7 @@ from zope.publisher.browser import TestRequest
 from collective.solr.tests.utils import pingSolr
 from collective.solr.tests.base import SolrTestCase
 from collective.solr.browser.interfaces import IThemeSpecific
+from collective.solr.browser.facets import SearchBox
 from collective.solr.dispatcher import solrSearchResults
 from collective.solr.utils import activate
 
@@ -84,6 +85,26 @@ class SolrFacettingTests(SolrTestCase):
         output = view(results=results)
         self.checkOrder(output, 'portal-searchfacets', 'Content type',
             'Topic', '1', 'Large Plone Folder', '1')
+
+    def testFacetFieldsInSearchBox(self):
+        request = self.portal.REQUEST
+        viewlet = SearchBox(self.portal, request, None, None)
+        viewlet = viewlet.__of__(self.portal)   # needed to get security right
+        viewlet.update()
+        output = viewlet.render()
+        self.checkOrder(output,
+            '<input', 'name="facet" value="true"',
+            '<input', 'value="portal_type"',
+            '<input', 'value="review_state"',
+            '</form>')
+        # try overriding the desired facets in the request
+        request.form['facet_fields'] = ['foo']
+        output = viewlet.render()
+        self.checkOrder(output,
+            '<input', 'name="facet" value="true"',
+            '<input', 'value="foo"',
+            '</form>')
+        self.failIf('portal_type' in output)
 
 
 def test_suite():

@@ -41,9 +41,13 @@
         <div class="LSResult" id="LSResult" style=""><div class="LSShadow" id="LSShadow"></div></div>
         </div>
 
-        <input type="hidden" name="facet" value="true" />
-        <input type="hidden" name="facet.field" value="portal_type" />
-        <input type="hidden" name="facet.field" value="review_state" />
+        <tal:facets define="facets view/facets"
+                    condition="facets">
+            <input type="hidden" name="facet" value="true" />
+            <input type="hidden" name="facet.field"
+                   tal:repeat="facet facets"
+                   tal:attributes="value facet" />
+        </tal:facets>
 
     </form>
 
