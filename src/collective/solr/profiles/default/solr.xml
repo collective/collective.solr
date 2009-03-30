@@ -14,5 +14,9 @@
     <required-query-parameters>
       <parameter name="SearchableText" />
     </required-query-parameters>
+    <search-facets>
+      <parameter name="portal_type" />
+      <parameter name="review_state" />
+    </search-facets>
   </settings>
 </object>
