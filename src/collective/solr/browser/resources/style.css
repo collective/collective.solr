@@ -44,12 +44,11 @@
 }
 
 #portal-searchfacets ul li {
-  font-size: 90%;
   margin: 0;
 }
 
 #portal-searchfacets ul li:before {
-  content: "\00bb\00a0";
+  content: "\00bb";
 }
 
 #portal-searchfacets ul li a {
