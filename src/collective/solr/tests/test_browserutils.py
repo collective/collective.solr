@@ -137,6 +137,19 @@ class FacettingHelperTest(TestCase):
         self.assertEqual(params(foos[2]['query']), [
             'facet.field=bar', 'fq=foo:Folder'])
 
+    def testFacetLinksWithMultipleSelectedFacets(self):
+        context = Dummy()
+        request = {'facet.field': 'foo', 'fq': 'bar:private'}
+        fields = dict(foo=dict(Document=3, Folder=2))
+        info = convertFacets(fields, context, request)
+        self.assertEqual(len(info), 1)
+        counts = info[0]['counts']
+        params = lambda query: sorted(map(unquote, query.split('&')))
+        self.assertEqual(params(counts[0]['query']), [
+            'fq=bar:private', 'fq=foo:Document'])
+        self.assertEqual(params(counts[1]['query']), [
+            'fq=bar:private', 'fq=foo:Folder'])
+
 
 def test_suite():
     return defaultTestLoader.loadTestsFromName(__name__)
