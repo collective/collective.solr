@@ -4,10 +4,11 @@ from collective.solr.interfaces import ISolrConnectionConfig
 
 def facetParameters(context, request):
     """ determine facet fields to be queried for """
-    fields = request.get('facet.field', None)
-    if fields is None:
-        fields = getattr(context, 'facet_fields', None)
-    if fields is None:
+    marker = []
+    fields = request.get('facet.field', marker)
+    if fields is marker:
+        fields = getattr(context, 'facet_fields', marker)
+    if fields is marker:
         config = queryUtility(ISolrConnectionConfig)
         if config is not None:
             fields = config.facets

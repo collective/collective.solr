@@ -55,7 +55,7 @@ class FacettingHelperTest(TestCase):
         context = Dummy()
         request = {}
         # with nothing set up, no facets will be returned
-        self.assertEqual(facetParameters(context, request), None)
+        self.assertEqual(facetParameters(context, request), [])
         # setting up the regular config utility should give the default value
         cfg = SolrConnectionConfig()
         provideUtility(cfg, ISolrConnectionConfig)
