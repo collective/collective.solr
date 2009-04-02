@@ -25,11 +25,11 @@ class FacettingHelperTest(TestCase):
         # and the fields contents
         types, = info
         self.assertEqual(types['title'], 'portal_type')
-        self.assertEqual(types['counts'], [
-            dict(name='Document', count=10),
-            dict(name='Event', count=5),
-            dict(name='Folder', count=3),
-            dict(name='Topic', count=2),
+        self.assertEqual([(c['name'], c['count']) for c in types['counts']], [
+            ('Document', 10),
+            ('Event', 5),
+            ('Folder', 3),
+            ('Topic', 2),
         ])
 
     def testConvertFacetResponse(self):
@@ -43,15 +43,15 @@ class FacettingHelperTest(TestCase):
         # and the fields contents
         cat, inStock = info
         self.assertEqual(cat['title'], 'cat')
-        self.assertEqual(cat['counts'], [
-            dict(name='search', count=1),
-            dict(name='software', count=1),
-            dict(name='electronics', count=0),
-            dict(name='monitor', count=0),
+        self.assertEqual([(c['name'], c['count']) for c in cat['counts']], [
+            ('search', 1),
+            ('software', 1),
+            ('electronics', 0),
+            ('monitor', 0),
         ])
         self.assertEqual(inStock['title'], 'inStock')
-        self.assertEqual(inStock['counts'], [
-            dict(name='true', count=1),
+        self.assertEqual([(c['name'], c['count']) for c in inStock['counts']], [
+            ('true', 1),
         ])
 
     def testFacetParameters(self):
