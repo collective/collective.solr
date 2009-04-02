@@ -36,3 +36,30 @@
   line-height: normal;
   margin: 0 0 0 1em;
 }
+
+#portal-searchfacets ul {
+  padding: 0.5em 0 0 0;
+  margin: 0;
+  list-style: none;
+}
+
+#portal-searchfacets ul li {
+  font-size: 90%;
+  margin: 0;
+}
+
+#portal-searchfacets ul li:before {
+  content: "\00bb\00a0";
+}
+
+#portal-searchfacets ul li a {
+  width: 1em;
+  height: 1em;
+  line-height: normal;
+  display: inline-block;
+  overflow: hidden;
+}
+
+#portal-searchfacets ul li a:before {
+  content: "\2297";
+}

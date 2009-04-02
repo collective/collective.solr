@@ -10,7 +10,8 @@
       <li tal:repeat="item view/selected">
         <span tal:content="item/value" i18n:translate=""
               tal:attributes="title item/title" i18n:attributes="title" />
-        <a tal:attributes="href string:${request/ACTUAL_URL}?${item/query}">
+        <a tal:attributes="href string:${request/ACTUAL_URL}?${item/query}"
+           title="Remove this search limit..." i18n:attributes="title" >
           remove
         </a>
       </li>
