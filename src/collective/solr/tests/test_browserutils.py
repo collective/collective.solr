@@ -1,7 +1,10 @@
 from unittest import TestCase, defaultTestLoader, main
+from zope.component import provideUtility
 from collective.solr.tests.utils import getData
+from collective.solr.interfaces import ISolrConnectionConfig
+from collective.solr.manager import SolrConnectionConfig
 from collective.solr.parser import SolrResponse
-from collective.solr.browser.utils import convertFacets
+from collective.solr.browser.utils import facetParameters, convertFacets
 
 
 class FacettingHelperTest(TestCase):
@@ -45,6 +48,27 @@ class FacettingHelperTest(TestCase):
         self.assertEqual(inStock['counts'], [
             dict(name='true', count=1),
         ])
+
+    def testFacetParameters(self):
+        class Dummy(object):
+            pass
+        context = Dummy()
+        request = {}
+        # with nothing set up, no facets will be returned
+        self.assertEqual(facetParameters(context, request), None)
+        # setting up the regular config utility should give the default value
+        cfg = SolrConnectionConfig()
+        provideUtility(cfg, ISolrConnectionConfig)
+        self.assertEqual(facetParameters(context, request), [])
+        # so let's set it...
+        cfg.facets = ['foo']
+        self.assertEqual(facetParameters(context, request), ['foo'])
+        # override the setting on the context
+        context.facet_fields = ['bar']
+        self.assertEqual(facetParameters(context, request), ['bar'])
+        # and again via the request
+        request['facet_fields'] = ['foo', 'bar']
+        self.assertEqual(facetParameters(context, request), ['foo', 'bar'])
 
 
 def test_suite():

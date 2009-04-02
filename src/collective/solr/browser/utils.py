@@ -1,3 +1,17 @@
+from zope.component import queryUtility
+from collective.solr.interfaces import ISolrConnectionConfig
+
+
+def facetParameters(context, request):
+    """ determine facet fields to be queried for """
+    fields = request.get('facet_fields', None)
+    if fields is None:
+        fields = getattr(context, 'facet_fields', None)
+    if fields is None:
+        config = queryUtility(ISolrConnectionConfig)
+        if config is not None:
+            fields = config.facets
+    return fields
 
 
 def convertFacets(fields):
