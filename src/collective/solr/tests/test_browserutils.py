@@ -96,6 +96,22 @@ class FacettingHelperTest(TestCase):
         self.assertEqual(params(counts[2]['query']), [
             'foo=bar', 'fq=portal_type:Folder'])
 
+    def testFacetLinksWithSelectedFacet(self):
+        context = Dummy()
+        request = {'foo': 'bar', 'facet.field': 'bar'}
+        fields = dict(foo=dict(private=2, published=4))
+        info = convertFacets(fields, context, request)
+        self.assertEqual(len(info), 1)
+        counts = info[0]['counts']
+        self.assertEqual(len(counts), 2)
+        params = lambda query: sorted(map(unquote, query.split('&')))
+        self.assertEqual(counts[0]['name'], 'published')
+        self.assertEqual(params(counts[0]['query']), [
+            'facet.field=bar', 'foo=bar', 'fq=foo:published'])
+        self.assertEqual(counts[1]['name'], 'private')
+        self.assertEqual(params(counts[1]['query']), [
+            'facet.field=bar', 'foo=bar', 'fq=foo:private'])
+
 
 def test_suite():
     return defaultTestLoader.loadTestsFromName(__name__)

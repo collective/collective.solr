@@ -7,6 +7,8 @@ def facetParameters(context, request):
     """ determine facet fields to be queried for """
     marker = []
     fields = request.get('facet.field', marker)
+    if isinstance(fields, basestring):
+        fields = [fields]
     if fields is marker:
         fields = getattr(context, 'facet_fields', marker)
     if fields is marker:
