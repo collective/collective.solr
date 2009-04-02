@@ -98,7 +98,7 @@ class SolrFacettingTests(SolrTestCase):
             '<input', 'value="review_state"',
             '</form>')
         # try overriding the desired facets in the request
-        request.form['facet_fields'] = ['foo']
+        request.form['facet.field'] = ['foo']
         output = viewlet.render()
         self.checkOrder(output,
             '<input', 'name="facet" value="true"',

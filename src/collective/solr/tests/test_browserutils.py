@@ -67,7 +67,7 @@ class FacettingHelperTest(TestCase):
         context.facet_fields = ['bar']
         self.assertEqual(facetParameters(context, request), ['bar'])
         # and again via the request
-        request['facet_fields'] = ['foo', 'bar']
+        request['facet.field'] = ['foo', 'bar']
         self.assertEqual(facetParameters(context, request), ['foo', 'bar'])
         # clean up...
         getGlobalSiteManager().unregisterUtility(cfg, ISolrConnectionConfig)
