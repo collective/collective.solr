@@ -59,3 +59,29 @@ In fact, information for multiple facets should be displayed:
    ...published...2...
    ...Site News...'
 
+Clicking on of the facets should restrict the search:
+
+  >>> browser.getLink('Topic').click()
+  >>> browser.url
+  'http://nohost/plone/search?...&fq=portal_type%3ATopic...'
+  >>> 'facet.field=portal_type' in browser.url
+  False
+  >>> browser.contents
+  '...Search results...1 items matching...
+   ...portal-searchfacets...
+   ...Review state...
+   ...published...1...
+   ...Site News...'
+
+There should be no information for the selected facet:
+
+  >>> 'Content type' in browser.contents
+  False
+  >>> 'Large Plone Folder' in browser.contents
+  False
+
+But the other facet should still be browsable:
+
+  >>> browser.getLink('published').url
+  'http://nohost/plone/search?...fq=portal_type%3ATopic...fq=review_state%3Apublished...'
+

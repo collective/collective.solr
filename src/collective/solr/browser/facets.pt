@@ -11,7 +11,10 @@
      <tal:counts repeat="item facet/counts">
        <tal:count define="count item/count"
                   condition="count">
-         <dt tal:content="item/name" />
+         <dt>
+           <a href="#" tal:content="item/name"
+              tal:attributes="href string:${request/ACTUAL_URL}?${item/query}" />
+         </dt>
          <dd tal:content="item/count" />
        </tal:count>
      </tal:counts>

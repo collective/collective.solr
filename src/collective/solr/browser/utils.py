@@ -22,7 +22,7 @@ def facetParameters(context, request):
 def convertFacets(fields, context=None, request={}):
     """ convert facet info to a form easy to process in templates """
     info = []
-    params = dict(request.items())  # request is dict-like, but has no `copy`
+    params = request.copy()   # request needs to be a dict, i.e. request.form
     params['facet.field'] = list(facetParameters(context, request))
     fq = params.get('fq', None)
     if isinstance(fq, basestring):
