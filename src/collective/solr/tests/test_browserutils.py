@@ -1,5 +1,5 @@
 from unittest import TestCase, defaultTestLoader, main
-from zope.component import provideUtility
+from zope.component import provideUtility, getGlobalSiteManager
 from collective.solr.tests.utils import getData
 from collective.solr.interfaces import ISolrConnectionConfig
 from collective.solr.manager import SolrConnectionConfig
@@ -69,6 +69,8 @@ class FacettingHelperTest(TestCase):
         # and again via the request
         request['facet_fields'] = ['foo', 'bar']
         self.assertEqual(facetParameters(context, request), ['foo', 'bar'])
+        # clean up...
+        getGlobalSiteManager().unregisterUtility(cfg, ISolrConnectionConfig)
 
 
 def test_suite():
