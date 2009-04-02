@@ -192,6 +192,17 @@ class FacettingHelperTest(TestCase):
             ('bah', ['facet.field=bah', 'facet.field=x', 'fq=bar:y', 'fq=foo:x']),
         ])
 
+    def testSelectedFacetValues(self):
+        request = TestRequest()
+        selected = SearchFacetsView(Dummy(), request).selected
+        info = lambda: [(i['title'], i['value']) for i in selected()]
+        request.form['fq'] = 'foo:xy'
+        self.assertEqual(info(), [('foo', 'xy')])
+        request.form['fq'] = ['foo:x', 'bar:y']
+        self.assertEqual(info(), [('foo', 'x'), ('bar', 'y')])
+        request.form['fq'] = ['foo:x', 'bar:y', 'bah:z']
+        self.assertEqual(info(), [('foo', 'x'), ('bar', 'y'), ('bah', 'z')])
+
 
 def test_suite():
     return defaultTestLoader.loadTestsFromName(__name__)

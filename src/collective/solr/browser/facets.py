@@ -48,5 +48,6 @@ class SearchFacetsView(BrowserView):
             params['fq'] = fq[:idx] + fq[idx+1:]
             if field not in facets:
                 params['facet.field'] = facets + [field]
-            info.append(dict(title=field, query=urlencode(params, doseq=True)))
+            info.append(dict(title=field, value=value,
+                query=urlencode(params, doseq=True)))
         return info
