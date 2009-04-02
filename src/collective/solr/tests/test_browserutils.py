@@ -1,9 +1,11 @@
 from unittest import TestCase, defaultTestLoader, main
 from zope.component import provideUtility, getGlobalSiteManager
+from zope.publisher.browser import TestRequest
 from collective.solr.tests.utils import getData
 from collective.solr.interfaces import ISolrConnectionConfig
 from collective.solr.manager import SolrConnectionConfig
 from collective.solr.parser import SolrResponse
+from collective.solr.browser.facets import SearchFacetsView
 from collective.solr.browser.utils import facetParameters, convertFacets
 from urllib import unquote
 
@@ -149,6 +151,46 @@ class FacettingHelperTest(TestCase):
             'fq=bar:private', 'fq=foo:Document'])
         self.assertEqual(params(counts[1]['query']), [
             'fq=bar:private', 'fq=foo:Folder'])
+
+    def testSelectedFacetsInformation(self):
+        request = TestRequest()
+        selected = SearchFacetsView(Dummy(), request).selected
+        # initially no facets are seleted
+        self.assertEqual(selected(), [])
+        # so let's select one...
+        params = lambda query: sorted(map(unquote, query.split('&')))
+        info = lambda: [(i['title'], params(i['query'])) for i in selected()]
+        request.form['fq'] = 'foo:xy'
+        self.assertEqual(info(), [
+            ('foo', ['facet.field=foo']),
+        ])
+        # and then some more...
+        request.form['fq'] = ['foo:x', 'bar:y']
+        self.assertEqual(info(), [
+            ('foo', ['facet.field=foo', 'fq=bar:y']),
+            ('bar', ['facet.field=bar', 'fq=foo:x']),
+        ])
+        request.form['fq'] = ['foo:x', 'bar:y', 'bah:z']
+        self.assertEqual(info(), [
+            ('foo', ['facet.field=foo', 'fq=bah:z', 'fq=bar:y']),
+            ('bar', ['facet.field=bar', 'fq=bah:z', 'fq=foo:x']),
+            ('bah', ['facet.field=bah', 'fq=bar:y', 'fq=foo:x']),
+        ])
+        # extra parameter should be left untouched
+        request.form['foo'] = 'bar'
+        self.assertEqual(info(), [
+            ('foo', ['facet.field=foo', 'foo=bar', 'fq=bah:z', 'fq=bar:y']),
+            ('bar', ['facet.field=bar', 'foo=bar', 'fq=bah:z', 'fq=foo:x']),
+            ('bah', ['facet.field=bah', 'foo=bar', 'fq=bar:y', 'fq=foo:x']),
+        ])
+        # an existing 'facet.field' parameter should be preserved
+        del request.form['foo']
+        request.form['facet.field'] = 'x'
+        self.assertEqual(info(), [
+            ('foo', ['facet.field=foo', 'facet.field=x', 'fq=bah:z', 'fq=bar:y']),
+            ('bar', ['facet.field=bar', 'facet.field=x', 'fq=bah:z', 'fq=foo:x']),
+            ('bah', ['facet.field=bah', 'facet.field=x', 'fq=bar:y', 'fq=foo:x']),
+        ])
 
 
 def test_suite():

@@ -69,19 +69,46 @@ Clicking on of the facets should restrict the search:
   >>> browser.contents
   '...Search results...1 items matching...
    ...portal-searchfacets...
+   ...Content type...remove...
    ...Review state...
    ...published...1...
    ...Site News...'
 
-There should be no information for the selected facet:
+There should be a link to remove the selected facet, but no other details:
 
-  >>> 'Content type' in browser.contents
-  False
+  >>> browser.getLink('remove').url
+  'http://nohost/plone/search?...&facet.field=portal_type...'
   >>> 'Large Plone Folder' in browser.contents
   False
 
 But the other facet should still be browsable:
 
-  >>> browser.getLink('published').url
+  >>> browser.getLink('published').click()
+  >>> browser.url
   'http://nohost/plone/search?...fq=portal_type%3ATopic...fq=review_state%3Apublished...'
+  >>> 'facet.field=' in browser.url
+  False
+  >>> browser.contents
+  '...Search results...1 items matching...
+   ...portal-searchfacets...
+   ...Content type...remove...
+   ...Review state...remove...
+   ...Site News...'
 
+Removing a previously selected facet should extend the search again:
+
+  >>> browser.getLink('remove').click()
+  >>> browser.url
+  'http://nohost/plone/search?...&facet.field=portal_type...'
+  >>> 'fq=portal_type' in browser.url
+  False
+  >>> 'fq=review_state' in browser.url
+  True
+  >>> browser.contents
+  '...Search results...2 items matching...
+   ...portal-searchfacets...
+   ...Review state...remove...
+   ...Content type...
+   ...Topic...1...
+   ...Large Plone Folder...1...
+   ...Site News...'

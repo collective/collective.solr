@@ -5,6 +5,17 @@
     Limit search results...
   </h4>
 
+  <div i18n:domain="solr">
+    <ul>
+      <li tal:repeat="item view/selected">
+        <div tal:replace="item/title" i18n:translate="" />
+        <a tal:attributes="href string:${request/ACTUAL_URL}?${item/query}">
+          remove
+        </a>
+      </li>
+    </ul>
+  </div>
+
   <div tal:repeat="facet view/facets" i18n:domain="solr">
     <h5 tal:content="facet/title" i18n:translate="" />
     <dl>
