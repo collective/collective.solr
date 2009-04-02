@@ -5,6 +5,11 @@ from collective.solr.interfaces import ISolrConnectionConfig
 from collective.solr.manager import SolrConnectionConfig
 from collective.solr.parser import SolrResponse
 from collective.solr.browser.utils import facetParameters, convertFacets
+from urllib import unquote
+
+
+class Dummy(object):
+    """ dummy class that allows setting attributes """
 
 
 class FacettingHelperTest(TestCase):
@@ -50,8 +55,6 @@ class FacettingHelperTest(TestCase):
         ])
 
     def testFacetParameters(self):
-        class Dummy(object):
-            pass
         context = Dummy()
         request = {}
         # with nothing set up, no facets will be returned
@@ -71,6 +74,27 @@ class FacettingHelperTest(TestCase):
         self.assertEqual(facetParameters(context, request), ['foo', 'bar'])
         # clean up...
         getGlobalSiteManager().unregisterUtility(cfg, ISolrConnectionConfig)
+
+    def testFacetLinks(self):
+        context = Dummy()
+        context.facet_fields = ['portal_type']
+        request = {'foo': 'bar'}
+        fields = dict(portal_type=dict(Document=10, Folder=3, Event=5))
+        info = convertFacets(fields, context, request)
+        # let's check queries for the one and only facet field
+        self.assertEqual(len(info), 1)
+        counts = info[0]['counts']
+        self.assertEqual(len(counts), 3)
+        params = lambda query: sorted(map(unquote, query.split('&')))
+        self.assertEqual(counts[0]['name'], 'Document')
+        self.assertEqual(params(counts[0]['query']), [
+            'foo=bar', 'fq=portal_type:Document'])
+        self.assertEqual(counts[1]['name'], 'Event')
+        self.assertEqual(params(counts[1]['query']), [
+            'foo=bar', 'fq=portal_type:Event'])
+        self.assertEqual(counts[2]['name'], 'Folder')
+        self.assertEqual(params(counts[2]['query']), [
+            'foo=bar', 'fq=portal_type:Folder'])
 
 
 def test_suite():
