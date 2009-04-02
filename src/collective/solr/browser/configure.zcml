@@ -25,11 +25,6 @@
       class=".errors.ErrorView"
       permission="zope2.Public" />
 
-  <interface
-      interface=".interfaces.IThemeSpecific"
-      type="zope.publisher.interfaces.browser.IBrowserSkinType"
-      name="collective.solr" />
-
   <browser:viewlet
       name="plone.searchbox"
       manager="plone.app.layout.viewlets.interfaces.IPortalHeader"

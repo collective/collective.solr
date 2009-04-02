@@ -1,4 +1,0 @@
-<?xml version="1.0"?>
-<object name="portal_skins" default_skin="collective.solr">
-  <skin-path name="collective.solr" based-on="Plone Default"/>
-</object>

@@ -1,5 +1,5 @@
-from plone.theme.interfaces import IDefaultPloneLayer
+from zope.interface import Interface
 
 
-class IThemeSpecific(IDefaultPloneLayer):
+class IThemeSpecific(Interface):
     """ marker interface that defines a zope3 browser layer """
