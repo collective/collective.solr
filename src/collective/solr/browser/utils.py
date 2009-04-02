@@ -30,6 +30,7 @@ def convertFacets(fields, context=None, request={}):
             p = params.copy()
             p['fq'] = '%s:%s' % (field, name)
             if field in p.get('facet.field', []):
+                p['facet.field'] = list(p['facet.field'])   # make a copy first
                 p['facet.field'].remove(field)
             counts.append(dict(name=name, count=count,
                 query=urlencode(p, doseq=True)))
