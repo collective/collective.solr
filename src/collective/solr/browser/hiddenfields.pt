@@ -1,0 +1,7 @@
+<input type="hidden" name="facet" value="true" />
+<input type="hidden" name="facet.field"
+       tal:repeat="facet options/facets"
+       tal:attributes="value facet" />
+<input type="hidden" name="fq"
+       tal:repeat="fq options/queries"
+       tal:attributes="value fq" />
