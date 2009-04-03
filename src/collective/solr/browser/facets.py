@@ -16,13 +16,13 @@ def param(view, name):
 class FacetMixin:
     """ mixin with helpers common to the viewlet and view """
 
-    def available(self):
-        """ determine facet fields to be queried for """
-        return facetParameters(self.context, self.request)
+    hidden = ViewPageTemplateFile('hiddenfields.pt')
 
-    def queries(self):
-        """ return filter queries used in the current request """
-        return param(self, 'fq')
+    def hiddenfields(self):
+        """ render hidden fields suitable for inclusion in search forms """
+        facets = facetParameters(self.context, self.request)
+        queries = param(self, 'fq')
+        return self.hidden(facets=facets, queries=queries)
 
 
 class SearchBox(SearchBoxViewlet, FacetMixin):

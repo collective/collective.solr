@@ -56,15 +56,10 @@
         </span>
         to refine your search.
         </p>
-        <tal:facets define="view nocall: context/@@search-facets">
-            <input type="hidden" name="facet" value="true" />
-            <input type="hidden" name="facet.field"
-                   tal:repeat="facet view/available"
-                   tal:attributes="value facet" />
-            <input type="hidden" name="fq"
-                   tal:repeat="fq view/queries"
-                   tal:attributes="value fq" />
-        </tal:facets>
+
+        <tal:facets define="view nocall: context/@@search-facets"
+                    replace="structure view/hiddenfields" />
+
     </form>
 
 

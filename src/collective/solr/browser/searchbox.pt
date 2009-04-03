@@ -41,13 +41,7 @@
         <div class="LSResult" id="LSResult" style=""><div class="LSShadow" id="LSShadow"></div></div>
         </div>
 
-        <input type="hidden" name="facet" value="true" />
-        <input type="hidden" name="facet.field"
-               tal:repeat="facet view/available"
-               tal:attributes="value facet" />
-        <input type="hidden" name="fq"
-               tal:repeat="fq view/queries"
-               tal:attributes="value fq" />
+        <div tal:replace="structure view/hiddenfields" />
 
     </form>
 
