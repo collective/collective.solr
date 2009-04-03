@@ -5,6 +5,14 @@ from collective.solr.browser.utils import facetParameters, convertFacets
 from urllib import urlencode
 
 
+def param(view, name):
+    """ return a request parameter as a list """
+    value = view.request.form.get(name, [])
+    if isinstance(value, basestring):
+        value = [value]
+    return value
+
+
 class SearchBox(SearchBoxViewlet):
 
     index = ViewPageTemplateFile('searchbox.pt')
@@ -22,16 +30,9 @@ class SearchFacetsView(BrowserView):
         self.kw = kw
         return super(SearchFacetsView, self).__call__(*args, **kw)
 
-    def param(self, name):
-        """ return a request parameter as a list """
-        value = self.request.form.get(name, [])
-        if isinstance(value, basestring):
-            value = [value]
-        return value
-
     def queries(self):
         """ return filter queries used in the current request """
-        return self.param('fq')
+        return param(self, 'fq')
 
     def available(self):
         """ determine facet fields to be queried for """
@@ -51,8 +52,8 @@ class SearchFacetsView(BrowserView):
         """ determine selected facets and prepare links to clear them;
             this assumes that facets are selected using filter queries """
         info = []
-        facets = self.param('facet.field')
-        fq = self.param('fq')
+        facets = param(self, 'facet.field')
+        fq = param(self, 'fq')
         for idx, query in enumerate(fq):
             field, value = query.split(':', 1)
             params = self.request.form.copy()
