@@ -13,9 +13,8 @@ def param(view, name):
     return value
 
 
-class SearchBox(SearchBoxViewlet):
-
-    index = ViewPageTemplateFile('searchbox.pt')
+class FacetMixin:
+    """ mixin with helpers common to the viewlet and view """
 
     def available(self):
         """ determine facet fields to be queried for """
@@ -26,21 +25,18 @@ class SearchBox(SearchBoxViewlet):
         return param(self, 'fq')
 
 
-class SearchFacetsView(BrowserView):
+class SearchBox(SearchBoxViewlet, FacetMixin):
+
+    index = ViewPageTemplateFile('searchbox.pt')
+
+
+class SearchFacetsView(BrowserView, FacetMixin):
     """ view for displaying facetting info as provided by solr searches """
 
     def __call__(self, *args, **kw):
         self.args = args
         self.kw = kw
         return super(SearchFacetsView, self).__call__(*args, **kw)
-
-    def queries(self):
-        """ return filter queries used in the current request """
-        return param(self, 'fq')
-
-    def available(self):
-        """ determine facet fields to be queried for """
-        return facetParameters(self.context, self.request)
 
     def facets(self):
         """ prepare and return facetting info for the given SolrResponse """
