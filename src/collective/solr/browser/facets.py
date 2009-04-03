@@ -29,6 +29,14 @@ class SearchFacetsView(BrowserView):
             value = [value]
         return value
 
+    def queries(self):
+        """ return filter queries used in the current request """
+        return self.param('fq')
+
+    def available(self):
+        """ determine facet fields to be queried for """
+        return facetParameters(self.context, self.request)
+
     def facets(self):
         """ prepare and return facetting info for the given SolrResponse """
         results = self.kw.get('results', None)
