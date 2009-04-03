@@ -41,7 +41,7 @@
         <div class="LSResult" id="LSResult" style=""><div class="LSShadow" id="LSShadow"></div></div>
         </div>
 
-        <tal:facets define="facets view/facets"
+        <tal:facets define="facets view/available"
                     condition="facets">
             <input type="hidden" name="facet" value="true" />
             <input type="hidden" name="facet.field"

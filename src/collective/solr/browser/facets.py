@@ -9,7 +9,7 @@ class SearchBox(SearchBoxViewlet):
 
     index = ViewPageTemplateFile('searchbox.pt')
 
-    def facets(self):
+    def available(self):
         """ determine facet fields to be queried for """
         return facetParameters(self.context, self.request)
 
