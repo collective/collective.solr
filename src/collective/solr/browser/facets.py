@@ -22,6 +22,13 @@ class SearchFacetsView(BrowserView):
         self.kw = kw
         return super(SearchFacetsView, self).__call__(*args, **kw)
 
+    def param(self, name):
+        """ return a request parameter as a list """
+        value = self.request.form.get(name, [])
+        if isinstance(value, basestring):
+            value = [value]
+        return value
+
     def facets(self):
         """ prepare and return facetting info for the given SolrResponse """
         results = self.kw.get('results', None)
@@ -36,12 +43,8 @@ class SearchFacetsView(BrowserView):
         """ determine selected facets and prepare links to clear them;
             this assumes that facets are selected using filter queries """
         info = []
-        facets = self.request.form.get('facet.field', [])
-        if isinstance(facets, basestring):
-            facets = [facets]
-        fq = self.request.form.get('fq', [])
-        if isinstance(fq, basestring):
-            fq = [fq]
+        facets = self.param('facet.field')
+        fq = self.param('fq')
         for idx, query in enumerate(fq):
             field, value = query.split(':', 1)
             params = self.request.form.copy()
