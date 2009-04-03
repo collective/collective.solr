@@ -21,6 +21,10 @@ class SearchBox(SearchBoxViewlet):
         """ determine facet fields to be queried for """
         return facetParameters(self.context, self.request)
 
+    def queries(self):
+        """ return filter queries used in the current request """
+        return param(self, 'fq')
+
 
 class SearchFacetsView(BrowserView):
     """ view for displaying facetting info as provided by solr searches """
