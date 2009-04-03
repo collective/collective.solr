@@ -3,7 +3,6 @@ from zope.testing import doctest
 from Testing import ZopeTestCase as ztc
 from collective.solr.tests.base import SolrFunctionalTestCase
 from collective.solr.tests.base import SolrControlPanelTestCase
-from collective.solr.tests.base import SolrFacetsTestCase
 from collective.solr.tests.utils import pingSolr
 
 optionflags = (doctest.REPORT_ONLY_FIRST_FAILURE |
@@ -35,6 +34,6 @@ def test_suite():
         suite.addTest(
             ztc.FunctionalDocFileSuite(
                'facets.txt', package='collective.solr.tests',
-               test_class=SolrFacetsTestCase, optionflags=optionflags),
+               test_class=SolrFunctionalTestCase, optionflags=optionflags),
         )
     return suite

@@ -30,22 +30,3 @@ class SolrLayer(PloneSite):
     @classmethod
     def tearDown(cls):
         pass
-
-
-class SolrFacetsLayer(SolrLayer):
-    """ layer for solr integration tests with facet support """
-
-    @classmethod
-    def setUp(cls):
-        # import facets profile...
-        root = app()
-        profile = 'profile-collective.solr:facets'
-        tool = getToolByName(root.plone, 'portal_setup')
-        tool.runAllImportStepsFromProfile(profile, purge_old=False)
-        # and commit the changes
-        commit()
-        close(root)
-
-    @classmethod
-    def tearDown(cls):
-        pass

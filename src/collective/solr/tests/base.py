@@ -2,7 +2,7 @@ from Products.Five.testbrowser import Browser
 from Products.PloneTestCase import PloneTestCase as ptc
 from plone.app.controlpanel.tests.cptc import ControlPanelTestCase
 from collective.solr.utils import activate
-from collective.solr.tests.layer import SolrLayer, SolrFacetsLayer
+from collective.solr.tests.layer import SolrLayer
 
 
 ptc.setupPloneSite()
@@ -17,7 +17,7 @@ class SolrTestCase(ptc.PloneTestCase):
 class SolrControlPanelTestCase(ControlPanelTestCase):
     """ base class for control panel tests """
 
-    layer = SolrFacetsLayer
+    layer = SolrLayer
 
 
 class SolrFunctionalTestCase(ptc.FunctionalTestCase):
@@ -48,9 +48,3 @@ class SolrFunctionalTestCase(ptc.FunctionalTestCase):
         maintenance.clear()
         maintenance.reindex()
         response.write = original
-
-
-class SolrFacetsTestCase(SolrFunctionalTestCase):
-    """ base class for functional tests with facets """
-
-    layer = SolrFacetsLayer
