@@ -4,6 +4,9 @@ Changelog
 1.0b6 - Unreleased
 ------------------
 
+* Add support for facetted searches.
+  [witsch]
+
 * Update code to comply to PEP8 style guide lines.
   [witsch]
 
