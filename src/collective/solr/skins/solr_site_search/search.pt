@@ -57,8 +57,9 @@
         to refine your search.
         </p>
 
-        <tal:facets define="view nocall: context/@@search-facets"
-                    replace="structure view/hiddenfields" />
+        <div tal:define="view nocall: context/@@search-facets | nothing"
+             tal:condition="python: view"
+             tal:replace="structure view/hiddenfields" />
 
     </form>
 
@@ -92,7 +93,7 @@
     <div tal:condition="results"
           tal:define="batch python:Batch(results, b_size, int(b_start), orphan=1);">
 
-        <div tal:define="view nocall: here/@@search-facets | nothing"
+        <div tal:define="view nocall: context/@@search-facets | nothing"
              tal:condition="python: view"
              tal:replace="structure python: view(results=results)" />
 
