@@ -37,28 +37,10 @@
   margin: 0 0 0 1em;
 }
 
-#portal-searchfacets ul {
+#portal-searchfacets #selected-facets {
   padding: 0.5em 0 0 0;
-  margin: 0;
-  list-style: none;
 }
 
-#portal-searchfacets ul li {
-  margin: 0;
-}
-
-#portal-searchfacets ul li:before {
-  content: "\00bb";
-}
-
-#portal-searchfacets ul li a {
-  width: 1em;
-  height: 1em;
-  line-height: normal;
-  display: inline-block;
-  overflow: hidden;
-}
-
-#portal-searchfacets ul li a:before {
-  content: "\2297";
+#portal-searchfacets #selected-facets a {
+  text-decoration: none;
 }
