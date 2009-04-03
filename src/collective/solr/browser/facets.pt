@@ -8,12 +8,12 @@
   <div i18n:domain="solr" id="selected-facets">
     <div tal:repeat="item view/selected">
       &raquo;
-        <span tal:content="item/value" i18n:translate=""
-              tal:attributes="title item/title" i18n:attributes="title" />
-        <a tal:attributes="href string:${request/ACTUAL_URL}?${item/query}"
-           title="Remove this search limit..." i18n:attributes="title" >
-          &otimes;
-        </a>
+      <span tal:content="item/value" i18n:translate=""
+            tal:attributes="title item/title" i18n:attributes="title" />
+      <a tal:attributes="href string:${request/ACTUAL_URL}?${item/query}"
+         title="Remove this search limit..." i18n:attributes="title" >
+        &otimes;
+      </a>
     </div>
   </div>
 
