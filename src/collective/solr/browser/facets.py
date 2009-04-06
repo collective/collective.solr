@@ -43,7 +43,7 @@ class SearchFacetsView(BrowserView, FacetMixin):
         results = self.kw.get('results', None)
         fcs = getattr(results, 'facet_counts', None)
         if results is not None and fcs is not None:
-            return convertFacets(fcs['facet_fields'],
+            return convertFacets(fcs.get('facet_fields', {}),
                 self.context, self.request.form)
         else:
             return None

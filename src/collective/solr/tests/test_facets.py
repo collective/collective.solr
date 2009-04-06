@@ -106,6 +106,16 @@ class SolrFacettingTests(SolrTestCase):
             '</form>')
         self.failIf('portal_type' in output)
 
+    def testUnknownFacetField(self):
+        request = TestRequest()
+        request.form['SearchableText'] = 'News'
+        request.form['facet'] = 'true'
+        request.form['facet_field'] = 'foo'
+        alsoProvides(request, IThemeSpecific)
+        view = getMultiAdapter((self.portal, request), name='search-facets')
+        view.kw = dict(results=solrSearchResults(request))
+        self.assertEqual(view.facets(), [])
+
 
 def test_suite():
     if pingSolr():
