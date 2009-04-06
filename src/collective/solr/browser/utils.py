@@ -37,6 +37,7 @@ def convertFacets(fields, context=None, request={}):
                 p['facet.field'].remove(field)
             counts.append(dict(name=name, count=count,
                 query=urlencode(p, doseq=True)))
-        info.append(dict(title=field, counts=counts))
+        if counts:
+            info.append(dict(title=field, counts=counts))
     byTitle = lambda a, b: cmp(a['title'], b['title'])
     return sorted(info, cmp=byTitle)

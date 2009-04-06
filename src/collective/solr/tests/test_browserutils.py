@@ -203,6 +203,13 @@ class FacettingHelperTest(TestCase):
         request.form['fq'] = ['foo:x', 'bar:y', 'bah:z']
         self.assertEqual(info(), [('foo', 'x'), ('bar', 'y'), ('bah', 'z')])
 
+    def testEmptyFacetField(self):
+        context = Dummy()
+        request = {'facet.field': 'Subject'}
+        fields = dict(Subject=dict())
+        info = convertFacets(fields, context, request)
+        self.assertEqual(info, [])
+
 
 def test_suite():
     return defaultTestLoader.loadTestsFromName(__name__)
