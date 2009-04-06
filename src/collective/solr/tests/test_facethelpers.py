@@ -6,7 +6,7 @@ from collective.solr.interfaces import ISolrConnectionConfig
 from collective.solr.manager import SolrConnectionConfig
 from collective.solr.parser import SolrResponse
 from collective.solr.browser.facets import SearchFacetsView
-from collective.solr.browser.utils import facetParameters, convertFacets
+from collective.solr.browser.facets import facetParameters, convertFacets
 from urllib import unquote
 
 
