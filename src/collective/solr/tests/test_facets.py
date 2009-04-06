@@ -116,6 +116,28 @@ class SolrFacettingTests(SolrTestCase):
         view.kw = dict(results=solrSearchResults(request))
         self.assertEqual(view.facets(), [])
 
+    def testEmptyFacetValue(self):
+        # let's artificially create an empty value;  while this is a
+        # somewhat unrealistic scenario, empty values may very well occur
+        # for additional custom indexes...
+        self.portal.news.portal_type = ''
+        self.maintenance.reindex()
+        # after updating the solr index the view can be checked...
+        request = TestRequest()
+        request.form['SearchableText'] = 'News'
+        request.form['facet'] = 'true'
+        request.form['facet_field'] = 'portal_type'
+        alsoProvides(request, IThemeSpecific)
+        view = getMultiAdapter((self.portal, request), name='search-facets')
+        view = view.__of__(self.portal)     # needed to traverse `view/`
+        results = solrSearchResults(request)
+        output = view(results=results)
+        # the empty facet value should be displayed resulting in
+        # only one list item (`<dd>`)
+        self.assertEqual(len(output.split('<dd>')), 2)
+        # let's also make sure there are no empty filter queries
+        self.failIf('fq=portal_type%3A&amp;' in output)
+
 
 def test_suite():
     if pingSolr():
