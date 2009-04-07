@@ -21,11 +21,11 @@
     <h5 tal:content="facet/title" i18n:translate="" />
     <dl>
       <tal:counts repeat="item facet/counts">
-          <dt>
-            <a href="#" tal:content="item/name"
-               tal:attributes="href string:${request/ACTUAL_URL}?${item/query}" />
-          </dt>
-          <dd tal:content="item/count" />
+        <dt>
+          <a href="#" tal:content="item/name"
+             tal:attributes="href string:${request/ACTUAL_URL}?${item/query}" />
+        </dt>
+        <dd tal:content="item/count" />
       </tal:counts>
     </dl>
   </div>
