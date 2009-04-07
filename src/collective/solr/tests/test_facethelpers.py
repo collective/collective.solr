@@ -13,6 +13,9 @@ from urllib import unquote
 class Dummy(object):
     """ dummy class that allows setting attributes """
 
+    def __init__(self, **kw):
+        self.__dict__.update(kw)
+
 
 class FacettingHelperTest(TestCase):
 
@@ -78,8 +81,7 @@ class FacettingHelperTest(TestCase):
         getGlobalSiteManager().unregisterUtility(cfg, ISolrConnectionConfig)
 
     def testFacetLinks(self):
-        context = Dummy()
-        context.facet_fields = ['portal_type']
+        context = Dummy(facet_fields=['portal_type'])
         request = {'foo': 'bar'}
         fields = dict(portal_type=dict(Document=10, Folder=3, Event=5))
         info = convertFacets(fields, context, request)
@@ -211,11 +213,9 @@ class FacettingHelperTest(TestCase):
         self.assertEqual(info, [])
 
     def testEmptyFacetFieldWithZeroCounts(self):
-        request = Dummy()
-        request.form = {}
+        request = Dummy(form={})
         fields = dict(foo={'foo': 0, 'bar': 0})
-        results = Dummy()
-        results.facet_counts = dict(facet_fields=fields)
+        results = Dummy(facet_counts=dict(facet_fields=fields))
         view = SearchFacetsView(Dummy(), request)
         view.kw = dict(results=results)
         self.assertEqual(view.facets(), [])
