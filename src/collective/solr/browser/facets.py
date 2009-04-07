@@ -30,7 +30,7 @@ def facetParameters(context, request):
     return fields
 
 
-def convertFacets(fields, context=None, request={}):
+def convertFacets(fields, context=None, request={}, filter=None):
     """ convert facet info to a form easy to process in templates """
     info = []
     params = request.copy()   # request needs to be a dict, i.e. request.form
@@ -46,8 +46,9 @@ def convertFacets(fields, context=None, request={}):
             fqs = p.setdefault('fq', []).append('%s:%s' % (field, name))
             if field in p.get('facet.field', []):
                 p['facet.field'].remove(field)
-            counts.append(dict(name=name, count=count,
-                query=urlencode(p, doseq=True)))
+            if filter is None or filter(name, count):
+                counts.append(dict(name=name, count=count,
+                    query=urlencode(p, doseq=True)))
         if counts:
             info.append(dict(title=field, counts=counts))
     byTitle = lambda a, b: cmp(a['title'], b['title'])

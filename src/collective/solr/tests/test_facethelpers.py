@@ -210,6 +210,37 @@ class FacettingHelperTest(TestCase):
         info = convertFacets(fields, context, request)
         self.assertEqual(info, [])
 
+    def testFacetFieldFilter(self):
+        context = Dummy()
+        request = {'facet.field': 'foo'}
+        fields = dict(foo={'foo': 2, 'bar': 4, '': 6, 'nil': 0})
+        # without a filter all values are included
+        info = convertFacets(fields, context, request)
+        self.assertEqual(len(info), 1)
+        self.assertEqual([(c['name'], c['count']) for c in info[0]['counts']], [
+            ('', 6),
+            ('bar', 4),
+            ('foo', 2),
+            ('nil', 0),
+        ])
+        # let's filter out zero counts
+        filter = lambda name, count: count > 0
+        info = convertFacets(fields, context, request, filter=filter)
+        self.assertEqual(len(info), 1)
+        self.assertEqual([(c['name'], c['count']) for c in info[0]['counts']], [
+            ('', 6),
+            ('bar', 4),
+            ('foo', 2),
+        ])
+        # and also unnamed facets
+        filter = lambda name, count: name and count > 0
+        info = convertFacets(fields, context, request, filter=filter)
+        self.assertEqual(len(info), 1)
+        self.assertEqual([(c['name'], c['count']) for c in info[0]['counts']], [
+            ('bar', 4),
+            ('foo', 2),
+        ])
+
 
 def test_suite():
     return defaultTestLoader.loadTestsFromName(__name__)
