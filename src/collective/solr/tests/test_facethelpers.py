@@ -210,6 +210,16 @@ class FacettingHelperTest(TestCase):
         info = convertFacets(fields, context, request)
         self.assertEqual(info, [])
 
+    def testEmptyFacetFieldWithZeroCounts(self):
+        request = Dummy()
+        request.form = {}
+        fields = dict(foo={'foo': 0, 'bar': 0})
+        results = Dummy()
+        results.facet_counts = dict(facet_fields=fields)
+        view = SearchFacetsView(Dummy(), request)
+        view.kw = dict(results=results)
+        self.assertEqual(view.facets(), [])
+
     def testFacetFieldFilter(self):
         context = Dummy()
         request = {'facet.field': 'foo'}
