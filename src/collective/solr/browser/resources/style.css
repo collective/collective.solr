@@ -20,7 +20,7 @@
 }
 
 #portal-searchfacets dl {
-  margin-top: 0.2em;
+  margin: 0.2em 0 0 0;
 }
 
 #portal-searchfacets dt {
@@ -43,4 +43,14 @@
 
 #portal-searchfacets #selected-facets a {
   text-decoration: none;
+}
+
+.showMoreHidden {
+  display: none;
+}
+
+.showMoreLink {
+  font-size: 90%;
+  display: block;
+  clear: both;
 }
