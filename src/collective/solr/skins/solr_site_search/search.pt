@@ -16,6 +16,15 @@
                  tal:define="dummy python:request.set('disable_border',1)" />
     <metal:block fill-slot="column_one_slot" />
     <metal:block fill-slot="column_two_slot" />
+
+    <metal:js fill-slot="javascript_head_slot">
+      <script type="text/javascript" src=""
+              tal:attributes="src string:${portal_url}/++resource++collective.showmore.js">
+      </script>
+      <script type="text/javascript" src=""
+              tal:attributes="src string:${portal_url}/++resource++collective.solr.resources/scripts.js">
+      </script>
+    </metal:js>
 </head>
 
 <body>

@@ -13,6 +13,7 @@
 
   <include package="collective.indexing" />
   <include package="plone.browserlayer" />
+  <include package="collective.js.showmore" />
 
   <include file="profiles.zcml" />
 
