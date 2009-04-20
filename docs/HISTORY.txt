@@ -1,8 +1,12 @@
 Changelog
 =========
 
-1.0b6 - Unreleased
+1.0b7 - Unreleased
 ------------------
+
+
+1.0b6 - Released April 20, 2009
+-------------------------------
 
 * Add support for facetted searches.
   [witsch]
