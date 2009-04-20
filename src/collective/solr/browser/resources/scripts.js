@@ -2,6 +2,7 @@
 
 jq(function() {
     jq('#portal-searchfacets dl').showMore({
-        expression: 'dt:gt(4), dd:gt(4)'
+        expression: 'dt:gt(4), dd:gt(4)',
+        grace_count: 2,
     });
 });
