@@ -32,7 +32,7 @@ convenience.
 
   .. |--| unicode:: U+2013   .. en dash
   .. |---| unicode:: U+2014  .. em dash
-  .. _buildout: http://svn.plone.org/svn/collective/collective.solr/buildout
+  .. _buildout: http://svn.plone.org/svn/collective/collective.solr/trunk/buildout.cfg
 
 The code was written with emphasis on minimalism, clarity and maintainability.
 It comes with extensive tests covering the code base. The package is currently
@@ -41,9 +41,10 @@ in use in production and considered stable.
   .. at more than 95%.  XXX: make coverage run pick up all modules!
 
 For outstanding issues and features remaining to be implemented please see the
-`to-do list`__ included in the package.
+`to-do list`__ included in the package as well as it's `issue tracker`__.
 
   .. __: http://svn.plone.org/svn/collective/collective.solr/trunk/TODO.txt
+  .. __: http://plone.org/products/collective.solr/issues
 
 
 Credits

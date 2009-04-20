@@ -1,4 +1,5 @@
 TODOs:
+* support for date facets
 * tests for maintenance view for syncing catalog and solr indexes
 * result iterator (with __len__ on results object)
 * batch support for searching
