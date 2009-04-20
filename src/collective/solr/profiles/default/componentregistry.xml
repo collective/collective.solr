@@ -11,6 +11,6 @@
   <utility
      interface="collective.solr.interfaces.ISolrIndexQueueProcessor"
      name="solr"
-     factory="collective.solr.indexer.SolrIndexQueueProcessor"/>
+     factory="collective.solr.indexer.SolrIndexProcessor"/>
  </utilities>
 </componentregistry>

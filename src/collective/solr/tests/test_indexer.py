@@ -8,7 +8,7 @@ from Products.CMFCore.CMFCatalogAware import CMFCatalogAware
 from collective.solr.interfaces import ISolrConnectionConfig
 from collective.solr.manager import SolrConnectionConfig
 from collective.solr.manager import SolrConnectionManager
-from collective.solr.indexer import SolrIndexQueueProcessor
+from collective.solr.indexer import SolrIndexProcessor
 from collective.solr.indexer import logger as logger_indexer
 from collective.solr.tests.utils import getData, fakehttp, fakemore
 from collective.solr.solr import SolrConnection
@@ -40,7 +40,7 @@ class QueueIndexerTests(TestCase):
         conn = self.mngr.getConnection()
         fakehttp(conn, getData('schema.xml'))       # fake schema response
         self.mngr.getSchema()                       # read and cache the schema
-        self.proc = SolrIndexQueueProcessor(self.mngr)
+        self.proc = SolrIndexProcessor(self.mngr)
 
     def tearDown(self):
         self.mngr.closeConnection()
@@ -113,7 +113,7 @@ class RobustnessTests(TestCase):
         self.mngr = SolrConnectionManager()
         self.mngr.setHost(active=True)
         self.conn = self.mngr.getConnection()
-        self.proc = SolrIndexQueueProcessor(self.mngr)
+        self.proc = SolrIndexProcessor(self.mngr)
         self.log = []                   # catch log messages...
         def logger(*args):
             self.log.extend(args)
@@ -162,7 +162,7 @@ class FakeHTTPConnectionTests(TestCase):
 
     def testTwoRequests(self):
         mngr = SolrConnectionManager(active=True)
-        proc = SolrIndexQueueProcessor(mngr)
+        proc = SolrIndexProcessor(mngr)
         output = fakehttp(mngr.getConnection(), getData('schema.xml'),
             getData('add_response.txt'))
         proc.index(self.foo)
@@ -173,7 +173,7 @@ class FakeHTTPConnectionTests(TestCase):
 
     def testThreeRequests(self):
         mngr = SolrConnectionManager(active=True)
-        proc = SolrIndexQueueProcessor(mngr)
+        proc = SolrIndexProcessor(mngr)
         output = fakehttp(mngr.getConnection(), getData('schema.xml'),
             getData('add_response.txt'), getData('delete_response.txt'))
         proc.index(self.foo)
@@ -186,7 +186,7 @@ class FakeHTTPConnectionTests(TestCase):
 
     def testFourRequests(self):
         mngr = SolrConnectionManager(active=True)
-        proc = SolrIndexQueueProcessor(mngr)
+        proc = SolrIndexProcessor(mngr)
         output = fakehttp(mngr.getConnection(), getData('schema.xml'),
             getData('add_response.txt'), getData('delete_response.txt'),
             getData('commit_response.txt'))
@@ -204,7 +204,7 @@ class FakeHTTPConnectionTests(TestCase):
         # basically the same as `testThreeRequests`, except it
         # tests adding fake responses consecutively
         mngr = SolrConnectionManager(active=True)
-        proc = SolrIndexQueueProcessor(mngr)
+        proc = SolrIndexProcessor(mngr)
         conn = mngr.getConnection()
         output = fakehttp(conn, getData('schema.xml'))
         fakemore(conn, getData('add_response.txt'))
@@ -223,7 +223,7 @@ class ThreadedConnectionTests(TestCase):
     def testLocalConnections(self):
         provideUtility(SolrConnectionConfig(), ISolrConnectionConfig)
         mngr = SolrConnectionManager(active=True)
-        proc = SolrIndexQueueProcessor(mngr)
+        proc = SolrIndexProcessor(mngr)
         mngr.setHost(active=True)
         schema = getData('schema.xml')
         log = []
@@ -253,9 +253,9 @@ class ThreadedConnectionTests(TestCase):
         mngr.setHost(active=False)
         self.assertEqual(len(log), 3)
         self.assertEqual(sortFields(log[0]), getData('add_request.txt'))
-        self.failUnless(isinstance(log[1], SolrIndexQueueProcessor))
+        self.failUnless(isinstance(log[1], SolrIndexProcessor))
         self.failUnless(isinstance(log[2], SolrConnection))
-        self.failUnless(isinstance(proc, SolrIndexQueueProcessor))
+        self.failUnless(isinstance(proc, SolrIndexProcessor))
         self.failUnless(isinstance(conn, SolrConnection))
         self.assertEqual(log[1], proc)      # processors should be the same...
         self.assertNotEqual(log[2], conn)   # but not the connections

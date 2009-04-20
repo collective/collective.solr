@@ -1,5 +1,4 @@
 from logging import getLogger
-from persistent import Persistent
 from DateTime import DateTime
 from zope.component import getUtility, queryUtility, queryMultiAdapter
 from zope.interface import implements
@@ -39,7 +38,7 @@ def datehandler(value):
 handlers = {'solr.DateField': datehandler}
 
 
-class SolrIndexQueueProcessor(Persistent):
+class SolrIndexProcessor(object):
     """ a queue processor for solr """
     implements(ISolrIndexQueueProcessor)
 

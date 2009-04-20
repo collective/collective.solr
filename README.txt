@@ -47,6 +47,29 @@ For outstanding issues and features remaining to be implemented please see the
   .. __: http://plone.org/products/collective.solr/issues
 
 
+FAQs / Troubleshooting
+----------------------
+
+**"AssertionError: cannot use multiple direct indexers; please enable queueing"**
+
+  Symptom
+    When installing additional packages or applying a GenericSetup profile
+    you're getting the following error::
+
+      AssertionError: cannot use multiple direct indexers; please enable queueing
+  Problem
+    Early versions of the package used a persistent local utility, which is
+    still present in your ZODB.  This utility has meanwhile been replaced so
+    that there are currently two instances present.  However, without queued
+    indexing being enabled, only one such indexer is allowed at a time.
+  Solution
+    Please simply re-install the package via Plone's control panel or the
+    quick-installer.  Alternatively you can also use the ZMI "Components" tab
+    on your site root object, typically located at
+    http://localhost:8080/plone/manage_components, to remove the broken
+    utilities from the XML.  Search for "broken".
+
+
 Credits
 -------
 
