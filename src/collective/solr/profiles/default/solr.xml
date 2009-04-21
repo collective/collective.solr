@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <object name="solr">
   <connection>
-    <active value="False" />
     <host value="127.0.0.1" />
     <port value="8983" />
     <base value="/solr" />

@@ -50,6 +50,27 @@ class SetupToolTests(SolrTestCase, TarballTester):
         self._verifyTarballContents(tarball, ['solr.xml'])
         self._verifyTarballEntryXML(tarball, 'solr.xml', SOLR_XML)
 
+    def testImportDoesntChangeActivationState(self):
+        # re-applying the solr profile shouldn't change the activation state
+        # so let's assume we've already got a site using the package...
+        profile = 'profile-collective.solr:default'
+        tool = self.portal.portal_setup
+        result = tool.runImportStepFromProfile(profile, 'solr')
+        self.assertEqual(result['steps'], [u'componentregistry', 'solr'])
+        # by default solr support shouldn't be active
+        config = getUtility(ISolrConnectionConfig)
+        self.assertEqual(config.active, False)
+        # so let's active and re-apply the profile...
+        config.active = True
+        result = tool.runImportStepFromProfile(profile, 'solr')
+        self.assertEqual(result['steps'], [u'componentregistry', 'solr'])
+        self.assertEqual(config.active, True)
+        # now again in a deactivated state...
+        config.active = False
+        result = tool.runImportStepFromProfile(profile, 'solr')
+        self.assertEqual(result['steps'], [u'componentregistry', 'solr'])
+        self.assertEqual(config.active, False)
+
 
 SOLR_XML = """\
 <?xml version="1.0"?>

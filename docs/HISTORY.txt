@@ -4,6 +4,10 @@ Changelog
 1.0b7 - Unreleased
 ------------------
 
+* Fix unintended (de)activation of the Solr integration during profile
+  (re)application.
+  [witsch]
+
 * Fix display of facet information with no active facets.
   [witsch]
 

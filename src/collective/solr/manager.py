@@ -42,8 +42,9 @@ class SolrConnectionManager(object):
     """ a thread-local connection manager for solr """
     implements(ISolrConnectionManager)
 
-    def __init__(self, active=False):
-        self.setHost(active=active)
+    def __init__(self, active=None):
+        if isinstance(active, bool):
+            self.setHost(active=active)
 
     def setHost(self, active=False, host='localhost', port=8983, base='/solr'):
         """ set connection parameters """
