@@ -4,6 +4,9 @@ Changelog
 1.0b7 - Unreleased
 ------------------
 
+* Fix display of facet information with no active facets.
+  [witsch]
+
 * Register import and export steps using ZCML.
   [witsch]
 

@@ -116,6 +116,17 @@ class SolrFacettingTests(SolrTestCase):
         view.kw = dict(results=solrSearchResults(request))
         self.assertEqual(view.facets(), [])
 
+    def testNoFacetFields(self):
+        request = TestRequest()
+        request.form['SearchableText'] = 'News'
+        request.form['facet'] = 'true'
+        request.form['facet_field'] = []
+        alsoProvides(request, IThemeSpecific)
+        view = getMultiAdapter((self.portal, request), name='search-facets')
+        view = view.__of__(self.portal)     # needed to traverse `view/`
+        output = view(results=solrSearchResults(request))
+        self.failIf('portal-searchfacets' in output, output)
+
     def testEmptyFacetValue(self):
         # let's artificially create an empty value;  while this is a
         # somewhat unrealistic scenario, empty values may very well occur

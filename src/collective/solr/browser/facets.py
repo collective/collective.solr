@@ -18,7 +18,7 @@ def param(view, name):
 def facetParameters(context, request):
     """ determine facet fields to be queried for """
     marker = []
-    fields = request.get('facet.field', marker)
+    fields = request.get('facet.field', request.get('facet_field', marker))
     if isinstance(fields, basestring):
         fields = [fields]
     if fields is marker:
