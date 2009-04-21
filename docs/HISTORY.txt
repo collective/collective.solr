@@ -4,6 +4,9 @@ Changelog
 1.0b7 - Unreleased
 ------------------
 
+* Register import and export steps using ZCML.
+  [witsch]
+
 
 1.0b6 - Released April 20, 2009
 -------------------------------

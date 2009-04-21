@@ -1,8 +1,0 @@
-<?xml version="1.0"?>
-<export-steps>
- <export-step id="solr"
-           handler="collective.solr.exportimport.exportSolrSettings"
-           title="solr configuration">
-  Export settings for Solr integration.
- </export-step>
-</export-steps>
