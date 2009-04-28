@@ -1,8 +1,12 @@
 Changelog
 =========
 
-1.0b7 - Unreleased
+1.0b8 - Unreleased
 ------------------
+
+
+1.0b7 - Released April 28, 2009
+-------------------------------
 
 * Fix unintended (de)activation of the Solr integration during profile
   (re)application.
