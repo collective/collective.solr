@@ -1,8 +1,12 @@
 Changelog
 =========
 
-1.0b8 - Unreleased
+1.0b9 - Unreleased
 ------------------
+
+
+1.0b8 - Released May 4, 2009
+----------------------------
 
 * Fix indexing regarding Plone 3.3, `plone.indexer`_ & `PLIP 239`_.
   This fixes http://plone.org/products/collective.solr/issues/6
