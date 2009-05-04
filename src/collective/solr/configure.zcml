@@ -61,6 +61,10 @@
 
   </configure>
 
+  <adapter name="physicalPath" factory=".attributes.physicalPathIndexer" />
+  <adapter name="physicalDepth" factory=".attributes.physicalDepthIndexer" />
+  <adapter name="parentPaths" factory=".attributes.parentPathsIndexer" />
+
   <adapter
       factory=".exportimport.SolrConfigXMLAdapter"
       provides="Products.GenericSetup.interfaces.IBody"

@@ -39,6 +39,7 @@ setup(name = 'collective.solr',
           'collective.indexing',
           'plone.browserlayer',
           'collective.js.showmore',
+          'plone.indexer',
       ],
       entry_points = '',
 )

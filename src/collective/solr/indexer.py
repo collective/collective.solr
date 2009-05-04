@@ -6,6 +6,8 @@ from Products.CMFCore.utils import getToolByName
 from Products.CMFCore.CMFCatalogAware import CMFCatalogAware
 from Products.Archetypes.CatalogMultiplex import CatalogMultiplex
 from plone.app.content.interfaces import IIndexableObjectWrapper
+from plone.indexer.interfaces import IIndexableObject
+
 from collective.solr.interfaces import ISolrConnectionConfig
 from collective.solr.interfaces import ISolrConnectionManager
 from collective.solr.interfaces import ISolrIndexQueueProcessor
@@ -132,18 +134,26 @@ class SolrIndexProcessor(object):
             return self.manager.getConnection()
 
     def wrapObject(self, obj):
-        """ wrap object with an "IndexableObjectWrapper`, see
-            `CatalogTool.catalog_object` for some background """
-        portal = getToolByName(obj, 'portal_url', None)
-        if portal is None:
-            return obj
-        portal = portal.getPortalObject()
-        wrapper = queryMultiAdapter((obj, portal), IIndexableObjectWrapper)
-        if wrapper is None:
-            return obj
-        wft = getToolByName(obj, 'portal_workflow', None)
-        if wft is not None:
-            wrapper.update(wft.getCatalogVariablesFor(obj))
+        """ wrap object with an "IndexableObjectWrapper` (for Plone < 3.3) or
+            adapt it to `IIndexableObject` (for Plone >= 3.3), see
+            `CMFPlone...CatalogTool.catalog_object` for some background """
+        wrapper = obj
+        # first try the new way, i.e. using `plone.indexer`...
+        catalog = getToolByName(obj, 'portal_catalog', None)
+        adapter = queryMultiAdapter((obj, catalog), IIndexableObject)
+        if adapter is not None:
+            wrapper = adapter
+        else:       # otherwise try the old way...
+            portal = getToolByName(obj, 'portal_url', None)
+            if portal is None:
+                return obj
+            portal = portal.getPortalObject()
+            adapter = queryMultiAdapter((obj, portal), IIndexableObjectWrapper)
+            if adapter is not None:
+                wrapper = adapter
+            wft = getToolByName(obj, 'portal_workflow', None)
+            if wft is not None:
+                wrapper.update(wft.getCatalogVariablesFor(obj))
         return wrapper
 
     def getData(self, obj, attributes=None):
