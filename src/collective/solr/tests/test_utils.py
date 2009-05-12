@@ -49,6 +49,11 @@ class TranslationTests(TestCase):
         prepareData(data)
         self.assertEqual(data, {'SearchableText': 'foo\n\tbar  \r'})
 
+    def testUnicodeSearchableText(self):
+        data = {'SearchableText': u'f\xf8\xf8'}
+        prepareData(data)
+        self.assertEqual(data, {'SearchableText': 'f\xc3\xb8\xc3\xb8'})
+
 
 def test_suite():
     return defaultTestLoader.loadTestsFromName(__name__)

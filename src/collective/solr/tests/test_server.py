@@ -193,6 +193,12 @@ class SolrServerTests(SolrTestCase):
         self.assertEqual([(r.Title, r.physicalPath) for r in results],
             [('News', '/plone/news'), ('News', '/plone/news/aggregator')])
 
+    def testSolrSearchResultsWithUnicodeTitle(self):
+        self.folder.processForm(values={'title': u'Føø'})
+        commit()                        # indexing happens on commit
+        results = solrSearchResults(SearchableText=u'Føø')
+        self.assertEqual([r.Title for r in results], [u'Føø'])
+
     def testSolrSearchResultsInformation(self):
         self.maintenance.reindex()
         response = solrSearchResults(SearchableText='News')

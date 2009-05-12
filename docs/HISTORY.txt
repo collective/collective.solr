@@ -4,6 +4,10 @@ Changelog
 1.0b9 - Unreleased
 ------------------
 
+* Add safety net for using a translation map on unicode strings.
+  This fixes http://plone.org/products/collective.solr/issues/4
+  [witsch]
+
 * Add workaround for issue with `SearchableText` criteria in topics.
   This fixes http://plone.org/products/collective.solr/issues/3
   [witsch]

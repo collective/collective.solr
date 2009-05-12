@@ -43,6 +43,8 @@ def prepareData(data):
         data['allowedRolesAndUsers'] = [r.replace(':', '$') for r in allowed]
     searchable = data.get('SearchableText', None)
     if searchable is not None:
+        if isinstance(searchable, unicode):
+            searchable = searchable.encode('utf-8')
         data['SearchableText'] = searchable.translate(translation_map)
 
 
