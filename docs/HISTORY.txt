@@ -1,8 +1,8 @@
 Changelog
 =========
 
-1.0b9 - Unreleased
-------------------
+1.0b9 - Released May 12, 2009
+-----------------------------
 
 * Add safety net for using a translation map on unicode strings.
   This fixes http://plone.org/products/collective.solr/issues/4
