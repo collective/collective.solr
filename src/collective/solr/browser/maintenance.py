@@ -114,15 +114,15 @@ class SolrMaintenanceView(BrowserView):
         log(msg)
         logger.info(msg)
 
-    def metadata(self, index, func=lambda x: x):
-        """ build a mapping between UIDs and a given attribute from
+    def metadata(self, index, key, func=lambda x: x):
+        """ build a mapping between a unique key and a given attribute from
             the portal catalog; catalog metadata must exist for the given
             index """
         catalog = getToolByName(self.context, 'portal_catalog')
         cat = catalog._catalog      # get the real catalog...
         pos = cat.schema[index]
         data = {}
-        for uid, rids in cat.getIndex('UID').items():
+        for uid, rids in cat.getIndex(key).items():
             for rid in rids:
                 value = cat.data[rid][pos]
                 if value is not None:
@@ -132,14 +132,16 @@ class SolrMaintenanceView(BrowserView):
     def diff(self):
         """ determine objects that need to be indexed/reindex/unindexed by
             diff'ing the records in the portal catalog and solr """
-        uids = self.metadata('modified', func=lambda x: x.millis())
+        key = queryUtility(ISolrConnectionManager).getSchema().uniqueKey
+        uids = self.metadata('modified', key=key, func=lambda x: x.millis())
         search = queryUtility(ISearch)
         reindex = []
         unindex = []
         rows = len(uids) * 10               # sys.maxint makes solr choke :(
-        for flare in search('UID:[* TO *]', rows=rows, fl='UID modified'):
-            uid = flare.UID
-            assert uid, 'empty UID?'
+        query = '%s:[* TO *]' % key
+        for flare in search(query, rows=rows, fl='%s modified' % key):
+            uid = getattr(flare, key)
+            assert uid, 'empty unique key?'
             if uid in uids:
                 if uids[uid] > flare.modified.millis():
                     reindex.append(uid)     # item isn't current

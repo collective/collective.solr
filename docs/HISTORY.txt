@@ -4,6 +4,9 @@ Changelog
 1.0b9 - Unreleased
 ------------------
 
+* Fix hard-coded unique key in maintenance view.
+  [witsch]
+
 
 1.0b8 - Released May 4, 2009
 ----------------------------
