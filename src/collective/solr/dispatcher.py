@@ -12,8 +12,9 @@ from collective.solr.mangler import mangleQuery
 from collective.solr.mangler import extractQueryParameters
 from collective.solr.mangler import cleanupQueryParameters
 
-from collective.solr.monkey import patchCatalogTool
+from collective.solr.monkey import patchCatalogTool, patchLazyCat
 patchCatalogTool()      # patch catalog tool to use the dispatcher...
+patchLazyCat()          # ...as well as ZCatalog's Lazy class
 
 from collective.solr.attributes import registerAttributes
 registerAttributes()    # register additional indexable attributes

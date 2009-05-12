@@ -4,6 +4,10 @@ Changelog
 1.0b9 - Unreleased
 ------------------
 
+* Add workaround for issue with `SearchableText` criteria in topics.
+  This fixes http://plone.org/products/collective.solr/issues/3
+  [witsch]
+
 * Add maintenance view for adding/syncing single indexes using already
   existing data from the portal catalog.
   [witsch]

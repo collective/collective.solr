@@ -435,6 +435,17 @@ class SolrServerTests(SolrTestCase):
         results = solrSearchResults(SearchableText=' ', path='/plone')
         self.assertEqual(len(results), 8)
 
+    def testSearchableTopic(self):
+        self.maintenance.reindex()
+        self.setRoles(['Manager'])
+        self.folder.invokeFactory('Topic', id='news', title='some news')
+        news = self.folder.news
+        crit = news.addCriterion('SearchableText', 'ATSimpleStringCriterion')
+        crit.setValue('News')
+        results = news.queryCatalog()
+        self.assertEqual([(r.Title, r.physicalPath) for r in results],
+            [('News', '/plone/news'), ('News', '/plone/news/aggregator')])
+
 
 def test_suite():
     if pingSolr():
