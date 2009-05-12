@@ -228,17 +228,17 @@ class SolrMaintenanceView(BrowserView):
         log(msg)
         logger.info(msg)
 
-    def catalogSync(self, index, batch=100):
+    def catalogSync(self, index, batch=1000):
         """ add or sync a single solr index using data from the portal
             catalog;  existing data in solr will be overwritten for the
             given index """
         manager = queryUtility(ISolrConnectionManager)
         manager.setTimeout(None)        # don't time out during syncing
         log = self.mklog()
-        log('getting data for "%s" from portal catalog...', index)
+        log('getting data for "%s" from portal catalog...\n' % index)
         key = manager.getSchema().uniqueKey
         data = self.metadata(index, key=key)
-        log('syncing "%s" from portal catalog to solr...', index)
+        log('syncing "%s" from portal catalog to solr...\n' % index)
         real = timer()          # real time
         lap = timer()           # real lap time (for intermediate commits)
         cpu = timer(clock)      # cpu time
@@ -253,6 +253,7 @@ class SolrMaintenanceView(BrowserView):
         for uid, value in data.items():
             data = {key: uid, index: value}
             conn.add(**data)
+            processed += 1
             cpi.next()
         conn.commit()           # make sure to commit in the end...
         log('portal catalog data synced.\n')
