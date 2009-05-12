@@ -22,58 +22,42 @@ class SolrMaintenanceTests(SolrTestCase):
 
     def afterSetUp(self):
         activate()
+        manager = getUtility(ISolrConnectionManager)
+        self.connection = connection = manager.getConnection()
+        # make sure nothing is indexed
+        connection.deleteByQuery('[* TO *]')
+        connection.commit()
+        result = connection.search(q='[* TO *]').read()
+        self.assertEqual(numFound(result), 0)
+        # ignore any generated logging output
+        self.portal.REQUEST.RESPONSE.write = lambda x: x
 
     def beforeTearDown(self):
         activate(active=False)
 
+    def search(self, query='[* TO *]'):
+        return self.connection.search(q=query).read()
+
     def testClear(self):
-        manager = getUtility(ISolrConnectionManager)
-        connection = manager.getConnection()
-        # make sure nothing is indexed
-        connection.deleteByQuery('[* TO *]')
-        connection.commit()
-        result = connection.search(q='[* TO *]').read()
-        self.assertEqual(numFound(result), 0)
-        # now add something...
+        # add something...
+        connection = self.connection
         connection.add(UID='foo', Title='bar')
         connection.commit()
-        result = connection.search(q='[* TO *]').read()
-        self.assertEqual(numFound(result), 1)
+        self.assertEqual(numFound(self.search()), 1)
         # and clear things again...
         maintenance = self.portal.unrestrictedTraverse('solr-maintenance')
         maintenance.clear()
-        result = connection.search(q='[* TO *]').read()
-        self.assertEqual(numFound(result), 0)
+        self.assertEqual(numFound(self.search()), 0)
 
     def testReindex(self):
-        manager = getUtility(ISolrConnectionManager)
-        connection = manager.getConnection()
-        # make sure nothing is indexed
-        connection.deleteByQuery('[* TO *]')
-        connection.commit()
-        result = connection.search(q='[* TO *]').read()
-        self.assertEqual(numFound(result), 0)
-        # reindex and check again...
-        self.portal.REQUEST.RESPONSE.write = lambda x: x    # ignore output
         maintenance = self.portal.unrestrictedTraverse('solr-maintenance')
         maintenance.reindex()
-        result = connection.search(q='[* TO *]').read()
-        self.assertEqual(numFound(result), 8)
+        self.assertEqual(numFound(self.search()), 8)
 
     def testPartialReindex(self):
-        manager = getUtility(ISolrConnectionManager)
-        connection = manager.getConnection()
-        # make sure nothing is indexed
-        connection.deleteByQuery('[* TO *]')
-        connection.commit()
-        result = connection.search(q='[* TO *]').read()
-        self.assertEqual(numFound(result), 0)
-        # reindex and check again...
-        self.portal.REQUEST.RESPONSE.write = lambda x: x    # ignore output
         maintenance = self.portal.unrestrictedTraverse('news/solr-maintenance')
         maintenance.reindex()
-        result = connection.search(q='[* TO *]').read()
-        self.assertEqual(numFound(result), 2)
+        self.assertEqual(numFound(self.search()), 2)
 
 
 class SolrErrorHandlingTests(SolrTestCase):
