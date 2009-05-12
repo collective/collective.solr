@@ -114,18 +114,25 @@ class SolrMaintenanceView(BrowserView):
         log(msg)
         logger.info(msg)
 
+    def metadata(self, index, func=lambda x: x):
+        """ build a mapping between UIDs and a given attribute from
+            the portal catalog; catalog metadata must exist for the given
+            index """
+        catalog = getToolByName(self.context, 'portal_catalog')
+        cat = catalog._catalog      # get the real catalog...
+        pos = cat.schema[index]
+        data = {}
+        for uid, rids in cat.getIndex('UID').items():
+            for rid in rids:
+                value = cat.data[rid][pos]
+                if value is not None:
+                    data[uid] = func(value)
+        return data
+
     def diff(self):
         """ determine objects that need to be indexed/reindex/unindexed by
             diff'ing the records in the portal catalog and solr """
-        catalog = getToolByName(self.context, 'portal_catalog')
-        cat = catalog._catalog      # get the real catalog...
-        pos = cat.schema['modified']
-        uids = {}
-        for uid, rids in cat.getIndex('UID').items():
-            for rid in rids:
-                modified = cat.data[rid][pos]
-                if modified is not None:
-                    uids[uid] = modified.millis()
+        uids = self.metadata('modified', func=lambda x: x.millis())
         search = queryUtility(ISearch)
         reindex = []
         unindex = []
