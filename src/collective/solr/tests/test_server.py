@@ -59,6 +59,20 @@ class SolrMaintenanceTests(SolrTestCase):
         maintenance.reindex()
         self.assertEqual(numFound(self.search()), 2)
 
+    def testCatalogSync(self):
+        maintenance = self.portal.unrestrictedTraverse('solr-maintenance')
+        # initially solr should have no data for the index
+        def count(index):
+            return numFound(self.search(query='%s:[* TO *]' % index))
+        self.assertEqual(count('review_state'), 0)
+        # after syncing from the catalog the index data should be available
+        maintenance.catalogSync(index='review_state')
+        self.assertEqual(count('review_state'), 8)
+        # but not for any of the other indexes
+        self.assertEqual(count('Title'), 0)
+        self.assertEqual(count('physicalPath'), 0)
+        self.assertEqual(count('portal_type'), 0)
+
 
 class SolrErrorHandlingTests(SolrTestCase):
 

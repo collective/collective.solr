@@ -4,6 +4,10 @@ Changelog
 1.0b9 - Unreleased
 ------------------
 
+* Add maintenance view for adding/syncing single indexes using already
+  existing data from the portal catalog.
+  [witsch]
+
 * Fix hard-coded unique key in maintenance view.
   [witsch]
 

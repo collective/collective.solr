@@ -227,3 +227,36 @@ class SolrMaintenanceView(BrowserView):
         msg = msg % (processed, real.next(), cpu.next())
         log(msg)
         logger.info(msg)
+
+    def catalogSync(self, index, batch=100):
+        """ add or sync a single solr index using data from the portal
+            catalog;  existing data in solr will be overwritten for the
+            given index """
+        manager = queryUtility(ISolrConnectionManager)
+        manager.setTimeout(None)        # don't time out during syncing
+        log = self.mklog()
+        log('getting data for "%s" from portal catalog...', index)
+        key = manager.getSchema().uniqueKey
+        data = self.metadata(index, key=key)
+        log('syncing "%s" from portal catalog to solr...', index)
+        real = timer()          # real time
+        lap = timer()           # real lap time (for intermediate commits)
+        cpu = timer(clock)      # cpu time
+        processed = 0
+        conn = manager.getConnection()
+        def checkPoint():
+            log('intermediate commit (%d items processed, '
+                'last batch in %s)...\n' % (processed, lap.next()))
+            conn.commit()
+            manager.getConnection().reset()     # force new connection
+        cpi = checkpointIterator(checkPoint, batch)
+        for uid, value in data.items():
+            data = {key: uid, index: value}
+            conn.add(**data)
+            cpi.next()
+        conn.commit()           # make sure to commit in the end...
+        log('portal catalog data synced.\n')
+        msg = 'processed %d items in %s (%s cpu time).'
+        msg = msg % (processed, real.next(), cpu.next())
+        log(msg)
+        logger.info(msg)

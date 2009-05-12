@@ -145,3 +145,8 @@ class ISolrMaintenanceView(Interface):
             contained in the catalog can be optionally removed;  this can
             be used to ensure consistency between zope and solr after the
             solr server has been unavailable etc """
+
+    def catalogSync(index, batch=100):
+        """ add or sync a single solr index using data from the portal
+            catalog;  existing data in solr will be overwritten for the
+            given index """
