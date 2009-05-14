@@ -67,7 +67,7 @@ class PloneFlare(AttrDict):
         score = self.get('score', None)
         if score is None:
             return 'n.a.'
-        return score
+        return '%.1f' % (float(score) * 100)
 
     @property
     def review_state(self):
