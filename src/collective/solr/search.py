@@ -36,7 +36,9 @@ class Search(object):
             parameters['rows'] = config.max_results or ''
         logger.debug('searching for %r (%r)', query, parameters)
         response = connection.search(q=query, **parameters)
-        return SolrResponse(response)
+        results = SolrResponse(response)
+        response.close()
+        return results
 
     __call__ = search
 

@@ -183,6 +183,16 @@ class SolrServerTests(SolrTestCase):
         self.assertEqual(results[0].Title, 'Foo')
         self.assertEqual(results[0].UID, self.folder.UID())
 
+    def testSearchingTwice(self):
+        connection = getUtility(ISolrConnectionManager).getConnection()
+        self.assertEqual(connection.reconnects, 0)
+        results = self.search('+Title:Foo').results()
+        self.assertEqual(results.numFound, '0')
+        self.assertEqual(connection.reconnects, 0)
+        results = self.search('+Title:Foo').results()
+        self.assertEqual(results.numFound, '0')
+        self.assertEqual(connection.reconnects, 0)
+
     def testSolrSearchResultsFallback(self):
         self.assertRaises(FallBackException, solrSearchResults,
             dict(foo='bar'))
