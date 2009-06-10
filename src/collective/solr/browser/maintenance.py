@@ -52,14 +52,17 @@ class SolrMaintenanceView(BrowserView):
     def optimize(self):
         """ optimize solr indexes """
         manager = queryUtility(ISolrConnectionManager)
-        manager.getConnection(timeout=None).commit(optimize=True)
+        conn = manager.getConnection()
+        conn.setTimeout(None)
+        conn.commit(optimize=True)
         return 'solr indexes optimized.'
 
     def clear(self):
         """ clear all data from solr, i.e. delete all indexed objects """
         manager = queryUtility(ISolrConnectionManager)
         uniqueKey = manager.getSchema().uniqueKey
-        conn = manager.getConnection(timeout=None)
+        conn = manager.getConnection()
+        conn.setTimeout(None)
         conn.deleteByQuery('%s:[* TO *]' % uniqueKey)
         conn.commit()
         return 'solr index cleared.'

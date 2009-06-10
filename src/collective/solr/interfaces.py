@@ -65,9 +65,8 @@ class ISolrConnectionManager(Interface):
     def closeConnection(clearSchema=False):
         """ close the current connection, if any """
 
-    def getConnection(timeout=object()):
-        """ returns an existing connection or opens one, optionally
-            allowing to directly specify a timeout value """
+    def getConnection():
+        """ returns an existing connection or opens one """
 
     def getSchema():
         """ returns the currently used schema or fetches it """

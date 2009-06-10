@@ -65,9 +65,8 @@ class SolrConnectionManager(object):
         if clearSchema:
             setLocal('schema', None)
 
-    def getConnection(self, timeout=marker):
-        """ returns an existing connection or opens one, optionally
-            allowing to directly specify a timeout value """
+    def getConnection(self):
+        """ returns an existing connection or opens one """
         config = getUtility(ISolrConnectionConfig)
         if not config.active:
             return None
@@ -78,8 +77,6 @@ class SolrConnectionManager(object):
             conn = SolrConnection(host=host, solrBase=config.base,
                 persistent=True)
             setLocal('connection', conn)
-        if conn is not None and timeout is not marker:
-            conn.setTimeout(timeout)
         return conn
 
     def getSchema(self):
