@@ -38,6 +38,7 @@ class Search(object):
         response = connection.search(q=query, **parameters)
         results = SolrResponse(response)
         response.close()
+        manager.setTimeout(None)
         return results
 
     __call__ = search

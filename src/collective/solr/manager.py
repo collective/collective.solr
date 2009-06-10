@@ -43,6 +43,7 @@ class SolrConnectionManager(object):
     implements(ISolrConnectionManager)
 
     def __init__(self, active=None):
+        self.lock = False
         if isinstance(active, bool):
             self.setHost(active=active)
 
@@ -93,12 +94,15 @@ class SolrConnectionManager(object):
                     logger.exception('exception while getting schema')
         return schema
 
-    def setTimeout(self, timeout):
+    def setTimeout(self, timeout, lock=marker):
         """ set the timeout on the current (or to be opened) connection
             to the given value """
-        conn = self.getConnection()
-        if conn is not None:
-            conn.setTimeout(timeout)
+        if lock is not marker:
+            self.lock = bool(lock)
+        if not self.lock:
+            conn = self.getConnection()
+            if conn is not None:
+                conn.setTimeout(timeout)
 
     def setIndexTimeout(self):
         """ set the timeout on the current (or to be opened) connection

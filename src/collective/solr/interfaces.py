@@ -71,9 +71,10 @@ class ISolrConnectionManager(Interface):
     def getSchema():
         """ returns the currently used schema or fetches it """
 
-    def setTimeout(timeout):
+    def setTimeout(timeout, lock=object()):
         """ set the timeout on the current (or to be opened) connection
-            to the given value """
+            to the given value and optionally lock it until explicitly
+            freed again """
 
     def setIndexTimeout():
         """ set the timeout on the current (or to be opened) connection

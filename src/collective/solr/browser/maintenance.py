@@ -71,7 +71,7 @@ class SolrMaintenanceView(BrowserView):
         """ find all contentish objects (meaning all objects derived from one
             of the catalog mixin classes) and (re)indexes them """
         manager = queryUtility(ISolrConnectionManager)
-        manager.setTimeout(None)        # don't time out during reindexing
+        manager.setTimeout(None, lock=True) # don't time out during reindexing
         proc = queryUtility(ISolrIndexQueueProcessor, name='solr')
         log = self.mklog()
         if skip:
@@ -110,6 +110,7 @@ class SolrMaintenanceView(BrowserView):
                             log(msg % size)
                             db.cacheMinimize()
         proc.commit(wait=True)      # make sure to commit in the end...
+        manager.setTimeout(None, lock=False)    # reset the timeout lock
         now, cpu = time() - now, clock() - cpu
         log('solr index rebuilt.\n')
         msg = 'indexed %d object(s) in %.3f seconds (%.3f cpu time).'
@@ -161,7 +162,7 @@ class SolrMaintenanceView(BrowserView):
             be used to ensure consistency between zope and solr after the
             solr server has been unavailable etc """
         manager = queryUtility(ISolrConnectionManager)
-        manager.setTimeout(None)        # don't time out during syncing
+        manager.setTimeout(None, lock=True) # don't time out during reindexing
         proc = queryUtility(ISolrIndexQueueProcessor, name='solr')
         db = self.context.getPhysicalRoot()._p_jar.db()
         log = self.mklog()
@@ -225,6 +226,7 @@ class SolrMaintenanceView(BrowserView):
             else:
                 log('not unindexing existing object %r (%r).\n' % (obj, uid))
         proc.commit(wait=True)      # make sure to commit in the end...
+        manager.setTimeout(None, lock=False)    # reset the timeout lock
         log('solr index synced.\n')
         msg = 'processed %d object(s) in %s (%s cpu time).'
         msg = msg % (processed, real.next(), cpu.next())
@@ -236,7 +238,7 @@ class SolrMaintenanceView(BrowserView):
             catalog;  existing data in solr will be overwritten for the
             given index """
         manager = queryUtility(ISolrConnectionManager)
-        manager.setTimeout(None)        # don't time out during syncing
+        manager.setTimeout(None, lock=True) # don't time out during reindexing
         log = self.mklog()
         log('getting data for "%s" from portal catalog...\n' % index)
         key = manager.getSchema().uniqueKey
@@ -259,6 +261,7 @@ class SolrMaintenanceView(BrowserView):
             processed += 1
             cpi.next()
         conn.commit()           # make sure to commit in the end...
+        manager.setTimeout(None, lock=False)    # reset the timeout lock
         log('portal catalog data synced.\n')
         msg = 'processed %d items in %s (%s cpu time).'
         msg = msg % (processed, real.next(), cpu.next())

@@ -107,6 +107,7 @@ class SolrConnection:
 
     def setTimeout(self, timeout):
         """ set a timeout value for the currently open connection """
+        logger.debug('setting socket timeout on %r: %s', self, timeout)
         self.conn.setTimeout(timeout)
 
     def doPost(self, url, body, headers):

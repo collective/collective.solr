@@ -73,6 +73,40 @@ class SolrMaintenanceTests(SolrTestCase):
         self.assertEqual(count('physicalPath'), 0)
         self.assertEqual(count('portal_type'), 0)
 
+    def testDisabledTimeoutDuringReindex(self):
+        log = []
+        def logger(*args):
+            log.extend(args)
+        logger_solr.exception = logger
+        # specify a very short timeout...
+        config = getUtility(ISolrConnectionConfig)
+        config.index_timeout = 0.01             # huh, solr is fast!
+        # reindexing should disable the timeout...
+        maintenance = self.portal.unrestrictedTraverse('solr-maintenance')
+        maintenance.reindex()
+        # there should have been no errors...
+        self.assertEqual(log, [])
+        # let's also reset the timeout and check the results...
+        config.index_timeout = None
+        self.assertEqual(numFound(self.search()), 8)
+
+    def testDisabledTimeoutDuringSyncing(self):
+        log = []
+        def logger(*args):
+            log.extend(args)
+        logger_solr.exception = logger
+        # specify a very short timeout...
+        config = getUtility(ISolrConnectionConfig)
+        config.index_timeout = 0.01             # huh, solr is fast!
+        # syncing should disable the timeout...
+        maintenance = self.portal.unrestrictedTraverse('solr-maintenance')
+        maintenance.sync()
+        # there should have been no errors...
+        self.assertEqual(log, [])
+        # let's also reset the timeout and check the results...
+        config.index_timeout = None
+        self.assertEqual(numFound(self.search()), 8)
+
 
 class SolrErrorHandlingTests(SolrTestCase):
 
@@ -445,6 +479,14 @@ class SolrServerTests(SolrTestCase):
         # the old title should still be exist...
         result = connection.search(q='+Title:Foo').read()
         self.assertEqual(numFound(result), 1)
+
+    def testTimeoutResetAfterSearch(self):
+        self.config.search_timeout = 1      # specify the timeout
+        connection = getUtility(ISolrConnectionManager).getConnection()
+        self.assertEqual(connection.conn.sock.gettimeout(), None)
+        results = self.search('+Title:Foo').results()
+        self.assertEqual(results.numFound, '0')
+        self.assertEqual(connection.conn.sock.gettimeout(), None)
 
     def testEmptyStringSearch(self):
         self.maintenance.reindex()
