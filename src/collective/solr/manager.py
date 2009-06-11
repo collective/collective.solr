@@ -42,8 +42,9 @@ class SolrConnectionManager(object):
     """ a thread-local connection manager for solr """
     implements(ISolrConnectionManager)
 
+    lock = False
+
     def __init__(self, active=None):
-        self.lock = False
         if isinstance(active, bool):
             self.setHost(active=active)
 
