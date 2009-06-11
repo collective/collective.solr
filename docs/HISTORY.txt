@@ -1,8 +1,8 @@
 Changelog
 =========
 
-1.0b10 - Unreleased
-------------------
+1.0b10 - Released June 11, 2009
+-------------------------------
 
 * Range queries must not be quoted with the new query parser.
   [witsch]
