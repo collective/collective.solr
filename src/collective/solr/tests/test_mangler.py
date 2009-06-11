@@ -35,29 +35,29 @@ class QueryManglerTests(TestCase):
 
     def testMinRange(self):
         keywords = mangle(foo=[23], foo_usage='range:min')
-        self.assertEqual(keywords, {'foo': '"[23 TO *]"'})
+        self.assertEqual(keywords, {'foo': '[23 TO *]'})
         keywords = mangle(foo=dict(query=[23], range='min'))
-        self.assertEqual(keywords, {'foo': '"[23 TO *]"'})
+        self.assertEqual(keywords, {'foo': '[23 TO *]'})
         keywords = mangle(foo=Query(query=[23], range='min'))
-        self.assertEqual(keywords, {'foo': '"[23 TO *]"'})
+        self.assertEqual(keywords, {'foo': '[23 TO *]'})
 
     def testMaxRange(self):
         keywords = mangle(foo=[23], foo_usage='range:max')
-        self.assertEqual(keywords, {'foo': '"[* TO 23]"'})
+        self.assertEqual(keywords, {'foo': '[* TO 23]'})
         keywords = mangle(foo=dict(query=[23], range='max'))
-        self.assertEqual(keywords, {'foo': '"[* TO 23]"'})
+        self.assertEqual(keywords, {'foo': '[* TO 23]'})
         keywords = mangle(foo=dict(query=23, range='max'))
-        self.assertEqual(keywords, {'foo': '"[* TO 23]"'})
+        self.assertEqual(keywords, {'foo': '[* TO 23]'})
         keywords = mangle(foo=Query(query=23, range='max'))
-        self.assertEqual(keywords, {'foo': '"[* TO 23]"'})
+        self.assertEqual(keywords, {'foo': '[* TO 23]'})
 
     def testMinMaxRange(self):
         keywords = mangle(foo=(23, 42), foo_usage='range:min:max')
-        self.assertEqual(keywords, {'foo': '"[23 TO 42]"'})
+        self.assertEqual(keywords, {'foo': '[23 TO 42]'})
         keywords = mangle(foo=dict(query=(23, 42), range='min:max'))
-        self.assertEqual(keywords, {'foo': '"[23 TO 42]"'})
+        self.assertEqual(keywords, {'foo': '[23 TO 42]'})
         keywords = mangle(foo=Query(query=(23, 42), range='min:max'))
-        self.assertEqual(keywords, {'foo': '"[23 TO 42]"'})
+        self.assertEqual(keywords, {'foo': '[23 TO 42]'})
 
     def testDateConversion(self):
         day = DateTime('1972/05/11 UTC')
@@ -65,13 +65,13 @@ class QueryManglerTests(TestCase):
         self.assertEqual(keywords, {'foo': '1972-05-11T00:00:00.000Z'})
         keywords = mangle(foo=(day, day + 7), foo_usage='range:min:max')
         self.assertEqual(keywords, {'foo':
-            '"[1972-05-11T00:00:00.000Z TO 1972-05-18T00:00:00.000Z]"'})
+            '[1972-05-11T00:00:00.000Z TO 1972-05-18T00:00:00.000Z]'})
         keywords = mangle(foo=[day], foo_usage='range:min')
         self.assertEqual(keywords, {'foo':
-            '"[1972-05-11T00:00:00.000Z TO *]"'})
+            '[1972-05-11T00:00:00.000Z TO *]'})
         keywords = mangle(foo=dict(query=[day], range='min'))
         self.assertEqual(keywords, {'foo':
-            '"[1972-05-11T00:00:00.000Z TO *]"'})
+            '[1972-05-11T00:00:00.000Z TO *]'})
         keywords = mangle(foo=Query(day))
         self.assertEqual(keywords, {'foo': '1972-05-11T00:00:00.000Z'})
 

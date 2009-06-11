@@ -3,9 +3,9 @@ from collective.solr.search import quote
 
 
 ranges = {
-    'min': '"[%s TO *]"',
-    'max': '"[* TO %s]"',
-    'min:max': '"[%s TO %s]"',
+    'min': '[%s TO *]',
+    'max': '[* TO %s]',
+    'min:max': '[%s TO %s]',
 }
 
 sort_aliases = {

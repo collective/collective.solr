@@ -504,6 +504,12 @@ class SolrServerTests(SolrTestCase):
         self.assertEqual([(r.Title, r.physicalPath) for r in results],
             [('News', '/plone/news'), ('News', '/plone/news/aggregator')])
 
+    def testSearchDateRange(self):
+        self.maintenance.reindex()
+        results = solrSearchResults(SearchableText='News',
+            created=dict(query=DateTime('1970/02/01'), range='min'))
+        self.assertEqual(len(results), 2)
+
 
 def test_suite():
     if pingSolr():

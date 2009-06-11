@@ -45,6 +45,21 @@ behaviour won't break things:
    ...http://nohost/plone/file...my first file...'
 
 
+Advanced Search
+---------------
+
+Plone's advanced search should also work.  However, we only test the default
+settings here in order to make sure including the extra query parameters
+doesn't lead to problems:
+
+  >>> browser.getLink('Advanced Search').click()
+  >>> browser.getControl('Search Text').value = 'Foo'
+  >>> browser.getForm(name='search').submit()
+  >>> browser.contents
+  '...Search results...1...items matching your search terms...
+   ...http://nohost/plone/foo...Foo...'
+
+
 404 Responses
 -------------
 
