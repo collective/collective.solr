@@ -11,6 +11,9 @@ Changelog
   `ResponseNotReady` errors triggering duplicate queries.
   [witsch]
 
+* Use proper way of accessing jQuery & fix IE6 syntax error.
+  [fschulze]
+
 * Format relevance value for search results.
   [witsch]
 
