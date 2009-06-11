@@ -24,7 +24,7 @@
     <dl>
       <tal:counts repeat="item facet/counts">
         <dt>
-          <a href="#" tal:content="item/name"
+          <a href="#" tal:content="item/name" i18n:translate=""
              tal:attributes="href string:${request/ACTUAL_URL}?${item/query}" />
         </dt>
         <dd tal:content="item/count" />

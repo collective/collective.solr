@@ -4,6 +4,9 @@ Changelog
 1.0b11 - Unreleased
 -------------------
 
+* Allow facet values to be translated.
+  [witsch]
+
 
 1.0b10 - Released June 11, 2009
 -------------------------------
