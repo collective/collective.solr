@@ -84,7 +84,7 @@ class SolrFacettingTests(SolrTestCase):
         results = solrSearchResults(request)
         output = view(results=results)
         self.checkOrder(output, 'portal-searchfacets', 'Content type',
-            'Topic', '1', 'Large Plone Folder', '1')
+            'Topic', '1', 'Large Folder', '1')
 
     def testFacetFieldsInSearchBox(self):
         request = self.portal.REQUEST
