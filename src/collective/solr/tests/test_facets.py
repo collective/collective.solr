@@ -149,6 +149,26 @@ class SolrFacettingTests(SolrTestCase):
         # let's also make sure there are no empty filter queries
         self.failIf('fq=portal_type%3A&amp;' in output)
 
+    def testFacetOrder(self):
+        request = TestRequest()
+        request.form['SearchableText'] = 'News'
+        request.form['facet'] = 'true'
+        request.form['facet_field'] = ['portal_type', 'review_state']
+        alsoProvides(request, IThemeSpecific)
+        view = getMultiAdapter((self.portal, request), name='search-facets')
+        view = view.__of__(self.portal)     # needed to traverse `view/`
+        results = solrSearchResults(request)
+        output = view(results=results)
+        # the displayed facets should match the given order...
+        self.checkOrder(output, 'portal-searchfacets',
+            'Content type', 'Review state')
+        # let's also try the other way round...
+        request.form['facet_field'] = ['review_state', 'portal_type']
+        results = solrSearchResults(request)
+        output = view(results=results)
+        self.checkOrder(output, 'portal-searchfacets',
+            'Review state', 'Content type')
+
 
 def test_suite():
     if pingSolr():

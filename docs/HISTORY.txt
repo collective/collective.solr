@@ -4,6 +4,9 @@ Changelog
 1.0b11 - Unreleased
 -------------------
 
+* Fix facet display to try to keep the given order of facets.
+  [witsch]
+
 * Allow facet values to be translated.
   [witsch]
 

@@ -34,7 +34,7 @@ def convertFacets(fields, context=None, request={}, filter=None):
     """ convert facet info to a form easy to process in templates """
     info = []
     params = request.copy()   # request needs to be a dict, i.e. request.form
-    params['facet.field'] = list(facetParameters(context, request))
+    params['facet.field'] = facets = list(facetParameters(context, request))
     fq = params.get('fq', None)
     if isinstance(fq, basestring):
         params['fq'] = [fq]
@@ -51,8 +51,16 @@ def convertFacets(fields, context=None, request={}, filter=None):
                     query=urlencode(p, doseq=True)))
         if counts:
             info.append(dict(title=field, counts=counts))
-    byTitle = lambda a, b: cmp(a['title'], b['title'])
-    return sorted(info, cmp=byTitle)
+    if facets:          # sort according to given facets (if available)
+        def pos(item):
+            try:
+                return facets.index(item)
+            except ValueError:
+                return len(facets)      # position the item at the end
+        func = lambda a, b: cmp(pos(a), pos(b))
+    else:               # otherwise sort by title
+        func = lambda a, b: cmp(a['title'], b['title'])
+    return sorted(info, cmp=func)
 
 
 class FacetMixin:

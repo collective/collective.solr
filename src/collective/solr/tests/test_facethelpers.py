@@ -124,7 +124,7 @@ class FacettingHelperTest(TestCase):
         info = convertFacets(fields, context, request)
         self.assertEqual(len(info), 2)
         # check the facets for 'bar'
-        bars = info[0]['counts']
+        bars = info[1]['counts']
         self.assertEqual(len(bars), 2)
         params = lambda query: sorted(map(unquote, query.split('&')))
         self.assertEqual(params(bars[0]['query']), [
@@ -132,7 +132,7 @@ class FacettingHelperTest(TestCase):
         self.assertEqual(params(bars[1]['query']), [
             'facet.field=foo', 'fq=bar:private'])
         # and also the one for 'foo'
-        foos = info[1]['counts']
+        foos = info[0]['counts']
         self.assertEqual(len(foos), 3)
         self.assertEqual(params(foos[0]['query']), [
             'facet.field=bar', 'fq=foo:Document'])
