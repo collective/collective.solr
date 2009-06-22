@@ -4,6 +4,9 @@ Changelog
 1.0b11 - Unreleased
 -------------------
 
+* Encode unicode strings when building facet links.
+  [fschulze, witsch]
+
 * Fix facet display to try to keep the given order of facets.
   [witsch]
 

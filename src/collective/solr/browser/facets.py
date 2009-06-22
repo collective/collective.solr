@@ -43,7 +43,7 @@ def convertFacets(fields, context=None, request={}, filter=None):
         second = lambda a, b: cmp(b[1], a[1])
         for name, count in sorted(values.items(), cmp=second):
             p = deepcopy(params)
-            p.setdefault('fq', []).append('%s:%s' % (field, name))
+            p.setdefault('fq', []).append('%s:%s' % (field, name.encode('utf-8')))
             if field in p.get('facet.field', []):
                 p['facet.field'].remove(field)
             if filter is None or filter(name, count):

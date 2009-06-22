@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from unittest import TestSuite, defaultTestLoader
 from zope.interface import alsoProvides
 from zope.component import getMultiAdapter
@@ -6,7 +8,7 @@ from zope.publisher.browser import TestRequest
 from collective.solr.tests.utils import pingSolr
 from collective.solr.tests.base import SolrTestCase
 from collective.solr.browser.interfaces import IThemeSpecific
-from collective.solr.browser.facets import SearchBox
+from collective.solr.browser.facets import SearchBox, SearchFacetsView
 from collective.solr.dispatcher import solrSearchResults
 from collective.solr.utils import activate
 
@@ -65,6 +67,19 @@ class SolrFacettingTests(SolrTestCase):
             ['/plone/news/aggregator'])
         states = results.facet_counts['facet_fields']['review_state']
         self.assertEqual(states, dict(private=0, published=1))
+
+    def testFacettedSearchWithUnicodeFilterQuery(self):
+        self.portal.news.portal_type = u'Føø'.encode('utf-8')
+        self.maintenance.reindex()
+        request = TestRequest()
+        request.form['SearchableText'] = 'News'
+        request.form['facet'] = 'true'
+        request.form['facet_field'] = 'portal_type'
+        view = SearchFacetsView(self.portal, request)
+        view.kw = dict(results=solrSearchResults(request))
+        facets = view.facets()
+        self.assertEqual(sorted([c['name'] for c in facets[0]['counts']]),
+            [u'Føø', 'Topic'])
 
     def checkOrder(self, html, *order):
         for item in order:
