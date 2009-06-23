@@ -1,5 +1,5 @@
 from zope.interface import Interface
-from zope.schema import Bool, TextLine, Int, Float, List
+from zope.schema import Bool, TextLine, Int, Float, List, Choice
 from zope.i18nmessageid import MessageFactory
 from collective.indexing.interfaces import IIndexQueueProcessor
 
@@ -48,8 +48,17 @@ class ISolrSchema(Interface):
 
     facets = List(title=_(u'Default search facets'),
         description = _(u'Specify catalog indexes that should be queried for '
-                         'facet information, one per line. '),
+                         'facet information, one per line.'),
         value_type = TextLine(), default = [], required = False)
+
+    filter_queries = List(title=_(u'Filter query parameters'),
+        description = _(u'Specify query parameters for which filter queries '
+                         'should be used, one per line.  Please note that '
+                         'the below list of indexes might not be complete '
+                         'if the Solr server is not running or the '
+                         'connection hasn\'t been activated yet.'),
+        value_type = Choice(vocabulary='collective.solr.indexes'),
+        default = [], required = False)
 
 
 class ISolrConnectionConfig(ISolrSchema):

@@ -1,5 +1,6 @@
 from unittest import TestSuite, defaultTestLoader
 from zope.component import getUtility
+from zope.schema.interfaces import IVocabularyFactory
 from transaction import commit, abort
 from DateTime import DateTime
 from time import sleep
@@ -509,6 +510,13 @@ class SolrServerTests(SolrTestCase):
         results = solrSearchResults(SearchableText='News',
             created=dict(query=DateTime('1970/02/01'), range='min'))
         self.assertEqual(len(results), 2)
+
+    def testSolrIndexesVocabulary(self):
+        vocab = getUtility(IVocabularyFactory, name='collective.solr.indexes')
+        indexes = [i.token for i in vocab(self.portal)]
+        self.failUnless('SearchableText' in indexes)
+        self.failUnless('physicalDepth' in indexes)
+        self.failIf('physicalPath' in indexes)
 
 
 def test_suite():

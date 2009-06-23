@@ -4,14 +4,21 @@ from zope.interface import implements
 from Products.CMFDefault.formlib.schema import SchemaAdapterBase
 from Products.CMFPlone.interfaces import IPloneSiteRoot
 from plone.app.controlpanel.form import ControlPanelForm
+from plone.app.controlpanel.widgets import MultiCheckBoxVocabularyWidget
 
 from collective.solr.interfaces import ISolrSchema, _
 from collective.solr.interfaces import ISolrConnectionConfig
+from collective.solr.interfaces import ISolrConnectionManager
 
 
 class SolrControlPanelAdapter(SchemaAdapterBase):
     adapts(IPloneSiteRoot)
     implements(ISolrSchema)
+
+    def reset(self):
+        manager = queryUtility(ISolrConnectionManager)
+        if manager is not None:
+            manager.closeConnection()
 
     def getActive(self):
         util = queryUtility(ISolrConnectionConfig)
@@ -21,6 +28,7 @@ class SolrControlPanelAdapter(SchemaAdapterBase):
         util = queryUtility(ISolrConnectionConfig)
         if util is not None:
             util.active = value
+        self.reset()
 
     active = property(getActive, setActive)
 
@@ -32,6 +40,7 @@ class SolrControlPanelAdapter(SchemaAdapterBase):
         util = queryUtility(ISolrConnectionConfig)
         if util is not None:
             util.host = value
+        self.reset()
 
     host = property(getHost, setHost)
 
@@ -43,6 +52,7 @@ class SolrControlPanelAdapter(SchemaAdapterBase):
         util = queryUtility(ISolrConnectionConfig)
         if util is not None:
             util.port = value
+        self.reset()
 
     port = property(getPort, setPort)
 
@@ -123,10 +133,22 @@ class SolrControlPanelAdapter(SchemaAdapterBase):
 
     facets = property(getDefaultFacets, setDefaultFacets)
 
+    def getFilterQueryParameters(self):
+        util = queryUtility(ISolrConnectionConfig)
+        return getattr(util, 'filter_queries', '')
+
+    def setFilterQueryParameters(self, value):
+        util = queryUtility(ISolrConnectionConfig)
+        if util is not None:
+            util.filter_queries = value
+
+    filter_queries = property(getFilterQueryParameters, setFilterQueryParameters)
+
 
 class SolrControlPanel(ControlPanelForm):
 
     form_fields = FormFields(ISolrSchema)
+    form_fields['filter_queries'].custom_widget = MultiCheckBoxVocabularyWidget
 
     label = _('Solr settings')
     description = _('Settings to enable and configure Solr integration.')

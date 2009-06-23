@@ -59,6 +59,10 @@
         class=".configlet.SolrControlPanel"
         permission="cmf.ManagePortal" />
 
+    <utility
+        factory=".vocabularies.SolrIndexes"
+        name="collective.solr.indexes" />
+
   </configure>
 
   <adapter name="physicalPath" factory=".attributes.physicalPathIndexer" />

@@ -17,5 +17,8 @@
       <parameter name="portal_type" />
       <parameter name="review_state" />
     </search-facets>
+    <filter-query-parameters>
+      <parameter name="portal_type" />
+    </filter-query-parameters>
   </settings>
 </object>

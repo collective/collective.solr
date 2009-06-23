@@ -10,12 +10,13 @@ optionflags = (doctest.REPORT_ONLY_FIRST_FAILURE |
 
 
 def test_suite():
-    suite = TestSuite([
-        ztc.FunctionalDocFileSuite(
-           'configlet.txt', package='collective.solr.tests',
-           test_class=SolrControlPanelTestCase, optionflags=optionflags),
-    ])
+    suite = TestSuite()
     if pingSolr():
+        suite.addTest(
+            ztc.FunctionalDocFileSuite(
+               'configlet.txt', package='collective.solr.tests',
+               test_class=SolrControlPanelTestCase, optionflags=optionflags),
+        )
         suite.addTest(
             ztc.FunctionalDocFileSuite(
                'errors.txt', package='collective.solr.tests',
