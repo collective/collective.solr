@@ -4,6 +4,10 @@ Changelog
 1.0b11 - Unreleased
 -------------------
 
+* Allow to configure query parameters for which filter queries should be
+  used (see http://wiki.apache.org/solr/FilterQueryGuidance for more info)
+  [fschulze, witsch]
+
 * Encode unicode strings when building facet links.
   [fschulze, witsch]
 

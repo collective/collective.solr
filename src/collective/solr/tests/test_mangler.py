@@ -1,9 +1,13 @@
 from unittest import TestCase, defaultTestLoader, main
+from zope.component import provideUtility
 from DateTime import DateTime
 
+from collective.solr.interfaces import ISolrConnectionConfig
+from collective.solr.manager import SolrConnectionConfig
 from collective.solr.mangler import mangleQuery
 from collective.solr.mangler import extractQueryParameters
 from collective.solr.mangler import cleanupQueryParameters
+from collective.solr.mangler import optimizeQueryParameters
 from collective.solr.parser import SolrSchema, SolrField
 
 
@@ -243,6 +247,34 @@ class QueryParameterTests(TestCase):
         schema['Title'] = SolrField(indexed=True)
         params = cleanup(dict(sort='sortable_title asc'), schema)
         self.assertEqual(params, dict(sort='Title asc'))
+
+    def testFilterQuerySubstitution(self):
+        def optimize(**params):
+            query = dict(a='a:23', b='b:42', c='c:(23 42)')
+            optimizeQueryParameters(query, params)
+            return query, params
+        # first test without the configuration utility
+        self.assertEqual(optimize(),
+            (dict(a='a:23', b='b:42', c='c:(23 42)'), dict()))
+        # now unconfigured...
+        config = SolrConnectionConfig()
+        provideUtility(config, ISolrConnectionConfig)
+        self.assertEqual(optimize(),
+            (dict(a='a:23', b='b:42', c='c:(23 42)'), dict()))
+        config.filter_queries = ['a']
+        self.assertEqual(optimize(),
+            (dict(b='b:42', c='c:(23 42)'), dict(fq=['a:23'])))
+        self.assertEqual(optimize(fq='x:13'),
+            (dict(b='b:42', c='c:(23 42)'), dict(fq=['x:13', 'a:23'])))
+        self.assertEqual(optimize(fq=['x:13', 'y:17']),
+            (dict(b='b:42', c='c:(23 42)'), dict(fq=['x:13', 'y:17', 'a:23'])))
+        config.filter_queries = ['a', 'c']
+        self.assertEqual(optimize(),
+            (dict(b='b:42'), dict(fq=['a:23', 'c:(23 42)'])))
+        self.assertEqual(optimize(fq='x:13'),
+            (dict(b='b:42'), dict(fq=['x:13', 'a:23', 'c:(23 42)'])))
+        self.assertEqual(optimize(fq=['x:13', 'y:17']),
+            (dict(b='b:42'), dict(fq=['x:13', 'y:17', 'a:23', 'c:(23 42)'])))
 
 
 def test_suite():

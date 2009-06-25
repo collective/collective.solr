@@ -14,6 +14,7 @@ from collective.solr.dispatcher import solrSearchResults, FallBackException
 from collective.solr.indexer import logger as logger_indexer
 from collective.solr.manager import logger as logger_manager
 from collective.solr.flare import PloneFlare
+from collective.solr.search import Search
 from collective.solr.solr import logger as logger_solr
 from collective.solr.utils import activate
 from collective.indexing.utils import getIndexer
@@ -517,6 +518,34 @@ class SolrServerTests(SolrTestCase):
         self.failUnless('SearchableText' in indexes)
         self.failUnless('physicalDepth' in indexes)
         self.failIf('physicalPath' in indexes)
+
+    def testFilterQuerySubstitutionDuringSearch(self):
+        self.maintenance.reindex()
+        # first set up a logger to be able to test the query parameters
+        log = []
+        original = Search.search
+        def logger(*args, **parameters):
+            log.append((args, parameters))
+            return original(*args, **parameters)
+        Search.__call__ = logger
+        # a filter query should be used for `portal_type`;  like plone itself
+        # we inject the "friendly types" into the query (in `queryCatalog.py`)
+        # by using a keyword parameter...
+        request = dict(SearchableText='News')
+        results = solrSearchResults(request, portal_type='Topic')
+        self.assertEqual([(r.Title, r.physicalPath) for r in results],
+            [('News', '/plone/news/aggregator')])
+        self.assertEqual(len(log), 1)
+        self.assertEqual(log[-1][1]['fq'], ['+portal_type:Topic'], log)
+        # let's test again with an already existing filter query parameter
+        request = dict(SearchableText='News', fq='+review_state:published')
+        results = solrSearchResults(request, portal_type='Topic')
+        self.assertEqual([(r.Title, r.physicalPath) for r in results],
+            [('News', '/plone/news/aggregator')])
+        self.assertEqual(len(log), 2)
+        self.assertEqual(sorted(log[-1][1]['fq']),
+            ['+portal_type:Topic', '+review_state:published'], log)
+        Search.__call__ = original
 
 
 def test_suite():

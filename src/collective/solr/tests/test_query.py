@@ -150,8 +150,12 @@ class QueryTests(TestCase):
         self.mngr.closeConnection()
         self.mngr.setHost(active=False)
 
+    def bq(self, *args, **kw):
+        query = self.search.buildQuery(*args, **kw)
+        return ' '.join(query.values())
+
     def testSimpleQueries(self):
-        bq = self.search.buildQuery
+        bq = self.bq
         self.assertEqual(bq('foo'), '+foo')
         self.assertEqual(bq('foo*'), '+foo*')
         self.assertEqual(bq('foo!'), '+foo\\!')
@@ -167,7 +171,7 @@ class QueryTests(TestCase):
         self.assertEqual(bq(name=''), '')
 
     def testMultiValueQueries(self):
-        bq = self.search.buildQuery
+        bq = self.bq
         self.assertEqual(bq(('foo', 'bar')), '+(foo bar)')
         self.assertEqual(bq(('foo', 'bar*')), '+(foo bar*)')
         self.assertEqual(bq(('foo bar', 'hmm')), '+("foo bar" hmm)')
@@ -178,7 +182,7 @@ class QueryTests(TestCase):
         self.assertEqual(bq(name=['foo bar', 'hmm']), '+name:("foo bar" hmm)')
 
     def testMultiArgumentQueries(self):
-        bq = self.search.buildQuery
+        bq = self.bq
         self.assertEqual(bq('foo', name='bar'), '+foo +name:bar')
         self.assertEqual(bq('foo', name=('bar', 'hmm')),
             '+foo +name:(bar hmm)')
@@ -192,13 +196,13 @@ class QueryTests(TestCase):
         self.assertEqual(bq('foo', name=''), '+foo')
 
     def testInvalidArguments(self):
-        bq = self.search.buildQuery
+        bq = self.bq
         self.assertEqual(bq(title='foo'), '')
         self.assertEqual(bq(title='foo', name='bar'), '+name:bar')
         self.assertEqual(bq('bar', title='foo'), '+bar')
 
     def testUnicodeArguments(self):
-        bq = self.search.buildQuery
+        bq = self.bq
         self.assertEqual(bq(u'foo'), '+foo')
         self.assertEqual(bq(u'foø'), '+fo\xc3\xb8')
         self.assertEqual(bq(u'john@foo.com'), '+john@foo.com')
@@ -209,7 +213,7 @@ class QueryTests(TestCase):
         self.assertEqual(bq(name=u'john@foo.com', cat='spammer'), '+name:john@foo.com +cat:spammer')
 
     def testQuotedQueries(self):
-        bq = self.search.buildQuery
+        bq = self.bq
         self.assertEqual(bq('"foo"'), '+"foo"')
         self.assertEqual(bq('foo'), '+foo')
         self.assertEqual(bq('"foo*"'), '+"foo\*"')
@@ -232,14 +236,14 @@ class QueryTests(TestCase):
         self.assertEqual(bq(name='""'), '+name:\\"\\"')
 
     def testComplexQueries(self):
-        bq = self.search.buildQuery
+        bq = self.bq
         self.assertEqual(bq('foo', name='"herb*"', cat=(u'bär', '"-hmm"')),
             '+foo +name:"herb\*" +cat:(b\xc3\xa4r "\-hmm")')
         self.assertEqual(bq('foo', name='herb*', cat=(u'bär', '-hmm')),
             '+foo +name:herb* +cat:(b\xc3\xa4r -hmm)')
 
     def testBooleanQueries(self):
-        bq = self.search.buildQuery
+        bq = self.bq
         self.assertEqual(bq(inStock=True), '+inStock:true')
         self.assertEqual(bq(inStock=False), '+inStock:false')
 
@@ -250,8 +254,8 @@ class InactiveQueryTests(TestCase):
         provideUtility(SolrConnectionConfig(), ISolrConnectionConfig)
         search = Search()
         search.manager = SolrConnectionManager()
-        self.assertEqual(search.buildQuery('foo'), '')
-        self.assertEqual(search.buildQuery(name='foo'), '')
+        self.assertEqual(search.buildQuery('foo'), {})
+        self.assertEqual(search.buildQuery(name='foo'), {})
 
 
 class SearchTests(TestCase):
@@ -274,6 +278,7 @@ class SearchTests(TestCase):
         request = getData('search_request.txt')
         output = fakehttp(self.conn, schema, search)    # fake responses
         query = self.search.buildQuery(id='[* TO *]')
+        query = ' '.join(query.values())
         results = self.search(query, rows=10, wt='xml', indent='on').results()
         normalize = lambda x: sorted(x.split('&'))      # sort request params
         self.assertEqual(normalize(output.get(skip=1)), normalize(request))

@@ -1,4 +1,7 @@
+from zope.component import queryUtility
 from DateTime import DateTime
+
+from collective.solr.interfaces import ISolrConnectionConfig
 from collective.solr.search import quote
 
 
@@ -127,3 +130,22 @@ def cleanupQueryParameters(args, schema):
         else:
             del args['sort']
     return args
+
+
+def optimizeQueryParameters(query, params):
+    """ optimize query parameters by using filter queries for
+        configured indexes """
+    config = queryUtility(ISolrConnectionConfig)
+    fq = []
+    if config is not None:
+        for idx in config.filter_queries:
+            if idx in query:
+                fq.append(query[idx])
+                del query[idx]
+    if 'fq' in params:
+        if isinstance(params['fq'], list):
+            params['fq'].extend(fq)
+        else:
+            params['fq'] = [params['fq']] + fq
+    elif fq:
+        params['fq'] = fq
