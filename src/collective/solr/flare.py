@@ -21,7 +21,7 @@ class PloneFlare(AttrDict):
     def __init__(self, context, request=None):
         self.context = context
         self.request = request
-        self.update(context.__dict__)  # copy data
+        self.update(context)        # copy data
 
     @property
     def id(self):
