@@ -4,6 +4,9 @@ Changelog
 1.0b11 - Unreleased
 -------------------
 
+* Fix maintenance view for adding/syncing single indexes using catalog data.
+  [witsch]
+
 * Allow to configure query parameters for which filter queries should be
   used (see http://wiki.apache.org/solr/FilterQueryGuidance for more info)
   [fschulze, witsch]

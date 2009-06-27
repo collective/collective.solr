@@ -75,6 +75,22 @@ class SolrMaintenanceTests(SolrTestCase):
         self.assertEqual(count('physicalPath'), 0)
         self.assertEqual(count('portal_type'), 0)
 
+    def testCatalogSyncKeepsExistingData(self):
+        maintenance = self.portal.unrestrictedTraverse('solr-maintenance')
+        maintenance.reindex()
+        # a catalog sync shouldn't destroy any of the existing data fields
+        # to check we remember the original results first...
+        search = getUtility(ISearch)
+        original = search('+UID:[* TO *]').results()
+        self.assertEqual(original.numFound, '8')
+        # let's sync and compare the data from a new search
+        maintenance.catalogSync(index='review_state')
+        results = search('+UID:[* TO *]').results()
+        self.assertEqual(results.numFound, '8')
+        for idx in range(len(results)):
+            self.assertEqual(original[idx], results[idx],
+                '%r vs %r' % (original[idx], results[idx]))
+
     def testDisabledTimeoutDuringReindex(self):
         log = []
         def logger(*args):

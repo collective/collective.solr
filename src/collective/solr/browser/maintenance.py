@@ -249,18 +249,31 @@ class SolrMaintenanceView(BrowserView):
         cpu = timer(clock)      # cpu time
         processed = 0
         conn = manager.getConnection()
+        search = queryUtility(ISearch)
+        updates = {}            # list to hold data to be updated
         def checkPoint():
+            uids = updates.keys()
+            query = '+%s:(%s)' % (key, ' '.join(uids))
+            flares = {}
+            for flare in search(query, rows=len(uids)):
+                uid = getattr(flare, key)
+                assert uid, 'empty unique key?'
+                flares[uid] = flare
+            for uid, value in updates.items():
+                flare = flares.get(uid, {key: uid})
+                flare[index] = value
+                conn.add(**flare)
+            updates.clear()     # clear pending updates
             log('intermediate commit (%d items processed, '
                 'last batch in %s)...\n' % (processed, lap.next()))
             conn.commit()
             manager.getConnection().reset()     # force new connection
         cpi = checkpointIterator(checkPoint, batch)
         for uid, value in data.items():
-            data = {key: uid, index: value}
-            conn.add(**data)
+            updates[uid] = value
             processed += 1
             cpi.next()
-        conn.commit()           # make sure to commit in the end...
+        checkPoint()            # make sure to process the last batch
         manager.setTimeout(None, lock=False)    # reset the timeout lock
         log('portal catalog data synced.\n')
         msg = 'processed %d items in %s (%s cpu time).'
