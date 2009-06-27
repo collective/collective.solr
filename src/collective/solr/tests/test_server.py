@@ -27,9 +27,9 @@ class SolrMaintenanceTests(SolrTestCase):
         manager = getUtility(ISolrConnectionManager)
         self.connection = connection = manager.getConnection()
         # make sure nothing is indexed
-        connection.deleteByQuery('[* TO *]')
+        connection.deleteByQuery('+UID:[* TO *]')
         connection.commit()
-        result = connection.search(q='[* TO *]').read()
+        result = connection.search(q='+UID:[* TO *]').read()
         self.assertEqual(numFound(result), 0)
         # ignore any generated logging output
         self.portal.REQUEST.RESPONSE.write = lambda x: x
@@ -37,7 +37,7 @@ class SolrMaintenanceTests(SolrTestCase):
     def beforeTearDown(self):
         activate(active=False)
 
-    def search(self, query='[* TO *]'):
+    def search(self, query='+UID:[* TO *]'):
         return self.connection.search(q=query).read()
 
     def testClear(self):
