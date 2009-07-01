@@ -79,7 +79,6 @@ def solrSearchResults(request=None, **keywords):
     prepareData(args)
     query = search.buildQuery(**args)
     optimizeQueryParameters(query, params)
-    query = ' '.join(query.values())
     __traceback_info__ = (query, params, args)
     response = search(query, fl='* score', **params)
     def wrap(flare):

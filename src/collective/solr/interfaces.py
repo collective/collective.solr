@@ -119,7 +119,9 @@ class ISearch(Interface):
         """ convenience alias for `search` """
 
     def buildQuery(default=None, **args):
-        """ helper to build a querystring for simple use-cases """
+        """ helper to build a query for simple use-cases; the query is
+            returned as a dictionary which might be string-joined or
+            passed to the `search` method as the `query` argument """
 
 
 class ICatalogTool(Interface):

@@ -34,6 +34,8 @@ class Search(object):
         if not 'rows' in parameters:
             config = queryUtility(ISolrConnectionConfig)
             parameters['rows'] = config.max_results or ''
+        if isinstance(query, dict):
+            query = ' '.join(query.values())
         logger.debug('searching for %r (%r)', query, parameters)
         response = connection.search(q=query, **parameters)
         results = SolrResponse(response)

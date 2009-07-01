@@ -278,7 +278,6 @@ class SearchTests(TestCase):
         request = getData('search_request.txt')
         output = fakehttp(self.conn, schema, search)    # fake responses
         query = self.search.buildQuery(id='[* TO *]')
-        query = ' '.join(query.values())
         results = self.search(query, rows=10, wt='xml', indent='on').results()
         normalize = lambda x: sorted(x.split('&'))      # sort request params
         self.assertEqual(normalize(output.get(skip=1)), normalize(request))
