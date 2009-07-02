@@ -1,8 +1,8 @@
 Changelog
 =========
 
-1.0b11 - Unreleased
--------------------
+1.0b11 - Released July 2, 2009
+------------------------------
 
 * Fix maintenance view for adding/syncing single indexes using catalog data.
   [witsch]
