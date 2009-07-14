@@ -167,11 +167,12 @@ class SolrIndexProcessor(object):
         obj = self.wrapObject(obj)
         data, marker = {}, []
         for name in attributes:
-            value = getattr(obj, name, marker)
-            if value is marker:
+            try:
+                value = getattr(obj, name)
+                if callable(value):
+                    value = value()
+            except AttributeError:
                 continue
-            if callable(value):
-                value = value()
             field = schema[name]
             handler = handlers.get(field.class_, None)
             if handler is not None:

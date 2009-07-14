@@ -105,6 +105,21 @@ class QueueIndexerTests(TestCase):
         self.proc.index(Foo(id='500'))                           # indexing sends data
         self.assertEqual(str(output), '')
 
+    def testIndexerMethods(self):
+        class Bar(Foo):
+            def cat(self):
+                return 'nerd'
+            def price(self):
+                raise AttributeError, 'price'
+        foo = Bar(id='500', name='foo')
+        # raising the exception should keep the attribute from being indexed
+        response = getData('add_response.txt')
+        output = fakehttp(self.mngr.getConnection(), response)
+        self.proc.index(foo)
+        output = str(output)
+        self.assertTrue(output.find('<field name="cat">nerd</field>') > 0, '"cat" data not found')
+        self.assertEqual(output.find('price'), -1, '"price" data found?')
+
 
 class RobustnessTests(TestCase):
 

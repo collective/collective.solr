@@ -4,6 +4,10 @@ Changelog
 1.0b12 - Unreleased
 -------------------
 
+* Allow indexer methods to raise `AttributeError` to prevent an attribute
+  from being indexed.
+  [witsch]
+
 
 1.0b11 - Released July 2, 2009
 ------------------------------
