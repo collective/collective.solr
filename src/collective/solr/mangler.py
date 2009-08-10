@@ -109,9 +109,16 @@ def extractQueryParameters(args):
     if limit:
         params['rows'] = int(limit)
     for key, value in args.items():
-        if key in ('fq', 'fl', 'facet') or key.startswith('facet.'):
+        if key in ('fq', 'fl', 'facet'):
             params[key] = value
-        elif key.startswith('facet_'):
+        elif key.startswith('facet.') or key.startswith('facet_'):
+            name = lambda facet: facet.split(':', 1)[0]
+            if isinstance(value, list):
+                value = map(name, value)
+            elif isinstance(value, tuple):
+                value = tuple(map(name, value))
+            else:
+                value = name(value)
             params[key.replace('_', '.', 1)] = value
     return params
 

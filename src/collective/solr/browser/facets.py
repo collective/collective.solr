@@ -5,6 +5,7 @@ from plone.app.layout.viewlets.common import SearchBoxViewlet
 from collective.solr.interfaces import ISolrConnectionConfig
 from urllib import urlencode
 from copy import deepcopy
+from string import strip
 
 
 def param(view, name):
@@ -27,17 +28,24 @@ def facetParameters(context, request):
         config = queryUtility(ISolrConnectionConfig)
         if config is not None:
             fields = config.facets
-    return fields
+    dependencies = {}
+    for idx, field in enumerate(fields):
+        if ':' in field:
+            facet, dep = map(strip, field.split(':', 1))
+            dependencies[facet] = map(strip, dep.split(','))
+    return fields, dependencies
 
 
 def convertFacets(fields, context=None, request={}, filter=None):
     """ convert facet info to a form easy to process in templates """
     info = []
     params = request.copy()   # request needs to be a dict, i.e. request.form
-    params['facet.field'] = facets = list(facetParameters(context, request))
-    fq = params.get('fq', None)
+    facets, dependencies = list(facetParameters(context, request))
+    params['facet.field'] = facets
+    fq = params.get('fq', [])
     if isinstance(fq, basestring):
-        params['fq'] = [fq]
+        fq = params['fq'] = [fq]
+    selected = set([facet.split(':', 1)[0] for facet in fq ])
     for field, values in fields.items():
         counts = []
         second = lambda a, b: cmp(b[1], a[1])
@@ -49,7 +57,9 @@ def convertFacets(fields, context=None, request={}, filter=None):
             if filter is None or filter(name, count):
                 counts.append(dict(name=name, count=count,
                     query=urlencode(p, doseq=True)))
-        if counts:
+        deps = dependencies.get(field, None)
+        visible = deps is None or selected.intersection(deps)
+        if counts and visible:
             info.append(dict(title=field, counts=counts))
     if facets:          # sort according to given facets (if available)
         def pos(item):
@@ -70,7 +80,7 @@ class FacetMixin:
 
     def hiddenfields(self):
         """ render hidden fields suitable for inclusion in search forms """
-        facets = facetParameters(self.context, self.request)
+        facets, dependencies = facetParameters(self.context, self.request)
         queries = param(self, 'fq')
         return self.hidden(facets=facets, queries=queries)
 

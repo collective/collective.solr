@@ -203,6 +203,8 @@ class QueryParameterTests(TestCase):
         self.assertEqual(params, {'facet': 'true'})
         params = extract({'facet.field': 'foo', 'facet.foo': 'bar'})
         self.assertEqual(params, {'facet.field': 'foo', 'facet.foo': 'bar'})
+        params = extract({'facet.field': ('foo', 'bar')})
+        self.assertEqual(params, {'facet.field': ('foo', 'bar')})
         # not 'facet*' though
         params = extract({'facetfoo': 'bar'})
         self.assertEqual(params, {})
@@ -210,6 +212,8 @@ class QueryParameterTests(TestCase):
         # passing parameters as keyword arguments...
         params = extract(dict(facet_foo='bar'))
         self.assertEqual(params, {'facet.foo': 'bar'})
+        params = extract(dict(facet_foo=('foo', 'bar')))
+        self.assertEqual(params, {'facet.foo': ('foo', 'bar')})
 
     def testAllowFilterQueryParameters(self):
         extract = extractQueryParameters
@@ -275,6 +279,19 @@ class QueryParameterTests(TestCase):
             (dict(b='b:42'), dict(fq=['x:13', 'a:23', 'c:(23 42)'])))
         self.assertEqual(optimize(fq=['x:13', 'y:17']),
             (dict(b='b:42'), dict(fq=['x:13', 'y:17', 'a:23', 'c:(23 42)'])))
+
+    def testFilterFacetDependencies(self):
+        extract = extractQueryParameters
+        # any info about facet dependencies must not be passed on to solr
+        params = extract({'facet.field': 'foo:bar', 'facet.foo': 'bar:foo'})
+        self.assertEqual(params, {'facet.field': 'foo', 'facet.foo': 'bar'})
+        params = extract({'facet.field': ('foo:bar', 'bar:foo')})
+        self.assertEqual(params, {'facet.field': ('foo', 'bar')})
+        # also check the "underscore" variant...
+        params = extract(dict(facet_foo='bar:foo'))
+        self.assertEqual(params, {'facet.foo': 'bar'})
+        params = extract(dict(facet_foo=('foo:bar', 'bar:foo')))
+        self.assertEqual(params, {'facet.foo': ('foo', 'bar')})
 
 
 def test_suite():

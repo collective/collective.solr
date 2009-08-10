@@ -63,20 +63,45 @@ class FacettingHelperTest(TestCase):
         context = Dummy()
         request = {}
         # with nothing set up, no facets will be returned
-        self.assertEqual(facetParameters(context, request), [])
+        self.assertEqual(facetParameters(context, request), ([], {}))
         # setting up the regular config utility should give the default value
         cfg = SolrConnectionConfig()
         provideUtility(cfg, ISolrConnectionConfig)
-        self.assertEqual(facetParameters(context, request), [])
+        self.assertEqual(facetParameters(context, request), ([], {}))
         # so let's set it...
         cfg.facets = ['foo']
-        self.assertEqual(facetParameters(context, request), ['foo'])
+        self.assertEqual(facetParameters(context, request), (['foo'], {}))
         # override the setting on the context
         context.facet_fields = ['bar']
-        self.assertEqual(facetParameters(context, request), ['bar'])
+        self.assertEqual(facetParameters(context, request), (['bar'], {}))
         # and again via the request
         request['facet.field'] = ['foo', 'bar']
-        self.assertEqual(facetParameters(context, request), ['foo', 'bar'])
+        self.assertEqual(facetParameters(context, request),
+            (['foo', 'bar'], {}))
+        # clean up...
+        getGlobalSiteManager().unregisterUtility(cfg, ISolrConnectionConfig)
+
+    def testFacetDependencies(self):
+        context = Dummy()
+        request = {}
+        cfg = SolrConnectionConfig()
+        provideUtility(cfg, ISolrConnectionConfig)
+        # dependency info can be set via the configuration utility...
+        cfg.facets = ['foo:bar']
+        self.assertEqual(facetParameters(context, request),
+            (['foo:bar'], dict(foo=['bar'])))
+        # overridden on the context
+        context.facet_fields = ['bar:foo']
+        self.assertEqual(facetParameters(context, request),
+            (['bar:foo'], dict(bar=['foo'])))
+        # and via the request
+        request['facet.field'] = ['foo:bar', 'bar:foo']
+        self.assertEqual(facetParameters(context, request),
+            (['foo:bar', 'bar:foo'], dict(foo=['bar'], bar=['foo'])))
+        # white space shouldn't matter
+        request['facet.field'] = ['foo : bar', 'bar  :foo']
+        self.assertEqual(facetParameters(context, request),
+            (['foo : bar', 'bar  :foo'], dict(foo=['bar'], bar=['foo'])))
         # clean up...
         getGlobalSiteManager().unregisterUtility(cfg, ISolrConnectionConfig)
 

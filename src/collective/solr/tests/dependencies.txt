@@ -1,0 +1,44 @@
+Facet dependencies
+------------------
+
+This tests dependencies of search facets.  A facet depending on another will
+only be displayed in case a value was already selected for the latter.  We'll
+use a testbrowser to check this.
+
+First we need to activate Solr support, reindex the site's content and set
+up a facet dependency:
+
+  >>> self.activateAndReindex()
+  >>> from zope.component import getUtility
+  >>> from collective.solr.interfaces import ISolrConnectionConfig
+  >>> config = getUtility(ISolrConnectionConfig)
+  >>> config.facets = ['portal_type', 'review_state:portal_type']
+
+Initially the depending facet show not show up:
+
+  >>> self.setRoles(('Manager',))
+  >>> browser = self.getBrowser()
+  >>> browser.open('http://nohost/plone/')
+  >>> browser.getControl('Search Site').value = 'news'
+  >>> browser.getForm(name='searchform').submit()
+  >>> browser.url
+  'http://nohost/plone/search?...&facet.field=portal_type...'
+  >>> 'Review state' in browser.contents
+  False
+
+After selecting the required facet it should, though:
+
+  >>> browser.getLink('Topic').click()
+  >>> browser.contents
+  '...Search results...1 items matching...
+   ...portal-searchfacets...
+   ...Content type...Topic...&otimes;...
+   ...Review state...
+   ...published...1...
+   ...Site News...'
+
+After removing the selection again we should be back to the beginning:
+
+  >>> browser.getLink('⊗').click()
+  >>> 'Review state' in browser.contents
+  False

@@ -68,6 +68,23 @@ class SolrFacettingTests(SolrTestCase):
         states = results.facet_counts['facet_fields']['review_state']
         self.assertEqual(states, dict(private=0, published=1))
 
+    def testFacettedSearchWithDependencies(self):
+        # facets depending on others should not show up initially
+        request = TestRequest()
+        request.form['SearchableText'] = 'News'
+        request.form['facet'] = 'true'
+        request.form['facet_field'] = ['portal_type',
+            'review_state:portal_type']
+        view = SearchFacetsView(self.portal, request)
+        view.kw = dict(results=solrSearchResults(request))
+        facets = [facet['title'] for facet in view.facets()]
+        self.assertEqual(facets, ['portal_type'])
+        # now again with the required facet selected
+        request.form['fq'] = 'portal_type:Topic'
+        view.kw = dict(results=solrSearchResults(request))
+        facets = [facet['title'] for facet in view.facets()]
+        self.assertEqual(facets, ['portal_type', 'review_state'])
+
     def testFacettedSearchWithUnicodeFilterQuery(self):
         self.portal.news.portal_type = u'Føø'.encode('utf-8')
         self.maintenance.reindex()
