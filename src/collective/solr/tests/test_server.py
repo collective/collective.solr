@@ -91,16 +91,16 @@ class SolrMaintenanceTests(SolrTestCase):
     def testCatalogSync(self):
         maintenance = self.portal.unrestrictedTraverse('solr-maintenance')
         # initially solr should have no data for the index
-        def count(index):
-            return numFound(self.search(query='%s:[* TO *]' % index))
-        self.assertEqual(count('review_state'), 0)
+        found, counts = self.counts()
+        self.failIf('review_state' in counts)
         # after syncing from the catalog the index data should be available
         maintenance.catalogSync(index='review_state')
-        self.assertEqual(count('review_state'), 8)
+        found, counts = self.counts()
+        self.assertEqual(counts['review_state'], 8)
         # but not for any of the other indexes
-        self.assertEqual(count('Title'), 0)
-        self.assertEqual(count('physicalPath'), 0)
-        self.assertEqual(count('portal_type'), 0)
+        self.failIf('Title' in counts, 'Title records?')
+        self.failIf('physicalPath' in counts, 'physicalPath records?')
+        self.failIf('portal_type' in counts, 'portal_type records?')
 
     def testCatalogSyncKeepsExistingData(self):
         maintenance = self.portal.unrestrictedTraverse('solr-maintenance')
