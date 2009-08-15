@@ -4,6 +4,10 @@ Changelog
 1.0b12 - Unreleased
 -------------------
 
+* Fix `reindex` maintenance view to keep any existing data when indexing a
+  given list of attributes.
+  [witsch]
+
 * Add support for facet dependencies: Specifying a facet "foo" like "foo:bar"
   only makes it show up when a value for "bar" has been previously selected.
   [witsch]

@@ -40,13 +40,14 @@ class SolrMaintenanceTests(SolrTestCase):
     def search(self, query='+UID:[* TO *]'):
         return self.connection.search(q=query).read()
 
-    def counts(self):
+    def counts(self, attributes=None):
         """ crude count of metadata records in the database """
         info = {}
         result = self.search()
         for record in result.split('<str name="')[1:]:
             name = record[:record.find('"')]
-            info[name] = info.get(name, 0) + 1
+            if not attributes or name in attributes:
+                info[name] = info.get(name, 0) + 1
         return numFound(result), info
 
     def testClear(self):
@@ -87,6 +88,28 @@ class SolrMaintenanceTests(SolrTestCase):
         self.assertEqual(counts['physicalPath'], 2)
         self.assertEqual(counts['portal_type'], 2)
         self.assertEqual(counts['review_state'], 2)
+
+    def testReindexAttributeKeepsExistingData(self):
+        # reindexing a set of attributes (or a single one) should not destroy
+        # any of the existing data fields, but merely add the new data...
+        maintenance = self.portal.unrestrictedTraverse('solr-maintenance')
+        maintenance.reindex(attributes=['UID', 'Title'])
+        # after adding some index data only that very data should exist...
+        attributes = 'Title', 'portal_type', 'review_state', 'physicalPath'
+        self.assertEqual(self.counts(attributes),
+            (8, dict(Title=8)))
+        # reindexing `portal_type` should add the new metadata column
+        maintenance.reindex(attributes=['portal_type'])
+        self.assertEqual(self.counts(attributes),
+            (8, dict(Title=8, portal_type=8)))
+        # let's try that again with an EIOW, i.e. `physicalPath`...
+        maintenance.reindex(attributes=['physicalPath'])
+        self.assertEqual(self.counts(attributes),
+            (8, dict(Title=8, portal_type=8, physicalPath=8)))
+        # as well as with the extra catalog variables...
+        maintenance.reindex(attributes=['review_state'])
+        self.assertEqual(self.counts(attributes),
+            (8, dict(Title=8, portal_type=8, physicalPath=8, review_state=8)))
 
     def testCatalogSync(self):
         maintenance = self.portal.unrestrictedTraverse('solr-maintenance')

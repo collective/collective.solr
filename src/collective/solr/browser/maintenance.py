@@ -4,7 +4,6 @@ from zope.interface import implements
 from zope.component import queryUtility
 from Products.Five.browser import BrowserView
 from Products.CMFCore.utils import getToolByName
-from httplib import BadStatusLine
 
 from collective.solr.interfaces import ISolrConnectionManager
 from collective.solr.interfaces import ISolrIndexQueueProcessor
@@ -12,6 +11,7 @@ from collective.solr.interfaces import ISolrMaintenanceView
 from collective.solr.interfaces import ISearch
 from collective.solr.indexer import indexable
 from collective.solr.utils import findObjects
+from collective.solr.utils import prepareData
 
 logger = getLogger('collective.solr.maintenance')
 
@@ -81,11 +81,26 @@ class SolrMaintenanceView(BrowserView):
         real = timer()          # real time
         lap = timer()           # real lap time (for intermediate commits)
         cpu = timer(clock)      # cpu time
-        count = processed = 0
+        processed = 0
+        conn = manager.getConnection()
+        search = queryUtility(ISearch)
+        updates = {}            # list to hold data to be updated
         def checkPoint():
-            log('intermediate commit (%d objects processed, '
+            uids = updates.keys()
+            query = '+%s:(%s)' % (key, ' '.join(uids))
+            flares = {}
+            for flare in search(query, rows=len(uids)):
+                uid = getattr(flare, key)
+                assert uid, 'empty unique key?'
+                flares[uid] = flare
+            for uid, values in updates.items():
+                flare = flares.get(uid, {key: uid})
+                flare.update(values)
+                conn.add(**flare)
+            updates.clear()     # clear pending updates
+            log('intermediate commit (%d items processed, '
                 'last batch in %s)...\n' % (processed, lap.next()))
-            proc.commit(wait=True)
+            conn.commit()
             manager.getConnection().reset()     # force new connection
             if cache:
                 size = db.cacheSize()
@@ -94,22 +109,26 @@ class SolrMaintenanceView(BrowserView):
                     db.cacheMinimize()
         single = timer()        # real time for single object
         cpi = checkpointIterator(checkPoint, batch)
+        count = 0
+        key = manager.getSchema().uniqueKey
+        if attributes is not None and not key in attributes:
+            attributes.append(key)
         for path, obj in findObjects(self.context):
             if indexable(obj):
                 count += 1
                 if count <= skip:
                     continue
-                log('indexing %r' % obj)
-                try:
-                    proc.index(obj, attributes)
+                data, missing = proc.getData(obj, attributes)
+                prepareData(data)
+                if data.get(key, None) is not None and not missing:
+                    log('indexing %r' % obj)
+                    updates[data[key]] = data
                     processed += 1
-                except BadStatusLine:
-                    log('WARNING: error while indexing %r' % obj)
-                    logger.exception('error while indexing %r', obj)
-                    manager.getConnection().reset()     # force new connection
-                log(' (%s).\n' % single.next(), timestamp=False)
-                cpi.next()
-                single.next()   # don't count commit time here...
+                    log(' (%s).\n' % single.next(), timestamp=False)
+                    cpi.next()
+                    single.next()   # don't count commit time here...
+                else:
+                    log('missing data, skipping indexing of %r.\n' % obj)
         checkPoint()            # make sure to process the last batch
         manager.setTimeout(None, lock=False)    # reset the timeout lock
         log('solr index rebuilt.\n')
