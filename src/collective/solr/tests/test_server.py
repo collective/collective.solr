@@ -264,7 +264,7 @@ class SolrServerTests(SolrTestCase):
 
     def testSearchingTwice(self):
         connection = getUtility(ISolrConnectionManager).getConnection()
-        self.assertEqual(connection.reconnects, 0)
+        connection.reconnects = 0       # reset reconnect count first
         results = self.search('+Title:Foo').results()
         self.assertEqual(results.numFound, '0')
         self.assertEqual(connection.reconnects, 0)

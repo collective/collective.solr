@@ -73,48 +73,48 @@ class SolrMaintenanceView(BrowserView):
         manager = queryUtility(ISolrConnectionManager)
         manager.setTimeout(None, lock=True) # don't time out during reindexing
         proc = queryUtility(ISolrIndexQueueProcessor, name='solr')
+        db = self.context.getPhysicalRoot()._p_jar.db()
         log = self.mklog()
+        log('reindexing solr catalog...\n')
         if skip:
             log('skipping indexing of %d object(s)...\n' % skip)
-        now, cpu = time(), clock()
-        count = 0
-        indexed = 0
-        commit = batch
+        real = timer()          # real time
+        lap = timer()           # real lap time (for intermediate commits)
+        cpu = timer(clock)      # cpu time
+        count = processed = 0
+        def checkPoint():
+            log('intermediate commit (%d objects processed, '
+                'last batch in %s)...\n' % (processed, lap.next()))
+            proc.commit(wait=True)
+            manager.getConnection().reset()     # force new connection
+            if cache:
+                size = db.cacheSize()
+                if size > cache:
+                    log('minimizing zodb cache with %d objects...\n' % size)
+                    db.cacheMinimize()
+        single = timer()        # real time for single object
+        cpi = checkpointIterator(checkPoint, batch)
         for path, obj in findObjects(self.context):
             if indexable(obj):
                 count += 1
                 if count <= skip:
                     continue
                 log('indexing %r' % obj)
-                lap = time()
                 try:
                     proc.index(obj, attributes)
-                    indexed += 1
+                    processed += 1
                 except BadStatusLine:
                     log('WARNING: error while indexing %r' % obj)
                     logger.exception('error while indexing %r', obj)
                     manager.getConnection().reset()     # force new connection
-                log(' (%.4fs)\n' % (time() - lap), timestamp=False)
-                commit -= 1
-                if commit == 0:
-                    msg = 'intermediate commit: %d objects indexed in %.4fs\n'
-                    log(msg % (indexed, time() - now))
-                    proc.commit(wait=True)
-                    commit = batch
-                    manager.getConnection().reset()     # force new connection
-                    if cache:
-                        db = self.context.getPhysicalRoot()._p_jar.db()
-                        size = db.cacheSize()
-                        if size > cache:
-                            msg = 'minimizing zodb cache with %d objects...\n'
-                            log(msg % size)
-                            db.cacheMinimize()
-        proc.commit(wait=True)      # make sure to commit in the end...
+                log(' (%s).\n' % single.next(), timestamp=False)
+                cpi.next()
+                single.next()   # don't count commit time here...
+        checkPoint()            # make sure to process the last batch
         manager.setTimeout(None, lock=False)    # reset the timeout lock
-        now, cpu = time() - now, clock() - cpu
         log('solr index rebuilt.\n')
-        msg = 'indexed %d object(s) in %.3f seconds (%.3f cpu time).'
-        msg = msg % (indexed, now, cpu)
+        msg = 'processed %d items in %s (%s cpu time).'
+        msg = msg % (processed, real.next(), cpu.next())
         log(msg)
         logger.info(msg)
 
