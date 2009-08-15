@@ -1,7 +1,6 @@
 TODOs:
 * support for date facets
 * update docs wrt installation & requirements
-* tests for maintenance view for syncing catalog and solr indexes
 * result iterator (with __len__ on results object)
 * batch support for searching
 
