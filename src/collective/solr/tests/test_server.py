@@ -40,6 +40,15 @@ class SolrMaintenanceTests(SolrTestCase):
     def search(self, query='+UID:[* TO *]'):
         return self.connection.search(q=query).read()
 
+    def counts(self):
+        """ crude count of metadata records in the database """
+        info = {}
+        result = self.search()
+        for record in result.split('<str name="')[1:]:
+            name = record[:record.find('"')]
+            info[name] = info.get(name, 0) + 1
+        return numFound(result), info
+
     def testClear(self):
         # add something...
         connection = self.connection
@@ -53,13 +62,31 @@ class SolrMaintenanceTests(SolrTestCase):
 
     def testReindex(self):
         maintenance = self.portal.unrestrictedTraverse('solr-maintenance')
+        # initially the solr index should be empty
+        self.assertEqual(numFound(self.search()), 0)
+        # after a full reindex all objects should appear...
         maintenance.reindex()
-        self.assertEqual(numFound(self.search()), 8)
+        found, counts = self.counts()
+        self.assertEqual(found, 8)
+        # let's also make sure the data is complete
+        self.assertEqual(counts['Title'], 8)
+        self.assertEqual(counts['physicalPath'], 8)
+        self.assertEqual(counts['portal_type'], 8)
+        self.assertEqual(counts['review_state'], 8)
 
     def testPartialReindex(self):
         maintenance = self.portal.unrestrictedTraverse('news/solr-maintenance')
+        # initially the solr index should be empty
+        self.assertEqual(numFound(self.search()), 0)
+        # after the partial reindex only some objects should appear...
         maintenance.reindex()
-        self.assertEqual(numFound(self.search()), 2)
+        found, counts = self.counts()
+        self.assertEqual(found, 2)
+        # let's also make sure their data is complete
+        self.assertEqual(counts['Title'], 2)
+        self.assertEqual(counts['physicalPath'], 2)
+        self.assertEqual(counts['portal_type'], 2)
+        self.assertEqual(counts['review_state'], 2)
 
     def testCatalogSync(self):
         maintenance = self.portal.unrestrictedTraverse('solr-maintenance')
