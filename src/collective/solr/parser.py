@@ -150,3 +150,9 @@ class SolrSchema(AttrDict):
                     required.append(name)
             elif elem.tag in ('uniqueKey', 'defaultSearchField'):
                 self[elem.tag] = elem.text
+
+    def fields(self):
+        """ return list of all fields the schema consists of """
+        for name, field in self.items():
+            if isinstance(field, SolrField):
+                yield field

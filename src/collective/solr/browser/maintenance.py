@@ -9,7 +9,7 @@ from collective.solr.interfaces import ISolrConnectionManager
 from collective.solr.interfaces import ISolrIndexQueueProcessor
 from collective.solr.interfaces import ISolrMaintenanceView
 from collective.solr.interfaces import ISearch
-from collective.solr.indexer import indexable
+from collective.solr.indexer import indexable, handlers
 from collective.solr.utils import findObjects
 from collective.solr.utils import prepareData
 
@@ -34,6 +34,39 @@ def checkpointIterator(function, interval=100):
         if counter % interval == 0:
             function()
         yield None
+
+
+def solrDataFor(uids):
+    """ fetch existing index data from solr for object with given uids """
+    manager = queryUtility(ISolrConnectionManager)
+    search = queryUtility(ISearch)
+    schema = manager.getSchema()
+    # set up data converters
+    converters = {}
+    for field in schema.fields():
+        name = field['name']
+        handler = handlers.get(field.class_, None)
+        if handler is not None:
+            converters[name] = handler
+        elif not field.multiValued:
+            separator = getattr(field, 'separator', ' ')
+            def conv(value):
+                if isinstance(value, (list, tuple)):
+                    value = separator.join(value)
+                return value
+            converters[name] = conv
+    # query & convert data for given uids
+    key = schema.uniqueKey
+    query = '+%s:(%s)' % (key, ' '.join(uids))
+    flares = {}
+    for flare in search(query, rows=len(uids)):
+        uid = getattr(flare, key)
+        assert uid, 'empty unique key?'
+        for name, conv in converters.items():
+            if name in flare:
+                flare[name] = conv(flare[name])
+        flares[uid] = flare
+    return flares
 
 
 class SolrMaintenanceView(BrowserView):
@@ -83,16 +116,11 @@ class SolrMaintenanceView(BrowserView):
         cpu = timer(clock)      # cpu time
         processed = 0
         conn = manager.getConnection()
-        search = queryUtility(ISearch)
+        key = manager.getSchema().uniqueKey
         updates = {}            # list to hold data to be updated
         def checkPoint():
             uids = updates.keys()
-            query = '+%s:(%s)' % (key, ' '.join(uids))
-            flares = {}
-            for flare in search(query, rows=len(uids)):
-                uid = getattr(flare, key)
-                assert uid, 'empty unique key?'
-                flares[uid] = flare
+            flares = solrDataFor(uids)
             for uid, values in updates.items():
                 flare = flares.get(uid, {key: uid})
                 flare.update(values)
@@ -110,7 +138,6 @@ class SolrMaintenanceView(BrowserView):
         single = timer()        # real time for single object
         cpi = checkpointIterator(checkPoint, batch)
         count = 0
-        key = manager.getSchema().uniqueKey
         if attributes is not None and not key in attributes:
             attributes.append(key)
         for path, obj in findObjects(self.context):
@@ -268,16 +295,10 @@ class SolrMaintenanceView(BrowserView):
         cpu = timer(clock)      # cpu time
         processed = 0
         conn = manager.getConnection()
-        search = queryUtility(ISearch)
         updates = {}            # list to hold data to be updated
         def checkPoint():
             uids = updates.keys()
-            query = '+%s:(%s)' % (key, ' '.join(uids))
-            flares = {}
-            for flare in search(query, rows=len(uids)):
-                uid = getattr(flare, key)
-                assert uid, 'empty unique key?'
-                flares[uid] = flare
+            flares = solrDataFor(uids)
             for uid, value in updates.items():
                 flare = flares.get(uid, {key: uid})
                 flare[index] = value

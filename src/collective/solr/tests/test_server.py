@@ -89,11 +89,13 @@ class SolrMaintenanceTests(SolrTestCase):
         self.assertEqual(counts['portal_type'], 2)
         self.assertEqual(counts['review_state'], 2)
 
-    def testReindexAttributeKeepsExistingData(self):
+    def testReindexSingleOrFewAttributes(self):
+        # add subjects for testing multi-value fields
+        self.portal.news.setSubject(['foo', 'bar'])
         # reindexing a set of attributes (or a single one) should not destroy
         # any of the existing data fields, but merely add the new data...
         maintenance = self.portal.unrestrictedTraverse('solr-maintenance')
-        maintenance.reindex(attributes=['UID', 'Title'])
+        maintenance.reindex(attributes=['UID', 'Title', 'Date', 'Subject'])
         # after adding some index data only that very data should exist...
         attributes = 'Title', 'portal_type', 'review_state', 'physicalPath'
         self.assertEqual(self.counts(attributes),
@@ -111,6 +113,28 @@ class SolrMaintenanceTests(SolrTestCase):
         self.assertEqual(self.counts(attributes),
             (8, dict(Title=8, portal_type=8, physicalPath=8, review_state=8)))
 
+    def testReindexKeepsExistingData(self):
+        # add subjects for testing multi-value fields
+        self.portal.news.setSubject(['foo', 'bar'])
+        attributes = ['UID', 'Title', 'Date', 'Subject']
+        maintenance = self.portal.unrestrictedTraverse('solr-maintenance')
+        maintenance.reindex(attributes=attributes)
+        # reindexing a single/few attributes shouldn't destroy existing data
+        # to check we remember the original results first...
+        search = getUtility(ISearch)
+        original = search('+UID:[* TO *]', sort='UID asc').results()
+        self.assertEqual(original.numFound, '8')
+        # let's sync and compare the data from a new search
+        maintenance.reindex(attributes=['portal_type', 'review_state'])
+        results = search('+UID:[* TO *]', sort='UID asc').results()
+        self.assertEqual(results.numFound, '8')
+        for idx, result in enumerate(results):
+            self.failUnless('portal_type' in result)
+            org = original[idx]
+            for attr in attributes:
+                self.assertEqual(org.get(attr, 42), result.get(attr, 42),
+                    '%r vs %r' % (org, result))
+
     def testCatalogSync(self):
         maintenance = self.portal.unrestrictedTraverse('solr-maintenance')
         # initially solr should have no data for the index
@@ -126,20 +150,26 @@ class SolrMaintenanceTests(SolrTestCase):
         self.failIf('portal_type' in counts, 'portal_type records?')
 
     def testCatalogSyncKeepsExistingData(self):
+        # add subjects for testing multi-value fields
+        self.portal.news.setSubject(['foo', 'bar'])
+        attributes = ['UID', 'Title', 'Date', 'Subject']
         maintenance = self.portal.unrestrictedTraverse('solr-maintenance')
-        maintenance.reindex()
+        maintenance.reindex(attributes=attributes)
         # a catalog sync shouldn't destroy any of the existing data fields
         # to check we remember the original results first...
         search = getUtility(ISearch)
-        original = search('+UID:[* TO *]').results()
+        original = search('+UID:[* TO *]', sort='UID asc').results()
         self.assertEqual(original.numFound, '8')
         # let's sync and compare the data from a new search
-        maintenance.catalogSync(index='review_state')
-        results = search('+UID:[* TO *]').results()
+        maintenance.catalogSync(index='portal_type')
+        results = search('+UID:[* TO *]', sort='UID asc').results()
         self.assertEqual(results.numFound, '8')
-        for idx in range(len(results)):
-            self.assertEqual(original[idx], results[idx],
-                '%r vs %r' % (original[idx], results[idx]))
+        for idx, result in enumerate(results):
+            self.failUnless('portal_type' in result)
+            org = original[idx]
+            for attr in attributes:
+                self.assertEqual(org.get(attr, 42), result.get(attr, 42),
+                    '%r vs %r' % (org, result))
 
     def testDisabledTimeoutDuringReindex(self):
         log = []
