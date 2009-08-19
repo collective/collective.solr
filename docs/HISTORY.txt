@@ -1,8 +1,8 @@
 Changelog
 =========
 
-1.0b13 - Unreleased
--------------------
+1.0b13 - Released August 20, 2009
+---------------------------------
 
 * Fix `reindex` and `catalogSync` maintenance views to not pass invalid data
   back to Solr when indexing an explicit list of attributes.
