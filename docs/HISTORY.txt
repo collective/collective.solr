@@ -4,6 +4,10 @@ Changelog
 1.0b14 - Unreleased
 -------------------
 
+* Remove relevance information from search results as they don't make sense
+  to the user.
+  [witsch]
+
 
 1.0b13 - Released August 20, 2009
 ---------------------------------
