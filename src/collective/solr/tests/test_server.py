@@ -355,7 +355,7 @@ class SolrServerTests(SolrTestCase):
         self.maintenance.reindex()
         results = solrSearchResults({'SearchableText': 'News'})
         self.failUnless([r for r in results if isinstance(r, PloneFlare)])
-        self.assertEqual([(r.Title, r.physicalPath) for r in results],
+        self.assertEqual(sorted([(r.Title, r.physicalPath) for r in results]),
             [('News', '/plone/news'), ('News', '/plone/news/aggregator')])
 
     def testRequiredParameters(self):
@@ -366,12 +366,12 @@ class SolrServerTests(SolrTestCase):
         config = getUtility(ISolrConnectionConfig)
         config.required = []
         results = solrSearchResults(Title='News')
-        self.assertEqual([(r.Title, r.physicalPath) for r in results],
+        self.assertEqual(sorted([(r.Title, r.physicalPath) for r in results]),
             [('News', '/plone/news'), ('News', '/plone/news/aggregator')])
         # specifying multiple values should required only one of them...
         config.required = ['Title', 'foo']
         results = solrSearchResults(Title='News')
-        self.assertEqual([(r.Title, r.physicalPath) for r in results],
+        self.assertEqual(sorted([(r.Title, r.physicalPath) for r in results]),
             [('News', '/plone/news'), ('News', '/plone/news/aggregator')])
         # but solr won't be used if none of them is present...
         config.required = ['foo', 'bar']
