@@ -162,6 +162,7 @@ class SiteSearchTests(SolrTestCase):
     def testSchemaUrlFallback(self):
         config = queryUtility(ISolrConnectionConfig)
         config.active = True
+        config.port = 55555         # random port so the real solr can still run
         def notfound(handler):      # set up fake 404 response
             self.assertEqual(handler.path,
                 '/solr/admin/file/?file=schema.xml')
