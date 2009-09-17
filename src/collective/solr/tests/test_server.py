@@ -643,6 +643,28 @@ class SolrServerTests(SolrTestCase):
             ['+portal_type:Topic', '+review_state:published'], log)
         Search.__call__ = original
 
+    def testDefaultOperatorIsOR(self):
+        schema = self.search.getManager().getSchema()
+        if schema['solrQueryParser'].defaultOperator == 'OR':
+            self.folder.invokeFactory('Document', id='doc1', title='Foo')
+            self.folder.invokeFactory('Document', id='doc2', title='Bar')
+            self.folder.invokeFactory('Document', id='doc3', title='Foo Bar')
+            commit()                        # indexing happens on commit
+            request = dict(SearchableText='Bar Foo')
+            results = solrSearchResults(request)
+            self.assertEqual(len(results), 3)
+
+    def testDefaultOperatorIsAND(self):
+        schema = self.search.getManager().getSchema()
+        if schema['solrQueryParser'].defaultOperator == 'AND':
+            self.folder.invokeFactory('Document', id='doc1', title='Foo')
+            self.folder.invokeFactory('Document', id='doc2', title='Bar')
+            self.folder.invokeFactory('Document', id='doc3', title='Foo Bar')
+            commit()                        # indexing happens on commit
+            request = dict(SearchableText='Bar Foo')
+            results = solrSearchResults(request)
+            self.assertEqual(len(results), 1)
+
 
 def test_suite():
     if pingSolr():

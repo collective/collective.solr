@@ -1,3 +1,4 @@
+from Testing.ZopeTestCase import Sandboxed
 from Products.Five.testbrowser import Browser
 from Products.PloneTestCase import PloneTestCase as ptc
 from plone.app.controlpanel.tests.cptc import ControlPanelTestCase
@@ -8,7 +9,7 @@ from collective.solr.tests.layer import SolrLayer
 ptc.setupPloneSite()
 
 
-class SolrTestCase(ptc.PloneTestCase):
+class SolrTestCase(Sandboxed, ptc.PloneTestCase):
     """ base class for integration tests """
 
     layer = SolrLayer
