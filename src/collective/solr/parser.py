@@ -112,16 +112,25 @@ class SolrField(AttrDict):
         super(SolrField, self).__init__(*args, **kw)
 
 
+class AttrStr(str):
+    """ a string class with attributes """
+
+    def __new__(self, value, **kw):
+        return str.__new__(self, value)
+
+    def __init__(self, value, **kw):
+        self.__dict__.update(kw)
+
+
 class SolrSchema(AttrDict):
     """ a solr schema parser:  the xml schema is partially parsed and the
         information collected is later on used both for indexing items as
-        well as buiding search queries;  for the time being we are only
+        well as buiding search queries;  for the time being we are mostly
         interested in explicitly defined fields and their data types, so
         all <analyzer> (tokenizers, filters) and <dynamicField> information
-        is ignored;  all the other fields like <uniqueKey>, <copyField>,
-        <solrQueryParser>, <defaultSearchField> etc get ignored as well,
-        since they are only used by solr, but not relevant when building
-        search or indexing queries """
+        is ignored;  some of the other fields relevant to the implementation,
+        like <uniqueKey>, <solrQueryParser> or <defaultSearchField>, are also
+        parsed and provided, all others are ignored """
 
     def __init__(self, data=None):
         if data is not None:
@@ -150,6 +159,8 @@ class SolrSchema(AttrDict):
                     required.append(name)
             elif elem.tag in ('uniqueKey', 'defaultSearchField'):
                 self[elem.tag] = elem.text
+            elif elem.tag == 'solrQueryParser':
+                self[elem.tag] = AttrStr(elem.text, **elem.attrib)
 
     def fields(self):
         """ return list of all fields the schema consists of """

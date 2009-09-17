@@ -176,7 +176,7 @@ class SiteSearchTests(SolrTestCase):
         schema = queryUtility(ISolrConnectionManager).getSchema()
         thread.join()               # the server thread must always be joined
         self.assertEqual(responses, [])
-        self.assertEqual(len(schema), 20)   # 20 items defined in schema.xml
+        self.assertEqual(len(schema), 21)   # 21 items defined in schema.xml
 
 
 class SiteSetupTests(SolrTestCase):

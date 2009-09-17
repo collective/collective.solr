@@ -120,9 +120,10 @@ class ParserTests(TestCase):
     def testParseConfig(self):
         schema_xml = getData('schema.xml')
         schema = SolrSchema(schema_xml.split('\n\n', 1)[1])
-        self.assertEqual(len(schema), 20) # 20 items defined in schema.xml
+        self.assertEqual(len(schema), 21) # 21 items defined in schema.xml
         self.assertEqual(schema['defaultSearchField'], 'text')
         self.assertEqual(schema['uniqueKey'], 'id')
+        self.assertEqual(schema['solrQueryParser'].defaultOperator, 'OR')
         self.assertEqual(schema['requiredFields'], ['id', 'name'])
         self.assertEqual(schema['id'].type, 'string')
         self.assertEqual(schema['id'].class_, 'solr.StrField')
