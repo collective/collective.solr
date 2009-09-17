@@ -172,26 +172,27 @@ class QueryTests(TestCase):
 
     def testMultiValueQueries(self):
         bq = self.bq
-        self.assertEqual(bq(('foo', 'bar')), '+(foo bar)')
-        self.assertEqual(bq(('foo', 'bar*')), '+(foo bar*)')
-        self.assertEqual(bq(('foo bar', 'hmm')), '+("foo bar" hmm)')
-        self.assertEqual(bq(('foø bar', 'hmm')), '+("fo\xc3\xb8 bar" hmm)')
-        self.assertEqual(bq(('"foo bar"', 'hmm')), '+("foo bar" hmm)')
-        self.assertEqual(bq(name=['foo', 'bar']), '+name:(foo bar)')
-        self.assertEqual(bq(name=['foo', 'bar*']), '+name:(foo bar*)')
-        self.assertEqual(bq(name=['foo bar', 'hmm']), '+name:("foo bar" hmm)')
+        self.assertEqual(bq(('foo', 'bar')), '+(foo OR bar)')
+        self.assertEqual(bq(('foo', 'bar*')), '+(foo OR bar*)')
+        self.assertEqual(bq(('foo bar', 'hmm')), '+("foo bar" OR hmm)')
+        self.assertEqual(bq(('foø bar', 'hmm')), '+("fo\xc3\xb8 bar" OR hmm)')
+        self.assertEqual(bq(('"foo bar"', 'hmm')), '+("foo bar" OR hmm)')
+        self.assertEqual(bq(name=['foo', 'bar']), '+name:(foo OR bar)')
+        self.assertEqual(bq(name=['foo', 'bar*']), '+name:(foo OR bar*)')
+        self.assertEqual(bq(name=['foo bar', 'hmm']), '+name:("foo bar" OR hmm)')
 
     def testMultiArgumentQueries(self):
         bq = self.bq
         self.assertEqual(bq('foo', name='bar'), '+foo +name:bar')
         self.assertEqual(bq('foo', name=('bar', 'hmm')),
-            '+foo +name:(bar hmm)')
+            '+foo +name:(bar OR hmm)')
         self.assertEqual(bq('foo', name=('foo bar', 'hmm')),
-            '+foo +name:("foo bar" hmm)')
+            '+foo +name:("foo bar" OR hmm)')
         self.assertEqual(bq(name='foo', cat='bar'), '+name:foo +cat:bar')
-        self.assertEqual(bq(name='foo', cat=['bar', 'hmm']), '+name:foo +cat:(bar hmm)')
+        self.assertEqual(bq(name='foo', cat=['bar', 'hmm']),
+            '+name:foo +cat:(bar OR hmm)')
         self.assertEqual(bq(name='foo', cat=['foo bar', 'hmm']),
-            '+name:foo +cat:("foo bar" hmm)')
+            '+name:foo +cat:("foo bar" OR hmm)')
         self.assertEqual(bq('foo', name=' '), '+foo')
         self.assertEqual(bq('foo', name=''), '+foo')
 
@@ -206,10 +207,10 @@ class QueryTests(TestCase):
         self.assertEqual(bq(u'foo'), '+foo')
         self.assertEqual(bq(u'foø'), '+fo\xc3\xb8')
         self.assertEqual(bq(u'john@foo.com'), '+john@foo.com')
-        self.assertEqual(bq(name=['foo', u'bar']), '+name:(foo bar)')
-        self.assertEqual(bq(name=['foo', u'bär']), '+name:(foo b\xc3\xa4r)')
-        self.assertEqual(bq(name='foo', cat=(u'bar', 'hmm')), '+name:foo +cat:(bar hmm)')
-        self.assertEqual(bq(name='foo', cat=(u'bär', 'hmm')), '+name:foo +cat:(b\xc3\xa4r hmm)')
+        self.assertEqual(bq(name=['foo', u'bar']), '+name:(foo OR bar)')
+        self.assertEqual(bq(name=['foo', u'bär']), '+name:(foo OR b\xc3\xa4r)')
+        self.assertEqual(bq(name='foo', cat=(u'bar', 'hmm')), '+name:foo +cat:(bar OR hmm)')
+        self.assertEqual(bq(name='foo', cat=(u'bär', 'hmm')), '+name:foo +cat:(b\xc3\xa4r OR hmm)')
         self.assertEqual(bq(name=u'john@foo.com', cat='spammer'), '+name:john@foo.com +cat:spammer')
 
     def testQuotedQueries(self):
@@ -238,9 +239,9 @@ class QueryTests(TestCase):
     def testComplexQueries(self):
         bq = self.bq
         self.assertEqual(bq('foo', name='"herb*"', cat=(u'bär', '"-hmm"')),
-            '+foo +name:"herb\*" +cat:(b\xc3\xa4r "\-hmm")')
+            '+foo +name:"herb\*" +cat:(b\xc3\xa4r OR "\-hmm")')
         self.assertEqual(bq('foo', name='herb*', cat=(u'bär', '-hmm')),
-            '+foo +name:herb* +cat:(b\xc3\xa4r -hmm)')
+            '+foo +name:herb* +cat:(b\xc3\xa4r OR -hmm)')
 
     def testBooleanQueries(self):
         bq = self.bq

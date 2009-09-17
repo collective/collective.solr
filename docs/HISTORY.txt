@@ -4,6 +4,10 @@ Changelog
 1.0b14 - Unreleased
 -------------------
 
+* Fix query builder to use explicit `OR`s so that it becomes possible to
+  change Solr's default operator to `AND`.
+  [witsch]
+
 * Remove relevance information from search results as they don't make sense
   to the user.
   [witsch]

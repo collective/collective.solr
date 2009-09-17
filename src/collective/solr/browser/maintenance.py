@@ -57,7 +57,7 @@ def solrDataFor(uids):
             converters[name] = conv
     # query & convert data for given uids
     key = schema.uniqueKey
-    query = '+%s:(%s)' % (key, ' '.join(uids))
+    query = '+%s:(%s)' % (key, ' OR '.join(uids))
     flares = {}
     for flare in search(query, rows=len(uids)):
         uid = getattr(flare, key)

@@ -72,7 +72,7 @@ class Search(object):
                     if not quoted.startswith('"') and not quoted == term:
                         quoted = quote('"' + term + '"')
                     return quoted
-                value = '(%s)' % ' '.join(map(quoteitem, value))
+                value = '(%s)' % ' OR '.join(map(quoteitem, value))
             elif isinstance(value, basestring):
                 value = quote(value)
                 if not value:   # don't search for empty strings, even quoted
