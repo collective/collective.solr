@@ -665,6 +665,14 @@ class SolrServerTests(SolrTestCase):
             results = solrSearchResults(request)
             self.assertEqual(len(results), 1)
 
+    def testMultiValueSearch(self):
+        self.maintenance.reindex()
+        results = solrSearchResults(SearchableText='New*',
+            portal_type=['Large Plone Folder', 'Document'])
+        self.assertEqual(len(results), 2)
+        self.assertEqual(sorted([r.physicalPath for r in results]),
+            ['/plone/front-page', '/plone/news'])
+
 
 def test_suite():
     if pingSolr():
