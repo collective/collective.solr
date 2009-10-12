@@ -35,6 +35,7 @@ import codecs
 import urllib
 from collective.solr.parser import SolrSchema
 from collective.solr.timeout import HTTPConnectionWithTimeout
+from collective.solr.utils import translation_map
 
 from logging import getLogger
 logger = getLogger(__name__)
@@ -191,7 +192,7 @@ class SolrConnection:
         if not isinstance(v, basestring):
             v = str(v)
         lst.append('<field name="%s">%s</field>' % (self.escapeKey(f),
-            self.escapeVal(v)))
+            self.escapeVal(v).translate(translation_map)))
 
     def __add(self, lst, fields):
         lst.append('<doc>')
