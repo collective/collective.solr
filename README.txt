@@ -47,6 +47,39 @@ For outstanding issues and features remaining to be implemented please see the
   .. __: http://plone.org/products/collective.solr/issues
 
 
+Installation
+------------
+
+The following buildout configuration may be used to get started quickly::
+
+  [buildout]
+  extends =
+    buildout.cfg
+    http://svn.plone.org/svn/collective/collective.solr/trunk/buildout/solr-1.3.cfg
+
+  [instance]
+  eggs += collective.solr
+  zcml += collective.solr
+
+After saving this to let's say ``solr.cfg`` buildout can be run and the
+`Solr`_ server and `Plone`_ instance started::
+
+  $ python bootstrap.py
+  $ bin/buildout -c solr.cfg
+  ...
+  $ bin/solr-instance start
+  $ bin/instance start
+
+Next the "collective.solr (site search)" profile should be applied via the
+portal setup or when creating a fresh Plone site.  After activating and
+configuring the integration in the Plone control panel and initially indexing
+any existing content using the provided maintenance view:
+
+  http://localhost:8080/plone/@@solr-maintenance/reindex
+
+facet information should appear in Plone's search results page.
+
+
 FAQs / Troubleshooting
 ----------------------
 
