@@ -164,7 +164,7 @@ class SolrMaintenanceView(BrowserView):
         log(msg)
         logger.info(msg)
 
-    def metadata(self, index, key, func=lambda x: x):
+    def metadata(self, index, key, func=lambda x: x, path='/'):
         """ build a mapping between a unique key and a given attribute from
             the portal catalog; catalog metadata must exist for the given
             index """
@@ -175,20 +175,21 @@ class SolrMaintenanceView(BrowserView):
         for uid, rids in cat.getIndex(key).items():
             for rid in rids:
                 value = cat.data[rid][pos]
-                if value is not None:
+                if value is not None and cat.paths[rid].startswith(path):
                     data[uid] = func(value)
         return data
 
-    def diff(self):
+    def diff(self, path):
         """ determine objects that need to be indexed/reindex/unindexed by
             diff'ing the records in the portal catalog and solr """
         key = queryUtility(ISolrConnectionManager).getSchema().uniqueKey
-        uids = self.metadata('modified', key=key, func=lambda x: x.millis())
+        uids = self.metadata('modified', key=key,
+            func=lambda x: x.millis(), path=path)
         search = queryUtility(ISearch)
         reindex = []
         unindex = []
         rows = len(uids) * 10               # sys.maxint makes solr choke :(
-        query = '%s:[* TO *]' % key
+        query = '+%s:[* TO *] +parentPaths:%s' % (key, path)
         for flare in search(query, rows=rows, fl='%s modified' % key):
             uid = getattr(flare, key)
             assert uid, 'empty unique key?'
@@ -215,8 +216,10 @@ class SolrMaintenanceView(BrowserView):
         real = timer()          # real time
         lap = timer()           # real lap time (for intermediate commits)
         cpu = timer(clock)      # cpu time
-        log('determining differences between portal catalog and solr...')
-        index, reindex, unindex = self.diff()
+        path = '/'.join(self.context.getPhysicalPath())
+        log('determining differences between portal catalog and solr '
+            '(from "%s")...' % path)
+        index, reindex, unindex = self.diff(path)
         log(' (%s).\n' % lap.next(), timestamp=False)
         log('operations needed: %d "index", %d "reindex", %d "unindex"\n' % (
             len(index), len(reindex), len(unindex)))
