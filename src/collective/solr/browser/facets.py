@@ -41,7 +41,7 @@ def convertFacets(fields, context=None, request={}, filter=None):
     info = []
     params = request.copy()   # request needs to be a dict, i.e. request.form
     facets, dependencies = list(facetParameters(context, request))
-    params['facet.field'] = facets
+    params['facet.field'] = facets = list(facets)
     fq = params.get('fq', [])
     if isinstance(fq, basestring):
         fq = params['fq'] = [fq]
