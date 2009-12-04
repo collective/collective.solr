@@ -54,7 +54,7 @@ doesn't lead to problems:
 
   >>> browser.getLink('Advanced Search').click()
   >>> browser.getControl('Search Text').value = 'Foo'
-  >>> browser.getForm(name='search').submit()
+  >>> browser.getControl(name='submit').click()
   >>> browser.contents
   '...Search results...1...items matching your search terms...
    ...http://nohost/plone/foo...Foo...'
