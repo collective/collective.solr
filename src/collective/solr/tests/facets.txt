@@ -63,7 +63,7 @@ Clicking on of the facets should restrict the search:
 
   >>> browser.getLink('Topic').click()
   >>> browser.url
-  'http://nohost/plone/search?...&fq=portal_type%3ATopic...'
+  'http://nohost/plone/search?...&fq=portal_type%3A%22Topic%22...'
   >>> 'facet.field=portal_type' in browser.url
   False
   >>> browser.contents
@@ -85,7 +85,7 @@ But the other facet should still be browsable:
 
   >>> browser.getLink('published').click()
   >>> browser.url
-  'http://nohost/plone/search?...fq=portal_type%3ATopic...fq=review_state%3Apublished...'
+  'http://nohost/plone/search?...fq=portal_type%3A%22Topic%22...fq=review_state%3A%22published%22...'
   >>> 'facet.field=' in browser.url
   False
   >>> browser.contents
