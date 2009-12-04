@@ -140,7 +140,7 @@ class RobustnessTests(TestCase):
 
     def testIndexingWithUniqueKeyMissing(self):
         fakehttp(self.conn, getData('simple_schema.xml'))   # fake schema response
-        schema = self.mngr.getSchema()                      # read and cache the schema
+        self.mngr.getSchema()                               # read and cache the schema
         response = getData('add_response.txt')
         output = fakehttp(self.conn, response)              # fake add response
         foo = Foo(id='500', name='foo')
@@ -151,7 +151,7 @@ class RobustnessTests(TestCase):
 
     def testUnindexingWithUniqueKeyMissing(self):
         fakehttp(self.conn, getData('simple_schema.xml'))   # fake schema response
-        schema = self.mngr.getSchema()                      # read and cache the schema
+        self.mngr.getSchema()                               # read and cache the schema
         response = getData('delete_response.txt')
         output = fakehttp(self.conn, response)              # fake delete response
         foo = Foo(id='500', name='foo')

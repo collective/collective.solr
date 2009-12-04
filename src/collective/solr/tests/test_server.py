@@ -258,7 +258,6 @@ class SolrMaintenanceTests(SolrTestCase):
         # a given path, returning only partial differences...
         search = self.portal.portal_catalog.unrestrictedSearchResults
         maintenance = self.portal.unrestrictedTraverse('solr-maintenance')
-        full_items = set([b.UID for b in search()])
         news_items = set([b.UID for b in search(path='/plone/news')])
         # initially only the items within the given path need indexing...
         index, reindex, unindex = maintenance.diff(path='/plone/news')
@@ -308,7 +307,6 @@ class SolrErrorHandlingTests(SolrTestCase):
             log.extend(args)
         logger_indexer.exception = logger
         logger_solr.exception = logger
-        config = getUtility(ISolrConnectionConfig)
         self.config.active = True
         self.folder.processForm(values={'title': 'Foo'})
         commit()                    # indexing on commit, schema gets cached
