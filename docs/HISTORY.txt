@@ -4,6 +4,10 @@ Changelog
 1.0b16 - Unreleased
 -------------------
 
+* Use wildcard searches for simple search terms to reflect Plone's default
+  behaviour.
+  [witsch]
+
 * Fix drill-down for facet values containing white space.
   [witsch]
 

@@ -1,7 +1,9 @@
+# -*- coding: utf-8 -*-
+
 from unittest import TestCase, defaultTestLoader, main
 from Testing import ZopeTestCase as ztc
 
-from collective.solr.utils import findObjects
+from collective.solr.utils import findObjects, isSimpleTerm
 from collective.solr.utils import setupTranslationMap, prepareData
 
 
@@ -35,6 +37,18 @@ class UtilsTests(ztc.ZopeTestCase):
         # but the rest should be the same...
         self.assertEqual(self.ids(found[1:]), self.good)
 
+    def testSimpleTerm(self):
+        self.failUnless(isSimpleTerm('foo'))
+        self.failUnless(isSimpleTerm('foo '))
+        self.failUnless(isSimpleTerm('foo42'))
+        self.failUnless(isSimpleTerm(u'føø'))
+        self.failUnless(isSimpleTerm('føø'))
+        self.failIf(isSimpleTerm('foo!'))
+        self.failIf(isSimpleTerm('foo 42'))
+        self.failIf(isSimpleTerm('"foo"'))
+        self.failIf(isSimpleTerm(u'føø!'))
+        self.failIf(isSimpleTerm(unicode('föö', 'latin')))
+
 
 class TranslationTests(TestCase):
 
@@ -50,9 +64,9 @@ class TranslationTests(TestCase):
         self.assertEqual(data, {'SearchableText': 'foo\n\tbar  \r'})
 
     def testUnicodeSearchableText(self):
-        data = {'SearchableText': u'f\xf8\xf8'}
+        data = {'SearchableText': u'f\xf8\xf8 bar'}
         prepareData(data)
-        self.assertEqual(data, {'SearchableText': 'f\xc3\xb8\xc3\xb8'})
+        self.assertEqual(data, {'SearchableText': 'f\xc3\xb8\xc3\xb8 bar'})
 
 
 def test_suite():

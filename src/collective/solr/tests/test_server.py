@@ -417,7 +417,7 @@ class SolrServerTests(SolrTestCase):
     def testSolrSearchResults(self):
         self.maintenance.reindex()
         results = solrSearchResults(SearchableText='News')
-        self.assertEqual([(r.Title, r.physicalPath) for r in results],
+        self.assertEqual(sorted([(r.Title, r.physicalPath) for r in results]),
             [('News', '/plone/news'), ('News', '/plone/news/aggregator')])
 
     def testSolrSearchResultsWithUnicodeTitle(self):
@@ -434,7 +434,7 @@ class SolrServerTests(SolrTestCase):
         self.failUnless(isinstance(response.responseHeader, dict))
         headers = response.responseHeader
         self.assertEqual(sorted(headers), ['QTime', 'params', 'status'])
-        self.assertEqual(headers['params']['q'], '+SearchableText:News')
+        self.assertEqual(headers['params']['q'], '+SearchableText:news*')
 
     def testSolrSearchResultsWithDictRequest(self):
         self.maintenance.reindex()
@@ -684,7 +684,7 @@ class SolrServerTests(SolrTestCase):
         crit = news.addCriterion('SearchableText', 'ATSimpleStringCriterion')
         crit.setValue('News')
         results = news.queryCatalog()
-        self.assertEqual([(r.Title, r.physicalPath) for r in results],
+        self.assertEqual(sorted([(r.Title, r.physicalPath) for r in results]),
             [('News', '/plone/news'), ('News', '/plone/news/aggregator')])
 
     def testSearchDateRange(self):

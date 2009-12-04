@@ -45,6 +45,23 @@ behaviour won't break things:
    ...http://nohost/plone/file...my first file...'
 
 
+Wildcard searches
+-----------------
+
+Simple searches should be wildcard searches to reflect (and not change)
+Plone's default behaviour.  So at least for single words the search should
+be automatically adjusted:
+
+  >>> browser.open('http://nohost/plone/')
+  >>> browser.getControl('Search Site').value = 'Fo'
+  >>> browser.getForm(name='searchform').submit()
+  >>> browser.contents
+  '...Search results...2...items matching your search terms...
+   ...http://nohost/plone/foo...Foo...'
+  >>> browser.getLink('Foo')
+  <Link text='Foo' url='http://nohost/plone/foo'>
+
+
 Advanced Search
 ---------------
 

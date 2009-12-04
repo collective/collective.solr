@@ -28,7 +28,7 @@ class SolrFacettingTests(SolrTestCase):
     def testFacettedSearchWithKeywordArguments(self):
         results = solrSearchResults(SearchableText='News', facet='true',
             facet_field='portal_type')
-        self.assertEqual([r.physicalPath for r in results],
+        self.assertEqual(sorted([r.physicalPath for r in results]),
             ['/plone/news', '/plone/news/aggregator'])
         types = results.facet_counts['facet_fields']['portal_type']
         self.assertEqual(types['Document'], 0)
@@ -42,7 +42,7 @@ class SolrFacettingTests(SolrTestCase):
         request.form['facet'] = 'true'
         request.form['facet_field'] = 'review_state'
         results = solrSearchResults(request)
-        self.assertEqual([r.physicalPath for r in results],
+        self.assertEqual(sorted([r.physicalPath for r in results]),
             ['/plone/news', '/plone/news/aggregator'])
         states = results.facet_counts['facet_fields']['review_state']
         self.assertEqual(states, dict(private=0, published=2))
@@ -50,7 +50,7 @@ class SolrFacettingTests(SolrTestCase):
     def testMultiFacettedSearch(self):
         results = solrSearchResults(SearchableText='News', facet='true',
             facet_field=['portal_type', 'review_state'])
-        self.assertEqual([r.physicalPath for r in results],
+        self.assertEqual(sorted([r.physicalPath for r in results]),
             ['/plone/news', '/plone/news/aggregator'])
         facets = results.facet_counts['facet_fields']
         self.assertEqual(facets['portal_type']['Large Plone Folder'], 1)

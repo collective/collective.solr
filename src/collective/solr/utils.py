@@ -1,6 +1,7 @@
 from zope.component import queryUtility
 from Acquisition import aq_base
 from string import maketrans
+from re import compile, UNICODE
 
 from collective.solr.interfaces import ISolrConnectionConfig
 
@@ -43,9 +44,21 @@ def prepareData(data):
         data['allowedRolesAndUsers'] = [r.replace(':', '$') for r in allowed]
     searchable = data.get('SearchableText', None)
     if searchable is not None:
+        if isSimpleTerm(searchable):
+            searchable = searchable.lower() + '*'   # use wildcard search
         if isinstance(searchable, unicode):
             searchable = searchable.encode('utf-8')
         data['SearchableText'] = searchable.translate(translation_map)
+
+
+simpleTerm = compile(r'^[\w\d]+$', UNICODE)
+def isSimpleTerm(term):
+    if isinstance(term, str):
+        try:
+            term = unicode(term, 'utf-8')
+        except UnicodeDecodeError:
+            pass
+    return bool(simpleTerm.match(term.strip()))
 
 
 def findObjects(origin):
