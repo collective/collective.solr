@@ -432,7 +432,7 @@ class SolrServerTests(SolrTestCase):
         self.failUnless(isinstance(response.responseHeader, dict))
         headers = response.responseHeader
         self.assertEqual(sorted(headers), ['QTime', 'params', 'status'])
-        self.assertEqual(headers['params']['q'], '+SearchableText:news*')
+        self.assertEqual(headers['params']['q'], '+SearchableText:(news* OR News)')
 
     def testSolrSearchResultsWithDictRequest(self):
         self.maintenance.reindex()
