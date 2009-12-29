@@ -106,6 +106,7 @@ class SolrMaintenanceView(BrowserView):
         manager = queryUtility(ISolrConnectionManager)
         manager.setTimeout(None, lock=True) # don't time out during reindexing
         proc = queryUtility(ISolrIndexQueueProcessor, name='solr')
+	proc.manager = manager
         db = self.context.getPhysicalRoot()._p_jar.db()
         log = self.mklog()
         log('reindexing solr catalog...\n')
