@@ -20,16 +20,16 @@
   </div>
 
   <div tal:repeat="facet facets" i18n:domain="solr">
-    <h5 tal:content="facet/title" i18n:translate="" tal:attributes="class facet/title"/>
-    
+    <h5 tal:content="facet/title" i18n:translate="" />
+    <dl>
       <tal:counts repeat="item facet/counts">
-        <div class="facet_item">
+        <dt>
           <a href="#" tal:content="item/name" i18n:translate=""
              tal:attributes="href string:${request/ACTUAL_URL}?${item/query}" />
-        
-        <span class="facet_count">(<span tal:replace="item/count" />)</span></div>
+        </dt>
+        <dd tal:content="item/count" />
       </tal:counts>
-    
+    </dl>
   </div>
 
 </div>
