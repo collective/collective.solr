@@ -134,6 +134,10 @@ class SolrMaintenanceTests(SolrTestCase):
             for attr in attributes:
                 self.assertEqual(org.get(attr, 42), result.get(attr, 42),
                     '%r vs %r' % (org, result))
+        # data not stored (but only indexed) in solr must also be preserved
+        # so that querying against the according indices still works...
+        results = search('+parentPaths:/plone/news').results()
+        self.assertEqual(results.numFound, '2')
 
     def testCatalogSync(self):
         maintenance = self.portal.unrestrictedTraverse('solr-maintenance')

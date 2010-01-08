@@ -4,6 +4,10 @@ Changelog
 1.0b16 - Unreleased
 -------------------
 
+* Fix `reindex` maintenance view to preserve data that cannot be fetched from
+  Solr during partial indexing, i.e. indices that are not stored.
+  [witsch]
+
 * Use wildcard searches for simple search terms to reflect Plone's default
   behaviour.
   [witsch]

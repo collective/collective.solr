@@ -138,8 +138,14 @@ class SolrMaintenanceView(BrowserView):
         single = timer()        # real time for single object
         cpi = checkpointIterator(checkPoint, batch)
         count = 0
-        if attributes is not None and not key in attributes:
-            attributes.append(key)
+        if attributes is not None:
+            if not key in attributes:
+                attributes.append(key)
+            for field in manager.getSchema().fields():
+                if not field.stored:    # fields not stored need to be added
+                    log('adding non-stored field "%s" to attribute list...\n'
+                        % field.name)
+                    attributes.append(field.name)
         for path, obj in findObjects(self.context):
             if indexable(obj):
                 count += 1
