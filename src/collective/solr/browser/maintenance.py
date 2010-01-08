@@ -100,7 +100,7 @@ class SolrMaintenanceView(BrowserView):
         conn.commit()
         return 'solr index cleared.'
 
-    def reindex(self, batch=100, skip=0, cache=1000, attributes=None):
+    def reindex(self, batch=100, skip=0, cache=10000, attributes=None):
         """ find all contentish objects (meaning all objects derived from one
             of the catalog mixin classes) and (re)indexes them """
         manager = queryUtility(ISolrConnectionManager)
@@ -208,7 +208,7 @@ class SolrMaintenanceView(BrowserView):
         index = uids.keys()
         return index, reindex, unindex
 
-    def sync(self, batch=100, cache=1000):
+    def sync(self, batch=100, cache=10000):
         """ sync the solr index with the portal catalog;  records contained
             in the catalog but not in solr will be indexed and records not
             contained in the catalog can be optionally removed;  this can
