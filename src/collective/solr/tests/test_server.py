@@ -139,42 +139,6 @@ class SolrMaintenanceTests(SolrTestCase):
         results = search('+parentPaths:/plone/news').results()
         self.assertEqual(results.numFound, '2')
 
-    def testCatalogSync(self):
-        maintenance = self.portal.unrestrictedTraverse('solr-maintenance')
-        # initially solr should have no data for the index
-        found, counts = self.counts()
-        self.failIf('review_state' in counts)
-        # after syncing from the catalog the index data should be available
-        maintenance.catalogSync(index='review_state')
-        found, counts = self.counts()
-        self.assertEqual(counts['review_state'], 8)
-        # but not for any of the other indexes
-        self.failIf('Title' in counts, 'Title records?')
-        self.failIf('physicalPath' in counts, 'physicalPath records?')
-        self.failIf('portal_type' in counts, 'portal_type records?')
-
-    def testCatalogSyncKeepsExistingData(self):
-        # add subjects for testing multi-value fields
-        self.portal.news.setSubject(['foo', 'bar'])
-        attributes = ['UID', 'Title', 'Date', 'Subject']
-        maintenance = self.portal.unrestrictedTraverse('solr-maintenance')
-        maintenance.reindex(attributes=attributes)
-        # a catalog sync shouldn't destroy any of the existing data fields
-        # to check we remember the original results first...
-        search = getUtility(ISearch)
-        original = search('+UID:[* TO *]', sort='UID asc').results()
-        self.assertEqual(original.numFound, '8')
-        # let's sync and compare the data from a new search
-        maintenance.catalogSync(index='portal_type')
-        results = search('+UID:[* TO *]', sort='UID asc').results()
-        self.assertEqual(results.numFound, '8')
-        for idx, result in enumerate(results):
-            self.failUnless('portal_type' in result)
-            org = original[idx]
-            for attr in attributes:
-                self.assertEqual(org.get(attr, 42), result.get(attr, 42),
-                    '%r vs %r' % (org, result))
-
     def testDisabledTimeoutDuringReindex(self):
         log = []
         def logger(*args):

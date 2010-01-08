@@ -4,6 +4,11 @@ Changelog
 1.0b16 - Unreleased
 -------------------
 
+* Remove `catalogSync` maintenance view since it would need to fetch
+  additional data (for non-stored indices) from the objects themselves in
+  order to work correctly.
+  [witsch]
+
 * Fix `reindex` maintenance view to preserve data that cannot be fetched from
   Solr during partial indexing, i.e. indices that are not stored.
   [witsch]
