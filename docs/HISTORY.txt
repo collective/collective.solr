@@ -1,8 +1,8 @@
 Changelog
 =========
 
-1.0b16 - Unreleased
--------------------
+1.0b16 - Released January 11, 2010
+----------------------------------
 
 * Remove `catalogSync` maintenance view since it would need to fetch
   additional data (for non-stored indices) from the objects themselves in
