@@ -231,8 +231,10 @@ class SolrMaintenanceView(BrowserView):
             len(index), len(reindex), len(unindex)))
         processed = 0
         def checkPoint():
-            log('intermediate commit (%d objects processed, '
-                'last batch in %s)...\n' % (processed, lap.next()))
+            msg = 'intermediate commit (%d objects processed, ' \
+                  'last batch in %s)...\n' % (processed, lap.next())
+            log(msg)
+            logger.info(msg)
             proc.commit(wait=True)
             manager.getConnection().reset()     # force new connection
             if cache:
