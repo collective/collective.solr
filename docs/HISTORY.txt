@@ -4,6 +4,9 @@ Changelog
 1.0b17 - Unreleased
 -------------------
 
+* Always display selected facets, even, or especially, without search results.
+  [witsch]
+
 
 1.0b16 - Released January 11, 2010
 ----------------------------------

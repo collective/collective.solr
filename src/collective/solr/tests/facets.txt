@@ -5,6 +5,7 @@ This tests the integration of Solr's facetted searches into Plone.  We'll
 use a testbrowser to check the correct display of facets.  First we need to
 activate Solr support and reindex the site's content:
 
+  >>> self.folder.setTitle('My folder')
   >>> self.activateAndReindex()
 
 The search form should contain default settings for facets to be shown:
@@ -136,3 +137,18 @@ the already selected facets:
    ...Topic...1...
    ...Large Folder...1...
    ...Site News...'
+
+The already selected facets should of course be displayed in case there were
+no search results, so the filters can be removed by the user.  So while at
+first no results will be shown, they should appear after removing the facet
+selection for "review_state":
+
+  >>> form = browser.getForm(name='searchform', index=0)
+  >>> form.getControl('Search Site').value = 'my'
+  >>> form.submit()
+  >>> browser.contents
+  '...No results were found...'
+  >>> browser.getLink('⊗').click()
+  >>> browser.contents
+  '...Search results...1 items matching...
+   ...My folder...'
