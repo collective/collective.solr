@@ -122,7 +122,6 @@ class SearchFacetsView(BrowserView, FacetMixin):
             if field not in facets:
                 params['facet.field'] = facets + [field]
             if value.startswith('"') and value.endswith('"'):
-                value = value[1:-1]
-            info.append(dict(title=field, value=value,
-                query=urlencode(params, doseq=True)))
+                info.append(dict(title=field, value=value[1:-1],
+                    query=urlencode(params, doseq=True)))
         return info

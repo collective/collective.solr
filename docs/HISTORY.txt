@@ -4,6 +4,9 @@ Changelog
 1.0b17 - Unreleased
 -------------------
 
+* Don't confuse pre-configured filter queries with facet selections.
+  [witsch]
+
 * Always display selected facets, even, or especially, without search results.
   [witsch]
 
