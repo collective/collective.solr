@@ -104,7 +104,7 @@
          tal:replace="structure python: view(results=results)" />
 
     <div tal:condition="results"
-          tal:define="batch python:Batch(results, b_size, int(b_start), orphan=1);">
+         tal:define="batch python:Batch(results, b_size, int(b_start), orphan=1);">
 
         <dl class="searchResults">
         <tal:results repeat="result batch">
