@@ -1,8 +1,8 @@
 Changelog
 =========
 
-1.0b18 - Unreleased
--------------------
+1.0b18 - Released January 23, 2010
+----------------------------------
 
 * Work around layout issue regarding facet counts on IE6.
   [witsch]
