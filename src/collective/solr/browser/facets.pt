@@ -28,6 +28,7 @@
              tal:attributes="href string:${request/ACTUAL_URL}?${item/query}" />
         </dt>
         <dd tal:content="item/count" />
+        <div class="visualClear"><!-- --></div>
       </tal:counts>
     </dl>
   </div>
