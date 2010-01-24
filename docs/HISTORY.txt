@@ -4,6 +4,9 @@ Changelog
 1.0b19 - Unreleased
 -------------------
 
+* Help with improved logging of auto-flushes for easier performance tuning.
+  [witsch]
+
 
 1.0b18 - Released January 23, 2010
 ----------------------------------

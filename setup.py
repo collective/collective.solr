@@ -36,7 +36,7 @@ setup(name = 'collective.solr',
       install_requires=[
           'setuptools',
           'elementtree',
-          'collective.indexing',
+          'collective.indexing >=1.2',
           'plone.browserlayer',
           'collective.js.showmore',
           'plone.indexer',
