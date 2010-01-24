@@ -4,6 +4,9 @@ Changelog
 1.0b19 - Unreleased
 -------------------
 
+* Fix partial reindexing to preserve data for indices that are not stored.
+  [witsch]
+
 * Help with improved logging of auto-flushes for easier performance tuning.
   [witsch]
 

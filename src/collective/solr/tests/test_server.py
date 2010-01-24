@@ -11,6 +11,7 @@ from collective.solr.interfaces import ISolrConnectionConfig
 from collective.solr.interfaces import ISolrConnectionManager
 from collective.solr.interfaces import ISearch
 from collective.solr.dispatcher import solrSearchResults, FallBackException
+from collective.solr.indexer import SolrIndexProcessor
 from collective.solr.indexer import logger as logger_indexer
 from collective.solr.manager import logger as logger_manager
 from collective.solr.flare import PloneFlare
@@ -336,6 +337,23 @@ class SolrServerTests(SolrTestCase):
         commit()                        # indexing happens on commit
         result = connection.search(q='+Title:Foo').read()
         self.assertEqual(numFound(result), 1)
+
+    def testReindexObjectKeepsExistingData(self):
+        manager = getUtility(ISolrConnectionManager)
+        connection = manager.getConnection()
+        search = lambda query: numFound(connection.search(q=query).read())
+        # first reindex the object in full
+        proc = SolrIndexProcessor(manager)
+        proc.reindex(self.folder)
+        proc.commit()
+        self.assertEqual(search('+Title:Foo'), 0)
+        self.assertEqual(search('+parentPaths:/plone'), 1)
+        # now let's only update one index, which shouldn't change anything...
+        self.folder.setTitle('Foo')
+        proc.reindex(self.folder, ['UID', 'Title'])
+        proc.commit()
+        self.assertEqual(search('+Title:Foo'), 1)
+        self.assertEqual(search('+parentPaths:/plone'), 1)
 
     def testFilterInvalidCharacters(self):
         log = []

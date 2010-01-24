@@ -50,7 +50,7 @@ class SolrIndexProcessor(object):
     def index(self, obj, attributes=None):
         conn = self.getConnection()
         if conn is not None and indexable(obj):
-            data, missing = self.getData(obj, attributes)
+            data, missing = self.getData(obj, attributes, nonstored=True)
             prepareData(data)
             schema = self.manager.getSchema()
             if schema is None:
@@ -156,7 +156,7 @@ class SolrIndexProcessor(object):
                 wrapper.update(wft.getCatalogVariablesFor(obj))
         return wrapper
 
-    def getData(self, obj, attributes=None):
+    def getData(self, obj, attributes=None, nonstored=False):
         schema = self.manager.getSchema()
         if schema is None:
             return {}, ()
@@ -164,6 +164,10 @@ class SolrIndexProcessor(object):
             attributes = schema.keys()
         else:
             attributes = set(schema.keys()).intersection(set(attributes))
+            if nonstored:       # all fields not stored need to be added
+                for field in schema.fields():
+                    if not field.stored:
+                        attributes.add(field.name)
         obj = self.wrapObject(obj)
         data, marker = {}, []
         for name in attributes:
