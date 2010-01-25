@@ -28,6 +28,7 @@
   font-size: 90%;
   float: left;
   clear: both;
+  white-space: nowrap;
 }
 
 #portal-searchfacets dd {
