@@ -7,6 +7,10 @@
   float: right;
 }
 
+* html #portal-searchfacets {
+  width: 20%;
+}
+
 #portal-searchfacets h4 {
   font-weight: normal;
   margin: 0;

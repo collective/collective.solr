@@ -4,7 +4,7 @@ Changelog
 1.0b20 - Unreleased
 -------------------
 
-* Fix CSS issue regarding facet display on IE6.
+* Fix CSS issues regarding facet display on IE6.
   [witsch]
 
 
