@@ -4,6 +4,11 @@ Changelog
 1.0b20 - Unreleased
 -------------------
 
+* Fix reindexing to always provide data for all fields defined in the schema
+  as support for "updateable/modifiable documents" is only planned for Solr
+  1.5.  See https://issues.apache.org/jira/browse/SOLR-139 for more info.
+  [witsch]
+
 * Fix CSS issues regarding facet display on IE6.
   [witsch]
 

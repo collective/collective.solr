@@ -70,8 +70,12 @@ class QueueIndexerTests(TestCase):
         self.proc.index(foo, attributes=['id', 'name'])
         output = str(output)
         self.assert_(output.find('<field name="name">foo</field>') > 0, '"name" data not found')
-        self.assertEqual(output.find('price'), -1, '"price" data found?')
-        self.assertEqual(output.find('42'), -1, '"price" data found?')
+        # at this point we'd normally check for a partial update:
+        #   self.assertEqual(output.find('price'), -1, '"price" data found?')
+        #   self.assertEqual(output.find('42'), -1, '"price" data found?')
+        # however, until SOLR-139 has been implemented (re)index operations
+        # always need to provide data for all attributes in the schema...
+        self.assert_(output.find('<field name="price">42.0</field>') > 0, '"price" data not found')
 
     def testDateIndexing(self):
         foo = Foo(id='zeidler', name='andi', cat='nerd', timestamp=DateTime('May 11 1972 03:45 GMT'))

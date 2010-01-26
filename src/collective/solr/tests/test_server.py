@@ -97,18 +97,18 @@ class SolrMaintenanceTests(SolrTestCase):
         # any of the existing data fields, but merely add the new data...
         maintenance = self.portal.unrestrictedTraverse('solr-maintenance')
         maintenance.reindex(attributes=['UID', 'Title', 'Date', 'Subject'])
-        # after adding some index data only that very data should exist...
+        # even after adding only one index all the data should already exist
         attributes = 'Title', 'portal_type', 'review_state', 'physicalPath'
         self.assertEqual(self.counts(attributes),
-            (8, dict(Title=8)))
+            (8, dict(Title=8, portal_type=8, physicalPath=8, review_state=8)))
         # reindexing `portal_type` should add the new metadata column
         maintenance.reindex(attributes=['portal_type'])
         self.assertEqual(self.counts(attributes),
-            (8, dict(Title=8, portal_type=8)))
+            (8, dict(Title=8, portal_type=8, physicalPath=8, review_state=8)))
         # let's try that again with an EIOW, i.e. `physicalPath`...
         maintenance.reindex(attributes=['physicalPath'])
         self.assertEqual(self.counts(attributes),
-            (8, dict(Title=8, portal_type=8, physicalPath=8)))
+            (8, dict(Title=8, portal_type=8, physicalPath=8, review_state=8)))
         # as well as with the extra catalog variables...
         maintenance.reindex(attributes=['review_state'])
         self.assertEqual(self.counts(attributes),
@@ -305,8 +305,6 @@ class SolrErrorHandlingTests(SolrTestCase):
         self.folder.processForm(values={'title': 'Bar'})
         commit()                    # indexing (doesn't) happen on commit
         self.assertEqual(log, ['exception while getting schema',
-            'exception while getting schema',
-            'unable to fetch schema, skipping indexing of %r', self.folder,
             'exception during request %r', '<commit/>'])
 
 
@@ -329,6 +327,24 @@ class SolrServerTests(SolrTestCase):
         self.config.async = False
         commit()
 
+    def testGetData(self):
+        manager = getUtility(ISolrConnectionManager)
+        fields = sorted([f.name for f in manager.getSchema().fields()])
+        fields.remove('default')        # remove any copy-fields
+        proc = SolrIndexProcessor(manager)
+        # without explicit attributes all data should be returned
+        data, missing = proc.getData(self.folder)
+        self.assertEqual(sorted(data.keys()), fields)
+        # with a list of attributes all data should be returned still.  this
+        # is because current versions of solr don't support partial updates
+        # yet... (see https://issues.apache.org/jira/browse/SOLR-139)
+        data, missing = proc.getData(self.folder, ['UID', 'Title'])
+        self.assertEqual(sorted(data.keys()), fields)
+        # however, the reindexing can be stopped if none of the given
+        # attributes match an existing solr index...
+        data, missing = proc.getData(self.folder, ['Foo', 'Bar'])
+        self.assertEqual(data, {})
+
     def testReindexObject(self):
         self.folder.processForm(values={'title': 'Foo'})
         connection = getUtility(ISolrConnectionManager).getConnection()
@@ -348,12 +364,14 @@ class SolrServerTests(SolrTestCase):
         proc.commit()
         self.assertEqual(search('+Title:Foo'), 0)
         self.assertEqual(search('+parentPaths:/plone'), 1)
+        self.assertEqual(search('+portal_type:Folder'), 1)
         # now let's only update one index, which shouldn't change anything...
         self.folder.setTitle('Foo')
         proc.reindex(self.folder, ['UID', 'Title'])
         proc.commit()
         self.assertEqual(search('+Title:Foo'), 1)
         self.assertEqual(search('+parentPaths:/plone'), 1)
+        self.assertEqual(search('+portal_type:Folder'), 1)
 
     def testFilterInvalidCharacters(self):
         log = []

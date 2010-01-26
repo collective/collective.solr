@@ -50,7 +50,9 @@ class SolrIndexProcessor(object):
     def index(self, obj, attributes=None):
         conn = self.getConnection()
         if conn is not None and indexable(obj):
-            data, missing = self.getData(obj, attributes, nonstored=True)
+            data, missing = self.getData(obj, attributes)
+            if not data:
+                return          # don't index with no data...
             prepareData(data)
             schema = self.manager.getSchema()
             if schema is None:
@@ -156,18 +158,19 @@ class SolrIndexProcessor(object):
                 wrapper.update(wft.getCatalogVariablesFor(obj))
         return wrapper
 
-    def getData(self, obj, attributes=None, nonstored=False):
+    def getData(self, obj, attributes=None):
         schema = self.manager.getSchema()
         if schema is None:
             return {}, ()
-        if attributes is None:
-            attributes = schema.keys()
-        else:
-            attributes = set(schema.keys()).intersection(set(attributes))
-            if nonstored:       # all fields not stored need to be added
-                for field in schema.fields():
-                    if not field.stored:
-                        attributes.add(field.name)
+        # unfortunately with current versions of solr we need to provide data
+        # for _all_ fields during an <add>.  partial updates aren't supported
+        # yet (see https://issues.apache.org/jira/browse/SOLR-139).  however,
+        # the reindexing can be stopped if none of the given attributes match
+        # existing solr indexes...
+        if attributes is not None:
+            if not set(schema.keys()).intersection(set(attributes)):
+                return {}, ()
+        attributes = schema.keys()
         obj = self.wrapObject(obj)
         data, marker = {}, []
         for name in attributes:
