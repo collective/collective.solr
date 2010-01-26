@@ -1,8 +1,8 @@
 Changelog
 =========
 
-1.0b20 - Unreleased
--------------------
+1.0b20 - Released January 26, 2010
+----------------------------------
 
 * Fix reindexing to always provide data for all fields defined in the schema
   as support for "updateable/modifiable documents" is only planned for Solr
