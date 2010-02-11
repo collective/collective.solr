@@ -45,7 +45,7 @@ class SolrIndexProcessor(object):
     implements(ISolrIndexQueueProcessor)
 
     def __init__(self, manager=None):
-        self.manager = manager      # for testing purposes only
+        self.manager = manager
 
     def index(self, obj, attributes=None):
         conn = self.getConnection()

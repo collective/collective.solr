@@ -4,6 +4,9 @@ Changelog
 1.0b21 - Unreleased
 -------------------
 
+* Fix maintenance views to work without setting up a Solr connection first.
+  [witsch]
+
 
 1.0b20 - Released January 26, 2010
 ----------------------------------

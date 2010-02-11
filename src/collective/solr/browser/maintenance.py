@@ -6,10 +6,9 @@ from Products.Five.browser import BrowserView
 from Products.CMFCore.utils import getToolByName
 
 from collective.solr.interfaces import ISolrConnectionManager
-from collective.solr.interfaces import ISolrIndexQueueProcessor
 from collective.solr.interfaces import ISolrMaintenanceView
 from collective.solr.interfaces import ISearch
-from collective.solr.indexer import indexable, handlers
+from collective.solr.indexer import indexable, handlers, SolrIndexProcessor
 from collective.solr.utils import findObjects
 from collective.solr.utils import prepareData
 
@@ -105,7 +104,7 @@ class SolrMaintenanceView(BrowserView):
             of the catalog mixin classes) and (re)indexes them """
         manager = queryUtility(ISolrConnectionManager)
         manager.setTimeout(None, lock=True) # don't time out during reindexing
-        proc = queryUtility(ISolrIndexQueueProcessor, name='solr')
+        proc = SolrIndexProcessor(manager)
         db = self.context.getPhysicalRoot()._p_jar.db()
         log = self.mklog()
         log('reindexing solr catalog...\n')
@@ -216,7 +215,7 @@ class SolrMaintenanceView(BrowserView):
             solr server has been unavailable etc """
         manager = queryUtility(ISolrConnectionManager)
         manager.setTimeout(None, lock=True) # don't time out during reindexing
-        proc = queryUtility(ISolrIndexQueueProcessor, name='solr')
+        proc = SolrIndexProcessor(manager)
         db = self.context.getPhysicalRoot()._p_jar.db()
         log = self.mklog()
         real = timer()          # real time
