@@ -1,8 +1,8 @@
 Changelog
 =========
 
-1.0b21 - Unreleased
--------------------
+1.0b21 - Released February 11, 2010
+-----------------------------------
 
 * Fix unindexing to not fetch more data from the objects than necessary.
   [witsch]
