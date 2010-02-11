@@ -34,6 +34,8 @@ indeed raised:
   ...   if first:
   ...     raise ConflictError()   # trigger a retry (once)
   >>> BaseObject.at_post_create_script = at_post_create_script
+  >>> from App.config import getConfiguration
+  >>> getConfiguration().conflict_error_log_level = 0
 
 Now we go ahead and actually create the content item, after which we can check
 Solr's index by searching for the title:
