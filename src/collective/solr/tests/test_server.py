@@ -4,6 +4,7 @@ from zope.schema.interfaces import IVocabularyFactory
 from transaction import commit, abort
 from DateTime import DateTime
 from time import sleep
+from re import split
 
 from collective.solr.tests.utils import pingSolr, numFound
 from collective.solr.tests.base import SolrTestCase
@@ -45,7 +46,7 @@ class SolrMaintenanceTests(SolrTestCase):
         """ crude count of metadata records in the database """
         info = {}
         result = self.search()
-        for record in result.split('<str name="')[1:]:
+        for record in split(r'<(str|date) name="', result)[1:]:
             name = record[:record.find('"')]
             if not attributes or name in attributes:
                 info[name] = info.get(name, 0) + 1
@@ -91,28 +92,26 @@ class SolrMaintenanceTests(SolrTestCase):
         self.assertEqual(counts['review_state'], 2)
 
     def testReindexSingleOrFewAttributes(self):
-        # add subjects for testing multi-value fields
-        self.portal.news.setSubject(['foo', 'bar'])
         # reindexing a set of attributes (or a single one) should not destroy
         # any of the existing data fields, but merely add the new data...
         maintenance = self.portal.unrestrictedTraverse('solr-maintenance')
-        maintenance.reindex(attributes=['UID', 'Title', 'Date', 'Subject'])
+        maintenance.reindex(attributes=['UID', 'Title', 'modified'])
         # even after adding only one index all the data should already exist
-        attributes = 'Title', 'portal_type', 'review_state', 'physicalPath'
+        attributes = 'Title', 'modified', 'portal_type', 'review_state', 'physicalPath'
         self.assertEqual(self.counts(attributes),
-            (8, dict(Title=8, portal_type=8, physicalPath=8, review_state=8)))
+            (8, dict(Title=8, modified=8)))
         # reindexing `portal_type` should add the new metadata column
         maintenance.reindex(attributes=['portal_type'])
         self.assertEqual(self.counts(attributes),
-            (8, dict(Title=8, portal_type=8, physicalPath=8, review_state=8)))
+            (8, dict(Title=8, modified=8, portal_type=8)))
         # let's try that again with an EIOW, i.e. `physicalPath`...
         maintenance.reindex(attributes=['physicalPath'])
         self.assertEqual(self.counts(attributes),
-            (8, dict(Title=8, portal_type=8, physicalPath=8, review_state=8)))
+            (8, dict(Title=8, modified=8, portal_type=8, physicalPath=8)))
         # as well as with the extra catalog variables...
         maintenance.reindex(attributes=['review_state'])
         self.assertEqual(self.counts(attributes),
-            (8, dict(Title=8, portal_type=8, physicalPath=8, review_state=8)))
+            (8, dict(Title=8, modified=8, portal_type=8, physicalPath=8, review_state=8)))
 
     def testReindexKeepsExistingData(self):
         # add subjects for testing multi-value fields
@@ -307,6 +306,7 @@ class SolrErrorHandlingTests(SolrTestCase):
         self.folder.processForm(values={'title': 'Bar'})
         commit()                    # indexing (doesn't) happen on commit
         self.assertEqual(log, ['exception while getting schema',
+            'exception while getting schema',
             'exception during request %r', '<commit/>'])
 
 
@@ -341,7 +341,7 @@ class SolrServerTests(SolrTestCase):
         # is because current versions of solr don't support partial updates
         # yet... (see https://issues.apache.org/jira/browse/SOLR-139)
         data, missing = proc.getData(self.folder, ['UID', 'Title'])
-        self.assertEqual(sorted(data.keys()), fields)
+        self.assertEqual(sorted(data.keys()), ['Title', 'UID'])
         # however, the reindexing can be stopped if none of the given
         # attributes match an existing solr index...
         data, missing = proc.getData(self.folder, ['Foo', 'Bar'])

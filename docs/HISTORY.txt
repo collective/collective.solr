@@ -4,6 +4,9 @@ Changelog
 1.0b21 - Unreleased
 -------------------
 
+* Fix unindexing to not fetch more data from the objects than necessary.
+  [witsch]
+
 * Use decorator to lock timeouts and make sure the lock is always released.
   [witsch]
 

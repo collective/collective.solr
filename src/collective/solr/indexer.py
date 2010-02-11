@@ -50,11 +50,20 @@ class SolrIndexProcessor(object):
     def index(self, obj, attributes=None):
         conn = self.getConnection()
         if conn is not None and indexable(obj):
-            data, missing = self.getData(obj, attributes)
+            # unfortunately with current versions of solr we need to provide
+            # data for _all_ fields during an <add> -- partial updates aren't
+            # supported (see https://issues.apache.org/jira/browse/SOLR-139)
+            # however, the reindexing can be skipped if none of the given
+            # attributes match existing solr indexes...
+            schema = self.manager.getSchema()
+            if attributes is not None:
+                attributes = set(schema.keys()).intersection(attributes)
+                if not attributes:
+                    return
+            data, missing = self.getData(obj)
             if not data:
                 return          # don't index with no data...
             prepareData(data)
-            schema = self.manager.getSchema()
             if schema is None:
                 msg = 'unable to fetch schema, skipping indexing of %r'
                 logger.warning(msg, obj)
@@ -162,15 +171,8 @@ class SolrIndexProcessor(object):
         schema = self.manager.getSchema()
         if schema is None:
             return {}, ()
-        # unfortunately with current versions of solr we need to provide data
-        # for _all_ fields during an <add>.  partial updates aren't supported
-        # yet (see https://issues.apache.org/jira/browse/SOLR-139).  however,
-        # the reindexing can be stopped if none of the given attributes match
-        # existing solr indexes...
-        if attributes is not None:
-            if not set(schema.keys()).intersection(set(attributes)):
-                return {}, ()
-        attributes = schema.keys()
+        if attributes is None:
+            attributes = schema.keys()
         obj = self.wrapObject(obj)
         data, marker = {}, []
         for name in attributes:
