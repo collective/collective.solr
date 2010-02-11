@@ -38,6 +38,7 @@ def checkpointIterator(function, interval=100):
 def notimeout(func):
     """ decorator to prevent long-running solr tasks from timing out """
     def wrapper(*args, **kw):
+        """ wrapper with random docstring so ttw access still works """
         manager = queryUtility(ISolrConnectionManager)
         manager.setTimeout(None, lock=True)
         try:

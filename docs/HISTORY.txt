@@ -4,6 +4,9 @@ Changelog
 1.0b22 - Unreleased
 -------------------
 
+* Fix timeout decorator to work ttw.
+  [hannosch, witsch]
+
 * Add "z3c.autoinclude.plugin" entry point, so in Plone 3.3+ you can avoid 
   loading the ZCML file.
   [hannosch]
