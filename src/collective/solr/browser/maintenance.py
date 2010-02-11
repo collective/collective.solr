@@ -70,15 +70,13 @@ def solrDataFor(uids):
     # query & convert data for given uids
     key = schema.uniqueKey
     query = '+%s:(%s)' % (key, ' OR '.join(uids))
-    flares = {}
     for flare in search(query, rows=len(uids)):
         uid = getattr(flare, key)
         assert uid, 'empty unique key?'
         for name, conv in converters.items():
             if name in flare:
                 flare[name] = conv(flare[name])
-        flares[uid] = flare
-    return flares
+        yield uid, flare
 
 
 class SolrMaintenanceView(BrowserView):
@@ -113,7 +111,7 @@ class SolrMaintenanceView(BrowserView):
         return 'solr index cleared.'
 
     @notimeout
-    def reindex(self, batch=100, skip=0, cache=10000, attributes=None):
+    def reindex(self, batch=100, skip=0, cache=10000, attributes=None, wait=True):
         """ find all contentish objects (meaning all objects derived from one
             of the catalog mixin classes) and (re)indexes them """
         manager = queryUtility(ISolrConnectionManager)
@@ -129,18 +127,29 @@ class SolrMaintenanceView(BrowserView):
         processed = 0
         conn = manager.getConnection()
         key = manager.getSchema().uniqueKey
+        missing = set()
+        if attributes is not None:
+            if not key in attributes:
+                attributes.append(key)
+            for field in manager.getSchema().fields():
+                if not field.stored:    # fields not stored need to be added
+                    log('adding non-stored field "%s" to attribute list...\n'
+                        % field.name)
+                    attributes.append(field.name)
+                elif not field.name in attributes:
+                    missing.add(field.name)
         updates = {}            # list to hold data to be updated
         def checkPoint():
-            uids = updates.keys()
-            flares = solrDataFor(uids)
-            for uid, values in updates.items():
-                flare = flares.get(uid, {key: uid})
-                flare.update(values)
-                conn.add(**flare)
+            if missing:         # only populate with data from solr if necessary
+                uids = updates.keys()
+                for uid, flare in solrDataFor(uids):
+                    updates[uid].update(flare)
+            for data in updates.values():
+                conn.add(**data)
             updates.clear()     # clear pending updates
             log('intermediate commit (%d items processed, '
                 'last batch in %s)...\n' % (processed, lap.next()))
-            conn.commit()
+            conn.commit(waitFlush=wait, waitSearcher=wait)
             manager.getConnection().reset()     # force new connection
             if cache:
                 size = db.cacheSize()
@@ -150,14 +159,6 @@ class SolrMaintenanceView(BrowserView):
         single = timer()        # real time for single object
         cpi = checkpointIterator(checkPoint, batch)
         count = 0
-        if attributes is not None:
-            if not key in attributes:
-                attributes.append(key)
-            for field in manager.getSchema().fields():
-                if not field.stored:    # fields not stored need to be added
-                    log('adding non-stored field "%s" to attribute list...\n'
-                        % field.name)
-                    attributes.append(field.name)
         for path, obj in findObjects(self.context):
             if indexable(obj):
                 count += 1

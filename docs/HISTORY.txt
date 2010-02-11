@@ -4,6 +4,9 @@ Changelog
 1.0b22 - Unreleased
 -------------------
 
+* Optimize reindex behavior when populating the Solr index for the first time.
+  [hannosch, witsch]
+
 * Only register indexable attributes the old way on Plone 3.x.
   [jcbrand]
 
