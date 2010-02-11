@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from unittest import TestSuite, defaultTestLoader
 from zope.component import getUtility
 from zope.schema.interfaces import IVocabularyFactory
