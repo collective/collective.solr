@@ -18,6 +18,7 @@ class SolrLayer(PloneSite):
         zcml.load_config('configure.zcml', solr)
         fiveconfigure.debug_mode = False
         # install package, import profile...
+        installPackage('collective.indexing', quiet=True)
         installPackage('collective.solr', quiet=True)
         root = app()
         profile = 'profile-collective.solr:search'

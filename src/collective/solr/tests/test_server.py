@@ -216,6 +216,7 @@ class SolrMaintenanceTests(SolrTestCase):
         self.setRoles(['Manager'])
         self.portal.news.processForm(values={'title': 'Foos'})
         self.portal.manage_delObjects('events')
+        commit()                        # indexing happens on commit
         activate(active=True)
         index, reindex, unindex = maintenance.diff(path='/plone')
         self.assertEqual(index, [])
@@ -252,6 +253,7 @@ class SolrMaintenanceTests(SolrTestCase):
         self.portal.news.processForm(values={'title': 'Foos'})
         self.portal.news.manage_delObjects('aggregator')
         self.portal.manage_delObjects('events')
+        commit()                        # indexing happens on commit
         activate(active=True)
         index, reindex, unindex = maintenance.diff(path='/plone/news')
         self.assertEqual(index, [])
