@@ -1,6 +1,16 @@
 [logger_root]
-level=NOTSET
+level=CRITICAL
 handlers=stderr
+
+[logger_indexing]
+level=DEBUG
+handlers=stderr
+qualname=collective.indexing
+
+[logger_solr]
+level=DEBUG
+handlers=stderr
+qualname=collective.solr
 
 [handler_stderr]
 class=StreamHandler
@@ -13,7 +23,7 @@ format=%(asctime)s %(levelname)s %(name)s %(message)s
 datefmt=%Y-%m-%dT%H:%M:%S
 
 [loggers]
-keys=root
+keys=root,indexing,solr
 
 [handlers]
 keys=stderr
