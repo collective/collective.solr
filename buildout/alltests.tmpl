@@ -1,7 +1,7 @@
 #!/bin/bash
 
 ${buildout:directory}/bin/solr-instance start
-${buildout:directory}/bin/test
+${buildout:directory}/bin/test $*
 status=$?
 ${buildout:directory}/bin/solr-instance stop
 exit $status
