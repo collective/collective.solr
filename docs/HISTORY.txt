@@ -4,6 +4,9 @@ Changelog
 1.0b22 - Unreleased
 -------------------
 
+* Only register indexable attributes the old way on Plone 3.x.
+  [jcbrand]
+
 * Fix timeout decorator to work ttw.
   [hannosch, witsch]
 
