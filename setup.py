@@ -41,5 +41,8 @@ setup(name = 'collective.solr',
           'collective.js.showmore',
           'plone.indexer',
       ],
-      entry_points = '',
+      entry_points = '''
+        [z3c.autoinclude.plugin]
+        target = plone
+      ''',
 )
