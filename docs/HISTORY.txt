@@ -198,7 +198,7 @@ Changelog
   [witsch]
 
   .. _`plone.indexer`: http://pypi.python.org/pypi/plone.indexer/
-  .. _`PLIP 239`: http://plone.org/products/plone/roadmap/239 
+  .. _`PLIP 239`: http://plone.org/products/plone/roadmap/239
 
 
 1.0b7 - Released April 28, 2009
@@ -234,7 +234,7 @@ Changelog
 * Parse and quote the query to filter invalid query syntax.
   [tesdal]
 
-* In solrSearchResults, if the passed in request is a dict, look up 
+* In solrSearchResults, if the passed in request is a dict, look up
   request to enable adaptation into PloneFlare.
   [tesdal]
 
