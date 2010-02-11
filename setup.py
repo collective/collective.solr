@@ -34,12 +34,12 @@ setup(name = 'collective.solr',
       platforms = 'Any',
       zip_safe = False,
       install_requires=[
-          'setuptools',
-          'elementtree',
-          'collective.indexing >=1.2',
-          'plone.browserlayer',
-          'collective.js.showmore',
-          'plone.indexer',
+        'setuptools',
+        'elementtree',
+        'collective.indexing >=1.2',
+        'plone.browserlayer',
+        'collective.js.showmore',
+        'plone.indexer',
       ],
       entry_points = '''
         [z3c.autoinclude.plugin]
