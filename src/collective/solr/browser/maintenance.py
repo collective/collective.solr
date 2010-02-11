@@ -48,7 +48,26 @@ def notimeout(func):
     return wrapper
 
 
-def solrDataFor(uids):
+def missingAndStored(attributes, schema):
+    """ determine the sets of attributes that need to be fetched from
+        the objects and what can be completed using data in solr """
+    missing = set()
+    stored = set()
+    if attributes is not None:
+        key = schema.uniqueKey
+        if not key in attributes:
+            missing.add(key)
+        for field in schema.fields():
+            if field.name in attributes:
+                continue
+            elif not field.stored:      # fields not stored need to be added
+                missing.add(field.name)
+            elif not field.name in attributes:
+                stored.add(field.name)
+    return missing, stored
+
+
+def solrDataFor(uids, fields):
     """ fetch existing index data from solr for object with given uids """
     manager = queryUtility(ISolrConnectionManager)
     search = queryUtility(ISearch)
@@ -70,7 +89,7 @@ def solrDataFor(uids):
     # query & convert data for given uids
     key = schema.uniqueKey
     query = '+%s:(%s)' % (key, ' OR '.join(uids))
-    for flare in search(query, rows=len(uids)):
+    for flare in search(query, rows=len(uids), fl=' '.join(fields)):
         uid = getattr(flare, key)
         assert uid, 'empty unique key?'
         for name, conv in converters.items():
@@ -126,23 +145,17 @@ class SolrMaintenanceView(BrowserView):
         cpu = timer(clock)      # cpu time
         processed = 0
         conn = manager.getConnection()
-        key = manager.getSchema().uniqueKey
-        missing = set()
+        schema = manager.getSchema()
+        key = schema.uniqueKey
+        stored = None
         if attributes is not None:
-            if not key in attributes:
-                attributes.append(key)
-            for field in manager.getSchema().fields():
-                if not field.stored:    # fields not stored need to be added
-                    log('adding non-stored field "%s" to attribute list...\n'
-                        % field.name)
-                    attributes.append(field.name)
-                elif not field.name in attributes:
-                    missing.add(field.name)
+            missing, stored = missingAndStored(attributes, schema)
+            attributes.extend(list(missing))
         updates = {}            # list to hold data to be updated
         def checkPoint():
-            if missing:         # only populate with data from solr if necessary
+            if stored:          # only populate with data from solr if necessary
                 uids = updates.keys()
-                for uid, flare in solrDataFor(uids):
+                for uid, flare in solrDataFor(uids, stored):
                     updates[uid].update(flare)
             for data in updates.values():
                 conn.add(**data)
