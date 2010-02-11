@@ -35,6 +35,18 @@ def checkpointIterator(function, interval=100):
         yield None
 
 
+def notimeout(func):
+    """ decorator to prevent long-running solr tasks from timing out """
+    def wrapper(*args, **kw):
+        manager = queryUtility(ISolrConnectionManager)
+        manager.setTimeout(None, lock=True)
+        try:
+            return func(*args, **kw)
+        finally:
+            manager.setTimeout(None, lock=False)
+    return wrapper
+
+
 def solrDataFor(uids):
     """ fetch existing index data from solr for object with given uids """
     manager = queryUtility(ISolrConnectionManager)
@@ -99,11 +111,11 @@ class SolrMaintenanceView(BrowserView):
         conn.commit()
         return 'solr index cleared.'
 
+    @notimeout
     def reindex(self, batch=100, skip=0, cache=10000, attributes=None):
         """ find all contentish objects (meaning all objects derived from one
             of the catalog mixin classes) and (re)indexes them """
         manager = queryUtility(ISolrConnectionManager)
-        manager.setTimeout(None, lock=True) # don't time out during reindexing
         proc = SolrIndexProcessor(manager)
         db = self.context.getPhysicalRoot()._p_jar.db()
         log = self.mklog()
@@ -162,7 +174,6 @@ class SolrMaintenanceView(BrowserView):
                 else:
                     log('missing data, skipping indexing of %r.\n' % obj)
         checkPoint()            # make sure to process the last batch
-        manager.setTimeout(None, lock=False)    # reset the timeout lock
         log('solr index rebuilt.\n')
         msg = 'processed %d items in %s (%s cpu time).'
         msg = msg % (processed, real.next(), cpu.next())
@@ -207,6 +218,7 @@ class SolrMaintenanceView(BrowserView):
         index = uids.keys()
         return index, reindex, unindex
 
+    @notimeout
     def sync(self, batch=100, cache=10000):
         """ sync the solr index with the portal catalog;  records contained
             in the catalog but not in solr will be indexed and records not
@@ -214,7 +226,6 @@ class SolrMaintenanceView(BrowserView):
             be used to ensure consistency between zope and solr after the
             solr server has been unavailable etc """
         manager = queryUtility(ISolrConnectionManager)
-        manager.setTimeout(None, lock=True) # don't time out during reindexing
         proc = SolrIndexProcessor(manager)
         db = self.context.getPhysicalRoot()._p_jar.db()
         log = self.mklog()
@@ -282,7 +293,6 @@ class SolrMaintenanceView(BrowserView):
             else:
                 log('not unindexing existing object %r (%r).\n' % (obj, uid))
         proc.commit(wait=True)      # make sure to commit in the end...
-        manager.setTimeout(None, lock=False)    # reset the timeout lock
         log('solr index synced.\n')
         msg = 'processed %d object(s) in %s (%s cpu time).'
         msg = msg % (processed, real.next(), cpu.next())

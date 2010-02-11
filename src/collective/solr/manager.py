@@ -102,9 +102,11 @@ class SolrConnectionManager(object):
             to the given value """
         if lock is not marker:
             self.lock = bool(lock)
+            logger.debug('%ssetting timeout lock', lock and '' or 're')
         if not self.lock:
             conn = self.getConnection()
             if conn is not None:
+                logger.debug('setting timeout to %s', timeout)
                 conn.setTimeout(timeout)
 
     def setIndexTimeout(self):

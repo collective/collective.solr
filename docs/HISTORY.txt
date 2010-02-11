@@ -4,6 +4,9 @@ Changelog
 1.0b21 - Unreleased
 -------------------
 
+* Use decorator to lock timeouts and make sure the lock is always released.
+  [witsch]
+
 * Fix maintenance views to work without setting up a Solr connection first.
   [witsch]
 
