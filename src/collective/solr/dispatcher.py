@@ -1,6 +1,7 @@
 from zope.interface import implements
 from zope.component import queryUtility, queryMultiAdapter, getSiteManager
 from zope.publisher.interfaces.http import IHTTPRequest
+from Acquisition import aq_base
 from Products.ZCatalog.ZCatalog import ZCatalog
 
 from collective.solr.interfaces import ISolrConnectionConfig
@@ -41,6 +42,8 @@ class SearchDispatcher(object):
                 return solrSearchResults(request, **keywords)
             except FallBackException:
                 pass
+        if getattr(aq_base(self.context), '_cs_old_searchResults', None):
+            return self.context._cs_old_searchResults(request, **keywords)
         return ZCatalog.searchResults(self.context, request, **keywords)
 
 

@@ -28,12 +28,12 @@ def searchResults(self, REQUEST=None, **kw):
     if adapter is not None:
         return adapter(REQUEST, **kw)
     else:
-        return self.__cs_old_searchResults(REQUEST, **kw)
+        return self._cs_old_searchResults(REQUEST, **kw)
 
 
 def patchCatalogTool():
     """ monkey patch plone's catalogtool with the solr dispatcher """
-    CatalogTool.__cs_old_searchResults = CatalogTool.searchResults
+    CatalogTool._cs_old_searchResults = CatalogTool.searchResults
     CatalogTool.searchResults = searchResults
     CatalogTool.__call__ = searchResults
 

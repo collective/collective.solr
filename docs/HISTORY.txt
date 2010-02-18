@@ -4,9 +4,13 @@ Changelog
 1.0b22 - Unreleased
 -------------------
 
+* We also need to change the SearchDispatcher to use the original method in
+  case Solr isn't active.
+  [hannosch]
+
 * Changed the ``searchResults`` monkey to store and use the method found on the
-  class instead of assuming it comes from the base class. This makes things work
-  with LinguaPlone which also patches this method.
+  class instead of assuming it comes from the base class. This makes things
+  work with LinguaPlone which also patches this method.
   [hannosch]
 
 * Add Dutch translation [WouterVH]
