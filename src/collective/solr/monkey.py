@@ -1,7 +1,6 @@
 from zope.component import queryAdapter
 from DateTime import DateTime
 from Products.ZCatalog.Lazy import LazyCat
-from Products.ZCatalog.ZCatalog import ZCatalog
 from Products.CMFCore.permissions import AccessInactivePortalContent
 from Products.CMFCore.utils import _getAuthenticatedUser
 from Products.CMFCore.utils import _checkPermission
@@ -29,11 +28,12 @@ def searchResults(self, REQUEST=None, **kw):
     if adapter is not None:
         return adapter(REQUEST, **kw)
     else:
-        return ZCatalog.searchResults(self, REQUEST, **kw)
+        return self.__cs_old_searchResults(REQUEST, **kw)
 
 
 def patchCatalogTool():
     """ monkey patch plone's catalogtool with the solr dispatcher """
+    CatalogTool.__cs_old_searchResults = CatalogTool.searchResults
     CatalogTool.searchResults = searchResults
     CatalogTool.__call__ = searchResults
 
