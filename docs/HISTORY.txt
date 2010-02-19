@@ -4,6 +4,10 @@ Changelog
 1.0b22 - Unreleased
 -------------------
 
+* Only apply timeout decorator when actually committing changes to Solr,
+  also re-enabling the use of query parameters for maintenance views again.
+  [witsch]
+
 * We also need to change the SearchDispatcher to use the original method in
   case Solr isn't active.
   [hannosch]
@@ -13,7 +17,8 @@ Changelog
   work with LinguaPlone which also patches this method.
   [hannosch]
 
-* Add Dutch translation [WouterVH]
+* Add dutch translation.
+  [WouterVH]
 
 * Refactor buildout to allow running tests against Plone 4.x.
   [witsch]
