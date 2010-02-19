@@ -36,10 +36,13 @@ class SolrMaintenanceTests(SolrTestCase):
         result = connection.search(q='+UID:[* TO *]').read()
         self.assertEqual(numFound(result), 0)
         # ignore any generated logging output
-        self.portal.REQUEST.RESPONSE.write = lambda x: x
+        self.response = self.portal.REQUEST.RESPONSE
+        self.write = self.response.write
+        self.response.write = lambda x: x
 
     def beforeTearDown(self):
         activate(active=False)
+        self.response.write = self.write
 
     def search(self, query='+UID:[* TO *]'):
         return self.connection.search(q=query).read()
@@ -78,6 +81,23 @@ class SolrMaintenanceTests(SolrTestCase):
         self.assertEqual(counts['physicalPath'], 8)
         self.assertEqual(counts['portal_type'], 8)
         self.assertEqual(counts['review_state'], 8)
+
+    def testReindexParameters(self):
+        maintenance = self.portal.unrestrictedTraverse('solr-maintenance')
+        # the view allos to skip the first n items...
+        maintenance.clear()
+        maintenance.reindex(skip=3)     # the site gets skipped, so add 1
+        self.assertEqual(numFound(self.search()), 6)
+        # and also specify the batch size
+        log = []
+        def write(msg):
+            if 'intermediate' in msg:
+                log.append(msg)
+        self.response.write = write
+        maintenance.clear()
+        maintenance.reindex(batch=3)
+        self.assertEqual(len(log), 3)
+        self.assertEqual(numFound(self.search()), 8)
 
     def testPartialReindex(self):
         maintenance = self.portal.unrestrictedTraverse('news/solr-maintenance')
