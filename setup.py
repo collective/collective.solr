@@ -41,6 +41,9 @@ setup(name = 'collective.solr',
         'collective.js.showmore',
         'plone.indexer',
       ],
+      extras_require = { 'test': [
+        'collective.testcaselayer',
+      ]},
       entry_points = '''
         [z3c.autoinclude.plugin]
         target = plone

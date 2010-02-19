@@ -3,7 +3,7 @@ from Products.Five.testbrowser import Browser
 from Products.PloneTestCase import PloneTestCase as ptc
 from plone.app.controlpanel.tests.cptc import ControlPanelTestCase
 from collective.solr.utils import activate
-from collective.solr.tests.layer import SolrLayer
+from collective.solr.tests.layer import layer
 
 
 ptc.setupPloneSite()
@@ -12,19 +12,19 @@ ptc.setupPloneSite()
 class SolrTestCase(Sandboxed, ptc.PloneTestCase):
     """ base class for integration tests """
 
-    layer = SolrLayer
+    layer = layer
 
 
 class SolrControlPanelTestCase(ControlPanelTestCase):
     """ base class for control panel tests """
 
-    layer = SolrLayer
+    layer = layer
 
 
 class SolrFunctionalTestCase(ptc.FunctionalTestCase):
     """ base class for functional tests """
 
-    layer = SolrLayer
+    layer = layer
 
     def getBrowser(self, loggedIn=True):
         """ instantiate and return a testbrowser for convenience """

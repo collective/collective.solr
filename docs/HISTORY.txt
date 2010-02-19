@@ -4,6 +4,9 @@ Changelog
 1.0b22 - Unreleased
 -------------------
 
+* Convert test setup to `collective.testcaselayer`.
+  [witsch]
+
 * Only apply timeout decorator when actually committing changes to Solr,
   also re-enabling the use of query parameters for maintenance views again.
   [witsch]
