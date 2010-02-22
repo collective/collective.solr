@@ -100,10 +100,12 @@ class SolrConnectionManager(object):
     def setTimeout(self, timeout, lock=marker):
         """ set the timeout on the current (or to be opened) connection
             to the given value """
+        update = not self.lock          # update if not locked...
         if lock is not marker:
             self.lock = bool(lock)
+            update = True               # ...or changed
             logger.debug('%ssetting timeout lock', lock and '' or 're')
-        if not self.lock:
+        if update:
             conn = self.getConnection()
             if conn is not None:
                 logger.debug('setting timeout to %s', timeout)

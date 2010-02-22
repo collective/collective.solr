@@ -4,6 +4,9 @@ Changelog
 1.0b22 - Unreleased
 -------------------
 
+* Fix bug regarding timeout locking.
+  [witsch]
+
 * Convert test setup to `collective.testcaselayer`.
   [witsch]
 
