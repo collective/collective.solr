@@ -13,14 +13,9 @@ logger = getLogger('collective.solr.manager')
 marker = object()
 
 
-class SolrConnectionConfig(Persistent):
+class BaseSolrConnectionConfig(object):
     """ utility to hold the connection configuration for the solr server """
     implements(ISolrConnectionConfig)
-
-    max_results = 0             # provide backwards compatibility
-    required = []
-    facets = []
-    filter_queries = []
 
     def __init__(self):
         self.active = False
@@ -34,6 +29,14 @@ class SolrConnectionConfig(Persistent):
         self.required = []
         self.facets = []
         self.filter_queries = []
+
+
+class SolrConnectionConfig(BaseSolrConnectionConfig, Persistent):
+
+    max_results = 0             # provide backwards compatibility
+    required = ()
+    facets = ()
+    filter_queries = ()
 
     def getId(self):
         """ return a unique id to be used with GenericSetup """

@@ -4,6 +4,10 @@ Changelog
 1.0b22 - Unreleased
 -------------------
 
+* Split out a BaseSolrConnectionConfig class, to be used for registering a
+  non-persistent connection configuration.
+  [hannosch]
+
 * Fix bug regarding timeout locking.
   [witsch]
 
