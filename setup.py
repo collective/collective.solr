@@ -43,6 +43,7 @@ setup(name = 'collective.solr',
       ],
       extras_require = { 'test': [
         'collective.testcaselayer',
+        'PIL',
       ]},
       entry_points = '''
         [z3c.autoinclude.plugin]
