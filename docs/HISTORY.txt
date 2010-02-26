@@ -4,6 +4,11 @@ Changelog
 1.0b23 - Unreleased
 -------------------
 
+* Update sample Solr buildout configuration and documentation to recommend a
+  high enough default setting for maximum search results returned by Solr.
+  This refs http://plone.org/products/collective.solr/issues/20
+  [witsch]
+
 
 1.0b22 - Released February 23, 2010
 -----------------------------------
@@ -22,8 +27,8 @@ Changelog
   also re-enabling the use of query parameters for maintenance views again.
   [witsch]
 
-* We also need to change the SearchDispatcher to use the original method in
-  case Solr isn't active.
+* We also need to change the ``SearchDispatcher`` to use the original method
+  in case Solr isn't active.
   [hannosch]
 
 * Changed the ``searchResults`` monkey to store and use the method found on
