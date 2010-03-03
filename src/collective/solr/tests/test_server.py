@@ -456,7 +456,7 @@ class SolrServerTests(SolrTestCase):
 
     def testSolrSearchResultsInformation(self):
         self.maintenance.reindex()
-        response = solrSearchResults(SearchableText='News')
+        response = solrSearchResults(SearchableText='News', Language='all')
         self.assertEqual(len(response), 2)
         self.assertEqual(response.response.numFound, '2')
         self.failUnless(isinstance(response.responseHeader, dict))

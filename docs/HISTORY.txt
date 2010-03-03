@@ -4,6 +4,9 @@ Changelog
 1.0b23 - Unreleased
 -------------------
 
+* Add support for LinguaPlone.
+  [witsch]
+
 * Update sample Solr buildout configuration and documentation to recommend a
   high enough default setting for maximum search results returned by Solr.
   This refs http://plone.org/products/collective.solr/issues/20
