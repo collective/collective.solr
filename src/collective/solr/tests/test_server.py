@@ -286,12 +286,13 @@ class SolrErrorHandlingTests(SolrTestCase):
 
     def afterSetUp(self):
         self.config = getUtility(ISolrConnectionConfig)
-        self.port = self.config.port    # remember previous port setting and...
+        self.port = self.config.port        # remember previous port setting
+        self.folder.unmarkCreationFlag()    # stop LinguaPlone from renaming
 
     def beforeTearDown(self):
         manager = getUtility(ISolrConnectionManager)
         manager.setHost(active=False, port=self.port)
-        commit()                    # undo port changes...
+        commit()                            # undo port changes...
 
     def testNetworkFailure(self):
         log = []
@@ -341,6 +342,7 @@ class SolrServerTests(SolrTestCase):
         self.maintenance.clear()
         self.config = getUtility(ISolrConnectionConfig)
         self.search = getUtility(ISearch)
+        self.folder.unmarkCreationFlag()    # stop LinguaPlone from renaming
 
     def beforeTearDown(self):
         # due to the `commit()` in the tests below the activation of the

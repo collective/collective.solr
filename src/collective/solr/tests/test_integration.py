@@ -51,10 +51,11 @@ class IndexingTests(SolrTestCase):
         self.proc = queryUtility(ISolrConnectionManager)
         self.proc.setHost(active=True)
         conn = self.proc.getConnection()
-        fakehttp(conn, schema)          # fake schema response
-        self.proc.getSchema()           # read and cache the schema
+        fakehttp(conn, schema)              # fake schema response
+        self.proc.getSchema()               # read and cache the schema
         self.config = queryUtility(IIndexingConfig)
-        self.config.auto_flush = False  # disable auto-flushes...
+        self.config.auto_flush = False      # disable auto-flushes...
+        self.folder.unmarkCreationFlag()    # stop LinguaPlone from renaming
 
     def beforeTearDown(self):
         self.proc.closeConnection(clearSchema=True)

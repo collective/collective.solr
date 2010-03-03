@@ -44,6 +44,7 @@ setup(name = 'collective.solr',
       extras_require = { 'test': [
         'collective.testcaselayer',
         'PIL',
+        'Products.LinguaPlone >=3.1a1',
       ]},
       entry_points = '''
         [z3c.autoinclude.plugin]

@@ -13,6 +13,7 @@ from collective.solr.mangler import mangleQuery
 from collective.solr.mangler import extractQueryParameters
 from collective.solr.mangler import cleanupQueryParameters
 from collective.solr.mangler import optimizeQueryParameters
+from collective.solr.lingua import languageFilter
 
 from collective.solr.monkey import patchCatalogTool, patchLazyCat
 patchCatalogTool()      # patch catalog tool to use the dispatcher...
@@ -80,6 +81,7 @@ def solrSearchResults(request=None, **keywords):
     params = cleanupQueryParameters(extractQueryParameters(args), schema)
     mangleQuery(args)
     prepareData(args)
+    languageFilter(args)
     query = search.buildQuery(**args)
     optimizeQueryParameters(query, params)
     __traceback_info__ = (query, params, args)
