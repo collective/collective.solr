@@ -42,6 +42,12 @@ def prepareData(data):
     allowed = data.get('allowedRolesAndUsers', None)
     if allowed is not None:
         data['allowedRolesAndUsers'] = [r.replace(':', '$') for r in allowed]
+    language = data.get('Language', None)
+    if language is not None:
+        if language == '':
+            data['Language'] = 'any'
+        elif isinstance(language, (tuple, list)) and '' in language:
+            data['Language'] = [lang or 'any' for lang in language]
     searchable = data.get('SearchableText', None)
     if searchable is not None:
         if isSimpleTerm(searchable):        # use prefix/wildcard search

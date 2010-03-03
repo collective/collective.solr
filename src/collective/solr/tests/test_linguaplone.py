@@ -43,12 +43,19 @@ class LinguaTests(SolrTestCase):
         en.reindexObject()
         de = en.addTranslation('de', title='ein dokument')
         de.reindexObject()
+        nt = self.portal[self.portal.invokeFactory('Document', 'foo')]
+        nt.update(title='doc foo', language='')     # language-neutral
+        nt.reindexObject()
         commit()                        # indexing happens on commit
         def search(**kw):
             results = solrSearchResults(SearchableText='do*', **kw)
             return sorted([r.Title for r in results])
+        self.assertEqual(search(), ['doc foo', 'some document'])
+        self.assertEqual(search(Language=''), ['doc foo'])
         self.assertEqual(search(Language='en'), ['some document'])
         self.assertEqual(search(Language='de'), ['ein dokument'])
+        self.assertEqual(search(Language='all'),
+            ['doc foo', 'ein dokument', 'some document'])
 
 
 def test_suite():

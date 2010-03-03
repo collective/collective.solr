@@ -79,9 +79,9 @@ def solrSearchResults(request=None, **keywords):
             raise FallBackException
     schema = search.getManager().getSchema() or {}
     params = cleanupQueryParameters(extractQueryParameters(args), schema)
+    languageFilter(args)
     mangleQuery(args)
     prepareData(args)
-    languageFilter(args)
     query = search.buildQuery(**args)
     optimizeQueryParameters(query, params)
     __traceback_info__ = (query, params, args)

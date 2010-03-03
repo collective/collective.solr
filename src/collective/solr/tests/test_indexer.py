@@ -51,6 +51,19 @@ class QueueIndexerTests(TestCase):
         prepareData(data)
         self.assertEqual(data, {'allowedRolesAndUsers': ['user$test_user_1_', 'user$portal_owner']})
 
+    def testLanguageParameterHandling(self):
+        # empty strings are replaced...
+        data = {'Language': ['en', '']}
+        prepareData(data)
+        self.assertEqual(data, {'Language': ['en', 'any']})
+        data = {'Language': ''}
+        prepareData(data)
+        self.assertEqual(data, {'Language': 'any'})
+        # for other indices this shouldn't happen...
+        data = {'Foo': ['en', '']}
+        prepareData(data)
+        self.assertEqual(data, {'Foo': ['en', '']})
+
     def testIndexObject(self):
         response = getData('add_response.txt')
         output = fakehttp(self.mngr.getConnection(), response)   # fake add response
