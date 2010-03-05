@@ -28,6 +28,8 @@ def indexable(obj):
 def datehandler(value):
     # TODO: we might want to handle datetime and time as well;
     # check the enfold.solr implementation
+    if value is None:
+        raise AttributeError
     if isinstance(value, str) and not value.endswith('Z'):
         value = DateTime(value)
     if isinstance(value, DateTime):
@@ -185,7 +187,10 @@ class SolrIndexProcessor(object):
             field = schema[name]
             handler = handlers.get(field.class_, None)
             if handler is not None:
-                value = handler(value)
+                try:
+                    value = handler(value)
+                except AttributeError:
+                    continue
             elif isinstance(value, (list, tuple)) and not field.multiValued:
                 separator = getattr(field, 'separator', ' ')
                 value = separator.join(value)

@@ -4,12 +4,15 @@ Changelog
 1.0b23 - Unreleased
 -------------------
 
+* Fix issue when reindexing objects with empty date fields.
+  [witsch]
+
 * Changed the default schema for ``is_folderish`` to store the value. The
   reference browser search expects it on the brain.
   [hannosch]
 
-* Changed the GenericSetup export/import handler for the Solr manager to ignore
-  non-persistent utilities.
+* Changed the GenericSetup export/import handler for the Solr manager to
+  ignore non-persistent utilities.
   [hannosch]
 
 * Add support for LinguaPlone.

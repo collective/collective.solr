@@ -399,6 +399,19 @@ class SolrServerTests(SolrTestCase):
         self.assertEqual(search('+parentPaths:/plone'), 1)
         self.assertEqual(search('+portal_type:Folder'), 1)
 
+    def testReindexObjectWithEmptyDate(self):
+        log = []
+        def logger(*args):
+            log.extend(args)
+        logger_indexer.exception = logger
+        logger_solr.exception = logger
+        self.folder.setModificationDate(None)
+        self.folder.setTitle('Foo')
+        self.folder.reindexObject(idxs=['modified', 'Title'])
+        commit()
+        self.assertEqual(log, [])
+        self.assertEqual(self.search('+Title:Foo').results().numFound, '1')
+
     def testFilterInvalidCharacters(self):
         log = []
         def logger(*args):
