@@ -37,6 +37,12 @@ class Search(object):
         if isinstance(query, dict):
             query = ' '.join(query.values())
         logger.debug('searching for %r (%r)', query, parameters)
+        if 'sort' in parameters:    # issue warning for unknown sort indices
+            index, order = parameters['sort'].split()
+            schema = manager.getSchema() or {}
+            field = schema.get(index, None)
+            if field is None or not field.stored:
+                logger.warning('sorting on non-stored attribute "%s"', index)
         response = connection.search(q=query, **parameters)
         results = SolrResponse(response)
         response.close()
@@ -55,8 +61,8 @@ class Search(object):
         for name, value in args.items():
             field = schema.get(name or defaultSearchField, None)
             if field is None or not field.indexed:
-                logger.debug('dropping unknown search attribute "%s" (%r)',
-                    name, value)
+                logger.warning('dropping unknown search attribute "%s" (%r)',
+                        name, value)
                 continue
             if isinstance(value, bool):
                 value = str(value).lower()

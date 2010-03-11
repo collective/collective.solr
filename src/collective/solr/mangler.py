@@ -91,11 +91,13 @@ def mangleQuery(keywords):
 
 def extractQueryParameters(args):
     """ extract parameters related to sorting and limiting search results
-        from a given set of arguments """
+        from a given set of arguments, also removing them """
     def get(name):
         for prefix in 'sort_', 'sort-':
-            value = args.get('%s%s' % (prefix, name), None)
+            key = '%s%s' % (prefix, name)
+            value = args.get(key, None)
             if value is not None:
+                del args[key]
                 return value
         return None
     params = {}
@@ -111,6 +113,7 @@ def extractQueryParameters(args):
     for key, value in args.items():
         if key in ('fq', 'fl', 'facet'):
             params[key] = value
+            del args[key]
         elif key.startswith('facet.') or key.startswith('facet_'):
             name = lambda facet: facet.split(':', 1)[0]
             if isinstance(value, list):
@@ -120,6 +123,7 @@ def extractQueryParameters(args):
             else:
                 value = name(value)
             params[key.replace('_', '.', 1)] = value
+            del args[key]
     return params
 
 

@@ -73,7 +73,7 @@ def solrSearchResults(request=None, **keywords):
         required = set(config.required).intersection(args)
         if required:
             for key in required:
-                if not args[key]:
+                if not key in args:
                     raise FallBackException
         else:
             raise FallBackException

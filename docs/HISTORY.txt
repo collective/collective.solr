@@ -4,6 +4,9 @@ Changelog
 1.0b23 - Unreleased
 -------------------
 
+* Warn about missing search indices and non-stored sort parameters.
+  [witsch]
+
 * Fix issue when reindexing objects with empty date fields.
   [witsch]
 
