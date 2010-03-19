@@ -39,7 +39,10 @@ def datehandler(value):
     return value
 
 
-handlers = {'solr.DateField': datehandler}
+handlers = {
+    'solr.DateField': datehandler,
+    'solr.TrieDateField': datehandler,
+}
 
 
 class SolrIndexProcessor(object):

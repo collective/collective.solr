@@ -4,6 +4,10 @@ Changelog
 1.0b23 - Unreleased
 -------------------
 
+* Recognize new ``solr.TrieDateField`` field type and handle it in the same
+  way as we handle the older ``solr.DateField``.
+  [hannosch]
+
 * Warn about missing search indices and non-stored sort parameters.
   [witsch]
 
