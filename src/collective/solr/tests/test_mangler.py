@@ -108,7 +108,7 @@ class QueryManglerTests(TestCase):
 
     def testEffectiveRangeConversion(self):
         day = DateTime('1972/05/11 UTC')
-        keywords = mangle(effectiveRange=day)
+        keywords = mangle(effectiveRange=day, show_inactive=False)
         self.assertEqual(keywords, {
             'effective': '[* TO 1972-05-11T00:00:00.000Z]',
             'expires': '[1972-05-11T00:00:00.000Z TO *]',

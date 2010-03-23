@@ -70,6 +70,8 @@ def mangleQuery(keywords):
             del keywords[key]
             keywords['effective'] = '[* TO %s]' % value
             keywords['expires'] = '[%s TO *]' % value
+        elif key == 'show_inactive':
+            del keywords[key]           # marker for `effectiveRange`
         elif 'range' in args:
             if not isinstance(value, (list, tuple)):
                 value = [value]
