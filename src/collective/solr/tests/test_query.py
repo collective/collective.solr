@@ -2,6 +2,7 @@
 
 from unittest import TestCase, defaultTestLoader, main
 from DateTime import DateTime
+from Missing import MV
 from zope.component import provideUtility
 
 from collective.solr.interfaces import ISolrConnectionConfig
@@ -247,6 +248,18 @@ class QueryTests(TestCase):
         bq = self.bq
         self.assertEqual(bq(inStock=True), '+inStock:true')
         self.assertEqual(bq(inStock=False), '+inStock:false')
+
+    def testBooleanCriteriaQuoting(self):
+        # It's not clear what exactly the output query should be. It would be
+        # most efficient to have it as a simple "+inStock:true" or
+        # "+inStock:false" but it might be hard to parse that in a general way
+        bq = self.bq
+        self.assertEqual(
+            bq(inStock=[1, True, '1', 'True']),
+            '+inStock:(1 OR true or 1 or True)')
+        self.assertEqual(
+            bq(inStock=[0, '', False, '0', 'False', None, (), [], {}, MV]),
+            '+inStock:(0 or false or 0 or False )')
 
 
 class InactiveQueryTests(TestCase):

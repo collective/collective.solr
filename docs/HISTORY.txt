@@ -4,6 +4,9 @@ Changelog
 1.0b23 - Unreleased
 -------------------
 
+* Added a failing test to show query problems with boolean criteria.
+  [hannosch]
+
 * Recognize new ``solr.TrieDateField`` field type and handle it in the same
   way as we handle the older ``solr.DateField``.
   [hannosch]
