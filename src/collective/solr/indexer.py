@@ -20,7 +20,7 @@ logger = getLogger('collective.solr.indexer')
 
 def indexable(obj):
     """ indicate whether a given object should be indexed; for now only
-        objects inheriting one of the catalog mixin classes are considerd """
+        objects inheriting one of the catalog mixin classes are considered """
     return isinstance(obj, CatalogMultiplex) or \
         isinstance(obj, CMFCatalogAware)
 
