@@ -4,6 +4,10 @@ Changelog
 1.0b23 - Unreleased
 -------------------
 
+* Add failing test to demonstrate how criteria can end up being indexed
+  via the `reindex` maintenance view.
+  [witsch]
+
 * Added a failing test to show query problems with boolean criteria.
   [hannosch]
 

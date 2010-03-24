@@ -161,6 +161,29 @@ class SolrMaintenanceTests(SolrTestCase):
         results = search('+parentPaths:/plone/news').results()
         self.assertEqual(results.numFound, '2')
 
+    def testReindexSkipsNonReferencableItems(self):
+        # initially the solr index should be empty
+        self.assertEqual(numFound(self.search()), 0)
+        # after adding a topic and a criterion, only the topic should
+        # get indexed...
+        self.setRoles(['Manager'])
+        container = self.folder
+        container.invokeFactory('Topic', id='coll', title='a collection')
+        container.coll.addCriterion('Type', 'ATPortalTypeCriterion')
+        commit()                        # indexing happens on commit
+        self.assertEqual(numFound(self.search()), 1)
+        # after copying the collection that's still the same...
+        container.manage_pasteObjects(container.manage_copyObjects('coll'))
+        commit()
+        self.assertEqual(numFound(self.search()), 2)
+        # however, the call to `manage_afterAdd` generated a UID, which can
+        # cause the object to be added via the "reindex" maintenance view...
+        maintenance = container.unrestrictedTraverse('solr-maintenance')
+        maintenance.reindex()
+        self.assertEqual(numFound(self.search()), 2)
+        criterions = self.search('+Type:ATPortalTypeCriterion')
+        self.assertEqual(numFound(criterions), 2)
+
     def testDisabledTimeoutDuringReindex(self):
         log = []
         def logger(*args):
