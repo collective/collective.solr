@@ -1,6 +1,7 @@
 from logging import getLogger
 from zope.interface import implements
 from zope.component import queryUtility
+from Missing import MV
 
 from collective.solr.interfaces import ISolrConnectionConfig
 from collective.solr.interfaces import ISolrConnectionManager
@@ -68,6 +69,16 @@ class Search(object):
                 value = str(value).lower()
             elif not value:     # solr doesn't like empty fields (+foo:"")
                 continue
+            elif field.class_ == 'solr.BoolField':
+                if not isinstance(value, (tuple, list)):
+                    value = [value]
+                falses = '0', 'False', MV
+                true = lambda v: bool(v) and v not in falses
+                value = set(map(true, value))
+                if not len(value) == 1:
+                    assert len(value) == 2      # just to make sure
+                    continue                    # skip when "true or false"
+                value = str(value.pop()).lower()
             elif isinstance(value, (tuple, list)):
                 # list items should be treated as literals, but
                 # nevertheless only get quoted when necessary

@@ -8,8 +8,9 @@ Changelog
   via the `reindex` maintenance view.
   [witsch]
 
-* Added a failing test to show query problems with boolean criteria.
-  [hannosch]
+* Let query builder handle sets of possible boolean values as passed by
+  boolean topic criteria for example.
+  [hannosch, witsch]
 
 * Recognize new ``solr.TrieDateField`` field type and handle it in the same
   way as we handle the older ``solr.DateField``.
