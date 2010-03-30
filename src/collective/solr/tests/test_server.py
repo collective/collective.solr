@@ -187,6 +187,11 @@ class SolrMaintenanceTests(SolrTestCase):
         self.assertEqual(numFound(self.search()), 2)
         criterions = self.search('+portal_type:ATPortalTypeCriterion')
         self.assertEqual(numFound(criterions), 0)
+        # the "sync" maintenance view shouldn't add these object, either...
+        maintenance.reindex()
+        self.assertEqual(numFound(self.search()), 2)
+        criterions = self.search('+portal_type:ATPortalTypeCriterion')
+        self.assertEqual(numFound(criterions), 0)
 
     def testDisabledTimeoutDuringReindex(self):
         log = []
