@@ -5,6 +5,7 @@ from zope.component import queryUtility
 from Products.Five.browser import BrowserView
 from Products.CMFCore.utils import getToolByName
 
+from collective.indexing.indexer import getOwnIndexMethod
 from collective.solr.interfaces import ISolrConnectionManager
 from collective.solr.interfaces import ISolrMaintenanceView
 from collective.solr.interfaces import ISearch
@@ -175,6 +176,9 @@ class SolrMaintenanceView(BrowserView):
         count = 0
         for path, obj in findObjects(self.context):
             if indexable(obj):
+                if getOwnIndexMethod(obj, 'indexObject') is not None:
+                    log('skipping indexing of %r via private method.\n' % obj)
+                    continue
                 count += 1
                 if count <= skip:
                     continue

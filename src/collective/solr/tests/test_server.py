@@ -86,7 +86,7 @@ class SolrMaintenanceTests(SolrTestCase):
         maintenance = self.portal.unrestrictedTraverse('solr-maintenance')
         # the view allos to skip the first n items...
         maintenance.clear()
-        maintenance.reindex(skip=3)     # the site gets skipped, so add 1
+        maintenance.reindex(skip=2)
         self.assertEqual(numFound(self.search()), 6)
         # and also specify the batch size
         log = []
