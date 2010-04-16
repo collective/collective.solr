@@ -162,8 +162,10 @@ class SolrMaintenanceView(BrowserView):
             for data in updates.values():
                 conn.add(**data)
             updates.clear()     # clear pending updates
-            log('intermediate commit (%d items processed, '
-                'last batch in %s)...\n' % (processed, lap.next()))
+            msg = 'intermediate commit (%d items processed, ' \
+                  'last batch in %s)...\n' % (processed, lap.next())
+            log(msg)
+            logger.info(msg)
             commit()
             manager.getConnection().reset()     # force new connection
             if cache:
@@ -261,7 +263,7 @@ class SolrMaintenanceView(BrowserView):
         processed = 0
         commit = notimeout(lambda: proc.commit(wait=True))
         def checkPoint():
-            msg = 'intermediate commit (%d objects processed, ' \
+            msg = 'intermediate commit (%d items processed, ' \
                   'last batch in %s)...\n' % (processed, lap.next())
             log(msg)
             logger.info(msg)
