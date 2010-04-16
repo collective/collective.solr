@@ -432,6 +432,8 @@ class SolrServerTests(SolrTestCase):
         self.assertEqual(search('+portal_type:Folder'), 1)
 
     def testReindexObjectWithEmptyDate(self):
+        # this test passes on 64-bit systems, but fails on 32-bit machines
+        # for the same reasons explained in `testDateBefore1000AD`...
         log = []
         def logger(*args):
             log.extend(args)
@@ -442,6 +444,22 @@ class SolrServerTests(SolrTestCase):
         self.folder.reindexObject(idxs=['modified', 'Title'])
         commit()
         self.assertEqual(log, [])
+        self.assertEqual(self.search('+Title:Foo').results().numFound, '1')
+
+    def testDateBefore1000AD(self):
+        # AT's default "floor date" of `DateTime(1000, 1)` is converted
+        # to different time representations depending on if it's running
+        # on 32 or 64 bits (because the seconds since/before epoch are bigger
+        # than `sys.maxint` and `DateTime.safegmtime` raises an error in this
+        # case, resulting in a different timezone calculation).  while the
+        # result is off by 5 days for 64 bits, the one for 32 is even more
+        # troublesome.  that's because the resulting date is from december
+        # 999 (a.d.), and even though the year is sent with a leading zero
+        # to Solr, it's returned without one causing the `DateTime` parser
+        # to choke...  please note that this is only the case with Solr 1.4.
+        conn = getUtility(ISolrConnectionManager).getConnection()
+        conn.add(UID='foo', Title='foo', effective='0999-12-31T22:00:00Z')
+        conn.commit()
         self.assertEqual(self.search('+Title:Foo').results().numFound, '1')
 
     def testFilterInvalidCharacters(self):

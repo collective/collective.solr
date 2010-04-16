@@ -4,6 +4,10 @@ Changelog
 1.0b23 - Unreleased
 -------------------
 
+* Prevent parsing errors for dates from before 1000 A.D. in combination
+  with 32-bit systems and Solr 1.4.
+  [witsch]
+
 * Don't process content with its own indexing methods, e.g. `reindexObject`,
   via the `reindex` maintenance view.
   [witsch]
