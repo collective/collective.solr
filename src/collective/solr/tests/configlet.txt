@@ -32,7 +32,7 @@ First some initial setup code:
 
 
 Viewing the site control panel
------------------------------
+------------------------------
 
     >>> self.browser.open('http://nohost/plone/@@solr-controlpanel')
     >>> self.browser.url
@@ -131,3 +131,19 @@ correct host and port:
     >>> sorted(config.filter_queries)
     ['Subject', 'review_state']
 
+
+Required query parameters
+-------------------------
+
+Lastly, let's make sure the "Required query parameters" setting can be set
+to an empty list (please see `issue #18`__ for more infos):
+
+  .. __: http://plone.org/products/collective.solr/issues/18
+
+    >>> self.browser.getControl(name='form.required.remove_0').value = True
+    >>> self.browser.getControl(name='form.required.remove_1').value = True
+    >>> self.browser.getControl(name='form.required.remove').click()
+    >>> self.browser.getControl(name="form.actions.save").click()
+
+    >>> config.required
+    []
