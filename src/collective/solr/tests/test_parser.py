@@ -3,6 +3,7 @@ from DateTime import DateTime
 
 from collective.solr.parser import SolrResponse
 from collective.solr.parser import SolrSchema
+from collective.solr.parser import parseDate
 from collective.solr.tests.utils import getData
 
 
@@ -156,6 +157,19 @@ class ParserTests(TestCase):
         results = response.response     # the result set is named 'response'
         empty_uid = [r for r in results if r.UID == '']
         self.assertEqual(empty_uid, [])
+
+
+class ParseDateHelperTests(TestCase):
+
+    def testParseDateHelper(self):
+        self.assertEqual(parseDate('2007-08-11T00:00:00.000Z'),
+            DateTime(2007, 8, 11, 0, 0, 0, 'GMT'))
+        self.assertEqual(parseDate('1900-01-01T00:00:00.000Z'),
+            DateTime(1900, 1, 1, 0, 0, 0, 'GMT'))
+        self.assertEqual(parseDate('999-12-31T00:00:00.000Z'),
+            DateTime(999, 12, 31, 0, 0, 0, 'GMT'))
+        self.assertEqual(parseDate('99-12-31T00:00:00.000Z'),
+            DateTime('0099-12-31T00:00:00.000Z'))
 
 
 def test_suite():
