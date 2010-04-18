@@ -144,6 +144,8 @@ to an empty list (please see `issue #18`__ for more infos):
     >>> self.browser.getControl(name='form.required.remove_1').value = True
     >>> self.browser.getControl(name='form.required.remove').click()
     >>> self.browser.getControl(name="form.actions.save").click()
+    >>> 'Changes saved.' in self.browser.contents
+    True
 
     >>> config.required
     []

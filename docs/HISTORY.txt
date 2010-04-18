@@ -4,6 +4,11 @@ Changelog
 1.0b23 - Unreleased
 -------------------
 
+* Always fall back to portal catalog for "navtree" queries so the set of
+  required query parameters can be empty.
+  This refs http://plone.org/products/collective.solr/issues/18
+  [witsch]
+
 * Prevent parsing errors for dates from before 1000 A.D. in combination
   with 32-bit systems and Solr 1.4.
   [witsch]

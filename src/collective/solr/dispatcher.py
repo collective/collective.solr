@@ -69,6 +69,8 @@ def solrSearchResults(request=None, **keywords):
         # if request is a dict, we need the real request in order to
         # be able to adapt to plone flares
         request = getattr(getSiteManager(), 'REQUEST', args)
+    if 'path' in args and 'navtree' in args['path']:
+        raise FallBackException     # we can't handle navtree queries yet
     if config.required:
         required = set(config.required).intersection(args)
         if required:
