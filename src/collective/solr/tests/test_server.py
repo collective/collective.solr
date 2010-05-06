@@ -388,7 +388,7 @@ class SolrServerTests(SolrTestCase):
 
     def testGetData(self):
         manager = getUtility(ISolrConnectionManager)
-        fields = sorted([f.name for f in manager.getSchema().fields()])
+        fields = sorted([f.name for f in manager.getSchema().fields])
         fields.remove('default')        # remove any copy-fields
         proc = SolrIndexProcessor(manager)
         # without explicit attributes all data should be returned
@@ -857,7 +857,7 @@ class SolrServerTests(SolrTestCase):
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0].get('Subject'), MV)
         schema = self.search.getManager().getSchema()
-        expected = set(list(schema.stored()) + ['score'])   # score gets added
+        expected = set(list(schema.stored) + ['score'])     # score gets added
         self.assertEqual(set(results[0].keys()), expected)
 
 

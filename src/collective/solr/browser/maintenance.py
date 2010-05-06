@@ -58,7 +58,7 @@ def missingAndStored(attributes, schema):
         key = schema.uniqueKey
         if not key in attributes:
             missing.add(key)
-        for field in schema.fields():
+        for field in schema.fields:
             if field.name in attributes:
                 continue
             elif not field.stored:      # fields not stored need to be added
@@ -75,7 +75,7 @@ def solrDataFor(uids, fields):
     schema = manager.getSchema()
     # set up data converters
     converters = {}
-    for field in schema.fields():
+    for field in schema.fields:
         name = field['name']
         handler = handlers.get(field.class_, None)
         if handler is not None:

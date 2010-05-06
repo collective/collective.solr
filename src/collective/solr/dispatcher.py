@@ -96,7 +96,7 @@ def solrSearchResults(request=None, **keywords):
     results = response.results()
     for idx, flare in enumerate(results):
         flare = wrap(flare)
-        for missing in set(schema.stored()).difference(flare):
+        for missing in set(schema.stored).difference(flare):
             flare[missing] = MV
         results[idx] = wrap(flare)
     return response

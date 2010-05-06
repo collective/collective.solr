@@ -171,14 +171,16 @@ class SolrSchema(AttrDict):
             elif elem.tag == 'solrQueryParser':
                 self[elem.tag] = AttrStr(elem.text, **elem.attrib)
 
+    @property
     def fields(self):
         """ return list of all fields the schema consists of """
         for name, field in self.items():
             if isinstance(field, SolrField):
                 yield field
 
+    @property
     def stored(self):
         """ return names of all stored fields, a.k.a. metadata """
-        for field in self.fields():
+        for field in self.fields:
             if field.stored:
                 yield field.name
