@@ -60,7 +60,7 @@ class PloneFlare(AttrDict):
         modified = self.get('modified', None)
         if modified is None:
             return 'n.a.'
-        return modified.toZone(timezone).ISO()
+        return modified.toZone(timezone).ISO8601()
 
     @property
     def data_record_normalized_score_(self):
