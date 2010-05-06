@@ -4,6 +4,9 @@ Changelog
 1.0b23 - Unreleased
 -------------------
 
+* Always provide values for all metadata columns like the catalog does.
+  [witsch]
+
 * Always fall back to portal catalog for "navtree" queries so the set of
   required query parameters can be empty.
   This refs http://plone.org/products/collective.solr/issues/18

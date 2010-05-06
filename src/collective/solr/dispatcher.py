@@ -2,6 +2,7 @@ from zope.interface import implements
 from zope.component import queryUtility, queryMultiAdapter, getSiteManager
 from zope.publisher.interfaces.http import IHTTPRequest
 from Acquisition import aq_base
+from Missing import MV
 from Products.ZCatalog.ZCatalog import ZCatalog
 
 from collective.solr.interfaces import ISolrConnectionConfig
@@ -94,5 +95,8 @@ def solrSearchResults(request=None, **keywords):
         return adapter is not None and adapter or flare
     results = response.results()
     for idx, flare in enumerate(results):
+        flare = wrap(flare)
+        for missing in set(schema.stored()).difference(flare):
+            flare[missing] = MV
         results[idx] = wrap(flare)
     return response

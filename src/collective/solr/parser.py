@@ -176,3 +176,9 @@ class SolrSchema(AttrDict):
         for name, field in self.items():
             if isinstance(field, SolrField):
                 yield field
+
+    def stored(self):
+        """ return names of all stored fields, a.k.a. metadata """
+        for field in self.fields():
+            if field.stored:
+                yield field.name

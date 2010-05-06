@@ -5,6 +5,7 @@ from zope.component import getUtility
 from zope.schema.interfaces import IVocabularyFactory
 from transaction import commit, abort
 from DateTime import DateTime
+from Missing import MV
 from time import sleep
 from re import split
 
@@ -848,6 +849,16 @@ class SolrServerTests(SolrTestCase):
         self.assertEqual(len(results), 2)
         self.assertEqual(sorted([r.physicalPath for r in results]),
             ['/plone/front-page', '/plone/news'])
+
+    def testFlareHasDataForAllMetadataColumns(self):
+        # all search results should have metadata for all indices
+        self.maintenance.reindex()
+        results = solrSearchResults(SearchableText='Welcome')
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0].get('Subject'), MV)
+        schema = self.search.getManager().getSchema()
+        expected = set(list(schema.stored()) + ['score'])   # score gets added
+        self.assertEqual(set(results[0].keys()), expected)
 
 
 def test_suite():
