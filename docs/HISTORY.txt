@@ -4,6 +4,9 @@ Changelog
 1.0b23 - Unreleased
 -------------------
 
+* Fix handling of 'depth' argument when querying multiple paths.
+  [reinhardt, witsch]
+
 * Don't break when filter queries should be used for all parameters.
   [reinhardt, witsch]
 

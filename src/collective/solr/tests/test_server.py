@@ -561,15 +561,55 @@ class SolrServerTests(SolrTestCase):
         search = lambda path: sorted([r.physicalPath for r in
             solrSearchResults(request, path=path)])
         self.assertEqual(len(search(path='/plone')), 8)
+        self.assertEqual(len(search(path={'query': '/plone', 'depth': -1})), 8)
         self.assertEqual(search(path='/plone/news'),
             ['/plone/news', '/plone/news/aggregator'])
         self.assertEqual(search(path={'query': '/plone/news'}),
+            ['/plone/news', '/plone/news/aggregator'])
+        self.assertEqual(search(path={'query': '/plone/news', 'depth': -1}),
             ['/plone/news', '/plone/news/aggregator'])
         self.assertEqual(search(path={'query': '/plone/news', 'depth': 0}),
             ['/plone/news'])
         self.assertEqual(search(path={'query': '/plone', 'depth': 1}),
             ['/plone/Members', '/plone/events', '/plone/front-page',
              '/plone/news'])
+
+    def testMultiplePathSearches(self):
+        self.maintenance.reindex()
+        request = dict(SearchableText='"[* TO *]"')
+        search = lambda path, **kw: sorted([r.physicalPath for r in
+            solrSearchResults(request, path=dict(query=path, **kw))])
+        # multiple paths with equal length...
+        path = ['/plone/news', '/plone/events']
+        self.assertEqual(search(path),
+            ['/plone/events', '/plone/events/aggregator',
+             '/plone/events/aggregator/previous',
+             '/plone/news', '/plone/news/aggregator'])
+        self.assertEqual(search(path, depth=-1),
+            ['/plone/events', '/plone/events/aggregator',
+             '/plone/events/aggregator/previous',
+             '/plone/news', '/plone/news/aggregator'])
+        self.assertEqual(search(path, depth=0),
+            ['/plone/events', '/plone/news'])
+        self.assertEqual(search(path, depth=1),
+            ['/plone/events', '/plone/events/aggregator',
+             '/plone/news', '/plone/news/aggregator'])
+        # multiple paths with different length...
+        path = ['/plone/news', '/plone/events/aggregator']
+        self.assertEqual(search(path),
+            ['/plone/events/aggregator', '/plone/events/aggregator/previous',
+             '/plone/news', '/plone/news/aggregator'])
+        self.assertEqual(search(path, depth=-1),
+            ['/plone/events/aggregator', '/plone/events/aggregator/previous',
+             '/plone/news', '/plone/news/aggregator'])
+        self.assertEqual(search(path, depth=0),
+            ['/plone/events/aggregator', '/plone/news'])
+        self.assertEqual(search(path, depth=1),
+            ['/plone/events/aggregator', '/plone/events/aggregator/previous',
+             '/plone/news', '/plone/news/aggregator'])
+        self.assertEqual(search(['/plone/news', '/plone'], depth=1),
+            ['/plone/Members', '/plone/events',
+             '/plone/front-page', '/plone/news', '/plone/news/aggregator'])
 
     def testLogicalOperators(self):
         self.portal.news.setSubject(['News'])

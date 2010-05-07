@@ -90,6 +90,9 @@ class Search(object):
                         quoted = quote('"' + term + '"')
                     return quoted
                 value = '(%s)' % ' OR '.join(map(quoteitem, value))
+            elif isinstance(value, set):        # set are taken literally
+                query[name] = '(%s)' % ' OR '.join(value)
+                continue
             elif isinstance(value, basestring):
                 value = quote(value)
                 if not value:   # don't search for empty strings, even quoted

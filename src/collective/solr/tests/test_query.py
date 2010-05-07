@@ -263,6 +263,14 @@ class QueryTests(TestCase):
         self.assertEqual(bq(inStock=[True, False]), '')
         self.assertEqual(bq(inStock=[1, MV]), '')
 
+    def testLiterateQueries(self):
+        bq = self.bq
+        self.assertEqual(bq(name=set(['bar'])), '(bar)')
+        self.failUnless(bq(name=set(['foo', 'bar'])) in
+            ['(foo OR bar)', '(bar OR foo)'])
+        self.failUnless(bq(name=set(['foo!', '+bar:camp'])) in
+            ['(foo! OR +bar:camp)', '(+bar:camp OR foo!)'])
+
 
 class InactiveQueryTests(TestCase):
 

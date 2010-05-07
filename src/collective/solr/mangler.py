@@ -60,8 +60,15 @@ def mangleQuery(keywords):
             path = keywords['parentPaths'] = value
             del keywords[key]
             if 'depth' in args:
-                depth = len(path.split('/')) + int(args['depth'])
-                keywords['physicalDepth'] = '[* TO %d]' % depth
+                depth = int(args['depth'])
+                if depth >= 0:
+                    if not isinstance(value, (list, tuple)):
+                        path = [path]
+                    tmpl = '(+physicalDepth:[%d TO %d] AND +parentPaths:%s)'
+                    params = keywords['parentPaths'] = set()
+                    for p in path:
+                        base = len(p.split('/'))
+                        params.add(tmpl % (base, base + depth, p))
                 del args['depth']
         elif key == 'effectiveRange':
             value = convert(value)
