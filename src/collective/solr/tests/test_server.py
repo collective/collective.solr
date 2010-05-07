@@ -860,6 +860,16 @@ class SolrServerTests(SolrTestCase):
         expected = set(list(schema.stored) + ['score'])     # score gets added
         self.assertEqual(set(results[0].keys()), expected)
 
+    def testSearchWithOnlyFilterQueryParameters(self):
+        self.maintenance.reindex()
+        # let's remove all required parameters and use a filter query
+        config = getUtility(ISolrConnectionConfig)
+        config.required = []
+        config.filter_queries = ['portal_type', 'Language']
+        results = solrSearchResults(portal_type=['Document'])
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0].physicalPath, '/plone/front-page')
+
 
 def test_suite():
     if pingSolr():

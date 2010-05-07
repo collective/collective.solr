@@ -162,3 +162,5 @@ def optimizeQueryParameters(query, params):
             params['fq'] = [params['fq']] + fq
     elif fq:
         params['fq'] = fq
+    if not query:
+        query['*'] = '*:*'      # catch all if no regular query is left...
