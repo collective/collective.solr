@@ -1,20 +1,8 @@
 from StringIO import StringIO
-
-try:
-    from xml.etree.cElementTree import iterparse; iterparse
-except ImportError:
-    try:
-        from xml.etree.ElementTree import iterparse; iterparse
-    except ImportError:
-        try:
-            from cElementTree import iterparse; iterparse
-        except ImportError:
-            from elementtree.ElementTree import iterparse
-
 from DateTime import DateTime
 from zope.interface import implements
-
 from collective.solr.interfaces import ISolrFlare
+from collective.solr.iterparse import iterparse
 
 
 class AttrDict(dict):
