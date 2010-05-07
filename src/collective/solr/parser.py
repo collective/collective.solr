@@ -73,6 +73,8 @@ def setter(item, name, value):
 class SolrResponse(object):
     """ a solr search response; TODO: this should get an interface!! """
 
+    __allow_access_to_unprotected_subobjects__ = True
+
     def __init__(self, data=None):
         if data is not None:
             self.parse(data)

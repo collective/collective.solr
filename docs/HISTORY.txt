@@ -4,6 +4,9 @@ Changelog
 1.0b23 - Unreleased
 -------------------
 
+* Grant restricted code access to the search results, e.g. skin scripts.
+  [do3cc, witsch]
+
 * Fix handling of 'depth' argument when querying multiple paths.
   [reinhardt, witsch]
 

@@ -910,6 +910,14 @@ class SolrServerTests(SolrTestCase):
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0].physicalPath, '/plone/front-page')
 
+    def testAccessSearchResultsFromPythonScript(self):
+        self.maintenance.reindex()
+        from Products.PythonScripts.PythonScript import manage_addPythonScript
+        manage_addPythonScript(self.folder, 'foo')
+        self.folder.foo.write('return [r.Title for r in '
+            'context.portal_catalog(SearchableText="News")]')
+        self.assertEqual(self.folder.foo(), ['News', 'News'])
+
 
 def test_suite():
     if pingSolr():
