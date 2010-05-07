@@ -43,6 +43,7 @@ setup(name = 'collective.solr',
       ],
       extras_require = { 'test': [
         'collective.testcaselayer',
+        'cElementTree',
         'PIL',
         'Products.LinguaPlone >=3.1a1',
       ]},
