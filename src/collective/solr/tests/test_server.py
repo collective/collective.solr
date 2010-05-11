@@ -882,6 +882,18 @@ class SolrServerTests(SolrTestCase):
             results = solrSearchResults(request)
             self.assertEqual(len(results), 1)
 
+    def testExplicitLogicalOperatorQueries(self):
+        self.folder.invokeFactory('Document', id='doc1', title='Foo')
+        self.folder.invokeFactory('Document', id='doc2', title='Bar')
+        self.folder.invokeFactory('Document', id='doc3', title='Foo Bar')
+        commit()                        # indexing happens on commit
+        request = dict(SearchableText='Bar OR Foo')
+        results = solrSearchResults(request)
+        self.assertEqual(len(results), 3)
+        request = dict(SearchableText='Bar AND Foo')
+        results = solrSearchResults(request)
+        self.assertEqual(len(results), 1)
+
     def testMultiValueSearch(self):
         self.maintenance.reindex()
         results = solrSearchResults(SearchableText='New*',
