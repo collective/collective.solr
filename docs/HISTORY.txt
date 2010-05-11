@@ -4,6 +4,9 @@ Changelog
 1.0b23 - Unreleased
 -------------------
 
+* Fix quoting of operators for multi-word search terms.
+  [witsch]
+
 * Use the faster C implementations of `elementtree`/`xml.etree` if available.
   [hannosch, witsch]
 

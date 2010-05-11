@@ -206,8 +206,10 @@ def quote(term):
                          not stack.current[-1] in special)) \
                    or isinstance(stack.current, Range):
                     stack.current.append(special)
-            elif isinstance(stack.current, Group):
+            elif isinstance(stack.current, Range):
                 stack.current.append(special)
+            elif isinstance(stack.current, Group):
+                stack.current.append('\\%s'%special)
             elif isinstance(stack.current, list):
                 stack.current.append('\\%s'%special)
         i += 1

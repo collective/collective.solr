@@ -918,6 +918,12 @@ class SolrServerTests(SolrTestCase):
             'context.portal_catalog(SearchableText="News")]')
         self.assertEqual(self.folder.foo(), ['News', 'News'])
 
+    def testSearchForTermWithColon(self):
+        self.folder.processForm(values={'title': 'foo:bar'})
+        commit()                        # indexing happens on commit
+        results = solrSearchResults(SearchableText='foo foo:bar')
+        self.assertEqual(sorted([r.Title for r in results]), ['foo:bar'])
+
 
 def test_suite():
     if pingSolr():

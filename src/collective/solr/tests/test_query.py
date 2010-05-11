@@ -106,6 +106,10 @@ class QuoteTests(TestCase):
         self.assertEqual(quote('-+&&||!^~:'), '\\-\\+\\&&\\||\\!\\^\\~\\:')
         # Only quote * and ? if quoted
         self.assertEqual(quote('"*?"'), '"\\*\\?"')
+        # also quote multiple occurrences
+        self.assertEqual(quote(':'), '\\:')
+        self.assertEqual(quote(': :'), '(\\: \\:)')
+        self.assertEqual(quote('foo+ bar! nul:'), '(foo\\+ bar\\! nul\\:)')
 
     def testUnicode(self):
         self.assertEqual(quote('foø'), 'fo\xc3\xb8')
