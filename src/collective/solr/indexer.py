@@ -60,7 +60,7 @@ class SolrIndexProcessor(object):
             # supported (see https://issues.apache.org/jira/browse/SOLR-139)
             # however, the reindexing can be skipped if none of the given
             # attributes match existing solr indexes...
-            schema = self.manager.getSchema()
+            schema = self.manager.getSchema() or {}
             if attributes is not None:
                 attributes = set(schema.keys()).intersection(attributes)
                 if not attributes:
