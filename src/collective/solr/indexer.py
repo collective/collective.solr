@@ -60,7 +60,11 @@ class SolrIndexProcessor(object):
             # supported (see https://issues.apache.org/jira/browse/SOLR-139)
             # however, the reindexing can be skipped if none of the given
             # attributes match existing solr indexes...
-            schema = self.manager.getSchema() or {}
+            schema = self.manager.getSchema()
+            if schema is None:
+                msg = 'unable to fetch schema, skipping indexing of %r'
+                logger.warning(msg, obj)
+                return
             if attributes is not None:
                 attributes = set(schema.keys()).intersection(attributes)
                 if not attributes:
@@ -69,10 +73,6 @@ class SolrIndexProcessor(object):
             if not data:
                 return          # don't index with no data...
             prepareData(data)
-            if schema is None:
-                msg = 'unable to fetch schema, skipping indexing of %r'
-                logger.warning(msg, obj)
-                return
             uniqueKey = schema.get('uniqueKey', None)
             if uniqueKey is None:
                 msg = 'schema is missing unique key, skipping indexing of %r'
