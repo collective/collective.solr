@@ -78,7 +78,8 @@ class ISolrConnectionManager(Interface):
         """ returns an existing connection or opens one """
 
     def getSchema():
-        """ returns the currently used schema or fetches it """
+        """ returns the currently used schema or fetches it.
+            If the schema cannot be fetched None is returned. """
 
     def setTimeout(timeout, lock=object()):
         """ set the timeout on the current (or to be opened) connection
