@@ -710,7 +710,7 @@ class SolrServerTests(SolrTestCase):
 
     def testSortParameters(self):
         self.maintenance.reindex()
-        search = lambda attr, **kw: ', '.join([getattr(r, attr) for r in
+        search = lambda attr, **kw: ', '.join([getattr(r, attr, '?') for r in
             solrSearchResults(request=dict(SearchableText='"[* TO *]"',
                               path=dict(query='/plone', depth=1)), **kw)])
         self.assertEqual(search('Title', sort_on='Title'),
@@ -720,9 +720,9 @@ class SolrServerTests(SolrTestCase):
         self.assertEqual(search('getId', sort_on='Title',
             sort_order='descending'), 'front-page, Members, news, events')
         self.assertEqual(search('Title', sort_on='Title', sort_limit=2),
-            'Events, News')
+            'Events, News, ?, ?')
         self.assertEqual(search('Title', sort_on='Title', sort_order='reverse',
-            sort_limit='3'), 'Welcome to Plone, Users, News')
+            sort_limit='3'), 'Welcome to Plone, Users, News, ?')
         # test sort index aliases
         schema = self.search.getManager().getSchema()
         self.failIf('sortable_title' in schema)
@@ -935,6 +935,20 @@ class SolrServerTests(SolrTestCase):
         commit()                        # indexing happens on commit
         results = solrSearchResults(SearchableText='foo foo:bar')
         self.assertEqual(sorted([r.Title for r in results]), ['foo:bar'])
+
+    def testBatchedSearchResults(self):
+        self.maintenance.reindex()
+        search = lambda **kw: [getattr(i, 'Title', None) for i in
+            solrSearchResults(SearchableText='a*', sort_on='Title', **kw)]
+        self.assertEqual(search(),
+            ['Events', 'News', 'Past Events', 'Welcome to Plone'])
+        # when a batch size is given, the length should remain the same,
+        # but only items in the batch actually exist...
+        self.assertEqual(search(rows=2),
+            ['Events', 'News', None, None])
+        # given a start value, the batch is moved within the search results
+        self.assertEqual(search(rows=2, start=1),
+            [None, 'News', 'Past Events', None])
 
 
 def test_suite():

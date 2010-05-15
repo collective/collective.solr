@@ -208,6 +208,17 @@ class QueryParameterTests(TestCase):
         params = extract({'sort-limit': '10'})
         self.assertEqual(params, dict(rows=10))
 
+    def testBatchParameters(self):
+        extract = extractQueryParameters
+        params = extract({'start': 5})
+        self.assertEqual(params, dict(start=5))
+        params = extract({'start': '10'})
+        self.assertEqual(params, dict(start=10))
+        params = extract({'rows': 5})
+        self.assertEqual(params, dict(rows=5))
+        params = extract({'rows': '10'})
+        self.assertEqual(params, dict(rows=10))
+
     def testCombined(self):
         extract = extractQueryParameters
         params = extract({'sort_on': 'foo', 'sort_limit': 5})

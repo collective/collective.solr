@@ -80,3 +80,11 @@ def findObjects(origin):
         if hasattr(aq_base(obj), 'objectIds'):
             for id in obj.objectIds():
                 paths.insert(idx + 1, path + '/' + id)
+
+
+def padResults(results, start=0, **kw):
+    if start:
+        results[0:0] = [None] * start
+    found = int(results.numFound)
+    tail = found - len(results)
+    results.extend([None] * tail)

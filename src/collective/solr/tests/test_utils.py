@@ -4,9 +4,10 @@ from unittest import TestCase, defaultTestLoader, main
 from Testing import ZopeTestCase as ztc
 
 from collective.solr.tests.utils import getData
-from collective.solr.parser import SolrSchema
+from collective.solr.parser import SolrSchema, SolrResponse
 from collective.solr.utils import findObjects, isSimpleTerm
 from collective.solr.utils import setupTranslationMap, prepareData
+from collective.solr.utils import padResults
 
 
 class UtilsTests(ztc.ZopeTestCase):
@@ -103,6 +104,35 @@ class MaintenanceHelperTests(TestCase):
             'parentPaths']))
         self.assertEqual(stored, set(['id', 'Title', 'Subject',
             'physicalPath', 'review_state']))
+
+
+class BatchingHelperTests(TestCase):
+
+    def results(self):
+        xml_response = getData('quirky_response.txt')
+        response = SolrResponse(xml_response)
+        return response.response        # the result set is named 'response'
+
+    def testResult(self):
+        results = self.results()
+        self.assertEqual(results.numFound, '1204')
+        self.assertEqual(len(results), 137)
+        self.assertEqual(results[0].UID, '7c31adb20d5eee314233abfe48515cf3')
+
+    def testResultsPadding(self):
+        results = self.results()
+        padResults(results)
+        self.assertEqual(len(results), 1204)
+        self.assertEqual(results[0].UID, '7c31adb20d5eee314233abfe48515cf3')
+        self.assertEqual(results[137:], [None] * (1204 - 137))
+
+    def testResultsPaddingWithStart(self):
+        results = self.results()
+        padResults(results, start=50)
+        self.assertEqual(len(results), 1204)
+        self.assertEqual(results[:50], [None] * 50)
+        self.assertEqual(results[50].UID, '7c31adb20d5eee314233abfe48515cf3')
+        self.assertEqual(results[187:], [None] * (1204 - 187))
 
 
 def test_suite():

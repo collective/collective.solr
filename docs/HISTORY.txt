@@ -4,6 +4,10 @@ Changelog
 1.0b23 - Unreleased
 -------------------
 
+* Add support for batching, i.e. only fetch and parse items from Solr,
+  which are part of the currently handled batch.
+  [witsch]
+
 * Fix quoting of operators for multi-word search terms.
   [witsch]
 

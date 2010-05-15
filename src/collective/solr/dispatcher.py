@@ -10,6 +10,7 @@ from collective.solr.interfaces import ISearchDispatcher
 from collective.solr.interfaces import ISearch
 from collective.solr.interfaces import IFlare
 from collective.solr.utils import isActive, prepareData
+from collective.solr.utils import padResults
 from collective.solr.mangler import mangleQuery
 from collective.solr.mangler import extractQueryParameters
 from collective.solr.mangler import cleanupQueryParameters
@@ -99,4 +100,5 @@ def solrSearchResults(request=None, **keywords):
         for missing in set(schema.stored).difference(flare):
             flare[missing] = MV
         results[idx] = wrap(flare)
+    padResults(results, **params)           # pad the batch
     return response

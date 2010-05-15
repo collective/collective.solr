@@ -1,5 +1,4 @@
 TODOs:
-* batch support for searching
 * support for date facets
 * result iterator (with __len__ on results object)
 * support for "navtree" and "level" arguments for path queries

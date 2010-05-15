@@ -4,7 +4,7 @@
 ##bind namespace=
 ##bind script=script
 ##bind subpath=traverse_subpath
-##parameters=REQUEST=None,show_all=0,quote_logic=0,quote_logic_indexes=['SearchableText','Description','Title'],use_types_blacklist=False,show_inactive=False,use_navigation_root=False
+##parameters=REQUEST=None,show_all=0,quote_logic=0,quote_logic_indexes=['SearchableText','Description','Title'],use_types_blacklist=False,show_inactive=False,use_navigation_root=False,start=None,rows=None
 ##title=wraps the portal_catalog with a rules qualified query
 ##
 from ZODB.POSException import ConflictError
@@ -92,7 +92,7 @@ for k in REQUEST.keys():
             query[k] = int(v)
         else:
             query[k] = v
-    elif k in ('fq', 'fl', 'facet') or k.startswith('facet.'):
+    elif k in ('fq', 'fl', 'facet', 'start', 'rows') or k.startswith('facet.'):
         query[k] = v
 
 for k, v in second_pass.items():
@@ -101,6 +101,11 @@ for k, v in second_pass.items():
         continue
     query[k] = q = {'query':qs}
     q.update(v)
+
+if start is not None:
+    query['start'] = start
+if rows is not None:
+    query['rows'] = rows
 
 # doesn't normal call catalog unless some field has been queried
 # against. if you want to call the catalog _regardless_ of whether
