@@ -362,7 +362,7 @@ class SolrErrorHandlingTests(SolrTestCase):
         self.folder.processForm(values={'title': 'Bar'})
         commit()                    # indexing (doesn't) happen on commit
         self.assertEqual(log, ['exception while getting schema',
-            'exception while getting schema',
+            'unable to fetch schema, skipping indexing of %r', self.folder,
             'exception during request %r', '<commit/>'])
 
 
