@@ -706,6 +706,16 @@ class SolrServerTests(SolrTestCase):
         result = connection.search(q='+Title:Foo').read()
         self.assertEqual(numFound(result), 1)
 
+    def testNoAutoCommitIndexing(self):
+        connection = getUtility(ISolrConnectionManager).getConnection()
+        self.config.auto_commit = False        # disable committing
+        self.folder.processForm(values={'title': 'Foo'})
+        commit()
+        # no indexing happens, make sure we give the server some time
+        sleep(2)
+        result = connection.search(q='+Title:Foo').read()
+        self.assertEqual(numFound(result), 0)
+
     def testLimitSearchResults(self):
         self.maintenance.reindex()
         results = self.search('+parentPaths:/plone').results()

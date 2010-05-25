@@ -16,6 +16,7 @@ class SetupToolTests(SolrTestCase, TarballTester):
         config.port = 23
         config.base = '/bar'
         config.async = False
+        config.auto_commit = True
         config.index_timeout = 7
         config.search_timeout = 3.1415
         config.max_results = 42
@@ -36,6 +37,7 @@ class SetupToolTests(SolrTestCase, TarballTester):
         self.assertEqual(config.port, 8983)
         self.assertEqual(config.base, '/solr')
         self.assertEqual(config.async, False)
+        self.assertEqual(config.auto_commit, True)
         self.assertEqual(config.index_timeout, 0)
         self.assertEqual(config.search_timeout, 0)
         self.assertEqual(config.max_results, 0)
@@ -85,6 +87,7 @@ SOLR_XML = """\
   </connection>
   <settings>
     <async value="False" />
+    <auto_commit value="True" />
     <index-timeout value="7" />
     <search-timeout value="3.1415" />
     <max-results value="42" />

@@ -23,6 +23,7 @@ class BaseSolrConnectionConfig(object):
         self.port = None
         self.base = None
         self.async = False
+        self.auto_commit = True
         self.index_timeout = 0
         self.search_timeout = 0
         self.max_results = 0
@@ -34,6 +35,7 @@ class BaseSolrConnectionConfig(object):
 class SolrConnectionConfig(BaseSolrConnectionConfig, Persistent):
 
     max_results = 0             # provide backwards compatibility
+    auto_commit = True
     required = ()
     facets = ()
     filter_queries = ()

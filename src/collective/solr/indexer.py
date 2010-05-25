@@ -122,10 +122,13 @@ class SolrIndexProcessor(object):
         pass
 
     def commit(self, wait=None):
+        config = getUtility(ISolrConnectionConfig)
+        if not config.auto_commit:
+            return
         conn = self.getConnection()
         if conn is not None:
             if not isinstance(wait, bool):
-                wait = not getUtility(ISolrConnectionConfig).async
+                wait = not config.async
             try:
                 logger.debug('committing')
                 conn.commit(waitFlush=wait, waitSearcher=wait)

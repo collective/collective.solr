@@ -17,6 +17,8 @@ First some initial setup code:
     '/solr'
     >>> config.async
     False
+    >>> config.auto_commit
+    True
     >>> config.index_timeout
     0.0
     >>> config.search_timeout
@@ -67,6 +69,7 @@ Make some changes
     >>> self.browser.getControl(name='form.port').value = '1234'
     >>> self.browser.getControl(name='form.base').value = '/solr'
     >>> self.browser.getControl(name='form.async').value = True
+    >>> self.browser.getControl(name='form.auto_commit').value = False
     >>> self.browser.getControl(name='form.index_timeout').value = '7'
     >>> self.browser.getControl(name='form.search_timeout').value = '3.1415'
     >>> self.browser.getControl(name='form.max_results').value = '23'
@@ -105,6 +108,8 @@ Make sure the changes have been applied correctly to the tool:
     '/solr'
     >>> config.async
     True
+    >>> config.auto_commit
+    False
     >>> config.index_timeout
     7.0
     >>> config.search_timeout

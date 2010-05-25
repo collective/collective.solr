@@ -26,6 +26,12 @@ class ISolrSchema(Interface):
                        'which will improve Zope response times in return for '
                        'not having the Solr index updated immediately.'))
 
+    auto_commit = Bool(title=_(u'Automatic commit'), default=True,
+        description=_(u'If enabled each index operation will cause a commit '
+                       'to be sent to Solr, which causes it to update its '
+                       'index. If you disable this, you need to configure '
+                       'commit policies on the Solr server side.'))
+
     index_timeout = Float(title=_(u'Index timeout'),
         description=_(u'Number of seconds after which an index request will '
                        'time out. Set to "0" to disable timeouts.'))
