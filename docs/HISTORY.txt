@@ -4,6 +4,10 @@ Changelog
 1.0b24 - Unreleased
 -------------------
 
+* Added support for a special query key ``use_solr`` which forces queries to
+  be sent to Solr even though none of the required keys match. This can be
+  used to sent individual catalog queries to Solr.
+  [hannosch]
 
 1.0b23 - Released May 15, 2010
 ------------------------------

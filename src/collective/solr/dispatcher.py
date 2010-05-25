@@ -73,7 +73,8 @@ def solrSearchResults(request=None, **keywords):
         request = getattr(getSiteManager(), 'REQUEST', args)
     if 'path' in args and 'navtree' in args['path']:
         raise FallBackException     # we can't handle navtree queries yet
-    if config.required:
+    use_solr = args.get('use_solr', False)  # A special key to force Solr
+    if not use_solr and config.required:
         required = set(config.required).intersection(args)
         if required:
             for key in required:
