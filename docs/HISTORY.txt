@@ -15,6 +15,9 @@ Changelog
   used to sent individual catalog queries to Solr.
   [hannosch]
 
+* Added uninstall profile
+  [swampmonkey]
+
 1.0b23 - Released May 15, 2010
 ------------------------------
 
