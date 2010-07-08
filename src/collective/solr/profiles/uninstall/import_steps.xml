@@ -1,8 +1,0 @@
-<?xml version="1.0"?>
-<import-steps>
- <import-step id="collective-solr-uninstall" version="20100702-01"
-              handler="collective.solr.uninstallhandlers.uninstall"
-              title="collective.solr uninstall">
-    collective.solr uninstall step.
- </import-step>
-</import-steps>
