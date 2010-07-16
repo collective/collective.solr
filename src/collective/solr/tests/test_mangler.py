@@ -210,9 +210,9 @@ class QueryParameterTests(TestCase):
 
     def testBatchParameters(self):
         extract = extractQueryParameters
-        params = extract({'start': 5})
+        params = extract({'b_start': 5})
         self.assertEqual(params, dict(start=5))
-        params = extract({'start': '10'})
+        params = extract({'b_start': '10'})
         self.assertEqual(params, dict(start=10))
         params = extract({'rows': 5})
         self.assertEqual(params, dict(rows=5))

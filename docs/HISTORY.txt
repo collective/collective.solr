@@ -15,6 +15,10 @@ Changelog
   used to sent individual catalog queries to Solr.
   [hannosch]
 
+* Renamed the batch start parameter to b_start, since start is used in
+  calendars already
+  [do3cc]
+
 1.0b23 - Released May 15, 2010
 ------------------------------
 

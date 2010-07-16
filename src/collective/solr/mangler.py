@@ -131,8 +131,11 @@ def extractQueryParameters(args):
                 value = name(value)
             params[key.replace('_', '.', 1)] = value
             del args[key]
-        elif key in ('start', 'rows'):
+        elif key in ('rows', ):
             params[key] = int(value)
+            del args[key]
+        elif key == 'b_start':
+            params['start'] = int(value)
             del args[key]
     return params
 
