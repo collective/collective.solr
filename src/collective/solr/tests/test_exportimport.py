@@ -87,7 +87,7 @@ SOLR_XML = """\
   </connection>
   <settings>
     <async value="False" />
-    <auto_commit value="True" />
+    <auto-commit value="True" />
     <index-timeout value="7" />
     <search-timeout value="3.1415" />
     <max-results value="42" />

@@ -4,7 +4,7 @@ Changelog
 1.0b24 - Unreleased
 -------------------
 
-* Added a new config option ``auto_commit`` which is enabled by default. You
+* Added a new config option ``auto-commit`` which is enabled by default. You
   can disable this, which avoids any explicit commit messages to be sent to
   the Solr server by the client. You have to configure commit policies on
   the server side instead.

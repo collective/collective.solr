@@ -62,7 +62,7 @@ class SolrConfigXMLAdapter(XMLAdapterBase):
                 if child.nodeName == 'async':
                     value = str(child.getAttribute('value'))
                     self.context.async = self._convertToBoolean(value)
-                elif child.nodeName == 'auto_commit':
+                elif child.nodeName == 'auto-commit':
                     value = str(child.getAttribute('value'))
                     self.context.auto_commit = self._convertToBoolean(value)
                 elif child.nodeName == 'index-timeout':
@@ -109,7 +109,7 @@ class SolrConfigXMLAdapter(XMLAdapterBase):
         node.appendChild(settings)
         append = settings.appendChild
         append(create('async', str(bool(self.context.async))))
-        append(create('auto_commit', str(bool(self.context.auto_commit))))
+        append(create('auto-commit', str(bool(self.context.auto_commit))))
         append(create('index-timeout', str(self.context.index_timeout)))
         append(create('search-timeout', str(self.context.search_timeout)))
         append(create('max-results', str(self.context.max_results)))
