@@ -554,17 +554,17 @@ class SolrServerTests(SolrTestCase):
         config.required = ['foo', 'bar']
         self.assertRaises(FallBackException, solrSearchResults,
             dict(Title='News'))
-        # except if you force it via use_solr...
+        # except if you force it via `use_solr`...
         config.required = ['foo', 'bar']
         results = solrSearchResults(Title='News', use_solr=True)
         self.assertEqual(sorted([(r.Title, r.physicalPath) for r in results]),
             [('News', '/plone/news'), ('News', '/plone/news/aggregator')])
-        # which also works in nothing is required...
+        # which also works if nothing is required...
         config.required = []
         results = solrSearchResults(Title='News', use_solr=True)
         self.assertEqual(sorted([(r.Title, r.physicalPath) for r in results]),
             [('News', '/plone/news'), ('News', '/plone/news/aggregator')])
-        # it does respect a False though...
+        # it does respect a `False` though...
         config.required = ['foo', 'bar']
         self.assertRaises(FallBackException, solrSearchResults,
             dict(Title='News', use_solr=False))
