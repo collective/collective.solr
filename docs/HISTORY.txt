@@ -4,6 +4,10 @@ Changelog
 1.0b24 - Unreleased
 -------------------
 
+* Renamed the batch parameters to ``b_start`` and ``b_size`` to avoid
+  conflicts with index names and be consistent with existing template code.
+  [do3cc]
+
 * Added a new config option ``auto-commit`` which is enabled by default. You
   can disable this, which avoids any explicit commit messages to be sent to
   the Solr server by the client. You have to configure commit policies on
@@ -15,9 +19,6 @@ Changelog
   used to sent individual catalog queries to Solr.
   [hannosch]
 
-* Renamed the batch start parameter to b_start, since start is used in
-  calendars already
-  [do3cc]
 
 1.0b23 - Released May 15, 2010
 ------------------------------

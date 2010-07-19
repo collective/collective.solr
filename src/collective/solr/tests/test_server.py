@@ -384,6 +384,7 @@ class SolrServerTests(SolrTestCase):
         abort()
         self.config.active = False
         self.config.async = False
+        self.config.auto_commit = True
         commit()
 
     def testGetData(self):
@@ -968,10 +969,10 @@ class SolrServerTests(SolrTestCase):
             ['Events', 'News', 'Past Events', 'Welcome to Plone'])
         # when a batch size is given, the length should remain the same,
         # but only items in the batch actually exist...
-        self.assertEqual(search(rows=2),
+        self.assertEqual(search(b_size=2),
             ['Events', 'News', None, None])
         # given a start value, the batch is moved within the search results
-        self.assertEqual(search(rows=2, start=1),
+        self.assertEqual(search(b_size=2, b_start=1),
             [None, 'News', 'Past Events', None])
 
 

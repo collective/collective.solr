@@ -33,7 +33,7 @@
                  use_navigation_root request/use_navigation_root | python:True;
                  Batch python:modules['Products.CMFPlone'].Batch;
                  b_size python:30;b_start python:0;b_start request/b_start | b_start;
-                 results python:here.queryCatalog(REQUEST=request,use_types_blacklist=use_types_blacklist, use_navigation_root=use_navigation_root, b_start=b_start, rows=b_size+1);
+                 results python:here.queryCatalog(REQUEST=request,use_types_blacklist=use_types_blacklist, use_navigation_root=use_navigation_root, b_start=b_start, b_size=b_size+1);
                  desc_length site_properties/search_results_description_length;
                  desc_ellipsis site_properties/ellipsis;
                  searchterm request/SearchableText|nothing;

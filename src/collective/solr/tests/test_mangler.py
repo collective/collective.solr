@@ -214,9 +214,9 @@ class QueryParameterTests(TestCase):
         self.assertEqual(params, dict(start=5))
         params = extract({'b_start': '10'})
         self.assertEqual(params, dict(start=10))
-        params = extract({'rows': 5})
+        params = extract({'b_size': 5})
         self.assertEqual(params, dict(rows=5))
-        params = extract({'rows': '10'})
+        params = extract({'b_size': '10'})
         self.assertEqual(params, dict(rows=10))
 
     def testCombined(self):
