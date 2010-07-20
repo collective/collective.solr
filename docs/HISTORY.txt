@@ -4,6 +4,9 @@ Changelog
 1.0b24 - Unreleased
 -------------------
 
+* Limit number of matches looked up during live search for speedier replies.
+  [witsch]
+
 * Renamed the batch parameters to ``b_start`` and ``b_size`` to avoid
   conflicts with index names and be consistent with existing template code.
   [do3cc]
