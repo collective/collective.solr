@@ -1,0 +1,32 @@
+Support for Collections/Topics
+------------------------------
+
+This tests tries to make sure Solr-based queries can also be used with
+Plone's "Collection" content type.  We'll use a testbrowser to created such
+a stored search and then view it's matches.  First we need to activate Solr
+support and reindex the site's content:
+
+  >>> self.activateAndReindex()
+  >>> self.setRoles(('Manager',))
+
+  >>> browser = self.getBrowser()
+  >>> browser.open('http://nohost/plone/')
+  >>> browser.getLink('Collection').click()
+  >>> browser.getControl(name='title').value = 'Foo'
+  >>> browser.getControl('Save').click()
+
+  >>> browser.getLink('Criteria').click()
+  >>> browser.getControl('Field name').displayValue = ['Search Text']
+  >>> browser.getControl('Criteria type').displayValue = ['Text']
+  >>> browser.getControl('Add criteria').click()
+  >>> browser.getControl(name='crit__SearchableText_ATSimpleStringCriterion_value').value = 'new'
+  >>> browser.getControl('Save', index=0).click()
+
+  >>> browser.handleErrors = False
+  >>> browser.getLink('View').click()
+  >>> browser.url
+  'http://nohost/plone/foo/'
+  >>> browser.contents
+  '...Foo...
+   ...News...Site News...
+   ...News...Site News...'

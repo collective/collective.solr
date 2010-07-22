@@ -4,6 +4,10 @@ Changelog
 1.0b24 - Unreleased
 -------------------
 
+* Add missing `CreationDate` method to flares.
+  This fixes http://plone.org/products/collective.solr/issues/16
+  [witsch]
+
 * Add logging for slow queries along with the query time as reported by Solr.
   [witsch]
 

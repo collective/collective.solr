@@ -56,6 +56,13 @@ class PloneFlare(AttrDict):
         return '<untitled item>'
 
     @property
+    def CreationDate(self):
+        created = self.get('created', None)
+        if created is None:
+            return 'n.a.'
+        return created.toZone(timezone).ISO8601()
+
+    @property
     def ModificationDate(self):
         modified = self.get('modified', None)
         if modified is None:
