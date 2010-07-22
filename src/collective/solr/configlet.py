@@ -155,6 +155,17 @@ class SolrControlPanelAdapter(SchemaAdapterBase):
 
     filter_queries = property(getFilterQueryParameters, setFilterQueryParameters)
 
+    def getSlowQueryThreshold(self):
+        util = queryUtility(ISolrConnectionConfig)
+        return getattr(util, 'slow_query_threshold', '')
+
+    def setSlowQueryThreshold(self, value):
+        util = queryUtility(ISolrConnectionConfig)
+        if util is not None:
+            util.slow_query_threshold = value
+
+    slow_query_threshold = property(getSlowQueryThreshold, setSlowQueryThreshold)
+
 
 class SolrControlPanel(ControlPanelForm):
 

@@ -4,6 +4,9 @@ Changelog
 1.0b24 - Unreleased
 -------------------
 
+* Add logging for slow queries along with the query time as reported by Solr.
+  [witsch]
+
 * Limit number of matches looked up during live search for speedier replies.
   [witsch]
 

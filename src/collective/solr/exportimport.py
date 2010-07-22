@@ -37,6 +37,7 @@ class SolrConfigXMLAdapter(XMLAdapterBase):
         self.context.required = []
         self.context.facets = []
         self.context.filter_queries = []
+        self.context.slow_query_threshold = 0
 
     def _initProperties(self, node):
         elems = node.getElementsByTagName('connection')
@@ -89,6 +90,9 @@ class SolrConfigXMLAdapter(XMLAdapterBase):
                     for elem in child.getElementsByTagName('parameter'):
                         value.append(elem.getAttribute('name'))
                     self.context.filter_queries = tuple(map(str, value))
+                elif child.nodeName == 'slow-query-threshold':
+                    value = int(str(child.getAttribute('value')))
+                    self.context.slow_query_threshold = value
 
     def _createNode(self, name, value):
         node = self._doc.createElement(name)
@@ -131,6 +135,8 @@ class SolrConfigXMLAdapter(XMLAdapterBase):
             param = self._doc.createElement('parameter')
             param.setAttribute('name', name)
             filter_queries.appendChild(param)
+        append(create('slow-query-threshold',
+            str(self.context.slow_query_threshold)))
         return node
 
 

@@ -1,4 +1,5 @@
 from logging import getLogger
+from time import time
 from zope.interface import implements
 from zope.component import queryUtility
 from Missing import MV
@@ -27,13 +28,14 @@ class Search(object):
 
     def search(self, query, **parameters):
         """ perform a search with the given querystring and parameters """
+        start = time()
+        config = queryUtility(ISolrConnectionConfig)
         manager = self.getManager()
         manager.setSearchTimeout()
         connection = manager.getConnection()
         if connection is None:
             raise SolrInactiveException
         if not 'rows' in parameters:
-            config = queryUtility(ISolrConnectionConfig)
             parameters['rows'] = config.max_results or ''
         if isinstance(query, dict):
             query = ' '.join(query.values())
@@ -48,6 +50,11 @@ class Search(object):
         results = SolrResponse(response)
         response.close()
         manager.setTimeout(None)
+        elapsed = (time() - start) * 1000
+        slow = config.slow_query_threshold
+        if slow and elapsed >= slow:
+            logger.info('slow query: %d/%d ms for %r (%r)',
+                results.responseHeader['QTime'], elapsed, query, parameters)
         return results
 
     __call__ = search

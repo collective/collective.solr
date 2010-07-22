@@ -66,6 +66,11 @@ class ISolrSchema(Interface):
         value_type = Choice(vocabulary='collective.solr.indexes'),
         default = [], required = False)
 
+    slow_query_threshold = Int(title=_(u'Slow query threshold'),
+        description=_(u'Specify a threshold (in milliseconds) after which '
+                       'queries are considered to be slow causing them to '
+                       'be logged. Set to "0" to prevent any logging.'))
+
 
 class ISolrConnectionConfig(ISolrSchema):
     """ utility to hold the connection configuration for the solr server """

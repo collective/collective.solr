@@ -20,5 +20,6 @@
     <filter-query-parameters>
       <parameter name="portal_type" />
     </filter-query-parameters>
+    <slow-query-threshold value="0" />
   </settings>
 </object>
