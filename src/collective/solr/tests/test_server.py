@@ -4,6 +4,7 @@ from unittest import TestSuite, defaultTestLoader
 from zope.component import getUtility
 from zope.schema.interfaces import IVocabularyFactory
 from transaction import commit, abort
+from zExceptions import Unauthorized
 from DateTime import DateTime
 from Missing import MV
 from time import sleep
@@ -974,6 +975,16 @@ class SolrServerTests(SolrTestCase):
         # given a start value, the batch is moved within the search results
         self.assertEqual(search(b_size=2, b_start=1),
             [None, 'News', 'Past Events', None])
+
+    def testGetObjectOnPrivateObject(self):
+        self.maintenance.reindex()
+        self.loginAsPortalOwner()
+        self.portal.invokeFactory('Document', id='doc', title='Foo')
+        commit()                        # indexing happens on commit
+        self.login()
+        results = solrSearchResults(SearchableText='Foo')
+        self.assertEqual(len(results), 1)
+        self.assertRaises(Unauthorized, results[0].getObject)
 
 
 def test_suite():

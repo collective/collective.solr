@@ -4,6 +4,11 @@ Changelog
 1.0b24 - Unreleased
 -------------------
 
+* Fix security issue with `getObject` on Solr flares, which used unrestricted
+  traversal on the entire path, potentially leading to information leaks.
+  Refs http://plone.org/products/collective.solr/issues/27
+  [pilz, witsch]
+
 * Add missing `CreationDate` method to flares.
   This fixes http://plone.org/products/collective.solr/issues/16
   [witsch]

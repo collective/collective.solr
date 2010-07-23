@@ -33,12 +33,18 @@ class PloneFlare(AttrDict):
         return self['physicalPath']
 
     def getObject(self, REQUEST=None):
-        """ return the actual object corresponding to this flare """
+        """ return the actual object corresponding to this flare while
+            mimicking what publisher's traversal does, i.e. potentially
+            allowing access to the final object even if intermediate objects
+            cannot be accessed (much like the original implementation in
+            `ZCatalog.CatalogBrains.AbstractCatalogBrain`) """
         site = getSiteManager()
         path = self.getPath()
         if not path:
             return None
-        return site.unrestrictedTraverse(path)
+        path = path.split('/')
+        parent = site.unrestrictedTraverse(path[:-1])
+        return parent.restrictedTraverse(path[-1])
 
     def getURL(self, relative=False):
         """ convert the physical path into a url, if it was stored """
