@@ -4,6 +4,10 @@ Changelog
 1.0b25 - Unreleased
 -------------------
 
+* Handle broken or timed out connections during schema retrieval gracefully.
+  Refs http://plone.org/products/collective.solr/issues/23
+  [ftoth, witsch]
+
 
 1.0b24 - Released July 29, 2010
 -------------------------------

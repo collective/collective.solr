@@ -252,8 +252,15 @@ class SolrConnection:
                        '%s/admin/get-file.jsp?file=schema.xml') # solr 1.2
         for url in schema_urls:
             logger.debug('getting schema from: %s', url % self.solrBase)
-            self.conn.request('GET', url % self.solrBase)
-            response = self.conn.getresponse()
+            try:
+                self.conn.request('GET', url % self.solrBase)
+                response = self.conn.getresponse()
+            except (socket.error, httplib.CannotSendRequest,
+                httplib.ResponseNotReady, httplib.BadStatusLine):
+                # see `doPost` method for more info about these exceptions
+                self.__reconnect()
+                self.conn.request('GET', url % self.solrBase)
+                response = self.conn.getresponse()
             if response.status == 200:
                 xml = response.read()
                 return SolrSchema(xml.strip())
