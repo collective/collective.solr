@@ -508,6 +508,10 @@ class SolrServerTests(SolrTestCase):
         self.assertRaises(FallBackException, solrSearchResults,
             dict(foo='bar'))
 
+    def testSolrSearchResultsFallbackOnEmptyParameter(self):
+        self.assertRaises(FallBackException, solrSearchResults,
+            dict(SearchableText=''))
+
     def testSolrSearchResults(self):
         self.maintenance.reindex()
         results = solrSearchResults(SearchableText='News')

@@ -4,6 +4,9 @@ Changelog
 1.0 - Unreleased
 ----------------
 
+* Fix regression about catalog fallback with required, but empty parameters.
+  [tesdal, witsch]
+
 
 1.0rc1 - Released July 30, 2010
 -------------------------------
