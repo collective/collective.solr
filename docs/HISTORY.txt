@@ -4,6 +4,9 @@ Changelog
 1.0 - Unreleased
 ----------------
 
+* Fixed undefined ``here_url`` in ``search.pt`` for Plone 4.
+  [hannosch]
+
 
 1.0rc2 - Released August 31, 2010
 ---------------------------------
