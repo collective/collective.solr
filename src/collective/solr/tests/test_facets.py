@@ -3,7 +3,6 @@
 from unittest import TestSuite, defaultTestLoader
 from zope.interface import alsoProvides
 from zope.component import getMultiAdapter
-from zope.publisher.browser import TestRequest
 
 from collective.solr.tests.utils import pingSolr
 from collective.solr.tests.base import SolrTestCase
@@ -37,7 +36,7 @@ class SolrFacettingTests(SolrTestCase):
         self.assertEqual(types['Topic'], 1)
 
     def testFacettedSearchWithRequestArguments(self):
-        request = TestRequest()
+        request = self.app.REQUEST
         request.form['SearchableText'] = 'News'
         request.form['facet'] = 'true'
         request.form['facet_field'] = 'review_state'
@@ -57,7 +56,7 @@ class SolrFacettingTests(SolrTestCase):
         self.assertEqual(facets['review_state']['published'], 2)
 
     def testFacettedSearchWithFilterQuery(self):
-        request = TestRequest()
+        request = self.app.REQUEST
         request.form['SearchableText'] = 'News'
         request.form['fq'] = 'portal_type:Topic'
         request.form['facet'] = 'true'
@@ -70,7 +69,7 @@ class SolrFacettingTests(SolrTestCase):
 
     def testFacettedSearchWithDependencies(self):
         # facets depending on others should not show up initially
-        request = TestRequest()
+        request = self.app.REQUEST
         request.form['SearchableText'] = 'News'
         request.form['facet'] = 'true'
         request.form['facet_field'] = ['portal_type',
@@ -88,7 +87,7 @@ class SolrFacettingTests(SolrTestCase):
     def testFacettedSearchWithUnicodeFilterQuery(self):
         self.portal.news.portal_type = u'Føø'.encode('utf-8')
         self.maintenance.reindex()
-        request = TestRequest()
+        request = self.app.REQUEST
         request.form['SearchableText'] = 'News'
         request.form['facet'] = 'true'
         request.form['facet_field'] = 'portal_type'
@@ -106,7 +105,7 @@ class SolrFacettingTests(SolrTestCase):
             html = html[position:]
 
     def testFacetsInformationView(self):
-        request = TestRequest()
+        request = self.app.REQUEST
         request.form['SearchableText'] = 'News'
         request.form['facet'] = 'true'
         request.form['facet_field'] = 'portal_type'
@@ -139,7 +138,7 @@ class SolrFacettingTests(SolrTestCase):
         self.failIf('portal_type' in output)
 
     def testUnknownFacetField(self):
-        request = TestRequest()
+        request = self.app.REQUEST
         request.form['SearchableText'] = 'News'
         request.form['facet'] = 'true'
         request.form['facet_field'] = 'foo'
@@ -149,7 +148,7 @@ class SolrFacettingTests(SolrTestCase):
         self.assertEqual(view.facets(), [])
 
     def testNoFacetFields(self):
-        request = TestRequest()
+        request = self.app.REQUEST
         request.form['SearchableText'] = 'News'
         request.form['facet'] = 'true'
         request.form['facet_field'] = []
@@ -166,7 +165,7 @@ class SolrFacettingTests(SolrTestCase):
         self.portal.news.portal_type = ''
         self.maintenance.reindex()
         # after updating the solr index the view can be checked...
-        request = TestRequest()
+        request = self.app.REQUEST
         request.form['SearchableText'] = 'News'
         request.form['facet'] = 'true'
         request.form['facet_field'] = 'portal_type'
@@ -182,7 +181,7 @@ class SolrFacettingTests(SolrTestCase):
         self.failIf('fq=portal_type%3A&amp;' in output)
 
     def testFacetOrder(self):
-        request = TestRequest()
+        request = self.app.REQUEST
         request.form['SearchableText'] = 'News'
         request.form['facet'] = 'true'
         request.form['facet_field'] = ['portal_type', 'review_state']

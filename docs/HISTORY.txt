@@ -4,6 +4,9 @@ Changelog
 1.0 - Unreleased
 ----------------
 
+* Avoid using the incompatible TestRequest from zope.publisher inside Zope 2.
+  [hannosch]
+
 * Fixed undefined variables in ``search.pt`` for Plone 4 compatibility.
   [hannosch]
 
