@@ -17,7 +17,7 @@ to activate Solr support and reindex the site's content, though:
   'http://nohost/plone/foo'
   >>> browser.contents
   '...Info...Changes saved...
-   ...Foo...This item does not have any body text...'
+   ...documentFirstHeading...Foo...'
 
   >>> browser.getControl('Search Site').value = 'Foo'
   >>> browser.getForm(name='searchform').submit()
