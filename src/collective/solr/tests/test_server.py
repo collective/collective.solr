@@ -925,12 +925,14 @@ class SolrServerTests(SolrTestCase):
         self.assertEqual(len(results), 1)
 
     def testMultiValueSearch(self):
+        self.setRoles(('Manager',))
+        self.portal.invokeFactory('Event', id='event1', title='Welcome')
         self.maintenance.reindex()
-        results = solrSearchResults(SearchableText='New*',
-            portal_type=['Large Plone Folder', 'Document'])
+        results = solrSearchResults(SearchableText='Welcome',
+            portal_type=['Event', 'Document'])
         self.assertEqual(len(results), 2)
         self.assertEqual(sorted([r.physicalPath for r in results]),
-            ['/plone/front-page', '/plone/news'])
+            ['/plone/event1', '/plone/front-page'])
 
     def testFlareHasDataForAllMetadataColumns(self):
         # all search results should have metadata for all indices

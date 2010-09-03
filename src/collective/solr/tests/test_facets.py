@@ -32,7 +32,6 @@ class SolrFacettingTests(SolrTestCase):
         types = results.facet_counts['facet_fields']['portal_type']
         self.assertEqual(types['Document'], 0)
         self.assertEqual(types['Folder'], 0)
-        self.assertEqual(types['Large Plone Folder'], 1)
         self.assertEqual(types['Topic'], 1)
 
     def testFacettedSearchWithRequestArguments(self):
@@ -47,13 +46,16 @@ class SolrFacettingTests(SolrTestCase):
         self.assertEqual(states, dict(private=0, published=2))
 
     def testMultiFacettedSearch(self):
-        results = solrSearchResults(SearchableText='News', facet='true',
+        self.setRoles(('Manager',))
+        self.portal.invokeFactory('Event', id='event1', title='Welcome')
+        self.maintenance.reindex()
+        results = solrSearchResults(SearchableText='Welcome', facet='true',
             facet_field=['portal_type', 'review_state'])
         self.assertEqual(sorted([r.physicalPath for r in results]),
-            ['/plone/news', '/plone/news/aggregator'])
+            ['/plone/event1', '/plone/front-page'])
         facets = results.facet_counts['facet_fields']
-        self.assertEqual(facets['portal_type']['Large Plone Folder'], 1)
-        self.assertEqual(facets['review_state']['published'], 2)
+        self.assertEqual(facets['portal_type']['Event'], 1)
+        self.assertEqual(facets['review_state']['published'], 1)
 
     def testFacettedSearchWithFilterQuery(self):
         request = self.app.REQUEST
