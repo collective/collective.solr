@@ -42,11 +42,6 @@ Viewing the site control panel
     >>> self.browser.url
     'http://nohost/plone/@@solr-controlpanel'
 
-Check for the icon to exist:
-
-    >>> self.browser.contents
-    '...<img src="http://nohost/plone/++resource++collective.solr.images/icon.png"...'
-
 Click the cancel button:
 
     >>> self.browser.getControl(name="form.actions.cancel").click()
