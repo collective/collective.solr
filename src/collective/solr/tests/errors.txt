@@ -83,10 +83,10 @@ timeout error is provoked:
   >>> from collective.solr.tests.utils import fakeServer
   >>> from time import sleep
   >>> def action(handler):
-  ...   sleep(7)
+  ...   sleep(3)
   >>> thread = fakeServer([action,], port=55555)
   >>> self.setStatusCode('timeout', 200)
-  >>> getUtility(ISolrConnectionConfig).search_timeout = 5
+  >>> getUtility(ISolrConnectionConfig).search_timeout = 2
 
 And try the search again:
 
