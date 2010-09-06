@@ -100,4 +100,4 @@ In the end we need to clean up our changes to avoid having ill effects on
 other tests:
 
   >>> getUtility(ISolrConnectionManager).setHost(active=False, port=port)
-
+  >>> thread.join()
