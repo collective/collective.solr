@@ -33,9 +33,13 @@ class ISolrSchema(Interface):
                        'commit policies on the Solr server side.'))
 
     commit_within = Int(title=_(u'Commit within'), default=0,
-        description=_(u'Number of milliseconds in which a commit should be '
-                       'processed by Solr. Defaults to 0, meaning immediate '
-                       'commit. This feature requires a Solr 1.4 server.'))
+        description=_(u'Maximum number of milliseconds after which adds '
+                       'should be processed by Solr. Defaults to 0, meaning '
+                       'immediate commits. Enabling this feature implicitly '
+                       'disables automatic commit and you should configure '
+                       'commit policies on the Solr server side. Otherwise '
+                       'large numbers of deletes without adds will not be '
+                       'processed. This feature requires a Solr 1.4 server.'))
 
     index_timeout = Float(title=_(u'Index timeout'),
         description=_(u'Number of seconds after which an index request will '
