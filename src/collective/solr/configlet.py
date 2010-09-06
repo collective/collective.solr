@@ -89,6 +89,17 @@ class SolrControlPanelAdapter(SchemaAdapterBase):
 
     auto_commit = property(getAutoCommit, setAutoCommit)
 
+    def getCommitWithin(self):
+        util = queryUtility(ISolrConnectionConfig)
+        return getattr(util, 'commit_within', '')
+
+    def setCommitWithin(self, value):
+        util = queryUtility(ISolrConnectionConfig)
+        if util is not None:
+            util.commit_within = value
+
+    commit_within = property(getCommitWithin, setCommitWithin)
+
     def getIndexTimeout(self):
         util = queryUtility(ISolrConnectionConfig)
         return getattr(util, 'index_timeout', '')

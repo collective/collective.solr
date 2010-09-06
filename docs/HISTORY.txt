@@ -4,6 +4,10 @@ Changelog
 1.0 - Unreleased
 ----------------
 
+* Added support for ``commitWithin`` support on add messages as per SOLR-793.
+  This feature requires a Solr 1.4 server.
+  [hannosch]
+
 * Split out 404 auto-suggestion tests into a separate file and disabled them
   under Plone 4 - the feature is no longer part of Plone.
   [hannosch]

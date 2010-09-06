@@ -209,7 +209,11 @@ class SolrConnection:
         lst.append('</doc>')
 
     def add(self, **fields):
-        lst=['<add>']
+        within = fields.pop('commitWithin', None)
+        if within:
+            lst = ['<add commitWithin="%s">' % str(within)]
+        else:
+            lst = ['<add>']
         self.__add(lst, fields)
         lst.append('</add>')
         xstr = ''.join(lst)

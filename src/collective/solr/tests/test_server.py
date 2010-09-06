@@ -465,6 +465,15 @@ class SolrServerTests(SolrTestCase):
         conn.commit()
         self.assertEqual(self.search('+Title:Foo').results().numFound, '1')
 
+    def testCommitWithin(self):
+        conn = getUtility(ISolrConnectionManager).getConnection()
+        conn.add(UID='foo', Title='foo', commitWithin='1000')
+        conn.add(UID='bar', Title='foo', commitWithin='1000')
+        conn.flush()
+        self.assertEqual(self.search('+Title:Foo').results().numFound, '0')
+        sleep(1.5)
+        self.assertEqual(self.search('+Title:Foo').results().numFound, '2')
+
     def testFilterInvalidCharacters(self):
         log = []
         def logger(*args):

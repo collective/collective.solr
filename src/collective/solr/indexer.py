@@ -79,6 +79,9 @@ class SolrIndexProcessor(object):
                 logger.warning(msg, obj)
                 return
             if data.get(uniqueKey, None) is not None and not missing:
+                config = getUtility(ISolrConnectionConfig)
+                if config.commit_within:
+                    data['commitWithin'] = config.commit_within
                 try:
                     logger.debug('indexing %r (%r)', obj, data)
                     conn.add(**data)
