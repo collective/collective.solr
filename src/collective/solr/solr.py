@@ -115,6 +115,10 @@ class SolrConnection:
         try:
             self.conn.request('POST', url, body, headers)
             return self.__errcheck(self.conn.getresponse())
+        # XXX: This fixes some test failures under Python 2.6, but is likely
+        #      not the correct fix.
+        except socket.timeout:
+            raise
         except (socket.error, httplib.CannotSendRequest,
             httplib.ResponseNotReady, httplib.BadStatusLine):
             # Reconnect in case the connection was broken from the server
