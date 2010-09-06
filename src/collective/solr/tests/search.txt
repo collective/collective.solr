@@ -69,8 +69,8 @@ Plone's advanced search should also work.  However, we only test the default
 settings here in order to make sure including the extra query parameters
 doesn't lead to problems:
 
-  >>> browser.getLink('Advanced Search').click()
-  >>> browser.getControl('Search Text').value = 'Foo'
+  >>> browser.open('http://nohost/plone/search_form')
+  >>> browser.getControl(name='SearchableText', index=1).value = 'Foo'
   >>> browser.getControl(name='submit').click()
   >>> browser.contents
   '...Search results...1...items matching your search terms...
