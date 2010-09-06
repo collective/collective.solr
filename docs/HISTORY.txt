@@ -8,6 +8,10 @@ Changelog
   representations in Python 2.6.
   [hannosch]
 
+* Made tests independent of the ``Large Folder`` content type, as it no longer
+  exists in Plone 4.
+  [hannosch]
+
 * Avoid using the incompatible TestRequest from zope.publisher inside Zope 2.
   [hannosch]
 
