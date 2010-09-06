@@ -26,6 +26,9 @@ Changelog
 * Fixed undefined variables in ``search.pt`` for Plone 4 compatibility.
   [hannosch]
 
+* Handle python datetime and date objects.
+  [do3cc]
+
 
 1.0rc2 - Released August 31, 2010
 ---------------------------------
