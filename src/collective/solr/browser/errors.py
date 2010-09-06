@@ -16,7 +16,12 @@ class ErrorView(BrowserView):
 
     def errorInfo(self):
         """ provide error type and value """
+        # In Python < 2.6 the string representation of an exception was:
+        # "socket.error". In Python 2.6+ it's: "<class 'socket.error'>"
+        type_ = str(self.exception.__class__)
+        if '<class' in type_:
+            type_ = type_.replace("<class '", "").replace("'>", '')
         return {
-            'type': str(self.exception.__class__),
+            'type': type_,
             'value': self.exception.args,
         }

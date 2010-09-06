@@ -4,6 +4,10 @@ Changelog
 1.0 - Unreleased
 ----------------
 
+* Fixed error handling code to deal with different exception string
+  representations in Python 2.6.
+  [hannosch]
+
 * Avoid using the incompatible TestRequest from zope.publisher inside Zope 2.
   [hannosch]
 
