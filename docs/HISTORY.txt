@@ -4,6 +4,10 @@ Changelog
 1.0 - Unreleased
 ----------------
 
+* Split out 404 auto-suggestion tests into a separate file and disabled them
+  under Plone 4 - the feature is no longer part of Plone.
+  [hannosch]
+
 * Fixed error handling code to deal with different exception string
   representations in Python 2.6.
   [hannosch]
