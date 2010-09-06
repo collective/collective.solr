@@ -465,7 +465,7 @@ class SolrServerTests(SolrTestCase):
         conn.commit()
         self.assertEqual(self.search('+Title:Foo').results().numFound, '1')
 
-    def testCommitWithin(self):
+    def testCommitWithinConnection(self):
         conn = getUtility(ISolrConnectionManager).getConnection()
         conn.add(UID='foo', Title='foo', commitWithin='1000')
         conn.add(UID='bar', Title='foo', commitWithin='1000')
@@ -730,6 +730,19 @@ class SolrServerTests(SolrTestCase):
         sleep(2)
         result = connection.search(q='+Title:Foo').read()
         self.assertEqual(numFound(result), 0)
+
+    def testCommitWithinIndexing(self):
+        connection = getUtility(ISolrConnectionManager).getConnection()
+        self.config.commit_within = 1000
+        self.folder.processForm(values={'title': 'Foo'})
+        commit()
+        # no indexing happens
+        result = connection.search(q='+Title:Foo').read()
+        self.assertEqual(numFound(result), 0)
+        # but after some time, results are there
+        sleep(1.5)
+        result = connection.search(q='+Title:Foo').read()
+        self.assertEqual(numFound(result), 1)
 
     def testLimitSearchResults(self):
         self.maintenance.reindex()

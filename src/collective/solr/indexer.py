@@ -134,7 +134,13 @@ class SolrIndexProcessor(object):
                 wait = not config.async
             try:
                 logger.debug('committing')
-                conn.commit(waitFlush=wait, waitSearcher=wait)
+                if config.commit_within:
+                    # If we have commitWithin enabled, we never want to do
+                    # explicit commits. Even though only add's support this
+                    # and we might wait a bit longer on delete's this way
+                    conn.flush()
+                else:
+                    conn.commit(waitFlush=wait, waitSearcher=wait)
             except (SolrException, error):
                 logger.exception('exception during commit')
             self.manager.closeConnection()
