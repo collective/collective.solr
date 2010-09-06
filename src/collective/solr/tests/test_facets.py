@@ -25,14 +25,16 @@ class SolrFacettingTests(SolrTestCase):
         activate(active=False)
 
     def testFacettedSearchWithKeywordArguments(self):
-        results = solrSearchResults(SearchableText='News', facet='true',
+        self.setRoles(('Manager',))
+        self.portal.invokeFactory('Event', id='event1', title='Welcome')
+        self.maintenance.reindex()
+        results = solrSearchResults(SearchableText='Welcome', facet='true',
             facet_field='portal_type')
         self.assertEqual(sorted([r.physicalPath for r in results]),
-            ['/plone/news', '/plone/news/aggregator'])
+            ['/plone/event1', '/plone/front-page'])
         types = results.facet_counts['facet_fields']['portal_type']
-        self.assertEqual(types['Document'], 0)
-        self.assertEqual(types['Folder'], 0)
-        self.assertEqual(types['Topic'], 1)
+        self.assertEqual(types['Document'], 1)
+        self.assertEqual(types['Event'], 1)
 
     def testFacettedSearchWithRequestArguments(self):
         request = self.app.REQUEST
@@ -107,8 +109,11 @@ class SolrFacettingTests(SolrTestCase):
             html = html[position:]
 
     def testFacetsInformationView(self):
+        self.setRoles(('Manager',))
+        self.portal.invokeFactory('Event', id='event1', title='Welcome')
+        self.maintenance.reindex()
         request = self.app.REQUEST
-        request.form['SearchableText'] = 'News'
+        request.form['SearchableText'] = 'Welcome'
         request.form['facet'] = 'true'
         request.form['facet_field'] = 'portal_type'
         alsoProvides(request, IThemeSpecific)
@@ -117,7 +122,7 @@ class SolrFacettingTests(SolrTestCase):
         results = solrSearchResults(request)
         output = view(results=results)
         self.checkOrder(output, 'portal-searchfacets', 'Content type',
-            'Topic', '1', 'Large Folder', '1')
+            'Document', '1', 'Event', '1')
 
     def testFacetFieldsInSearchBox(self):
         request = self.portal.REQUEST
