@@ -4,7 +4,7 @@ Changelog
 1.0 - Unreleased
 ----------------
 
-- Fixed a grammar error in ``error.pt``.
+* Fixed a grammar error in ``error.pt``.
   [hannosch]
 
 1.0rc2 - Released August 31, 2010
