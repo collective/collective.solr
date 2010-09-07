@@ -1,8 +1,8 @@
 Changelog
 =========
 
-1.0 - Unreleased
-----------------
+2.0a1 - Unreleased
+------------------
 
 * Handle python datetime and date objects.
   [do3cc]
@@ -28,6 +28,10 @@ Changelog
 
 * Fixed undefined variables in ``search.pt`` for Plone 4 compatibility.
   [hannosch]
+
+
+1.0 - Unreleased
+----------------
 
 * Fixed a grammar error in ``error.pt``.
   [hannosch]
