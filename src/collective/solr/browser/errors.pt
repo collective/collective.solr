@@ -48,7 +48,7 @@
         Unknown error while trying to search using Solr.
       </strong>
       <span i18n:translate="description_solr_unknown_error_hint">
-        Please contact you system administration.
+        Please contact your system administration.
       </span>
     </p>
   </div>
