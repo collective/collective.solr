@@ -4,6 +4,10 @@ Changelog
 2.0a1 - Unreleased
 ------------------
 
+* Fixed auto-commit support to actually sent the data to Solr, but omit the
+  commit message.
+  [hannosch]
+
 * Handle python datetime and date objects.
   [do3cc]
 

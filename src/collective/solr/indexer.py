@@ -132,16 +132,14 @@ class SolrIndexProcessor(object):
         pass
 
     def commit(self, wait=None):
-        config = getUtility(ISolrConnectionConfig)
-        if not config.auto_commit:
-            return
         conn = self.getConnection()
         if conn is not None:
+            config = getUtility(ISolrConnectionConfig)
             if not isinstance(wait, bool):
                 wait = not config.async
             try:
                 logger.debug('committing')
-                if config.commit_within:
+                if not config.auto_commit or config.commit_within:
                     # If we have commitWithin enabled, we never want to do
                     # explicit commits. Even though only add's support this
                     # and we might wait a bit longer on delete's this way
