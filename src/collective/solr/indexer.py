@@ -37,7 +37,8 @@ def datehandler(value):
         v = value.toZone('UTC')
         value = '%04d-%02d-%02dT%02d:%02d:%06.3fZ' % (v.year(),
             v.month(), v.day(), v.hour(), v.minute(), v.second())
-    if isinstance(value, date):
+    elif isinstance(value, date):
+        # TODO: Timezone handling???
         value = value.strftime('%Y-%m-%dT%H:%M:%S.%f')[:23] + 'Z'
     return value
 
