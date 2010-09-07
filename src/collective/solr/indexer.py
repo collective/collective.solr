@@ -1,6 +1,6 @@
 from logging import getLogger
 from DateTime import DateTime
-from datetime import date
+from datetime import date, datetime
 from zope.component import getUtility, queryUtility, queryMultiAdapter
 from zope.interface import implements
 from Products.CMFCore.utils import getToolByName
@@ -38,7 +38,10 @@ def datehandler(value):
         value = '%04d-%02d-%02dT%02d:%02d:%06.3fZ' % (v.year(),
             v.month(), v.day(), v.hour(), v.minute(), v.second())
     elif isinstance(value, date):
-        # TODO: Timezone handling???
+        # Convert a timezone aware timetuple to a non timezone aware time
+        # tuple representing utc time. Does nothing if object is not
+        # timezone aware
+        value = datetime(*value.utctimetuple()[:7])
         value = value.strftime('%Y-%m-%dT%H:%M:%S.%f')[:23] + 'Z'
     return value
 
