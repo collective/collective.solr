@@ -4,6 +4,9 @@ Changelog
 1.0 - Unreleased
 ----------------
 
+* Handle python datetime and date objects.
+  [do3cc]
+
 * Added support for ``commitWithin`` support on add messages as per SOLR-793.
   This feature requires a Solr 1.4 server.
   [hannosch]
@@ -26,8 +29,8 @@ Changelog
 * Fixed undefined variables in ``search.pt`` for Plone 4 compatibility.
   [hannosch]
 
-* Handle python datetime and date objects.
-  [do3cc]
+* Fixed a grammar error in ``error.pt``.
+  [hannosch]
 
 
 1.0rc2 - Released August 31, 2010
