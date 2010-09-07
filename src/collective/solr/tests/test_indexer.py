@@ -2,6 +2,7 @@ from unittest import TestCase, defaultTestLoader
 from threading import Thread
 from re import search, findall, DOTALL
 from DateTime import DateTime
+from datetime import datetime
 from zope.component import provideUtility
 from Products.CMFCore.CMFCatalogAware import CMFCatalogAware
 
@@ -96,6 +97,14 @@ class QueueIndexerTests(TestCase):
         output = fakehttp(self.mngr.getConnection(), response)   # fake add response
         self.proc.index(foo)
         required = '<field name="timestamp">1972-05-11T03:45:00.000Z</field>'
+        self.assert_(str(output).find(required) > 0, '"date" data not found')
+
+    def testDateIndexingWithPythonDateTime(self):
+        foo = Foo(id='gerken', name='patrick', cat='nerd', timestamp=datetime.strptime('29.09.80 14:02 GMT', '%d.%m.%y %H:%M %Z'))
+        response = getData('add_response.txt')
+        output = fakehttp(self.mngr.getConnection(), response)   # fake add response
+        self.proc.index(foo)
+        required = '<field name="timestamp">1980-09-29T14:02:00.000Z</field>'
         self.assert_(str(output).find(required) > 0, '"date" data not found')
 
     def testReindexObject(self):

@@ -1,5 +1,6 @@
 from logging import getLogger
 from DateTime import DateTime
+from datetime import date
 from zope.component import getUtility, queryUtility, queryMultiAdapter
 from zope.interface import implements
 from Products.CMFCore.utils import getToolByName
@@ -36,6 +37,8 @@ def datehandler(value):
         v = value.toZone('UTC')
         value = '%04d-%02d-%02dT%02d:%02d:%06.3fZ' % (v.year(),
             v.month(), v.day(), v.hour(), v.minute(), v.second())
+    if isinstance(value, date):
+        value = value.strftime('%Y-%m-%dT%H:%M:%S.%f')[:23] + 'Z'
     return value
 
 
