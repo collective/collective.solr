@@ -73,7 +73,7 @@ def rootAtNavigationRoot(query):
 
 # Avoid creating a session implicitly.
 for k in REQUEST.keys():
-    if k in ('SESSION',):
+    if k == 'SESSION':
         continue
     v = REQUEST.get(k)
     if v and k in indexes:
@@ -86,7 +86,7 @@ for k in REQUEST.keys():
     elif k.endswith('_usage'):
         key = k[:-6]
         param, value = v.split(':')
-        second_pass[key] = {param:value}
+        second_pass[key] = {param: value}
     elif k in ('sort_on', 'sort_order', 'sort_limit'):
         if k == 'sort_limit' and not same_type(v, 0):
             query[k] = int(v)
@@ -99,7 +99,7 @@ for k, v in second_pass.items():
     qs = query.get(k)
     if qs is None:
         continue
-    query[k] = q = {'query':qs}
+    query[k] = q = {'query': qs}
     q.update(v)
 
 if b_start is not None:

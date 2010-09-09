@@ -11,16 +11,20 @@
 #   cElementTree:            49 seconds
 
 try:
-    from xml.etree.cElementTree import iterparse; iterparse
+    from xml.etree.cElementTree import iterparse
+    iterparse       # make pyflakes happy
     source = 'xml.etree.cElementTree'
 except ImportError:
     try:
-        from cElementTree import iterparse; iterparse
+        from cElementTree import iterparse
+        iterparse       # make pyflakes happy
         source = 'cElementTree'
     except ImportError:
         try:
-            from xml.etree.ElementTree import iterparse; iterparse
+            from xml.etree.ElementTree import iterparse
+            iterparse       # make pyflakes happy
             source = 'xml.etree.ElementTree'
         except ImportError:
-            from elementtree.ElementTree import iterparse; iterparse
+            from elementtree.ElementTree import iterparse
+            iterparse       # make pyflakes happy
             source = 'elementtree.ElementTree'

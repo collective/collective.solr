@@ -136,7 +136,7 @@ class QueueIndexerTests(TestCase):
             def cat(self):
                 return 'nerd'
             def price(self):
-                raise AttributeError, 'price'
+                raise AttributeError('price')
         foo = Bar(id='500', name='foo')
         # raising the exception should keep the attribute from being indexed
         response = getData('add_response.txt')

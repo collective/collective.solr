@@ -45,7 +45,7 @@ def convertFacets(fields, context=None, request={}, filter=None):
     fq = params.get('fq', [])
     if isinstance(fq, basestring):
         fq = params['fq'] = [fq]
-    selected = set([facet.split(':', 1)[0] for facet in fq ])
+    selected = set([facet.split(':', 1)[0] for facet in fq])
     for field, values in fields.items():
         counts = []
         second = lambda a, b: cmp(b[1], a[1])
