@@ -20,9 +20,8 @@ def searchResults(self, REQUEST=None, **kw):
     user = _getAuthenticatedUser(self)
     kw['allowedRolesAndUsers'] = self._listAllowedRolesAndUsers(user)
     if only_active and not _checkPermission(AccessInactivePortalContent, self):
-        config = queryUtility(ISolrConnectionConfig)
-        steps = config.effective_steps
-        kw['effectiveRange'] = DateTime(time()//steps*steps)
+        steps = queryUtility(ISolrConnectionConfig).effective_steps
+        kw['effectiveRange'] = DateTime(time() // steps * steps)
 
     # support collective.indexing's "auto-flush" feature
     # see http://dev.plone.org/collective/changeset/73602
