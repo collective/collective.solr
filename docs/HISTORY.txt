@@ -4,11 +4,11 @@ Changelog
 1.0 - Unreleased
 ----------------
 
+* Handle python `datetime` and `date` objects.
+  [do3cc]
+
 * Fixed a grammar error in ``error.pt``.
   [hannosch]
-
-* Handle python datetime and date objects.
-  [do3cc]
 
 
 1.0rc2 - Released August 31, 2010
