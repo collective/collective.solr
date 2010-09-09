@@ -23,6 +23,9 @@ Changelog
   representations in Python 2.6.
   [hannosch]
 
+* Fixed a grammar error in ``error.pt``.
+  [hannosch]
+
 * Made tests independent of the ``Large Folder`` content type, as it no longer
   exists in Plone 4.
   [hannosch]
