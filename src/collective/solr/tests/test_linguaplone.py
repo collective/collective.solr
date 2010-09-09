@@ -23,7 +23,7 @@ class LinguaTests(SolrTestCase):
         self.config = getUtility(ISolrConnectionConfig)
         self.search = getUtility(ISearch)
         # also set up the languages...
-        self.setRoles(('Manager',))
+        self.setRoles(['Manager'])
         ltool = getToolByName(self.portal, 'portal_languages')
         ltool.manage_setLanguageSettings(defaultLanguage='en',
             supportedLanguages=('en', 'de'))

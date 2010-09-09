@@ -23,7 +23,7 @@ class SetupToolTests(SolrTestCase, TarballTester):
         config.max_results = 42
         config.required = ('foo', 'bar')
         config.facets = ('type', 'state')
-        config.filter_queries = ('type',)
+        config.filter_queries = ('type', )
         config.slow_query_threshold = 2342
 
     def testImportStep(self):
@@ -46,7 +46,7 @@ class SetupToolTests(SolrTestCase, TarballTester):
         self.assertEqual(config.max_results, 0)
         self.assertEqual(config.required, ('SearchableText', ))
         self.assertEqual(config.facets, ('portal_type', 'review_state'))
-        self.assertEqual(config.filter_queries, ('portal_type',))
+        self.assertEqual(config.filter_queries, ('portal_type', ))
         self.assertEqual(config.slow_query_threshold, 0)
 
     def testExportStep(self):

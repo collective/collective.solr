@@ -122,7 +122,7 @@ else:
         write(icon.html_tag() or '')
         full_title = safe_unicode(pretty_title_or_id(result))
         if len(full_title) > MAX_TITLE:
-            display_title = ''.join((full_title[:MAX_TITLE],'...'))
+            display_title = ''.join((full_title[:MAX_TITLE], '...'))
         else:
             display_title = full_title
         full_title = full_title.replace('"', '&quot;')
@@ -130,7 +130,7 @@ else:
         write('''<a href="%s" title="%s" class="%s">%s</a>''' % (itemUrl, full_title, klass, display_title))
         display_description = safe_unicode(result.Description)
         if len(display_description) > MAX_DESCRIPTION:
-            display_description = ''.join((display_description[:MAX_DESCRIPTION],'...'))
+            display_description = ''.join((display_description[:MAX_DESCRIPTION], '...'))
         # need to quote it, to avoid injection of html containing javascript and other evil stuff
         display_description = html_quote(display_description)
         write('''<div class="LSDescr">%s</div>''' % (display_description))
@@ -138,17 +138,16 @@ else:
         full_title, display_title, display_description = None, None, None
 
     write('''<li class="LSRow">''')
-    write( '<a href="search_form" style="font-weight:normal">%s</a>' % ts.translate(label_advanced_search, context=REQUEST))
+    write('<a href="search_form" style="font-weight:normal">%s</a>' % ts.translate(label_advanced_search, context=REQUEST))
     write('''</li>''')
 
     if len(results)>limit:
         # add a more... row
         write('''<li class="LSRow">''')
-        write( '<a href="%s" style="font-weight:normal">%s</a>' % ('search?SearchableText=' + searchterms, ts.translate(label_show_all, context=REQUEST)))
+        write('<a href="%s" style="font-weight:normal">%s</a>' % ('search?SearchableText=' + searchterms, ts.translate(label_show_all, context=REQUEST)))
         write('''</li>''')
     write('''</ul>''')
     write('''</div>''')
     write('''</fieldset>''')
 
 return '\n'.join(output).encode(site_encoding)
-
