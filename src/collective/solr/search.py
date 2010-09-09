@@ -37,6 +37,8 @@ class Search(object):
             raise SolrInactiveException
         if not 'rows' in parameters:
             parameters['rows'] = config.max_results or ''
+            logger.info('falling back to "max_results" (%d) without a "rows" '
+                'parameter: %r (%r)', config.max_results, query, parameters)
         if isinstance(query, dict):
             query = ' '.join(query.values())
         logger.debug('searching for %r (%r)', query, parameters)

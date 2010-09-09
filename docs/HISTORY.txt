@@ -4,6 +4,9 @@ Changelog
 1.0 - Unreleased
 ----------------
 
+* Add logging of queries without explicit "rows" parameter.
+  [witsch]
+
 * Add configuration to exclude user from ``allowedRolesAndUsers`` for
   better cacheability.
   [tesdal, witsch]
