@@ -10,6 +10,7 @@ from collective.solr.interfaces import ISolrConnectionConfig
 from collective.solr.interfaces import ISolrConnectionManager
 from collective.solr.interfaces import ISolrIndexQueueProcessor
 from collective.solr.interfaces import ISearch
+from collective.solr.mangler import mangleQuery
 from collective.solr.exceptions import SolrInactiveException
 from collective.solr.tests.utils import getData, fakehttp, fakeServer
 from transaction import commit
@@ -42,6 +43,25 @@ class UtilityTests(SolrTestCase):
         search = queryUtility(ISearch)
         self.failUnless(search, 'search utility not found')
         self.failUnless(ISearch.providedBy(search))
+
+
+class QueryManglerTests(SolrTestCase):
+
+    def testExcludeUserFromAllowedRolesAndUsers(self):
+        config = queryUtility(ISolrConnectionConfig)
+        # first test the default setting, i.e. not removing the user
+        keywords = dict(allowedRolesAndUsers=['Member', 'user:test_user_1_'])
+        mangleQuery(keywords)
+        self.assertEqual(keywords, {
+            'allowedRolesAndUsers': ['Member', 'user:test_user_1_'],
+        })
+        # now let's remove it...
+        config.exclude_user = True
+        keywords = dict(allowedRolesAndUsers=['Member', 'user:test_user_1_'])
+        mangleQuery(keywords)
+        self.assertEqual(keywords, {
+            'allowedRolesAndUsers': ['Member'],
+        })
 
 
 class IndexingTests(SolrTestCase):

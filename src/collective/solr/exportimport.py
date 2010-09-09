@@ -99,8 +99,8 @@ class SolrConfigXMLAdapter(XMLAdapterBase):
                     value = int(str(child.getAttribute('value')))
                     self.context.effective_steps = value
                 elif child.nodeName == 'exclude-user':
-                    value = int(str(child.getAttribute('value')))
-                    self.context.exclude_user = value
+                    value = str(child.getAttribute('value'))
+                    self.context.exclude_user = self._convertToBoolean(value)
 
     def _createNode(self, name, value):
         node = self._doc.createElement(name)
@@ -145,10 +145,8 @@ class SolrConfigXMLAdapter(XMLAdapterBase):
             filter_queries.appendChild(param)
         append(create('slow-query-threshold',
             str(self.context.slow_query_threshold)))
-        append(create('effective-steps',
-            str(self.context.effective_steps)))
-        append(create('exclude-user',
-            str(self.context.exclude_user)))
+        append(create('effective-steps', str(self.context.effective_steps)))
+        append(create('exclude-user', str(bool(self.context.exclude_user))))
         return node
 
 

@@ -54,9 +54,7 @@ def mangleQuery(keywords):
                 if arg_val is not None:
                     extra[arg] = arg_val
             extras[key] = extra
-
     config = queryUtility(ISolrConnectionConfig)
-
     for key, value in keywords.items():
         args = extras.get(key, {})
         if key == 'path':
@@ -77,7 +75,7 @@ def mangleQuery(keywords):
             if isinstance(value, DateTime):
                 steps = config.effective_steps
                 if steps > 1:
-                    value = DateTime(value.timeTime()//steps*steps)
+                    value = DateTime(value.timeTime() // steps * steps)
             value = convert(value)
             del keywords[key]
             keywords['effective'] = '[* TO %s]' % value
@@ -97,11 +95,9 @@ def mangleQuery(keywords):
                 keywords[key] = '(%s)' % value
             del args['operator']
         elif key == 'allowedRolesAndUsers' and config.exclude_user:
-            try:
-                usr = getSecurityManager().getUser()
-                value.remove('user:%s' % getSecurityManager().getUser().getId())
-            except ValueError:
-                pass
+            token = 'user:' + getSecurityManager().getUser().getId()
+            if token in value:
+                value.remove(token)
         elif isinstance(value, basestring) and value.endswith('*'):
             keywords[key] = '%s' % value.lower()
         else:

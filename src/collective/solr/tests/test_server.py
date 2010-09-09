@@ -1021,6 +1021,20 @@ class SolrServerTests(SolrTestCase):
         self.assertEqual(len(results), 1)
         self.assertRaises(Unauthorized, results[0].getObject)
 
+    def testExcludeUserFromAllowedRolesAndUsers(self):
+        self.maintenance.reindex()
+        # first test the default of not removing the user
+        results = self.portal.portal_catalog(use_solr=True)
+        self.assertEqual(len(results), 8)
+        paths = [r.physicalPath for r in results]
+        self.failUnless('/plone/Members/test_user_1_' in paths)
+        # now we have it removed...
+        self.config.exclude_user = True
+        results = self.portal.portal_catalog(use_solr=True)
+        self.assertEqual(len(results), 7)
+        paths = [r.physicalPath for r in results]
+        self.failIf('/plone/Members/test_user_1_' in paths)
+
 
 def test_suite():
     if pingSolr():
