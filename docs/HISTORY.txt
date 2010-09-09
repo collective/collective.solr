@@ -5,7 +5,7 @@ Changelog
 ----------------
 
 * Handle python `datetime` and `date` objects.
-  [do3cc]
+  [do3cc, witsch]
 
 * Fixed a grammar error in ``error.pt``.
   [hannosch]

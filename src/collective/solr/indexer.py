@@ -42,7 +42,7 @@ def datehandler(value):
         # tuple representing utc time. Does nothing if object is not
         # timezone aware
         value = datetime(*value.utctimetuple()[:7])
-        value = value.strftime('%Y-%m-%dT%H:%M:%S.%f')[:23] + 'Z'
+        value = '%s.%03dZ' % (value.strftime('%Y-%m-%dT%H:%M:%S'), value.microsecond % 1000)
     return value
 
 
