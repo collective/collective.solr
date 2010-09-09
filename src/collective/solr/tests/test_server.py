@@ -696,6 +696,22 @@ class SolrServerTests(SolrTestCase):
         self.failUnless('/plone/news' in paths)
         self.failUnless('/plone/events' in paths)
 
+    def testEffectiveRangeWithSteps(self):
+        self.setRoles(['Manager'])
+        self.config.effective_steps = 900
+        self.portal.news.setEffectiveDate(DateTime() + 1)
+        self.portal.events.setExpirationDate(DateTime() - 1)
+        self.maintenance.reindex()
+        request = dict(SearchableText='"[* TO *]"')
+        results = self.portal.portal_catalog(request)
+        self.assertEqual(len(results), 8)
+        self.setRoles(())                   # again as anonymous user
+        results = self.portal.portal_catalog(request)
+        self.assertEqual(len(results), 6)
+        paths = [r.physicalPath for r in results]
+        self.failIf('/plone/news' in paths)
+        self.failIf('/plone/events' in paths)
+
     def testAsyncIndexing(self):
         connection = getUtility(ISolrConnectionManager).getConnection()
         self.config.async = True        # enable async indexing

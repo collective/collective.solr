@@ -4,6 +4,9 @@ Changelog
 1.0 - Unreleased
 ----------------
 
+* Add configuration for effective date steps.
+  [tesdal]
+
 * Handle python `datetime` and `date` objects.
   [do3cc, witsch]
 

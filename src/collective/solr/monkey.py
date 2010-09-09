@@ -1,4 +1,5 @@
-from zope.component import queryAdapter
+from time import time
+from zope.component import queryAdapter, queryUtility
 from DateTime import DateTime
 from Products.ZCatalog.Lazy import LazyCat
 from Products.CMFCore.permissions import AccessInactivePortalContent
@@ -8,6 +9,7 @@ from Products.CMFPlone.CatalogTool import CatalogTool
 
 from collective.solr.interfaces import ISearchDispatcher
 from collective.indexing.utils import autoFlushQueue
+from collective.solr.interfaces import ISolrConnectionConfig
 from collective.solr.parser import SolrResponse
 
 
@@ -18,7 +20,9 @@ def searchResults(self, REQUEST=None, **kw):
     user = _getAuthenticatedUser(self)
     kw['allowedRolesAndUsers'] = self._listAllowedRolesAndUsers(user)
     if only_active and not _checkPermission(AccessInactivePortalContent, self):
-        kw['effectiveRange'] = DateTime()
+        config = queryUtility(ISolrConnectionConfig)
+        steps = config.effective_steps
+        kw['effectiveRange'] = DateTime(time()//steps*steps)
 
     # support collective.indexing's "auto-flush" feature
     # see http://dev.plone.org/collective/changeset/73602

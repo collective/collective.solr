@@ -31,6 +31,7 @@ class BaseSolrConnectionConfig(object):
         self.facets = []
         self.filter_queries = []
         self.slow_query_threshold = 0
+        self.effective_steps = 1
 
 
 class SolrConnectionConfig(BaseSolrConnectionConfig, Persistent):
@@ -41,6 +42,7 @@ class SolrConnectionConfig(BaseSolrConnectionConfig, Persistent):
     facets = ()
     filter_queries = ()
     slow_query_threshold = 0
+    effective_steps = 1
 
     def getId(self):
         """ return a unique id to be used with GenericSetup """

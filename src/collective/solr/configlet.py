@@ -166,6 +166,17 @@ class SolrControlPanelAdapter(SchemaAdapterBase):
 
     slow_query_threshold = property(getSlowQueryThreshold, setSlowQueryThreshold)
 
+    def getEffectiveSteps(self):
+        util = queryUtility(ISolrConnectionConfig)
+        return getattr(util, 'effective_steps', '')
+
+    def setEffectiveSteps(self, value):
+        util = queryUtility(ISolrConnectionConfig)
+        if util is not None:
+            util.effective_steps = value
+
+    effective_steps = property(getEffectiveSteps, setEffectiveSteps)
+
 
 class SolrControlPanel(ControlPanelForm):
 
