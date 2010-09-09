@@ -177,6 +177,18 @@ class SolrControlPanelAdapter(SchemaAdapterBase):
 
     effective_steps = property(getEffectiveSteps, setEffectiveSteps)
 
+    def getExcludeUser(self):
+        util = queryUtility(ISolrConnectionConfig)
+        return getattr(util, 'exclude_user', '')
+
+    def setExcludeUser(self, value):
+        util = queryUtility(ISolrConnectionConfig)
+        if util is not None:
+            util.exclude_user = value
+
+    exclude_user = property(getExcludeUser, setExcludeUser)
+
+
 
 class SolrControlPanel(ControlPanelForm):
 

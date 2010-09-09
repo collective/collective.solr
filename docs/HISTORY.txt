@@ -4,6 +4,10 @@ Changelog
 1.0 - Unreleased
 ----------------
 
+* Add configuration to exclude user from
+  allowedRolesAndUsers for better cacheability.
+  [tesdal]
+
 * Add configuration for effective date steps.
   [tesdal, witsch]
 
