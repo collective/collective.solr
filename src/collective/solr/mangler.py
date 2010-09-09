@@ -71,6 +71,10 @@ def mangleQuery(keywords):
                         params.add(tmpl % (base, base + depth, p))
                 del args['depth']
         elif key == 'effectiveRange':
+            steps = queryUtility(ISolrConnectionConfig).effective_steps
+            if steps > 1:
+                value = value.millis() / 1000
+                value = DateTime(value // steps * steps)
             value = convert(value)
             del keywords[key]
             keywords['effective'] = '[* TO %s]' % value
