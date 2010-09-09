@@ -8,8 +8,8 @@ Changelog
   commit message.
   [hannosch]
 
-* Handle python datetime and date objects.
-  [do3cc]
+* Handle python `datetime` and `date` objects.
+  [do3cc, witsch]
 
 * Added support for ``commitWithin`` support on add messages as per SOLR-793.
   This feature requires a Solr 1.4 server.

@@ -100,7 +100,7 @@ class QueueIndexerTests(TestCase):
         self.assert_(str(output).find(required) > 0, '"date" data not found')
 
     def testDateIndexingWithPythonDateTime(self):
-        foo = Foo(id='gerken', name='patrick', cat='nerd', timestamp=datetime.strptime('29.09.80 14:02 GMT', '%d.%m.%y %H:%M %Z'))
+        foo = Foo(id='gerken', name='patrick', cat='nerd', timestamp=datetime(1980, 9, 29, 14, 02))
         response = getData('add_response.txt')
         output = fakehttp(self.mngr.getConnection(), response)   # fake add response
         self.proc.index(foo)
