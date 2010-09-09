@@ -697,20 +697,35 @@ class SolrServerTests(SolrTestCase):
         self.failUnless('/plone/events' in paths)
 
     def testEffectiveRangeWithSteps(self):
+        # set some content to become effective/expire around this time...
+        now = DateTime('2010/09/09 15:21:08 UTC')
         self.setRoles(['Manager'])
-        self.config.effective_steps = 900
-        self.portal.news.setEffectiveDate(DateTime() + 1)
-        self.portal.events.setExpirationDate(DateTime() - 1)
+        self.portal.news.setEffectiveDate('2010/09/09 15:20:13 UTC')
+        self.portal.events.setExpirationDate('2010/09/09 15:18:09 UTC')
         self.maintenance.reindex()
-        request = dict(SearchableText='"[* TO *]"')
+        # first test with the default step of 1 seconds, i.e. unaltered
+        # we prevent having `effectiveRange` set, but pass an explicit value
+        # the news item is already effective, the event expired...
+        request = dict(use_solr=True, show_inactive=True, effectiveRange=now)
         results = self.portal.portal_catalog(request)
-        self.assertEqual(len(results), 8)
-        self.setRoles(())                   # again as anonymous user
+        self.assertEqual(len(results), 7)
+        paths = [r.physicalPath for r in results]
+        self.failUnless('/plone/news' in paths)
+        self.failIf('/plone/events' in paths)
+        # with a granularity of 5 minutes the news item isn't effective yet
+        self.config.effective_steps = 300
         results = self.portal.portal_catalog(request)
         self.assertEqual(len(results), 6)
         paths = [r.physicalPath for r in results]
         self.failIf('/plone/news' in paths)
         self.failIf('/plone/events' in paths)
+        # with 15 minutes the event hasn't expired yet, though
+        self.config.effective_steps = 900
+        results = self.portal.portal_catalog(request)
+        self.assertEqual(len(results), 7)
+        paths = [r.physicalPath for r in results]
+        self.failIf('/plone/news' in paths)
+        self.failUnless('/plone/events' in paths)
 
     def testAsyncIndexing(self):
         connection = getUtility(ISolrConnectionManager).getConnection()
