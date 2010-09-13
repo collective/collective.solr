@@ -4,7 +4,7 @@ Changelog
 1.0 - Unreleased
 ----------------
 
-* Enable multi field fq statements.
+* Enable multi-field "fq" statements.
   [tesdal]
 
 * Prevent logging of "unknown" search attributes for `use_solr` and the

@@ -59,11 +59,11 @@ class ISolrSchema(Interface):
 
     filter_queries = List(title=_(u'Filter query parameters'),
         description = _(u'Specify query parameters for which filter queries '
-                         'should be used, one per line. You can use several'
+                         'should be used, one per line.  You can use several '
                          'indices in one filter query separated by space. '
                          'Typical examples are '
-                         '\'effective expires allowedRolesAndUsers\', '
-                         '\'review_state portal_type\''),
+                         '"effective expires allowedRolesAndUsers" or '
+                         '"review_state portal_type".'),
         value_type = TextLine(), default = [], required = False)
 
     slow_query_threshold = Int(title=_(u'Slow query threshold'),
