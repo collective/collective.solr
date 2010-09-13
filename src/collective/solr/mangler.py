@@ -177,10 +177,10 @@ def optimizeQueryParameters(query, params):
     config = queryUtility(ISolrConnectionConfig)
     fq = []
     if config is not None:
-        for idx in config.filter_queries:
-            if idx in query:
-                fq.append(query[idx])
-                del query[idx]
+        for idxs in config.filter_queries:
+            idxs = set(idxs.split(' '))
+            if idxs.issubset(query.keys()):
+                fq.append(' '.join([query.pop(idx) for idx in idxs]))
     if 'fq' in params:
         if isinstance(params['fq'], list):
             params['fq'].extend(fq)
