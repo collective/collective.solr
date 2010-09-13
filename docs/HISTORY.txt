@@ -5,7 +5,7 @@ Changelog
 ----------------
 
 * Enable multi-field "fq" statements.
-  [tesdal]
+  [tesdal, witsch]
 
 * Prevent logging of "unknown" search attributes for `use_solr` and the
   infamous `-C` Zope startup parameter.
