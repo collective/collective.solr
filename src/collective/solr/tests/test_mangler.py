@@ -132,6 +132,12 @@ class QueryManglerTests(TestCase):
             'expires': '[1972-05-11T03:45:00.000Z TO *]',
         })
 
+    def testIgnoredParameters(self):
+        keywords = mangle(use_solr=True, foo='bar')
+        self.assertEqual(keywords, {'foo': 'bar'})
+        keywords = mangle(**{'-C': True, 'foo': 'bar'})
+        self.assertEqual(keywords, {'foo': 'bar'})
+
 
 class PathManglerTests(TestCase):
 
