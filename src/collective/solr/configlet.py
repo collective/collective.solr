@@ -199,7 +199,6 @@ class SolrControlPanelAdapter(SchemaAdapterBase):
     exclude_user = property(getExcludeUser, setExcludeUser)
 
 
-
 class SolrControlPanel(ControlPanelForm):
 
     form_fields = FormFields(ISolrSchema)

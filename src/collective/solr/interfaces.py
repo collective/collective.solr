@@ -85,11 +85,11 @@ class ISolrSchema(Interface):
                        'Using 900 seconds (15 minutes) means the effective '
                        'date sent to Solr changes every 15 minutes.'))
 
-    exclude_user = Bool(title=_(u'Exclude user from allowedRolesAndUsers'), default=False,
+    exclude_user = Bool(title=_(u'Exclude user from allowedRolesAndUsers'),
         description=_(u'Specify whether the user:userid should be excluded '
-                       'from allowedRolesAndUser to improve cacheability '
+                       'from allowedRolesAndUsers to improve cacheability '
                        'on the expense of finding content with local roles'
-                       'given to specific users.'))
+                       'given to specific users.'), default=False)
 
 
 class ISolrConnectionConfig(ISolrSchema):
