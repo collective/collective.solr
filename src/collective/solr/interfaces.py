@@ -80,6 +80,11 @@ class ISolrSchema(Interface):
                        'queries are considered to be slow causing them to '
                        'be logged. Set to "0" to prevent any logging.'))
 
+    effective_steps = Int(title=_(u'Effective date steps'), default=1,
+        description=_(u'Specify the effective date steps in seconds. '
+                       'Using 900 seconds (15 minutes) means the effective '
+                       'date sent to Solr changes every 15 minutes.'))
+
 
 class ISolrConnectionConfig(ISolrSchema):
     """ utility to hold the connection configuration for the solr server """

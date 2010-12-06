@@ -8,9 +8,6 @@ Changelog
   commit message.
   [hannosch]
 
-* Handle python `datetime` and `date` objects.
-  [do3cc, witsch]
-
 * Added support for ``commitWithin`` support on add messages as per SOLR-793.
   This feature requires a Solr 1.4 server.
   [hannosch]
@@ -21,9 +18,6 @@ Changelog
 
 * Fixed error handling code to deal with different exception string
   representations in Python 2.6.
-  [hannosch]
-
-* Fixed a grammar error in ``error.pt``.
   [hannosch]
 
 * Made tests independent of the ``Large Folder`` content type, as it no longer
@@ -39,6 +33,12 @@ Changelog
 
 1.0 - Unreleased
 ----------------
+
+* Add configuration for effective date steps.
+  [tesdal]
+
+* Handle python `datetime` and `date` objects.
+  [do3cc, witsch]
 
 * Fixed a grammar error in ``error.pt``.
   [hannosch]
