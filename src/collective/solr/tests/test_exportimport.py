@@ -26,6 +26,7 @@ class SetupToolTests(SolrTestCase, TarballTester):
         config.filter_queries = ('type', )
         config.slow_query_threshold = 2342
         config.effective_steps = 900
+        config.exclude_user = True
 
     def testImportStep(self):
         profile = 'profile-collective.solr:default'
@@ -50,6 +51,7 @@ class SetupToolTests(SolrTestCase, TarballTester):
         self.assertEqual(config.filter_queries, ('portal_type', ))
         self.assertEqual(config.slow_query_threshold, 0)
         self.assertEqual(config.effective_steps, 900)
+        self.assertEqual(config.exclude_user, True)
 
     def testExportStep(self):
         tool = self.portal.portal_setup
@@ -111,6 +113,7 @@ SOLR_XML = """\
     </filter-query-parameters>
     <slow-query-threshold value="2342" />
     <effective-steps value="900" />
+    <exclude-user value="True" />
   </settings>
 </object>
 """

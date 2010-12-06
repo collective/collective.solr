@@ -1,4 +1,5 @@
 from zope.component import queryUtility
+from AccessControl import getSecurityManager
 from DateTime import DateTime
 
 from collective.solr.interfaces import ISolrConnectionConfig
@@ -54,6 +55,8 @@ def mangleQuery(keywords):
                     extra[arg] = arg_val
             extras[key] = extra
 
+    config = queryUtility(ISolrConnectionConfig)
+
     for key, value in keywords.items():
         args = extras.get(key, {})
         if key == 'path':
@@ -71,6 +74,10 @@ def mangleQuery(keywords):
                         params.add(tmpl % (base, base + depth, p))
                 del args['depth']
         elif key == 'effectiveRange':
+            if isinstance(value, DateTime):
+                steps = config.effective_steps
+                if steps > 1:
+                    value = DateTime(value.timeTime()//steps*steps)
             value = convert(value)
             del keywords[key]
             keywords['effective'] = '[* TO %s]' % value
@@ -89,6 +96,12 @@ def mangleQuery(keywords):
                 value = sep.join(map(str, map(convert, value)))
                 keywords[key] = '(%s)' % value
             del args['operator']
+        elif key == 'allowedRolesAndUsers' and config.exclude_user:
+            try:
+                usr = getSecurityManager().getUser()
+                value.remove('user:%s' % getSecurityManager().getUser().getId())
+            except ValueError:
+                pass
         elif isinstance(value, basestring) and value.endswith('*'):
             keywords[key] = '%s' % value.lower()
         else:

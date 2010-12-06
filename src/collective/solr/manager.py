@@ -33,6 +33,7 @@ class BaseSolrConnectionConfig(object):
         self.filter_queries = []
         self.slow_query_threshold = 0
         self.effective_steps = 1
+        self.exclude_user = False
 
 
 class SolrConnectionConfig(BaseSolrConnectionConfig, Persistent):
@@ -45,6 +46,7 @@ class SolrConnectionConfig(BaseSolrConnectionConfig, Persistent):
     filter_queries = ()
     slow_query_threshold = 0
     effective_steps = 1
+    exclude_user = False
 
     def getId(self):
         """ return a unique id to be used with GenericSetup """
