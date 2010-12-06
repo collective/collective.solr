@@ -21,6 +21,8 @@ query_args = ('range',
               'depth',
 )
 
+ignored = 'use_solr', '-C'
+
 
 def convert(value):
     """ convert values, which need a special format, i.e. dates """
@@ -46,7 +48,7 @@ def mangleQuery(keywords):
             keywords[key] = value['query']
             del value['query']
             extras[key] = value
-        elif hasattr(value, 'query'):     # unify object parameters
+        elif hasattr(value, 'query'):       # unify object parameters
             keywords[key] = value.query
             extra = dict()
             for arg in query_args:
@@ -54,6 +56,8 @@ def mangleQuery(keywords):
                 if arg_val is not None:
                     extra[arg] = arg_val
             extras[key] = extra
+        elif key in ignored:
+            del keywords[key]
     config = queryUtility(ISolrConnectionConfig)
     for key, value in keywords.items():
         args = extras.get(key, {})

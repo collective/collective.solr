@@ -37,6 +37,8 @@ class Search(object):
             raise SolrInactiveException
         if not 'rows' in parameters:
             parameters['rows'] = config.max_results or ''
+            logger.info('falling back to "max_results" (%d) without a "rows" '
+                'parameter: %r (%r)', config.max_results, query, parameters)
         if isinstance(query, dict):
             query = ' '.join(query.values())
         logger.debug('searching for %r (%r)', query, parameters)
@@ -69,8 +71,8 @@ class Search(object):
         for name, value in args.items():
             field = schema.get(name or defaultSearchField, None)
             if field is None or not field.indexed:
-                logger.warning('dropping unknown search attribute "%s" (%r)',
-                        name, value)
+                logger.warning('dropping unknown search attribute "%s" '
+                    ' (%r) for query: %r', name, value, args)
                 continue
             if isinstance(value, bool):
                 value = str(value).lower()

@@ -82,15 +82,10 @@ Make some changes
     >>> self.browser.getControl(name='form.required.1.').value = 'bar'
     >>> self.browser.getControl(name='form.facets.0.').value = 'type'
     >>> self.browser.getControl(name='form.facets.1.').value = 'state'
+    >>> self.browser.getControl(name='form.filter_queries.0.').value = 'portal_type'
     >>> self.browser.getControl(name='form.slow_query_threshold').value = '50'
     >>> self.browser.getControl(name='form.effective_steps').value = '300'
     >>> self.browser.getControl(name='form.exclude_user').value = True
-
-Filter query parameters cannot be specified until the connection has been
-activated.  At the moment only the already configured value shows up:
-
-    >>> self.browser.getControl('portal_type').selected
-    True
 
 Click the save button:
 
@@ -144,12 +139,12 @@ correct host and port:
     >>> self.browser.getControl(name='form.port').value = '8983'
     >>> self.browser.getControl(name="form.actions.save").click()
 
-    >>> self.browser.getControl('portal_type').selected = False
-    >>> self.browser.getControl('review_state').selected = True
-    >>> self.browser.getControl('Subject').selected = True
+    >>> self.browser.getControl(name='form.filter_queries.add').click()
+    >>> self.browser.getControl(name='form.filter_queries.0.').value = 'Subject'
+    >>> self.browser.getControl(name='form.filter_queries.1.').value = 'review_state'
     >>> self.browser.getControl(name="form.actions.save").click()
     >>> sorted(config.filter_queries)
-    ['Subject', 'review_state']
+    [u'Subject', u'review_state']
 
 
 Required query parameters
