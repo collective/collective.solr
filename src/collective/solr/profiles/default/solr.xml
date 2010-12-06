@@ -21,6 +21,7 @@
       <parameter name="portal_type" />
     </filter-query-parameters>
     <slow-query-threshold value="0" />
+    <effective-steps value="1" />
     <exclude-user value="False" />
   </settings>
 </object>

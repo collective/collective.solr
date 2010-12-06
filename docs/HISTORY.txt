@@ -42,7 +42,7 @@ Changelog
   [tesdal, witsch]
 
 * Add configuration for effective date steps.
-  [tesdal]
+  [tesdal, witsch]
 
 * Handle python `datetime` and `date` objects.
   [do3cc, witsch]

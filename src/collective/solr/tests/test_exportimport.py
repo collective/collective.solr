@@ -50,7 +50,7 @@ class SetupToolTests(SolrTestCase, TarballTester):
         self.assertEqual(config.facets, ('portal_type', 'review_state'))
         self.assertEqual(config.filter_queries, ('portal_type', ))
         self.assertEqual(config.slow_query_threshold, 0)
-        self.assertEqual(config.effective_steps, 900)
+        self.assertEqual(config.effective_steps, 1)
         self.assertEqual(config.exclude_user, False)
 
     def testExportStep(self):
