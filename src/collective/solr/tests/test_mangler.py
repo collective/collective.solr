@@ -313,6 +313,22 @@ class QueryParameterTests(TestCase):
         self.assertEqual(optimize(fq=['x:13', 'y:17']),
             (dict(b='b:42'), dict(fq=['x:13', 'y:17', 'a:23', 'c:(23 42)'])))
 
+        config.filter_queries = ['a c']
+        self.assertEqual(optimize(),
+            (dict(b='b:42'), dict(fq=['a:23 c:(23 42)'])))
+
+        config.filter_queries = ['a c', 'b']
+        self.assertEqual(optimize(),
+            ({'*': '*:*'}, dict(fq=['a:23 c:(23 42)', 'b:42'])))
+
+        config.filter_queries = ['a', 'a c', 'b']
+        self.assertEqual(optimize(),
+            (dict(c='c:(23 42)'), dict(fq=['a:23', 'b:42'])))
+
+        config.filter_queries = ['a nonexisting', 'b']
+        self.assertEqual(optimize(),
+            (dict(a='a:23', c='c:(23 42)'), dict(fq=['b:42'])))
+
     def testFilterFacetDependencies(self):
         extract = extractQueryParameters
         # any info about facet dependencies must not be passed on to solr

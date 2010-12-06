@@ -4,7 +4,6 @@ from zope.interface import implements
 from Products.CMFDefault.formlib.schema import SchemaAdapterBase
 from Products.CMFPlone.interfaces import IPloneSiteRoot
 from plone.app.controlpanel.form import ControlPanelForm
-from plone.app.controlpanel.widgets import MultiCheckBoxVocabularyWidget
 
 from collective.solr.interfaces import ISolrSchema, _
 from collective.solr.interfaces import ISolrConnectionConfig
@@ -204,7 +203,6 @@ class SolrControlPanelAdapter(SchemaAdapterBase):
 class SolrControlPanel(ControlPanelForm):
 
     form_fields = FormFields(ISolrSchema)
-    form_fields['filter_queries'].custom_widget = MultiCheckBoxVocabularyWidget
 
     label = _('Solr settings')
     description = _('Settings to enable and configure Solr integration.')

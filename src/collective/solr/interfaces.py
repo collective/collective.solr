@@ -1,5 +1,5 @@
 from zope.interface import Interface
-from zope.schema import Bool, TextLine, Int, Float, List, Choice
+from zope.schema import Bool, TextLine, Int, Float, List
 from zope.i18nmessageid import MessageFactory
 from collective.indexing.interfaces import IIndexQueueProcessor
 
@@ -68,12 +68,12 @@ class ISolrSchema(Interface):
 
     filter_queries = List(title=_(u'Filter query parameters'),
         description = _(u'Specify query parameters for which filter queries '
-                         'should be used, one per line.  Please note that '
-                         'the below list of indexes might not be complete '
-                         'if the Solr server is not running or the '
-                         'connection hasn\'t been activated yet.'),
-        value_type = Choice(vocabulary='collective.solr.indexes'),
-        default = [], required = False)
+                         'should be used, one per line. You can use several'
+                         'indices in one filter query separated by space. '
+                         'Typical examples are '
+                         '\'effective expires allowedRolesAndUsers\', '
+                         '\'review_state portal_type\''),
+        value_type = TextLine(), default = [], required = False)
 
     slow_query_threshold = Int(title=_(u'Slow query threshold'),
         description=_(u'Specify a threshold (in milliseconds) after which '
