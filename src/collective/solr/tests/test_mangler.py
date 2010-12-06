@@ -312,19 +312,18 @@ class QueryParameterTests(TestCase):
             (dict(b='b:42'), dict(fq=['x:13', 'a:23', 'c:(23 42)'])))
         self.assertEqual(optimize(fq=['x:13', 'y:17']),
             (dict(b='b:42'), dict(fq=['x:13', 'y:17', 'a:23', 'c:(23 42)'])))
-
+        # also test substitution of combined filter queries
         config.filter_queries = ['a c']
         self.assertEqual(optimize(),
             (dict(b='b:42'), dict(fq=['a:23 c:(23 42)'])))
-
         config.filter_queries = ['a c', 'b']
         self.assertEqual(optimize(),
             ({'*': '*:*'}, dict(fq=['a:23 c:(23 42)', 'b:42'])))
-
+        # for multiple matches the first takes precedence
         config.filter_queries = ['a', 'a c', 'b']
         self.assertEqual(optimize(),
             (dict(c='c:(23 42)'), dict(fq=['a:23', 'b:42'])))
-
+        # parameters not contained in the query must not be converted
         config.filter_queries = ['a nonexisting', 'b']
         self.assertEqual(optimize(),
             (dict(a='a:23', c='c:(23 42)'), dict(fq=['b:42'])))
