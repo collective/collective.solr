@@ -567,6 +567,25 @@ class SolrServerTests(SolrTestCase):
         self.assertEqual(sorted([(r.Title, r.physicalPath) for r in results]),
             [('News', '/plone/news'), ('News', '/plone/news/aggregator')])
 
+    def testSolrSearchResultsWithCustomSearchPattern(self):
+        self.maintenance.reindex()
+        self.setRoles(['Manager'])
+        self.folder.invokeFactory('Document', id='doc1', title='foo',
+            description='the bar is missing here')
+        self.folder.invokeFactory('Document', id='doc2', title='bar',
+            description='another foo, this time visible')
+        commit()                        # indexing happens on commit
+        # first we rank title higher than the description...
+        self.config.search_pattern = '(Title:%s^5 OR Description:%s)'
+        search = lambda term: [r.getId for r in
+            solrSearchResults(SearchableText=term)]
+        self.assertEqual(search('foo'), ['doc1', 'doc2'])
+        self.assertEqual(search('bar'), ['doc2', 'doc1'])
+        # now let's try changing the pattern...
+        self.config.search_pattern = '(Description:%s^5 OR Title:%s)'
+        self.assertEqual(search('foo'), ['doc2', 'doc1'])
+        self.assertEqual(search('bar'), ['doc1', 'doc2'])
+
     def testRequiredParameters(self):
         self.maintenance.reindex()
         self.assertRaises(FallBackException, solrSearchResults,
