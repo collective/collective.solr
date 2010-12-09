@@ -87,7 +87,7 @@ def quote(term):
     if isinstance(term, unicode):
         term = term.encode('utf-8')
     stack = Stack()
-    tokens = query_tokenizer.findall(term)
+    tokens = query_tokenizer.findall(term.strip())
     # Counter enables lookahead
     i = 0
     stop = len(tokens)
