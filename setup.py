@@ -1,9 +1,8 @@
 from setuptools import setup, find_packages
-from os.path import join
 
-version = open(join('src', 'collective', 'solr', 'version.txt')).read().strip()
+version = '2.0a1'
 readme = open("README.txt").read()
-history = open(join('docs', 'HISTORY.txt')).read()
+history = open('CHANGES.txt').read()
 
 setup(name = 'collective.solr',
       version = version,

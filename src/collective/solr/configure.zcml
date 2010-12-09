@@ -28,46 +28,38 @@
     class="Products.CMFPlone.CatalogTool.CatalogTool"
     interface=".interfaces.ICatalogTool" />
 
-  <configure zcml:condition="installed Products.CMFPlone">
+  <include package=".browser" />
 
-    <include package=".browser" />
+  <adapter
+      for=".interfaces.ICatalogTool"
+      provides=".interfaces.ISearchDispatcher"
+      factory=".dispatcher.SearchDispatcher" />
 
-    <adapter
-        for=".interfaces.ICatalogTool"
-        provides=".interfaces.ISearchDispatcher"
-        factory=".dispatcher.SearchDispatcher" />
+  <adapter
+      factory=".flare.PloneFlare" />
 
-    <adapter
-        factory=".flare.PloneFlare" />
+  <adapter
+      for="*
+           zope.publisher.interfaces.browser.IBrowserRequest
+           .flare.PloneFlare"
+         factory="plone.app.layout.icons.icons.CatalogBrainContentIcon"
+         provides="plone.app.layout.icons.interfaces.IContentIcon" />
 
-    <adapter
-        for="*
-             zope.publisher.interfaces.browser.IBrowserRequest
-             .flare.PloneFlare"
-           factory="plone.app.layout.icons.icons.CatalogBrainContentIcon"
-           provides="plone.app.layout.icons.interfaces.IContentIcon" />
+  <adapter factory=".configlet.SolrControlPanelAdapter" />
 
-  </configure>
+  <browser:page
+      name="solr-controlpanel"
+      for="Products.CMFPlone.interfaces.IPloneSiteRoot"
+      class=".configlet.SolrControlPanel"
+      permission="cmf.ManagePortal" />
 
-  <configure zcml:condition="installed plone.app.controlpanel">
+  <utility
+      factory=".vocabularies.SolrIndexes"
+      name="collective.solr.indexes" />
 
-    <adapter factory=".configlet.SolrControlPanelAdapter" />
-
-    <browser:page
-        name="solr-controlpanel"
-        for="Products.CMFPlone.interfaces.IPloneSiteRoot"
-        class=".configlet.SolrControlPanel"
-        permission="cmf.ManagePortal" />
-
-    <utility
-        factory=".vocabularies.SolrIndexes"
-        name="collective.solr.indexes" />
-
-  </configure>
-
-  <adapter name="physicalPath" factory=".attributes.physicalPathIndexer" />
-  <adapter name="physicalDepth" factory=".attributes.physicalDepthIndexer" />
-  <adapter name="parentPaths" factory=".attributes.parentPathsIndexer" />
+  <adapter name="physicalPath" factory=".attributes.physicalPath" />
+  <adapter name="physicalDepth" factory=".attributes.physicalDepth" />
+  <adapter name="parentPaths" factory=".attributes.parentPaths" />
 
   <adapter
       factory=".exportimport.SolrConfigXMLAdapter"
