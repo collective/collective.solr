@@ -60,10 +60,7 @@ def prepareData(data):
 simpleTerm = compile(r'^[\w\d]+$', UNICODE)
 def isSimpleTerm(term):
     if isinstance(term, str):
-        try:
-            term = unicode(term, 'utf-8')
-        except UnicodeDecodeError:
-            pass
+        term = unicode(term, 'utf-8', 'ignore')
     return bool(simpleTerm.match(term.strip()))
 
 
