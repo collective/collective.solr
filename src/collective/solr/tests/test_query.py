@@ -269,7 +269,11 @@ class QueryTests(TestCase):
 
     def testLiterateQueries(self):
         bq = self.bq
-        self.assertEqual(bq(name=set(['bar'])), '(bar)')
+        self.assertEqual(bq(name=set(['bar'])), 'bar')
+        self.assertEqual(bq(name=set(['foo OR bar'])), 'foo OR bar')
+        self.assertEqual(bq(name=set(['(foo OR bar)'])), '(foo OR bar)')
+        self.assertEqual(bq(name=set(['(Title:foo^10 OR Description:foo)'])),
+            '(Title:foo^10 OR Description:foo)')
         self.failUnless(bq(name=set(['foo', 'bar'])) in
             ['(foo OR bar)', '(bar OR foo)'])
         self.failUnless(bq(name=set(['foo!', '+bar:camp'])) in

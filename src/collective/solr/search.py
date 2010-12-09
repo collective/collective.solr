@@ -99,8 +99,11 @@ class Search(object):
                         quoted = quote('"' + term + '"')
                     return quoted
                 value = '(%s)' % ' OR '.join(map(quoteitem, value))
-            elif isinstance(value, set):        # set are taken literally
-                query[name] = '(%s)' % ' OR '.join(value)
+            elif isinstance(value, set):        # sets are taken literally
+                if len(value) == 1:
+                    query[name] = ''.join(value)
+                else:
+                    query[name] = '(%s)' % ' OR '.join(value)
                 continue
             elif isinstance(value, basestring):
                 value = quote(value)
