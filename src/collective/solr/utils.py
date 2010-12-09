@@ -64,6 +64,13 @@ def isSimpleTerm(term):
     return bool(simpleTerm.match(term.strip()))
 
 
+simpleSearch = compile(r'^[\s\w\d]+$', UNICODE)
+def isSimpleSearch(term):
+    if isinstance(term, str):
+        term = unicode(term, 'utf-8', 'ignore')
+    return bool(simpleSearch.match(term.strip()))
+
+
 def findObjects(origin):
     """ generator to recursively find and yield all zope objects below
         the given start point """

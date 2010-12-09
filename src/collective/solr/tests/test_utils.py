@@ -5,7 +5,7 @@ from Testing import ZopeTestCase as ztc
 
 from collective.solr.tests.utils import getData
 from collective.solr.parser import SolrSchema, SolrResponse
-from collective.solr.utils import findObjects, isSimpleTerm
+from collective.solr.utils import findObjects, isSimpleTerm, isSimpleSearch
 from collective.solr.utils import setupTranslationMap, prepareData
 from collective.solr.utils import padResults
 
@@ -51,6 +51,18 @@ class UtilsTests(ztc.ZopeTestCase):
         self.failIf(isSimpleTerm('"foo"'))
         self.failIf(isSimpleTerm(u'føø!'))
         self.failIf(isSimpleTerm(unicode('föö', 'latin')))
+
+    def testSimpleSearch(self):
+        self.failUnless(isSimpleSearch('foo'))
+        self.failUnless(isSimpleSearch('foo bar'))
+        self.failUnless(isSimpleSearch('foo bar '))
+        self.failUnless(isSimpleSearch('foo 42 bar11'))
+        self.failUnless(isSimpleSearch(u'føø bär'))
+        self.failUnless(isSimpleSearch('føø bär'))
+        self.failIf(isSimpleSearch('foo bar?'))
+        self.failIf(isSimpleSearch('"foo bar"'))
+        self.failIf(isSimpleSearch(u'føø bär!'))
+        self.failIf(isSimpleSearch(unicode('föö bär', 'latin')))
 
 
 class TranslationTests(TestCase):
