@@ -3,7 +3,7 @@ from AccessControl import getSecurityManager
 from DateTime import DateTime
 
 from collective.solr.interfaces import ISolrConnectionConfig
-from collective.solr.search import quote
+from collective.solr.queryparser import quote
 from collective.solr.utils import isSimpleTerm
 
 
