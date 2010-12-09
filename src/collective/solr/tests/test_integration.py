@@ -175,7 +175,9 @@ class SiteSearchTests(SolrTestCase):
         def slow(handler):          # set up another http response
             sleep(3)                # but wait longer before sending it
             handler.send_response(200, getData('search_response.txt'))
-        thread = fakeServer([quick, slow], port=55555)
+        # We need a third handler, as the second one will timeout, which causes
+        # the SolrConnection.doPost method to catch it and try to reconnect.
+        thread = fakeServer([quick, slow, slow], port=55555)
         search = queryUtility(ISearch)
         search('foo')               # the first search should succeed
         try:
