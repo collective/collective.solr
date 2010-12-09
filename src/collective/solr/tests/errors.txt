@@ -84,7 +84,7 @@ timeout error is provoked:
   >>> from time import sleep
   >>> def action(handler):
   ...   sleep(3)
-  >>> thread = fakeServer([action,], port=55555)
+  >>> thread = fakeServer([action, action], port=55555)
   >>> self.setStatusCode('timeout', 200)
   >>> getUtility(ISolrConnectionConfig).search_timeout = 2
 
