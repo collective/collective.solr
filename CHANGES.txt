@@ -4,6 +4,16 @@ Changelog
 2.0a1 - Unreleased
 ------------------
 
+* Require Plone 4.x, declare package dependencies & remove BBB bits.
+  [hannosch, witsch]
+
+* Add configurable setting for custom search pattern for simple searches,
+  allowing to include multiple fields with specific boost values.
+  [hannosch, witsch]
+
+* Don't modify search parameters during indexing.
+  [hannosch, witsch]
+
 * Fixed auto-commit support to actually sent the data to Solr, but omit the
   commit message.
   [hannosch]
