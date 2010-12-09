@@ -64,11 +64,19 @@ def isSimpleTerm(term):
     return bool(simpleTerm.match(term.strip()))
 
 
-simpleSearch = compile(r'^[\s\w\d]+$', UNICODE)
+simpleSearch = compile(r'^(([*"]?[\w\d?]+[*"]?)\s*)+$', UNICODE)
+operators = compile(r'(.*)\s+(AND|OR|NOT)\s+', UNICODE)
 def isSimpleSearch(term):
+    term = term.strip()
     if isinstance(term, str):
         term = unicode(term, 'utf-8', 'ignore')
-    return bool(simpleSearch.match(term.strip()))
+    if bool(simpleSearch.match(term)):
+        ops = operators.match(term)
+        if ops:
+            prefix, op = ops.groups()
+            return bool(prefix.count('"') % 2)  # even number of quotes
+        return True
+    return False
 
 
 def findObjects(origin):
