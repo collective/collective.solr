@@ -1,6 +1,7 @@
 from re import compile
 
 # Solr/lucene reserved characters/terms: + - && || ! ( ) { } [ ] ^ " ~ * ? : \
+# (see http://wiki.apache.org/solr/SolrQuerySyntax)
 # Four groups for tokenizer:
 # 1) Whitespace (\s+)
 # 2) Any non reserved characters (normal text) ([^(){}\[\]+\-!^\"~*?:\\\&\|\s]+)
