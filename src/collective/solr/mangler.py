@@ -4,6 +4,7 @@ from DateTime import DateTime
 
 from collective.solr.interfaces import ISolrConnectionConfig
 from collective.solr.search import quote
+from collective.solr.utils import isSimpleTerm
 
 
 ranges = {
@@ -61,7 +62,10 @@ def mangleQuery(keywords):
     config = queryUtility(ISolrConnectionConfig)
     for key, value in keywords.items():
         args = extras.get(key, {})
-        if key == 'path':
+        if key == 'SearchableText':
+            if isSimpleTerm(value):         # use prefix/wildcard search
+                value = '(%s* OR %s)' % (value.lower(), value)
+        if key == 'path':       # must not be `elif` to handle wildcards
             path = keywords['parentPaths'] = value
             del keywords[key]
             if 'depth' in args:

@@ -38,7 +38,9 @@ translation_map = setupTranslationMap()
 
 def prepareData(data):
     """ modify data according to solr specifics, i.e. replace ':' by '$'
-        for "allowedRolesAndUsers" etc """
+        for "allowedRolesAndUsers" etc;  please note that this function
+        is also used while indexing, so no query-specific modification
+        should happen here! """
     allowed = data.get('allowedRolesAndUsers', None)
     if allowed is not None:
         data['allowedRolesAndUsers'] = [r.replace(':', '$') for r in allowed]
@@ -50,8 +52,6 @@ def prepareData(data):
             data['Language'] = [lang or 'any' for lang in language]
     searchable = data.get('SearchableText', None)
     if searchable is not None:
-        if isSimpleTerm(searchable):        # use prefix/wildcard search
-            searchable = '(%s* OR %s)' % (searchable.lower(), searchable)
         if isinstance(searchable, unicode):
             searchable = searchable.encode('utf-8')
         data['SearchableText'] = searchable.translate(translation_map)
