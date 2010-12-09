@@ -143,6 +143,17 @@ class SolrControlPanelAdapter(SchemaAdapterBase):
 
     required = property(getRequiredParameters, setRequiredParameters)
 
+    def getSearchPattern(self):
+        util = queryUtility(ISolrConnectionConfig)
+        return getattr(util, 'search_pattern', '')
+
+    def setSearchPattern(self, value):
+        util = queryUtility(ISolrConnectionConfig)
+        if util is not None:
+            util.search_pattern = value
+
+    search_pattern = property(getSearchPattern, setSearchPattern)
+
     def getDefaultFacets(self):
         util = queryUtility(ISolrConnectionConfig)
         return getattr(util, 'facets', '')

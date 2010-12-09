@@ -61,6 +61,11 @@ class ISolrSchema(Interface):
                          'Leave empty to dispatch all searches.'),
         value_type = TextLine(), default = [], required = False)
 
+    search_pattern = TextLine(title=_(u'Pattern for simple search queries'),
+        description = _(u'Specify a query pattern used for simple queries '
+                         'consisting only of words and numbers, i.e. not '
+                         'using any of Solr\'s advanced query expressions.'))
+
     facets = List(title=_(u'Default search facets'),
         description = _(u'Specify catalog indexes that should be queried for '
                          'facet information, one per line.'),

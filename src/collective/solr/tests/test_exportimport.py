@@ -22,6 +22,7 @@ class SetupToolTests(SolrTestCase, TarballTester):
         config.search_timeout = 3.1415
         config.max_results = 42
         config.required = ('foo', 'bar')
+        config.search_pattern = 'foo:%s'
         config.facets = ('type', 'state')
         config.filter_queries = ('type', )
         config.slow_query_threshold = 2342
@@ -47,6 +48,8 @@ class SetupToolTests(SolrTestCase, TarballTester):
         self.assertEqual(config.search_timeout, 0)
         self.assertEqual(config.max_results, 0)
         self.assertEqual(config.required, ('SearchableText', ))
+        self.assertEqual(config.search_pattern,
+            '(Title:%s^10 OR Description:%s^3 OR SearchableText:%s)')
         self.assertEqual(config.facets, ('portal_type', 'review_state'))
         self.assertEqual(config.filter_queries, ('portal_type', ))
         self.assertEqual(config.slow_query_threshold, 0)
@@ -104,6 +107,7 @@ SOLR_XML = """\
       <parameter name="foo" />
       <parameter name="bar" />
     </required-query-parameters>
+    <search-pattern value="foo:%s" />
     <search-facets>
       <parameter name="type" />
       <parameter name="state" />
