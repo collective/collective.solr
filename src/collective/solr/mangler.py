@@ -69,6 +69,8 @@ def mangleQuery(keywords):
             if pattern and isSimpleSearch(value):
                 if simple_term:             # use prefix/wildcard search
                     value = '(%s* OR %s)' % (value.lower(), value)
+                elif value.endswith('*'):   # wildcard searches need lower-case
+                    value = value.lower()
                 # simple queries use custom search pattern
                 value = pattern % ((quote(value), ) * pattern.count('%s'))
                 keywords[key] = set([value])    # add literal query parameter
@@ -118,7 +120,9 @@ def mangleQuery(keywords):
             if token in value:
                 value.remove(token)
         elif isinstance(value, basestring) and value.endswith('*'):
-            keywords[key] = '%s' % value.lower()
+            # wildcard searches need to be lower-case as analyzers are
+            # skipped and we use the lower-case filter while indexing
+            keywords[key] = value.lower()
         else:
             keywords[key] = convert(value)
         assert not args, 'unsupported usage: %r' % args
