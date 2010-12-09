@@ -5,6 +5,7 @@ from DateTime import DateTime
 from collective.solr.interfaces import ISolrConnectionConfig
 from collective.solr.queryparser import quote
 from collective.solr.utils import isSimpleTerm
+from collective.solr.utils import isSimpleSearch
 
 
 ranges = {
@@ -63,9 +64,19 @@ def mangleQuery(keywords):
     for key, value in keywords.items():
         args = extras.get(key, {})
         if key == 'SearchableText':
-            if isSimpleTerm(value):         # use prefix/wildcard search
-                value = '(%s* OR %s)' % (value.lower(), value)
-        if key == 'path':       # must not be `elif` to handle wildcards
+            pattern = config.search_pattern
+            simple_term = isSimpleTerm(value)
+            if pattern and isSimpleSearch(value):
+                if simple_term:             # use prefix/wildcard search
+                    value = '(%s* OR %s)' % (value.lower(), value)
+                # simple queries use custom search pattern
+                value = pattern % ((quote(value), ) * pattern.count('%s'))
+                keywords[key] = set([value])    # add literal query parameter
+                continue
+            elif simple_term:               # use prefix/wildcard search
+                keywords[key] = '(%s* OR %s)' % (value.lower(), value)
+                continue
+        if key == 'path':
             path = keywords['parentPaths'] = value
             del keywords[key]
             if 'depth' in args:
@@ -103,7 +114,7 @@ def mangleQuery(keywords):
                 keywords[key] = '(%s)' % value
             del args['operator']
         elif key == 'allowedRolesAndUsers' and config.exclude_user:
-            token = 'user:' + getSecurityManager().getUser().getId()
+            token = 'user$' + getSecurityManager().getUser().getId()
             if token in value:
                 value.remove(token)
         elif isinstance(value, basestring) and value.endswith('*'):

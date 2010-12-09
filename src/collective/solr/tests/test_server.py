@@ -533,8 +533,9 @@ class SolrServerTests(SolrTestCase):
         results = solrSearchResults(SearchableText=u'Føø')
         self.assertEqual([r.Title for r in results], [u'Føø'])
 
-    def testSolrSearchResultsInformation(self):
+    def testSolrSearchResultsInformationWithoutCustomSearchPattern(self):
         self.maintenance.reindex()
+        self.config.search_pattern = None
         response = solrSearchResults(SearchableText='News', Language='all')
         self.assertEqual(len(response), 2)
         self.assertEqual(response.response.numFound, '2')
@@ -542,6 +543,22 @@ class SolrServerTests(SolrTestCase):
         headers = response.responseHeader
         self.assertEqual(sorted(headers), ['QTime', 'params', 'status'])
         self.assertEqual(headers['params']['q'], '+SearchableText:(news* OR News)')
+
+    def testSolrSearchResultsInformationForCustomSearchPattern(self):
+        self.maintenance.reindex()
+        self.config.search_pattern = '(Title:%s^5 OR getId:%s)'
+        # for single-word searches we get both, wildcards & the custom pattern
+        response = solrSearchResults(SearchableText='news', Language='all')
+        query = response.responseHeader['params']['q']
+        self.assertEqual(query, '(Title:(news* OR news)^5 OR getId:(news* OR news))')
+        # the pattern is applied for multi-word searches
+        response = solrSearchResults(SearchableText='foo bar', Language='all')
+        query = response.responseHeader['params']['q']
+        self.assertEqual(query, '(Title:(foo bar)^5 OR getId:(foo bar))')
+        # extra parameters should be unaffected
+        response = solrSearchResults(SearchableText='"news"', Type='xy', Language='all')
+        query = response.responseHeader['params']['q']
+        self.assertEqual(query, '+Type:xy (Title:"news"^5 OR getId:"news")')
 
     def testSolrSearchResultsWithDictRequest(self):
         self.maintenance.reindex()

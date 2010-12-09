@@ -50,14 +50,14 @@ class QueryManglerTests(SolrTestCase):
     def testExcludeUserFromAllowedRolesAndUsers(self):
         config = queryUtility(ISolrConnectionConfig)
         # first test the default setting, i.e. not removing the user
-        keywords = dict(allowedRolesAndUsers=['Member', 'user:test_user_1_'])
+        keywords = dict(allowedRolesAndUsers=['Member', 'user$test_user_1_'])
         mangleQuery(keywords)
         self.assertEqual(keywords, {
-            'allowedRolesAndUsers': ['Member', 'user:test_user_1_'],
+            'allowedRolesAndUsers': ['Member', 'user$test_user_1_'],
         })
         # now let's remove it...
         config.exclude_user = True
-        keywords = dict(allowedRolesAndUsers=['Member', 'user:test_user_1_'])
+        keywords = dict(allowedRolesAndUsers=['Member', 'user$test_user_1_'])
         mangleQuery(keywords)
         self.assertEqual(keywords, {
             'allowedRolesAndUsers': ['Member'],
