@@ -79,6 +79,11 @@ def isSimpleSearch(term):
     return False
 
 
+wildCard = compile(r'^[\w\d\s*?]*[*?]+[\w\d\s*?]*$', UNICODE)
+def isWildCard(term):
+    return bool(wildCard.match(term))
+
+
 def findObjects(origin):
     """ generator to recursively find and yield all zope objects below
         the given start point """

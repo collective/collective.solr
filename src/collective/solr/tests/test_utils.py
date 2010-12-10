@@ -6,6 +6,7 @@ from Testing import ZopeTestCase as ztc
 from collective.solr.tests.utils import getData
 from collective.solr.parser import SolrSchema, SolrResponse
 from collective.solr.utils import findObjects, isSimpleTerm, isSimpleSearch
+from collective.solr.utils import isWildCard
 from collective.solr.utils import setupTranslationMap, prepareData
 from collective.solr.utils import padResults
 
@@ -81,6 +82,24 @@ class UtilsTests(ztc.ZopeTestCase):
         self.failIf(isSimpleSearch('+foo'))
         self.failIf(isSimpleSearch('name:foo'))
         self.failIf(isSimpleSearch('foo && bar'))
+
+    def testIsWildCard(self):
+        self.failUnless(isWildCard('foo*'))
+        self.failUnless(isWildCard('fo?'))
+        self.failUnless(isWildCard('fo?o'))
+        self.failUnless(isWildCard('fo*oo'))
+        self.failUnless(isWildCard('fo?o*'))
+        self.failUnless(isWildCard('*foo'))
+        self.failUnless(isWildCard('foo* bar'))
+        self.failUnless(isWildCard('foo bar?'))
+        self.failUnless(isWildCard('*'))
+        self.failUnless(isWildCard('?'))
+        self.failIf(isWildCard('foo'))
+        self.failIf(isWildCard('fo#o'))
+        self.failIf(isWildCard('foo bar'))
+        # other characters might be meaningful in solr, but we don't
+        # distinguish them properly (yet)
+        self.failIf(isWildCard('foo#?'))
 
 
 class TranslationTests(TestCase):

@@ -4,6 +4,9 @@ Changelog
 2.0a1 - Unreleased
 ------------------
 
+* Fix wildcard searches for patterns other than just ending with an asterisk.
+  [hannosch, witsch]
+
 * Require Plone 4.x, declare package dependencies & remove BBB bits.
   [hannosch, witsch]
 

@@ -6,6 +6,7 @@ from collective.solr.interfaces import ISolrConnectionConfig
 from collective.solr.queryparser import quote
 from collective.solr.utils import isSimpleTerm
 from collective.solr.utils import isSimpleSearch
+from collective.solr.utils import isWildCard
 
 
 ranges = {
@@ -67,7 +68,7 @@ def mangleQuery(keywords):
             if pattern and isSimpleSearch(value):
                 if simple_term:             # use prefix/wildcard search
                     value = '(%s* OR %s)' % (value.lower(), value)
-                elif value.endswith('*'):   # wildcard searches need lower-case
+                elif isWildCard(value):     # wildcard searches need lower-case
                     value = value.lower()
                 # simple queries use custom search pattern
                 value = pattern % ((quote(value), ) * pattern.count('%s'))

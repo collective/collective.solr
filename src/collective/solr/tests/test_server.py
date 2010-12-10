@@ -878,6 +878,15 @@ class SolrServerTests(SolrTestCase):
         self.assertEqual(len(results), 4)
         self.assertEqual(sorted([i.Title for i in results]),
             ['Newbie!', 'News', 'News', 'Welcome to Plone'])
+        # wildcard searches can also be applied to other indexes...
+        self.config.required = []
+        results = solrSearchResults(Title='New*')
+        self.assertEqual(len(results), 3)
+        self.assertEqual(sorted([i.Title for i in results]),
+            ['Newbie!', 'News', 'News'])
+        # ...but don't work on non-text fields
+        results = solrSearchResults(Type='D*')
+        self.assertEqual(len(results), 0)
 
     def testWildcardSearchesMultipleWords(self):
         self.maintenance.reindex()
