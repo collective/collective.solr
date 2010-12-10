@@ -106,6 +106,8 @@ class Search(object):
                     query[name] = '(%s)' % ' OR '.join(value)
                 continue
             elif isinstance(value, basestring):
+                if value.endswith('*'):
+                    value = value.lower()   # wildcard searches need lower-case
                 value = quote(value)
                 if not value:   # don't search for empty strings, even quoted
                     continue

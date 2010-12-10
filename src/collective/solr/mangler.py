@@ -26,14 +26,12 @@ query_args = ('range',
 ignored = 'use_solr', '-C'
 
 
-def convert(value):
-    """ convert values, which need a special format, i.e. dates """
+def iso8601date(value):
+    """ convert `DateTime` to iso 8601 date format """
     if isinstance(value, DateTime):
         v = value.toZone('UTC')
         value = '%04d-%02d-%02dT%02d:%02d:%06.3fZ' % (v.year(),
             v.month(), v.day(), v.hour(), v.minute(), v.second())
-    elif isinstance(value, basestring):
-        value = quote(value)
     return value
 
 
@@ -97,7 +95,7 @@ def mangleQuery(keywords):
                 steps = config.effective_steps
                 if steps > 1:
                     value = DateTime(value.timeTime() // steps * steps)
-            value = convert(value)
+                value = iso8601date(value)
             del keywords[key]
             keywords['effective'] = '[* TO %s]' % value
             keywords['expires'] = '[%s TO *]' % value
@@ -106,26 +104,23 @@ def mangleQuery(keywords):
         elif 'range' in args:
             if not isinstance(value, (list, tuple)):
                 value = [value]
-            payload = map(convert, value)
+            payload = map(iso8601date, value)
             keywords[key] = ranges[args['range']] % tuple(payload)
             del args['range']
         elif 'operator' in args:
             if isinstance(value, (list, tuple)) and len(value) > 1:
                 sep = ' %s ' % args['operator'].upper()
-                value = sep.join(map(str, map(convert, value)))
+                value = sep.join(map(str, map(iso8601date, value)))
                 keywords[key] = '(%s)' % value
             del args['operator']
         elif key == 'allowedRolesAndUsers' and config.exclude_user:
             token = 'user$' + getSecurityManager().getUser().getId()
             if token in value:
                 value.remove(token)
-        elif isinstance(value, basestring) and value.endswith('*'):
-            # wildcard searches need to be lower-case as analyzers are
-            # skipped and we use the lower-case filter while indexing
-            keywords[key] = value.lower()
-        else:
-            keywords[key] = convert(value)
-        assert not args, 'unsupported usage: %r' % args
+        elif isinstance(value, DateTime):
+            keywords[key] = iso8601date(value)
+        elif not isinstance(value, basestring):
+            assert not args, 'unsupported usage: %r' % args
 
 
 def extractQueryParameters(args):
