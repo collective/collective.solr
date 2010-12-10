@@ -167,16 +167,20 @@ class SolrConnection:
         return parsed
 
     def escapeVal(self, val):
-        val = escape(val)
-        try:
-            return self.encoder(val)[0]  #to utf8
-        except UnicodeDecodeError:
-            return val # Already utf-8?
+        if isinstance(val, unicode):
+            val = val.encode('utf-8')
+        else:
+            val = str(val)
+        return escape(val.translate(translation_map))
 
     def escapeKey(self, key):
+        if isinstance(key, unicode):
+            key = key.encode('utf-8')
+        else:
+            key = str(key)
         key = key.replace("&", "&amp;")
         key = key.replace('"', "&quot;")
-        return self.encoder(key)[0]  #to utf8
+        return key
 
     def delete(self, id):
         xstr = '<delete><id>%s</id></delete>' % self.escapeVal(id)
@@ -186,39 +190,21 @@ class SolrConnection:
         xstr = '<delete><query>%s</query></delete>' % self.escapeVal(query)
         return self.doUpdateXML(xstr)
 
-    def __makeField(self, lst, f, v):
-        if not isinstance(f, basestring):
-            f = str(f)
-        if not isinstance(v, basestring):
-            v = str(v)
-        lst.append('<field name="%s">%s</field>' % (self.escapeKey(f),
-            self.escapeVal(v).translate(translation_map)))
-
-    def __add(self, lst, fields):
-        lst.append('<doc>')
-        for f, v in fields.items():
-            if isinstance(v, (list, tuple)): # multi-valued
-                for value in v:
-                    self.__makeField(lst, f, value)
-            else:
-                self.__makeField(lst, f, v)
-        lst.append('</doc>')
-
     def add(self, **fields):
         within = fields.pop('commitWithin', None)
         if within:
             lst = ['<add commitWithin="%s">' % str(within)]
         else:
             lst = ['<add>']
-        self.__add(lst, fields)
-        lst.append('</add>')
-        xstr = ''.join(lst)
-        return self.doUpdateXML(xstr)
-
-    def addMany(self, arrOfMap):
-        lst=['<add>']
-        for doc in arrOfMap:
-            self.__add(lst, doc)
+        lst.append('<doc>')
+        for f, v in fields.items():
+            tmpl = '<field name="%s">%%s</field>' % self.escapeKey(f)
+            if isinstance(v, (list, tuple)): # multi-valued
+                for value in v:
+                    lst.append(tmpl % self.escapeVal(value))
+            else:
+                lst.append(tmpl % self.escapeVal(v))
+        lst.append('</doc>')
         lst.append('</add>')
         xstr = ''.join(lst)
         return self.doUpdateXML(xstr)
