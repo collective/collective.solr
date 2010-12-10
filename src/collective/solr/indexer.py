@@ -72,6 +72,11 @@ class SolrIndexProcessor(object):
                 msg = 'unable to fetch schema, skipping indexing of %r'
                 logger.warning(msg, obj)
                 return
+            uniqueKey = schema.get('uniqueKey', None)
+            if uniqueKey is None:
+                msg = 'schema is missing unique key, skipping indexing of %r'
+                logger.warning(msg, obj)
+                return
             if attributes is not None:
                 attributes = set(schema.keys()).intersection(attributes)
                 if not attributes:
@@ -80,11 +85,6 @@ class SolrIndexProcessor(object):
             if not data:
                 return          # don't index with no data...
             prepareData(data)
-            uniqueKey = schema.get('uniqueKey', None)
-            if uniqueKey is None:
-                msg = 'schema is missing unique key, skipping indexing of %r'
-                logger.warning(msg, obj)
-                return
             if data.get(uniqueKey, None) is not None and not missing:
                 config = getUtility(ISolrConnectionConfig)
                 if config.commit_within:
