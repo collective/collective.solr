@@ -26,6 +26,18 @@ class TestSolr(TestCase):
         self.failUnlessEqual(node.text, '4')
         res.find('QTime')
 
+    def test_add_with_boost_values(self):
+        add_request = getData('add_request_with_boost_values.txt')
+        add_response = getData('add_response.txt')
+        c = SolrConnection(host='localhost:8983', persistent=True)
+        output = fakehttp(c, add_response)
+        boost = {'': 2, 'id': 0.5, 'name': 5}
+        c.add(boost_values=boost, id='500', name='python test doc')
+        res = c.flush()
+        self.assertEqual(len(res), 1)   # one request was sent
+        res = res[0]
+        self.failUnlessEqual(str(output), add_request)
+
     def test_commit(self):
         commit_request = getData('commit_request.txt')
         commit_response = getData('commit_response.txt')

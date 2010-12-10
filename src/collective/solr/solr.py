@@ -190,15 +190,24 @@ class SolrConnection:
         xstr = '<delete><query>%s</query></delete>' % self.escapeVal(query)
         return self.doUpdateXML(xstr)
 
-    def add(self, **fields):
+    def add(self, boost_values=None, **fields):
         within = fields.pop('commitWithin', None)
         if within:
             lst = ['<add commitWithin="%s">' % str(within)]
         else:
             lst = ['<add>']
-        lst.append('<doc>')
+        if boost_values is None:
+            boost_values = {}
+        if '' in boost_values:      # boost value for the entire document
+            lst.append('<doc boost="%s">' % boost_values[''])
+        else:
+            lst.append('<doc>')
         for f, v in fields.items():
-            tmpl = '<field name="%s">%%s</field>' % self.escapeKey(f)
+            if f in boost_values:
+                tmpl = '<field name="%s" boost="%s">%%s</field>' % (
+                    self.escapeKey(f), boost_values[f])
+            else:
+                tmpl = '<field name="%s">%%s</field>' % self.escapeKey(f)
             if isinstance(v, (list, tuple)): # multi-valued
                 for value in v:
                     lst.append(tmpl % self.escapeVal(value))
