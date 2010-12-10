@@ -1,4 +1,5 @@
 from logging import getLogger
+from Acquisition import aq_get
 from DateTime import DateTime
 from datetime import date, datetime
 from zope.component import getUtility, queryUtility, queryMultiAdapter
@@ -52,6 +53,14 @@ handlers = {
 }
 
 
+def boost_values(obj, data):
+    """ calculate boost values using a method or skin script;  returns
+        a dictionary with the values or `None` """
+    boost_index_getter = aq_get(obj, 'solr_boost_index_values', None)
+    if boost_index_getter is not None:
+        return boost_index_getter(data)
+
+
 class SolrIndexProcessor(object):
     """ a queue processor for solr """
     implements(ISolrIndexQueueProcessor)
@@ -91,7 +100,7 @@ class SolrIndexProcessor(object):
                     data['commitWithin'] = config.commit_within
                 try:
                     logger.debug('indexing %r (%r)', obj, data)
-                    conn.add(**data)
+                    conn.add(boost_values=boost_values(obj, data), **data)
                 except (SolrException, error):
                     logger.exception('exception during indexing %r', obj)
 

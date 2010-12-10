@@ -163,6 +163,28 @@ class SolrMaintenanceTests(SolrTestCase):
         results = search('+parentPaths:/plone/news').results()
         self.assertEqual(results.numFound, '2')
 
+    def testReindexKeepsBoostValues(self):
+        # "special" documents get boosted during indexing...
+        from Products.PythonScripts.PythonScript import PythonScript
+        name = 'solr_boost_index_values'
+        self.portal[name] = PythonScript(name)
+        self.portal[name].write("##parameters=data\n"
+            "return {'': 100} if data['getId'] == 'special' else {}")
+        self.folder.invokeFactory('Document', id='dull', title='foo',
+            description='the bar is missing here')
+        self.folder.invokeFactory('Document', id='special', title='bar',
+            description='another foo, this time visible')
+        commit()
+        # so even though the title ranks higher than the description...
+        search = lambda: [result['getId'] for result in
+            getUtility(ISearch)('Title:foo^2 OR Description:foo').results()]
+        # so overall the "special" document should be listed first...
+        self.assertEqual(search(), ['special', 'dull'])
+        # reindexing should keep the boost values intact...
+        maintenance = self.portal.unrestrictedTraverse('solr-maintenance')
+        maintenance.reindex()
+        self.assertEqual(search(), ['special', 'dull'])
+
     def testReindexSkipsNonReferencableItems(self):
         container = self.folder
         maintenance = container.unrestrictedTraverse('solr-maintenance')

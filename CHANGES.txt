@@ -4,6 +4,9 @@ Changelog
 2.0a1 - Unreleased
 ------------------
 
+* Add possibility to calculate site-specific boost values via a skin script.
+  [hannosch, witsch]
+
 * Fix wildcard searches for patterns other than just ending with an asterisk.
   [hannosch, witsch]
 

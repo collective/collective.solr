@@ -10,8 +10,10 @@ from collective.solr.interfaces import ISolrConnectionManager
 from collective.solr.interfaces import ISolrMaintenanceView
 from collective.solr.interfaces import ISearch
 from collective.solr.indexer import indexable, handlers, SolrIndexProcessor
+from collective.solr.indexer import boost_values
 from collective.solr.utils import findObjects
 from collective.solr.utils import prepareData
+
 
 logger = getLogger('collective.solr.maintenance')
 
@@ -158,9 +160,9 @@ class SolrMaintenanceView(BrowserView):
             if stored:          # only populate with data from solr if necessary
                 uids = updates.keys()
                 for uid, flare in solrDataFor(uids, stored):
-                    updates[uid].update(flare)
-            for data in updates.values():
-                conn.add(**data)
+                    updates[uid][1].update(flare)
+            for boost_values, data in updates.values():
+                conn.add(boost_values=boost_values, **data)
             updates.clear()     # clear pending updates
             msg = 'intermediate commit (%d items processed, ' \
                   'last batch in %s)...\n' % (processed, lap.next())
@@ -188,7 +190,7 @@ class SolrMaintenanceView(BrowserView):
                 prepareData(data)
                 if data.get(key, None) is not None and not missing:
                     log('indexing %r' % obj)
-                    updates[data[key]] = data
+                    updates[data[key]] = boost_values(obj, data), data
                     processed += 1
                     log(' (%s).\n' % single.next(), timestamp=False)
                     cpi.next()
