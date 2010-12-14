@@ -3,6 +3,7 @@ Changelog
 
 1.1 - Unreleased
 ----------------
+- add uninstall profile [kiorky]
 
 
 1.0 - Released September 14, 2010
