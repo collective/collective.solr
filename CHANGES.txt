@@ -4,6 +4,10 @@ Changelog
 2.0a1 - Unreleased
 ------------------
 
+* Changed search pattern syntax to use `str.format` syntax and make both
+  `{value}` and `{base_value}` available in the pattern.
+  [hannosch]
+
 * Add possibility to calculate site-specific boost values via a skin script.
   [hannosch, witsch]
 

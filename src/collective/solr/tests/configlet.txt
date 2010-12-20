@@ -30,7 +30,7 @@ First some initial setup code:
     >>> config.required
     ('SearchableText',)
     >>> config.search_pattern
-    '(Title:%s^10 OR Description:%s^3 OR SearchableText:%s)'
+    '(Title:{value}^10 OR Description:{value}^3 OR SearchableText:{value})'
     >>> config.facets
     ('portal_type', 'review_state')
     >>> config.filter_queries
@@ -82,7 +82,7 @@ Make some changes
     >>> self.browser.getControl(name='form.required.0.').value = 'foo'
     >>> self.browser.getControl(name='form.required.add').click()
     >>> self.browser.getControl(name='form.required.1.').value = 'bar'
-    >>> self.browser.getControl(name='form.search_pattern').value = '(Title:%s)'
+    >>> self.browser.getControl(name='form.search_pattern').value = '(Title:{value})'
     >>> self.browser.getControl(name='form.facets.0.').value = 'type'
     >>> self.browser.getControl(name='form.facets.1.').value = 'state'
     >>> self.browser.getControl(name='form.filter_queries.0.').value = 'portal_type'
@@ -126,7 +126,7 @@ Make sure the changes have been applied correctly to the tool:
     >>> config.required
     [u'foo', u'bar']
     >>> config.search_pattern
-    u'(Title:%s)'
+    u'(Title:{value})'
     >>> config.facets
     [u'type', u'state']
     >>> config.slow_query_threshold

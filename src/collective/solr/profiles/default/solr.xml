@@ -14,7 +14,7 @@
       <parameter name="SearchableText" />
     </required-query-parameters>
     <search-pattern
-      value="(Title:%s^10 OR Description:%s^3 OR SearchableText:%s)" />
+      value="(Title:{value}^10 OR Description:{value}^3 OR SearchableText:{value})" />
     <search-facets>
       <parameter name="portal_type" />
       <parameter name="review_state" />

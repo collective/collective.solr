@@ -66,12 +66,15 @@ def mangleQuery(keywords):
             pattern = config.search_pattern
             simple_term = isSimpleTerm(value)
             if pattern and isSimpleSearch(value):
+                base_value = value
                 if simple_term:             # use prefix/wildcard search
                     value = '(%s* OR %s)' % (value.lower(), value)
                 elif isWildCard(value):     # wildcard searches need lower-case
                     value = value.lower()
+                    base_value = quote(value.replace('*', '').replace('?', ''))
                 # simple queries use custom search pattern
-                value = pattern % ((quote(value), ) * pattern.count('%s'))
+                value = pattern.format(value=quote(value),
+                    base_value=base_value)
                 keywords[key] = set([value])    # add literal query parameter
                 continue
             elif simple_term:               # use prefix/wildcard search

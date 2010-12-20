@@ -568,7 +568,7 @@ class SolrServerTests(SolrTestCase):
 
     def testSolrSearchResultsInformationForCustomSearchPattern(self):
         self.maintenance.reindex()
-        self.config.search_pattern = '(Title:%s^5 OR getId:%s)'
+        self.config.search_pattern = '(Title:{value}^5 OR getId:{value})'
         # for single-word searches we get both, wildcards & the custom pattern
         response = solrSearchResults(SearchableText='news', Language='all')
         query = response.responseHeader['params']['q']
@@ -598,13 +598,13 @@ class SolrServerTests(SolrTestCase):
             description='another foo, this time visible')
         commit()                        # indexing happens on commit
         # first we rank title higher than the description...
-        self.config.search_pattern = '(Title:%s^5 OR Description:%s)'
+        self.config.search_pattern = '(Title:{value}^5 OR Description:{value})'
         search = lambda term: [r.getId for r in
             solrSearchResults(SearchableText=term)]
         self.assertEqual(search('foo'), ['doc1', 'doc2'])
         self.assertEqual(search('bar'), ['doc2', 'doc1'])
         # now let's try changing the pattern...
-        self.config.search_pattern = '(Description:%s^5 OR Title:%s)'
+        self.config.search_pattern = '(Description:{value}^5 OR Title:{value})'
         self.assertEqual(search('foo'), ['doc2', 'doc1'])
         self.assertEqual(search('bar'), ['doc1', 'doc2'])
 

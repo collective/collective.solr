@@ -64,7 +64,10 @@ class ISolrSchema(Interface):
     search_pattern = TextLine(title=_(u'Pattern for simple search queries'),
         description = _(u'Specify a query pattern used for simple queries '
                          'consisting only of words and numbers, i.e. not '
-                         'using any of Solr\'s advanced query expressions.'))
+                         'using any of Solr\'s advanced query expressions. '
+                         '{value} and {base_value} are available in the '
+                         'pattern and will be replaced by the search word '
+                         'and the search word stripped of wildcard symbols.'))
 
     facets = List(title=_(u'Default search facets'),
         description = _(u'Specify catalog indexes that should be queried for '
