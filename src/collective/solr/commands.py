@@ -114,8 +114,10 @@ def _convert_value(indexname, value, date_index=False):
         value = unicode(value).encode('utf-8')
     elif isinstance(value, (DateTime, datetime.datetime)):
         value = datehandler(value)
-    elif date_index and isinstance(value, int):
-        value = datehandler(datetime.datetime.utcfromtimestamp(value))
+    elif date_index:
+        if isinstance(value, int):
+            value = datetime.datetime.utcfromtimestamp(value)
+        value = datehandler(value)
     elif not isinstance(value, (bool, int, long, float, str)):
         logger.debug('Unsupported value: %s for index: %s' % (
             repr(value), indexname))
@@ -205,7 +207,11 @@ def solr_dump_catalog(app, args):
         batch = _log_batch(db, batch, i)
         values = {}
         for k, v in _catalog.getMetadataForRID(uid).iteritems():
-            value = _convert_value(k, v)
+            definition = schema.get(k)
+            if not definition:
+                continue
+            date_index = definition['class_'] == 'solr.TrieDateField'
+            value = _convert_value(k, v, date_index)
             if value:
                 values[k] = value
         _dump(data_dir, uid, values)
