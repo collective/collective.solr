@@ -4,6 +4,21 @@ Changelog
 2.0a1 - Unreleased
 ------------------
 
+* Added `zopectl.command` entry points for three new scripts.
+  `solr_clear_index` will remove all entries from Solr. `solr_dump_catalog`
+  will efficiently dump the content of the catalog onto the filesystem and
+  `solr_import_dump` will import the dump into Solr. This can be used to
+  bootstrap an empty Solr index or update it when the boost logic has changed.
+  All scripts will either take the first Plone site found in the database or
+  accept an unnamed command line argument to specify the id. The Solr server
+  needs to be running and the connection info needs to be configured in the
+  Plone site. Example use: ``bin/instance solr_dump_catalog Plone``. In this
+  example the data would be stored in `var/instance/solr_dump_plone`. The data
+  can be transferred between machines and calling `solr_dump_catalog` multiple
+  times will append new data to the existing dump. To get Solr up-to-date you
+  should still call `@@solr-maintenance/sync`.
+  [hannosch, witsch]
+
 * Changed search pattern syntax to use `str.format` syntax and make both
   `{value}` and `{base_value}` available in the pattern.
   [hannosch]

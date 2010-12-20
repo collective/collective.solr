@@ -68,5 +68,9 @@ setup(name = 'collective.solr',
       entry_points = '''
         [z3c.autoinclude.plugin]
         target = plone
+        [zopectl.command]
+        solr_clear_index = collective.solr.commands:solr_clear_index
+        solr_dump_catalog = collective.solr.commands:solr_dump_catalog
+        solr_import_dump = collective.solr.commands:solr_import_dump
       ''',
 )
