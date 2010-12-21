@@ -198,6 +198,8 @@ class SolrIndexProcessor(object):
                     value = value()
             except (ConflictError, KeyboardInterrupt):
                 raise
+            except AttributeError:
+                continue
             except Exception, e:
                 logger.warn(('Error %s occured when getting data '
                              'for indexing!'), e)
