@@ -5,6 +5,9 @@ Changelog
 ----------------
 - add uninstall profile [kiorky]
 
+- still index, if a field can't be accessed
+  [tom_gross]
+
 
 1.0 - Released September 14, 2010
 ---------------------------------

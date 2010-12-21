@@ -3,6 +3,7 @@ from DateTime import DateTime
 from datetime import date, datetime
 from zope.component import getUtility, queryUtility, queryMultiAdapter
 from zope.interface import implements
+from ZODB.POSException import ConflictError
 from Products.CMFCore.utils import getToolByName
 from Products.CMFCore.CMFCatalogAware import CMFCatalogAware
 from Products.Archetypes.CatalogMultiplex import CatalogMultiplex
@@ -195,7 +196,11 @@ class SolrIndexProcessor(object):
                 value = getattr(obj, name)
                 if callable(value):
                     value = value()
-            except AttributeError:
+            except (ConflictError, KeyboardInterrupt):
+                raise
+            except Exception, e:
+                logger.warn(('Error %s occured when getting data '
+                             'for indexing!'), e)
                 continue
             field = schema[name]
             handler = handlers.get(field.class_, None)

@@ -71,6 +71,15 @@ class QueueIndexerTests(TestCase):
         self.proc.index(Foo(id='500', name='python test doc'))   # indexing sends data
         self.assertEqual(sortFields(str(output)), getData('add_request.txt'))
 
+    def testIndexAccessorRaises(self):
+        response = getData('add_response.txt')
+        output = fakehttp(self.mngr.getConnection(), response)   # fake add response
+        def brokenfunc():
+            raise ValueError
+        self.proc.index(Foo(id='500', name='python test doc',
+                            text=brokenfunc))   # indexing sends data
+        self.assertEqual(sortFields(str(output)), getData('add_request.txt'))
+
     def testPartialIndexObject(self):
         foo = Foo(id='500', name='foo', price=42.0)
         # first index all attributes...
