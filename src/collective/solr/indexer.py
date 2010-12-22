@@ -212,7 +212,7 @@ class SolrIndexProcessor(object):
                 value = getattr(obj, name)
                 if callable(value):
                     value = value()
-            except (ConflictError, KeyboardInterrupt):
+            except ConflictError:
                 raise
             except AttributeError:
                 continue
