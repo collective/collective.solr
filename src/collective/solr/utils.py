@@ -81,6 +81,8 @@ def isSimpleSearch(term):
 
 wildCard = compile(r'^[\w\d\s*?]*[*?]+[\w\d\s*?]*$', UNICODE)
 def isWildCard(term):
+    if isinstance(term, str):
+        term = unicode(term, 'utf-8', 'ignore')
     return bool(wildCard.match(term))
 
 
