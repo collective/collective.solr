@@ -590,6 +590,9 @@ class SolrServerTests(SolrTestCase):
         response = solrSearchResults(SearchableText='news*', Language='all')
         query = response.responseHeader['params']['q']
         self.assertEqual(query, '(Title:news* OR getId:news)')
+        response = solrSearchResults(SearchableText='*news*', Language='all')
+        query = response.responseHeader['params']['q']
+        self.assertEqual(query, '(Title:news* OR getId:news)')
 
     def testSolrSearchResultsWithDictRequest(self):
         self.maintenance.reindex()
