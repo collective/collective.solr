@@ -212,13 +212,13 @@ class SolrIndexProcessor(object):
                 value = getattr(obj, name)
                 if callable(value):
                     value = value()
-            except ConflictError:
-                raise
             except AttributeError:
                 continue
-            except Exception, e:
-                logger.warn(('Error %s occured when getting data '
-                             'for indexing!'), e)
+            except ConflictError:
+                raise
+            except Exception:
+                logger.exception('Error occured while getting data for '
+                    'indexing!')
                 continue
             field = schema[name]
             handler = handlers.get(field.class_, None)

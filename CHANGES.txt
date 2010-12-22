@@ -4,8 +4,8 @@ Changelog
 2.0a1 - Unreleased
 ------------------
 
-* still index, if a field can't be accessed
-  [tom_gross]
+* Gracefully handle exceptions raised during index data retrieval.
+  [tom_gross, hannosch]
 
 * Added `zopectl.command` entry points for three new scripts.
   `solr_clear_index` will remove all entries from Solr. `solr_dump_catalog`
