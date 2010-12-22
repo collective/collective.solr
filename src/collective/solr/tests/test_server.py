@@ -581,6 +581,15 @@ class SolrServerTests(SolrTestCase):
         response = solrSearchResults(SearchableText='"news"', Type='xy', Language='all')
         query = response.responseHeader['params']['q']
         self.assertEqual(query, '+Type:xy (Title:"news"^5 OR getId:"news")')
+        # both value and base_value work
+        self.config.search_pattern = '(Title:{value} OR getId:{base_value})'
+        response = solrSearchResults(SearchableText='news', Language='all')
+        query = response.responseHeader['params']['q']
+        self.assertEqual(query, '(Title:(news* OR news) OR getId:news)')
+        # and they handle wildcards as advertised
+        response = solrSearchResults(SearchableText='news*', Language='all')
+        query = response.responseHeader['params']['q']
+        self.assertEqual(query, '(Title:news* OR getId:news)')
 
     def testSolrSearchResultsWithDictRequest(self):
         self.maintenance.reindex()
