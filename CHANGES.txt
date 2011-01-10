@@ -1,7 +1,7 @@
 Changelog
 =========
 
-2.0a1 - Unreleased
+2.0a1 - 2011-01-10
 ------------------
 
 * Handle utf-8 encoded data correctly in `utils.isWildCard`.
