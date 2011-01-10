@@ -133,7 +133,9 @@ def solr_dump_catalog(app, args):
     """
     _enable_log()
     db = app._p_jar.db()
-    site = _get_site(app, args)
+    from Testing import makerequest
+    root = makerequest.makerequest(app)
+    site = _get_site(root, args)
     data_dir = _data_dir(site.getId())
     _make_dir(data_dir)
 

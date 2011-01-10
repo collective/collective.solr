@@ -4,6 +4,8 @@ Changelog
 2.0a2 - unreleased
 ------------------
 
+* Provide a dummy request in the `solr_dump_catalog` command.
+  [hannosch]
 
 2.0a1 - 2011-01-10
 ------------------
