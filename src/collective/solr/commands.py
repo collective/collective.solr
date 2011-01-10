@@ -100,9 +100,11 @@ def _dump(data_dir, uid, data):
 
 
 def _convert_value(indexname, value, date_index=False):
-    # Missing support for string values representing booleans. Shouldn't be
-    # an issue anymore with a dedicated BooleanIndex being available
-    if not value or value == 'None':
+    if value is False or value is True:
+        return value
+    elif not value or value == 'None':
+        # Missing support for string values representing booleans. Shouldn't
+        # be an issue anymore with a dedicated BooleanIndex being available
         return None
     if isinstance(value, (IISet, IITreeSet)):
         value = tuple(value.keys())
@@ -212,10 +214,13 @@ def solr_dump_catalog(app, args):
             definition = schema.get(k)
             if not definition:
                 continue
-            date_index = definition['class_'] == 'solr.TrieDateField'
+            class_ = definition['class_']
+            date_index = class_ == 'solr.TrieDateField'
             value = _convert_value(k, v, date_index)
-            if value:
+            if value is not None:
                 values[k] = value
+            elif class_ == 'solr.TextField':
+                values[k] = ''
         _dump(data_dir, uid, values)
 
     # deal with GopipIndexes
