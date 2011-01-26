@@ -280,7 +280,9 @@ def solr_import_dump(app, args):
 
     conn = _solr_connection()
     data_dir = _data_dir(site.getId())
-    for i, rid_prefix in enumerate(listdir(data_dir)):
+    folders = listdir(data_dir)
+    logger.info('Folders to process: %s' % len(folders))
+    for i, rid_prefix in enumerate(folders):
         prefix_dir = join(data_dir, rid_prefix)
         if not os.path.isdir(prefix_dir):
             continue
@@ -311,7 +313,7 @@ def solr_import_dump(app, args):
                 conn.add(boost_values=boost_values, **data)
 
         conn.flush()
-        logger.info('Updated batch %s' % i)
+        logger.info('Updated folder %s' % (i + 1))
 
     logger.info('Starting optimize commit')
     conn.commit(optimize=True)
