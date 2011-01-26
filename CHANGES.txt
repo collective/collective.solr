@@ -1,7 +1,7 @@
 Changelog
 =========
 
-2.0a3 - unreleased
+2.0a3 - 2011-01-26
 ------------------
 
 * In `solr_dump_catalog` correctly handle boolean values and empty text fields.
