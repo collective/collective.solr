@@ -55,12 +55,6 @@ class PloneFlare(AttrDict):
             url = path2url(path.split('/'))
         return url
 
-    def pretty_title_or_id(self):
-        for attr in 'Title', 'getId', 'id':
-            if attr in self:
-                return self[attr]
-        return '<untitled item>'
-
     @property
     def CreationDate(self):
         created = self.get('created', None)
