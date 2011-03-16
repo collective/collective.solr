@@ -8,9 +8,8 @@ Changelog
 - still index, if a field can't be accessed
   [tom_gross]
 
-- Remove the pretty_title_or_id method from PloneFlare; the implementation
-  was broken and by removing it we fall back to the standard Plone
-  implementation.
+- Fix the pretty_title_or_id method from PloneFlare; the implementation
+  was broken, now delegates to the standard Plone implementation.
   [mj]
 
 

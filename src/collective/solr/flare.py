@@ -2,6 +2,7 @@ from zope.interface import implements
 from zope.component import adapts, getSiteManager
 from zope.publisher.interfaces.http import IHTTPRequest
 from OFS.Traversable import path2url
+from Products.CMFPlone.utils import pretty_title_or_id
 from DateTime import DateTime
 
 from collective.solr.interfaces import ISolrFlare
@@ -54,6 +55,10 @@ class PloneFlare(AttrDict):
         except AttributeError:
             url = path2url(path.split('/'))
         return url
+
+    def pretty_title_or_id(self):
+        context = getSiteManager()
+        return pretty_title_or_id(context, self)
 
     @property
     def CreationDate(self):
