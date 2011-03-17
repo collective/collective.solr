@@ -1,14 +1,15 @@
 Changelog
 =========
 
-1.1 - Unreleased
-----------------
-- add uninstall profile [kiorky]
+1.1 - Released March 17, 2011
+-----------------------------
 
-- still index, if a field can't be accessed
+* add uninstall profile [kiorky]
+
+* still index, if a field can't be accessed
   [tom_gross]
 
-- Fix the pretty_title_or_id method from PloneFlare; the implementation
+* Fix the pretty_title_or_id method from PloneFlare; the implementation
   was broken, now delegates to the standard Plone implementation.
   [mj]
 
