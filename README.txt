@@ -30,13 +30,13 @@ instance by allowing to remove the ``SearchableText`` index from the portal
 catalog - at least for most sites. A sample buildout_ is provided for your
 convenience.
 
-  .. _buildout: http://svn.plone.org/svn/collective/collective.solr/trunk/buildout.cfg
+  .. _buildout: https://github.com/Jarn/collective.solr/blob/master/buildout.cfg
 
 For outstanding issues and features remaining to be implemented please see the
 `to-do list`__ included in the package as well as it's `issue tracker`__.
 
-  .. __: http://svn.plone.org/svn/collective/collective.solr/trunk/TODO.txt
-  .. __: http://plone.org/products/collective.solr/issues
+  .. __: https://github.com/Jarn/collective.solr/blob/master/TODO.txt
+  .. __: https://github.com/Jarn/collective.solr/issues
 
 
 Installation
@@ -47,7 +47,7 @@ The following buildout configuration may be used to get started quickly::
   [buildout]
   extends =
     buildout.cfg
-    http://svn.plone.org/svn/collective/collective.solr/trunk/buildout/solr-1.4.cfg
+    https://github.com/Jarn/collective.solr/raw/master/buildout/solr-1.4.cfg
 
   [instance]
   eggs += collective.solr
@@ -114,7 +114,7 @@ FAQs / Troubleshooting
   .. __: http://plone.org/products/collective.solr/issues/20
   .. _`rows`: http://wiki.apache.org/solr/CommonQueryParameters#rows
   .. __: http://pypi.python.org/pypi/collective.recipe.solrinstance/
-  .. __: http://svn.plone.org/svn/collective/collective.solr/trunk/buildout/solr.cfg
+  .. __: https://github.com/Jarn/collective.solr/raw/master/buildout/solr.cfg
 
 
 Credits
