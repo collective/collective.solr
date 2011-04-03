@@ -212,10 +212,10 @@ class SolrIndexProcessor(object):
                 value = getattr(obj, name)
                 if callable(value):
                     value = value()
-            except AttributeError:
-                continue
             except ConflictError:
                 raise
+            except AttributeError:
+                continue
             except Exception:
                 logger.exception('Error occured while getting data for '
                     'indexing!')
