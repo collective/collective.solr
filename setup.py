@@ -64,7 +64,6 @@ setup(name = 'collective.solr',
         'collective.testcaselayer',
         'Products.LinguaPlone >=3.1a1',
         'Products.PloneTestCase',
-        'zope.testing',
       ]},
       entry_points = '''
         [z3c.autoinclude.plugin]

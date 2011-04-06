@@ -1,5 +1,6 @@
+import doctest
 from unittest import TestSuite
-from zope.testing import doctest
+
 from Testing import ZopeTestCase as ztc
 from collective.solr.tests.base import SolrFunctionalTestCase
 from collective.solr.tests.base import SolrControlPanelTestCase
