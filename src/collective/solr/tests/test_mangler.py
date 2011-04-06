@@ -1,4 +1,4 @@
-from unittest import TestCase, defaultTestLoader, main
+from unittest import TestCase
 from zope.component import provideUtility, getGlobalSiteManager
 from DateTime import DateTime
 
@@ -370,10 +370,3 @@ class QueryParameterTests(TestCase):
         self.assertEqual(params, {'facet.foo': 'bar'})
         params = extract(dict(facet_foo=('foo:bar', 'bar:foo')))
         self.assertEqual(params, {'facet.foo': ('foo', 'bar')})
-
-
-def test_suite():
-    return defaultTestLoader.loadTestsFromName(__name__)
-
-if __name__ == '__main__':
-    main(defaultTest='test_suite')

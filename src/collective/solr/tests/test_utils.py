@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from unittest import TestCase, defaultTestLoader, main
+from unittest import TestCase
 from Testing import ZopeTestCase as ztc
 
 from collective.solr.tests.utils import getData
@@ -188,10 +188,3 @@ class BatchingHelperTests(TestCase):
         self.assertEqual(results[:50], [None] * 50)
         self.assertEqual(results[50].UID, '7c31adb20d5eee314233abfe48515cf3')
         self.assertEqual(results[187:], [None] * (1204 - 187))
-
-
-def test_suite():
-    return defaultTestLoader.loadTestsFromName(__name__)
-
-if __name__ == '__main__':
-    main(defaultTest='test_suite')

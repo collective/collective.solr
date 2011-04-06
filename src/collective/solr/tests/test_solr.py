@@ -1,4 +1,4 @@
-from unittest import TestCase, defaultTestLoader, main
+from unittest import TestCase
 from elementtree.ElementTree import fromstring
 from collective.solr.solr import SolrConnection
 from collective.solr.tests.utils import getData, fakehttp
@@ -118,10 +118,3 @@ class TestSolr(TestCase):
         self.failUnlessEqual(node.attrib['name'], 'QTime')
         self.failUnlessEqual(node.text, '0')
         res.find('QTime')
-
-
-def test_suite():
-    return defaultTestLoader.loadTestsFromName(__name__)
-
-if __name__ == '__main__':
-    main(defaultTest='test_suite')

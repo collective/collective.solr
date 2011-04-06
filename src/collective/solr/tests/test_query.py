@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from unittest import TestCase, defaultTestLoader, main
+from unittest import TestCase
 from DateTime import DateTime
 from Missing import MV
 from zope.component import provideUtility
@@ -322,10 +322,3 @@ class SearchTests(TestCase):
         self.assertEqual(match.sku, '500')
         self.assertEqual(match.timestamp,
             DateTime('2008-02-29 16:11:46.998 GMT'))
-
-
-def test_suite():
-    return defaultTestLoader.loadTestsFromName(__name__)
-
-if __name__ == '__main__':
-    main(defaultTest='test_suite')

@@ -1,4 +1,4 @@
-from unittest import TestCase, defaultTestLoader, main
+from unittest import TestCase
 from DateTime import DateTime
 
 from collective.solr.parser import SolrResponse
@@ -170,10 +170,3 @@ class ParseDateHelperTests(TestCase):
             DateTime(999, 12, 31, 0, 0, 0, 'GMT'))
         self.assertEqual(parseDate('99-12-31T00:00:00.000Z'),
             DateTime('0099-12-31T00:00:00.000Z'))
-
-
-def test_suite():
-    return defaultTestLoader.loadTestsFromName(__name__)
-
-if __name__ == '__main__':
-    main(defaultTest='test_suite')
