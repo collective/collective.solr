@@ -4,6 +4,10 @@ Changelog
 2.0a4 - unreleased
 ------------------
 
+* Rewrite the `isSimpleSearch` function to use a less complex regular
+  expression, which doesn't have O(2**n) scaling properties.
+  [hannosch]
+
 * Use the standard libraries doctest module.
   [hannosch]
 

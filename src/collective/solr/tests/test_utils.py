@@ -73,6 +73,8 @@ class UtilsTests(ztc.ZopeTestCase):
         self.failUnless(isSimpleSearch('foo bar?'))
         self.failUnless(isSimpleSearch('areallyverylongword '
             'andanotherreallylongwordwithsomecake'))
+        self.failUnless(isSimpleSearch('areallyverylongword '
+            'andanotherreallylongwordwithsomecake *'))
         self.failIf(isSimpleSearch(''))
         self.failIf(isSimpleSearch(u'føø bär!'))
         self.failIf(isSimpleSearch(unicode('föö bär', 'latin')))
@@ -84,8 +86,6 @@ class UtilsTests(ztc.ZopeTestCase):
         self.failIf(isSimpleSearch('+foo'))
         self.failIf(isSimpleSearch('name:foo'))
         self.failIf(isSimpleSearch('foo && bar'))
-        self.failIf(isSimpleSearch('areallyverylongword '
-            'andanotherreallylongwordwithsomecake *'))
 
     def testIsWildCard(self):
         self.failUnless(isWildCard('foo*'))
