@@ -1,7 +1,7 @@
 Changelog
 =========
 
-2.0a4 - unreleased
+2.0b1 - 2011-04-06
 ------------------
 
 * Rewrite the `isSimpleSearch` function to use a less complex regular
