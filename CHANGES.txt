@@ -4,6 +4,8 @@ Changelog
 2.0b2 - unreleased
 ------------------
 
+* Avoid using the deprecated `five:implements` directive.
+  [hannosch]
 
 2.0b1 - 2011-04-06
 ------------------

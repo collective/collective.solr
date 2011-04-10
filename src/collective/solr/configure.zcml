@@ -24,9 +24,9 @@
     factory=".search.Search"
     provides=".interfaces.ISearch" />
 
-  <five:implements
-    class="Products.CMFPlone.CatalogTool.CatalogTool"
-    interface=".interfaces.ICatalogTool" />
+  <class class="Products.CMFPlone.CatalogTool.CatalogTool">
+    <implements interface=".interfaces.ICatalogTool" />
+  </class>
 
   <include package=".browser" />
 
