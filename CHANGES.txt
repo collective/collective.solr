@@ -4,6 +4,9 @@ Changelog
 2.0b2 - unreleased
 ------------------
 
+* Added optional support for the `Lazy` backports founds in catalogqueryplan.
+  [hannosch]
+
 * Fixed patch of LazyCat's `__add__` method to patch the base class instead, as
   the method was moved.
   [hannosch]
