@@ -4,6 +4,10 @@ Changelog
 2.0b2 - unreleased
 ------------------
 
+* Fixed patch of LazyCat's `__add__` method to patch the base class instead, as
+  the method was moved.
+  [hannosch]
+
 * Updated test config to Solr 3.1, which should be supported but hasn't seen
   extensive production use.
   [hannosch]

@@ -17,9 +17,9 @@ from collective.solr.mangler import cleanupQueryParameters
 from collective.solr.mangler import optimizeQueryParameters
 from collective.solr.lingua import languageFilter
 
-from collective.solr.monkey import patchCatalogTool, patchLazyCat
-patchCatalogTool()      # patch catalog tool to use the dispatcher...
-patchLazyCat()          # ...as well as ZCatalog's Lazy class
+from collective.solr.monkey import patchCatalogTool, patchLazy
+patchCatalogTool() # patch catalog tool to use the dispatcher...
+patchLazy() # ...as well as ZCatalog's Lazy class
 
 
 class FallBackException(Exception):

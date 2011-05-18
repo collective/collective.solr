@@ -1,5 +1,6 @@
 from zope.component import queryAdapter
 from DateTime import DateTime
+from Products.ZCatalog.Lazy import Lazy
 from Products.ZCatalog.Lazy import LazyCat
 from Products.CMFCore.permissions import AccessInactivePortalContent
 from Products.CMFCore.utils import _getAuthenticatedUser
@@ -41,11 +42,11 @@ def patchCatalogTool():
 def lazyAdd(self, other):
     if isinstance(other, SolrResponse):
         other = LazyCat([list(other)])
-    return LazyCat._solr_original__add__(self, other)
+    return Lazy._solr_original__add__(self, other)
 
 
-def patchLazyCat():
+def patchLazy():
     """ monkey patch ZCatalog's Lazy class in order to be able to
-        concatenate `LazyCat` and `SolrResponse` instances """
-    LazyCat._solr_original__add__ = LazyCat.__add__
-    LazyCat.__add__ = lazyAdd
+        concatenate `Lazy` and `SolrResponse` instances """
+    Lazy._solr_original__add__ = Lazy.__add__
+    Lazy.__add__ = lazyAdd
