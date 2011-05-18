@@ -1,7 +1,7 @@
 Changelog
 =========
 
-2.0b2 - unreleased
+2.0b2 - 2011-05-18
 ------------------
 
 * Added optional support for the `Lazy` backports founds in catalogqueryplan.
