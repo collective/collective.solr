@@ -4,6 +4,10 @@ Changelog
 2.0b2 - unreleased
 ------------------
 
+* Updated test config to Solr 3.1, which should be supported but hasn't seen
+  extensive production use.
+  [hannosch]
+
 * Avoid using the deprecated `five:implements` directive.
   [hannosch]
 
