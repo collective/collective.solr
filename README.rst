@@ -59,7 +59,7 @@ After saving this to let's say ``solr.cfg`` the buildout can be run and the
 Next you should activate the ``collective.solr (site search)`` add-on in the
 add-on control panel of Plone. After activation you should review the settings
 in the new ``Solr Settings`` control panel. To index all your content in Solr
-you can call the provided maintenance view:
+you can call the provided maintenance view::
 
   http://localhost:8080/plone/@@solr-maintenance/reindex
 
