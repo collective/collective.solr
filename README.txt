@@ -1,21 +1,21 @@
-collective.solr
-===============
-
 Introduction
 ------------
 
-`collective.solr`_ is an approach to integrate the `Solr`_ search engine with
-`Plone`_.  It provides an indexing processor for use with
-`collective.indexing`_ as well as a search API similar to the standard portal
-catalog.  `GenericSetup`_ profiles can be applied to set up content indexing
-in `Solr`_ and use it as a backend for `Plone`_'s site and live search
-facilities.
+collective.solr integrates the `Solr`_ search engine with `Plone`_.
 
-  .. _`collective.solr`: http://plone.org/products/collective.solr/
-  .. _`collective.indexing`: http://plone.org/products/collective.indexing/
-  .. _`Solr`: http://lucene.apache.org/solr/
-  .. _`Plone`: http://www.plone.org/
-  .. _`GenericSetup`: http://www.zope.org/Products/GenericSetup/
+Apache Solr is based on Lucene and is *the* enterprise open source search
+engine. It powers the search of sites like Twitter, the Apple and iTunes Stores,
+Wikipedia, Netflix and many more.
+
+Solr does not only scale to any level of content, but provides rich search
+functionality, like facetting, geospatial search, suggestions, spelling
+corrections, indexing of binary formats and a whole variety of powerful tools to
+configure custom search solutions. It has integrated clustering and
+load-balancing to provide a high level of robustness.
+
+collective.solr comes with a default configuration and setup of Solr that makes
+it extremely easy to get started, yet provides a vastly superior search quality
+compared to Plone's integrated text search based on ZCTextIndex.
 
 
 Current Status
@@ -132,3 +132,5 @@ Development was kindly sponsored by `Elkjop`_ and the
   .. __: http://tarekziade.wordpress.com/2008/01/20/snow-sprint-report-1-indexing/
   .. _`Elkjop`: http://www.elkjop.no/
   .. _`Nordic Council and Nordic Council of Ministers`: http://www.norden.org/en/
+  .. _`Solr`: http://lucene.apache.org/solr/
+  .. _`Plone`: http://www.plone.org/
