@@ -4,6 +4,9 @@ Changelog
 2.0b3 - unreleased
 ------------------
 
+* Updated readme and project description, adding detailed information about how
+  Solr works and how we integrate with it.
+  [hannosch]
 
 2.0b2 - 2011-05-18
 ------------------
