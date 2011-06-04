@@ -47,7 +47,7 @@ The following buildout configuration may be used to get started quickly::
   [buildout]
   extends =
     buildout.cfg
-    https://github.com/Jarn/collective.solr/raw/master/buildout/solr-1.4.cfg
+    https://github.com/Jarn/collective.solr/raw/master/buildout/solr.cfg
 
   [instance]
   eggs += collective.solr
