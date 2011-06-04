@@ -63,6 +63,10 @@ you can call the provided maintenance view:
 
   http://localhost:8080/plone/@@solr-maintenance/reindex
 
+Note that the example solr.cfg is bound to change. Always copy the file to your
+local buildout. In general you should never rely on extending buildout config
+files from servers that aren't under your control.
+
 
 Architecture
 ------------
