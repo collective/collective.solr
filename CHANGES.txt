@@ -1,8 +1,8 @@
 Changelog
 =========
 
-2.0b3 - unreleased
-------------------
+2.0 - 2011-06-04
+----------------
 
 * Updated readme and project description, adding detailed information about how
   Solr works and how we integrate with it.
