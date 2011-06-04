@@ -63,7 +63,9 @@ you can call the provided maintenance view:
 Architecture
 ------------
 
-When working with Solr it's good to keep some things about it in mind.
+When working with Solr it's good to keep some things about it in mind. This
+information is targeted at developers and integrators trying to use and extend
+Solr in their Plone projects.
 
 Indexing
 ********
