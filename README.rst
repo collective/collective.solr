@@ -1,5 +1,5 @@
 Introduction
-------------
+============
 
 collective.solr integrates the `Solr`_ search engine with `Plone`_.
 
@@ -19,7 +19,7 @@ compared to Plone's integrated text search based on ZCTextIndex.
 
 
 Current Status
---------------
+==============
 
 The code is used in production in many sites and considered stable. This
 add-on can be installed in a `Plone`_ 4.x site to enable indexing operations
@@ -35,7 +35,7 @@ and the rendering speed of Plone's page templates are a more dominant factor.
 
 
 Installation
-------------
+============
 
 The following buildout configuration may be used to get started quickly::
 
@@ -69,14 +69,14 @@ files from servers that aren't under your control.
 
 
 Architecture
-------------
+============
 
 When working with Solr it's good to keep some things about it in mind. This
 information is targeted at developers and integrators trying to use and extend
 Solr in their Plone projects.
 
 Indexing
-********
+--------
 
 Solr is not transactional aware or supports any kind of rollback or undo. We
 therefor only sent data to Solr at the end of any successful request. This is
@@ -136,7 +136,7 @@ interval, if document A is indexed at 5:15, B at 5:20 and C at 5:35, both A & B
 will be committed at 5:30 and C at 5:50.
 
 Searching
-*********
+---------
 
 Information retrieval is a complex science. We try to give a very brief
 explanation here, refer to the literature and documentation of Lucene/Solr for
@@ -222,7 +222,7 @@ derived from each content item.
 
 
 Development
------------
+===========
 
 Releases can be found on the Python Package Index at
 http://pypi.python.org/pypi/collective.solr. The code and issue trackers can be
@@ -236,7 +236,7 @@ For outstanding issues and features remaining to be implemented please see the
 
 
 Credits
--------
+=======
 
 This code was inspired by `enfold.solr`_ by `Enfold Systems`_ as well as `work
 done at the snowsprint'08`__.  The `solr.py` module is based on the original

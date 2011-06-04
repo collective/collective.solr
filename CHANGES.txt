@@ -614,4 +614,3 @@ Changelog
 
 * Initial release
   [witsch]
-
