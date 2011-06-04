@@ -80,7 +80,7 @@ Indexing
 
 Solr is not transactional aware or supports any kind of rollback or undo. We
 therefor only sent data to Solr at the end of any successful request. This is
-done via collective.indexing, a transaction manager and a end request
+done via collective.indexing, a transaction manager and an end request
 transaction hook. This means you won't see any changes done to content inside a
 request when doing Solr searches later on in the same request. Inside tests you
 need to either commit real transactions or otherwise flush the Solr connection.
@@ -103,9 +103,10 @@ search threads and thus all caches are thrown away and new threads are created
 reflecting the data after the commit. While there's a certain amount of cache
 data that is copied to the new search threads, this data has to be validated
 against the new index which takes some time. The `useColdSearcher` and
-`maxWarmingSearchers` options of the Solr recipe relate to the aspect. While
-cache data is copied over and validated for a new search thread, it's `warming`
-up. If that process is not yet completed the thread is considered to be `cold`.
+`maxWarmingSearchers` options of the Solr recipe relate to this aspect. While
+cache data is copied over and validated for a new search thread, the searcher
+is `warming up`. If the warming up is not yet completed the searcher is
+considered to be `cold`.
 
 In order to get real good performance out of Solr, we need to minimize the
 number of commits against the Solr index. We can achieve this by turning off
@@ -124,8 +125,8 @@ As a result of all the above, the Solr index and the Plone site will always have
 slightly diverging contents. If you use Solr to do searches you need to be aware
 of this, as you might get results for objects that no longer exist. So any
 `brain/getObject` call on the Plone side needs to have error handling code
-around it as the object might not be there anymore and traversing to it throws
-an exception.
+around it as the object might not be there anymore and traversing to it can
+throw an exception.
 
 When adding new or deleting old content or changing the workflow state of it,
 you will also not see those actions reflected in searches right away, but only
@@ -204,7 +205,7 @@ boost value on it - though it will be more important as it's likely to be
 extremely short. Similarly extracting the full text of binary files and simply
 appending them into the search stream might not be the best approach. You should
 rather index those in a separate field and then maybe use a boost value of less
-than one to make the field less important. Given to documents with the same
+than one to make the field less important. Given two documents with the same
 content, one as a normal page and one as a binary file, you'll likely want to
 find the page first, as it's faster to access and read than the file.
 
