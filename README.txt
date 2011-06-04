@@ -60,34 +60,6 @@ you can call the provided maintenance view:
   http://localhost:8080/plone/@@solr-maintenance/reindex
 
 
-FAQs / Troubleshooting
-----------------------
-
-**Searches only return up to 10 results**
-
-  Symptom
-    Searches don't display `more than 10 results`__ even though there are
-    more matches and "Maximum search results" is set to "0" (to always return
-    all results).
-  Problem
-    With the default setting for "Maximum search results" (i.e. "0") no
-    `rows`_ parameter is included when sending queries to Solr.  This results
-    in Solr's default setting to be applied, and both its internal default
-    (when removing the parameter from `solrconfig.xml`) as well as the
-    "max-num-results" option in `collective.recipe.solrinstance`__ end up
-    with a value of 10.
-  Solution
-    Please update your buildout to use a higher setting for "max-num-results".
-    It should be higher than or equal to the maximum number of total search
-    results you'd like to get from your site.  The `sample configuration`__
-    uses a value of "1000".
-
-  .. __: http://plone.org/products/collective.solr/issues/20
-  .. _`rows`: http://wiki.apache.org/solr/CommonQueryParameters#rows
-  .. __: http://pypi.python.org/pypi/collective.recipe.solrinstance/
-  .. __: https://github.com/Jarn/collective.solr/raw/master/buildout/solr.cfg
-
-
 Development
 -----------
 
