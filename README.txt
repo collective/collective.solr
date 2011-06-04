@@ -63,24 +63,6 @@ you can call the provided maintenance view:
 FAQs / Troubleshooting
 ----------------------
 
-**"AssertionError: cannot use multiple direct indexers; please enable queueing"**
-
-  Symptom
-    When activating additional add-ons or applying a GenericSetup profile
-    you get the following error::
-
-      AssertionError: cannot use multiple direct indexers; please enable queueing
-  Problem
-    Early versions of the add-on used a persistent local utility, which is
-    still present in your ZODB.  This utility has meanwhile been replaced so
-    that there are currently two instances present.  However, without queued
-    indexing being enabled, only one such indexer is allowed at a time.
-  Solution
-    Please re-install the add-on via the quick installer Zope Management
-    Interface. Note that this will reset all your configuration but won't
-    change any data in Solr.
-
-
 **Searches only return up to 10 results**
 
   Symptom
