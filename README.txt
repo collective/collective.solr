@@ -24,19 +24,10 @@ Current Status
 The code is used in production in many sites and considered stable. This
 add-on can be installed in a `Plone`_ 4.x site to enable indexing operations
 as well as searching (site and live search) using `Solr`_. Doing so will not
-only significantly improve search performance - especially for a large number
-of indexed objects, but also reduce the memory footprint of your `Plone`_
-instance by allowing to remove the ``SearchableText`` index from the portal
-catalog - at least for most sites. A sample buildout_ is provided for your
-convenience.
-
-  .. _buildout: https://github.com/Jarn/collective.solr/blob/master/buildout.cfg
-
-For outstanding issues and features remaining to be implemented please see the
-`to-do list`__ included in the package as well as it's `issue tracker`__.
-
-  .. __: https://github.com/Jarn/collective.solr/blob/master/TODO.txt
-  .. __: https://github.com/Jarn/collective.solr/issues
+only significantly improve search quality and performance - especially for a
+large number of indexed objects, but also reduce the memory footprint of your
+`Plone`_ instance by allowing to remove the ``SearchableText`` and
+``Description`` indexes from the catalog.
 
 
 Installation
@@ -52,7 +43,7 @@ The following buildout configuration may be used to get started quickly::
   [instance]
   eggs += collective.solr
 
-After saving this to let's say ``solr.cfg`` buildout can be run and the
+After saving this to let's say ``solr.cfg`` the buildout can be run and the
 `Solr`_ server and `Plone`_ instance started::
 
   $ python bootstrap.py
@@ -61,14 +52,12 @@ After saving this to let's say ``solr.cfg`` buildout can be run and the
   $ bin/solr-instance start
   $ bin/instance start
 
-Next the "collective.solr (site search)" profile should be applied via the
-portal setup or when creating a fresh Plone site.  After activating and
-configuring the integration in the Plone control panel and initially indexing
-any existing content using the provided maintenance view:
+Next you should activate the ``collective.solr (site search)`` add-on in the
+add-on control panel of Plone. After activation you should review the settings
+in the new ``Solr Settings`` control panel. To index all your content in Solr
+you can call the provided maintenance view:
 
   http://localhost:8080/plone/@@solr-maintenance/reindex
-
-facet information should appear in Plone's search results page.
 
 
 FAQs / Troubleshooting
@@ -115,6 +104,20 @@ FAQs / Troubleshooting
   .. _`rows`: http://wiki.apache.org/solr/CommonQueryParameters#rows
   .. __: http://pypi.python.org/pypi/collective.recipe.solrinstance/
   .. __: https://github.com/Jarn/collective.solr/raw/master/buildout/solr.cfg
+
+
+Development
+-----------
+
+Releases can be found on the Python Package Index at
+http://pypi.python.org/pypi/collective.solr. The code and issue trackers can be
+found on GitHub at https://github.com/Jarn/collective.solr.
+
+For outstanding issues and features remaining to be implemented please see the
+`to-do list`__ included in the package as well as it's `issue tracker`__.
+
+  .. __: https://github.com/Jarn/collective.solr/blob/master/TODO.txt
+  .. __: https://github.com/Jarn/collective.solr/issues
 
 
 Credits
