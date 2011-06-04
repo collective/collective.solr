@@ -76,10 +76,16 @@ done via collective.indexing, a transaction manager and a end request
 transaction hook. This means you won't see any changes done to content inside a
 request when doing Solr searches later on in the same request. Inside tests you
 need to either commit real transactions or otherwise flush the Solr connection.
+There's no transaction concept, so one request doing a search might get some
+results in its beginning, than a different request might add new information to
+Solr. If the first request is still running and does the same search again it
+might get different results taking the changes from the second request into
+account.
 
 Solr is not a real time search engine. While there's work under way to make Solr
 capable of delivering real time results, there's currently always a certain
-delay from the time data is sent to Solr to when it is available in searches.
+delay up to some minutes from the time data is sent to Solr to when it is
+available in searches.
 
 Search results are returned in Solr by distinct search threads. These search
 threads hold a great number of caches which are crucial for Solr to perform.
