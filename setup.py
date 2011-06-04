@@ -1,13 +1,13 @@
 from setuptools import setup, find_packages
 
 version = '2.0b3'
-readme = open("README.txt").read()
-history = open('CHANGES.txt').read()
+
 
 setup(name = 'collective.solr',
       version = version,
       description = 'Solr integration for external indexing and searching.',
-      long_description = readme[readme.find('\n\n'):] + '\n' + history,
+      long_description = open("README.rst").read() + '\n' +
+                         open('CHANGES.txt').read(),
       classifiers = [
         'Development Status :: 5 - Production/Stable',
         'Environment :: Web Environment',
@@ -59,7 +59,7 @@ setup(name = 'collective.solr',
         'zope.schema',
         'Zope2',
       ],
-      extras_require = { 'test': [
+      extras_require = {'test': [
         'cElementTree',
         'collective.testcaselayer',
         'Products.LinguaPlone >=3.1a1',
