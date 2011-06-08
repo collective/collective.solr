@@ -272,31 +272,21 @@ If you want to integrate with munin, you can install the JMX plugin at:
 http://exchange.munin-monitoring.org/plugins/jmx/details
 
 Follow its install instructions and tweak the included examples to query the
-information you want to track. To track the CPU usage, add a file called
-`solr_cpu.conf` into `/usr/share/munin/plugins` with the following contents::
+information you want to track. To track the average time per search request,
+add a file called `solr_avg_query_time.conf` into `/usr/share/munin/plugins`
+with the following contents::
 
-  graph_args --upper-limit 100 -l 0
-  graph_scale no
-  graph_title CPU Usage
-  graph_vlabel 1000* CPU time %
-  graph_category Java
-  graph_order java_cpu_time java_cpu_user_time
+  graph_title Average Query Time
+  graph_vlabel ms
+  graph_category Solr
 
-  java_cpu_time.label cpu
-  java_cpu_time.jmxObjectName java.lang:type=Threading
-  java_cpu_time.jmxAttributeName CurrentThreadCpuTime
-  java_cpu_time.type DERIVE
-  java_cpu_time.min 0
-  java_cpu_time.graph yes
-  java_cpu_time.cdef java_cpu_time,3000000,/
+  solr_average_query_time.label time per request
+  solr_average_query_time.jmxObjectName solr/:type=standard,id=org.apache.solr.handler.component.SearchHandler
+  solr_average_query_time.jmxAttributeName avgTimePerRequest
 
-  java_cpu_user_time.label user
-  java_cpu_user_time.jmxObjectName java.lang:type=Threading
-  java_cpu_user_time.jmxAttributeName CurrentThreadUserTime
-  java_cpu_user_time.type DERIVE
-  java_cpu_user_time.min 0
-  java_cpu_user_time.graph yes
-  java_cpu_user_time.cdef java_cpu_user_time,3000000,/
+Then add a symlink to add the plugin::
+
+  $ ln -s /usr/share/munin/plugins/jmx_ /etc/munin/plugins/jmx_solr_avg_query_time
 
 Point the jmx plugin to the Solr process, by
 opening `/etc/munin/plugin-conf.d/munin-node.conf` and adding something like::
@@ -312,9 +302,12 @@ if the plugins are working do::
 
 And call the plugin you configured directly, like for example::
 
-  $ ./jmx_solr_cpu
-  java_cpu_time.value 0
-  java_cpu_user_time.value 0
+  $ ./solr_avg_query_time
+  solr_average_query_time.value NaN
+
+We include a number of useful configurations inside the package, in the
+`collective/solr/munin_config` directory. You can copy all of them into the
+`/usr/share/munin/plugins` directory and create the symlinks for all of them.
 
 
 Development

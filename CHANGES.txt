@@ -4,7 +4,8 @@ Changelog
 2.1a1 - unreleased
 ------------------
 
-* Added documentation on Java process and monitoring production settings.
+* Added documentation on Java process, monitoring production settings and
+  include a number of useful munin plugin configurations.
   [hannosch]
 
 * Updated example config to include production settings and JMX.
