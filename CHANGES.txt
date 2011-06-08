@@ -4,6 +4,9 @@ Changelog
 2.1a1 - unreleased
 ------------------
 
+* Updated example config to include production settings and JMX.
+  [hannosch]
+
 * Updated example config to collective.recipe.solrinstance 3.1 and Solr 3.2.
   [hannosch]
 
