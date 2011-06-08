@@ -222,6 +222,101 @@ number of comments as a measure of user feedback or anything else that can be
 derived from each content item.
 
 
+Production
+==========
+
+Java settings
+-------------
+
+Make sure you are using a `server` version of Java in production. The output
+of::
+
+  $ java -version
+
+should include `Java HotSpot(TM) Server VM` or
+`Java HotSpot(TM) 64-Bit Server VM`. You can force the Java VM into server mode
+by calling it with the `-server` command. Do not try to run Solr with versions
+of OpenJDK or other non-official Java versions. They tend to not work well or
+at all.
+
+Depending on the size of your Solr index, you need to configure the Java VM to
+have enough memory. Good starting values are `-Xms128M -Xmx256M`, as a rule of
+thumb keep `Xmx` double the size of `Xms`.
+
+You can configure these settings via the `java_opts` value in the
+`collective.recipe.solrinstance` recipe section like::
+
+  java_opts =
+    -server
+    -Xms128M
+    -Xmx256M
+
+
+Monitoring
+----------
+
+Java has a general monitoring framework called JMX. You can use this to get
+a huge number of details about the Java process in general and Solr in
+particular. Some hints are at http://wiki.apache.org/solr/SolrJmx. The default
+`collective.recipe.solrinstance` config uses `<jmx />`, so we can use command
+line arguments to configure it. Our example `buildout/solr.cfg` includes all
+the relevant values in its `java_opts` variable.
+
+To view all the available metrics, start Solr and then the `jconsole` command
+included in the Java SDK and connect to the local process named `start.jar`.
+Solr specific information is available from the MBeans tab under the `solr`
+section. For example you'll find `avgTimePerRequest` within
+`search/org.apache.solr.handler.component.SearchHandler` under `Attributes`.
+
+If you want to integrate with munin, you can install the JMX plugin at:
+http://exchange.munin-monitoring.org/plugins/jmx/details
+
+Follow its install instructions and tweak the included examples to query the
+information you want to track. To track the CPU usage, add a file called
+`solr_cpu.conf` into `/usr/share/munin/plugins` with the following contents::
+
+  graph_args --upper-limit 100 -l 0
+  graph_scale no
+  graph_title CPU Usage
+  graph_vlabel 1000* CPU time %
+  graph_category Java
+  graph_order java_cpu_time java_cpu_user_time
+
+  java_cpu_time.label cpu
+  java_cpu_time.jmxObjectName java.lang:type=Threading
+  java_cpu_time.jmxAttributeName CurrentThreadCpuTime
+  java_cpu_time.type DERIVE
+  java_cpu_time.min 0
+  java_cpu_time.graph yes
+  java_cpu_time.cdef java_cpu_time,3000000,/
+
+  java_cpu_user_time.label user
+  java_cpu_user_time.jmxObjectName java.lang:type=Threading
+  java_cpu_user_time.jmxAttributeName CurrentThreadUserTime
+  java_cpu_user_time.type DERIVE
+  java_cpu_user_time.min 0
+  java_cpu_user_time.graph yes
+  java_cpu_user_time.cdef java_cpu_user_time,3000000,/
+
+Point the jmx plugin to the Solr process, by
+opening `/etc/munin/plugin-conf.d/munin-node.conf` and adding something like::
+
+  [jmx_*]
+  env.jmxurl service:jmx:rmi:///jndi/rmi://127.0.0.1:8984/jmxrmi
+
+The host and port need to match those passed via `java_opts` to Solr. To check
+if the plugins are working do::
+
+  $ export jmxurl="service:jmx:rmi:///jndi/rmi://127.0.0.1:8984/jmxrmi"
+  $ cd /etc/munin/plugins
+
+And call the plugin you configured directly, like for example::
+
+  $ ./jmx_solr_cpu
+  java_cpu_time.value 0
+  java_cpu_user_time.value 0
+
+
 Development
 ===========
 

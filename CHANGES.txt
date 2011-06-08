@@ -4,6 +4,9 @@ Changelog
 2.1a1 - unreleased
 ------------------
 
+* Added documentation on Java process and monitoring production settings.
+  [hannosch]
+
 * Updated example config to include production settings and JMX.
   [hannosch]
 
