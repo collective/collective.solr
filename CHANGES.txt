@@ -4,6 +4,12 @@ Changelog
 2.1a1 - unreleased
 ------------------
 
+* Adjusted the `mangleQuery` function to calculate extended path indexes from
+  the Solr schema instead of hardcoding `path`. You need to provide indexers
+  with the same three suffixes as we do ourselves in the `attributes` module
+  for the `path` index and add those to the Solr schema.
+  [hannosch]
+
 * Changed the names of the indexes used to emulate the `path` index. You need
   to adjust your schema and rename `physicalPath` to `path_string`, 
   `physicalDepth` to `path_depth` and `parentPaths` to `path_parents`.
