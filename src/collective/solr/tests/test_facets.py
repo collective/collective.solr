@@ -30,7 +30,7 @@ class SolrFacettingTests(SolrTestCase):
         self.maintenance.reindex()
         results = solrSearchResults(SearchableText='Welcome', facet='true',
             facet_field='portal_type')
-        self.assertEqual(sorted([r.physicalPath for r in results]),
+        self.assertEqual(sorted([r.path_string for r in results]),
             ['/plone/event1', '/plone/front-page'])
         types = results.facet_counts['facet_fields']['portal_type']
         self.assertEqual(types['Document'], 1)
@@ -42,7 +42,7 @@ class SolrFacettingTests(SolrTestCase):
         request.form['facet'] = 'true'
         request.form['facet_field'] = 'review_state'
         results = solrSearchResults(request)
-        self.assertEqual(sorted([r.physicalPath for r in results]),
+        self.assertEqual(sorted([r.path_string for r in results]),
             ['/plone/news', '/plone/news/aggregator'])
         states = results.facet_counts['facet_fields']['review_state']
         self.assertEqual(states, dict(private=0, published=2))
@@ -53,7 +53,7 @@ class SolrFacettingTests(SolrTestCase):
         self.maintenance.reindex()
         results = solrSearchResults(SearchableText='Welcome', facet='true',
             facet_field=['portal_type', 'review_state'])
-        self.assertEqual(sorted([r.physicalPath for r in results]),
+        self.assertEqual(sorted([r.path_string for r in results]),
             ['/plone/event1', '/plone/front-page'])
         facets = results.facet_counts['facet_fields']
         self.assertEqual(facets['portal_type']['Event'], 1)
@@ -66,7 +66,7 @@ class SolrFacettingTests(SolrTestCase):
         request.form['facet'] = 'true'
         request.form['facet_field'] = 'review_state'
         results = solrSearchResults(request)
-        self.assertEqual([r.physicalPath for r in results],
+        self.assertEqual([r.path_string for r in results],
             ['/plone/news/aggregator'])
         states = results.facet_counts['facet_fields']['review_state']
         self.assertEqual(states, dict(private=0, published=1))
