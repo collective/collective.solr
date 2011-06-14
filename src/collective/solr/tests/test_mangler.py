@@ -12,7 +12,7 @@ from collective.solr.parser import SolrSchema, SolrField
 
 
 def mangle(**keywords):
-    mangleQuery(keywords)
+    mangleQuery(keywords, None, {})
     return keywords
 
 
@@ -43,7 +43,7 @@ class QueryManglerTests(TestCase):
 
     def testComplainAboutUnknownUsages(self):
         keywords = dict(foo=23, foo_usage='bar:42')
-        self.assertRaises(AssertionError, mangleQuery, keywords)
+        self.assertRaises(AssertionError, mangleQuery, keywords, None, {})
 
     def testMinRange(self):
         keywords = mangle(foo=[23], foo_usage='range:min')
@@ -126,7 +126,8 @@ class QueryManglerTests(TestCase):
         })
         # and finally with a setting for steps
         self.config.effective_steps = 300
-        keywords = mangle(effectiveRange=date, show_inactive=False)
+        keywords = dict(effectiveRange=date, show_inactive=False)
+        mangleQuery(keywords, self.config, {})
         self.assertEqual(keywords, {
             'effective': '[* TO 1972-05-11T03:45:00.000Z]',
             'expires': '[1972-05-11T03:45:00.000Z TO *]',

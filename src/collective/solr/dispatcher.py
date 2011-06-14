@@ -83,7 +83,7 @@ def solrSearchResults(request=None, **keywords):
     params = cleanupQueryParameters(extractQueryParameters(args), schema)
     languageFilter(args)
     prepareData(args)
-    mangleQuery(args)
+    mangleQuery(args, config, schema)
     query = search.buildQuery(**args)
     optimizeQueryParameters(query, params)
     __traceback_info__ = (query, params, args)
