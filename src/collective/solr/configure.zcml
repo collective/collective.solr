@@ -57,9 +57,9 @@
       factory=".vocabularies.SolrIndexes"
       name="collective.solr.indexes" />
 
-  <adapter name="physicalPath" factory=".attributes.physicalPath" />
-  <adapter name="physicalDepth" factory=".attributes.physicalDepth" />
-  <adapter name="parentPaths" factory=".attributes.parentPaths" />
+  <adapter name="path_string" factory=".attributes.path_string" />
+  <adapter name="path_depth" factory=".attributes.path_depth" />
+  <adapter name="path_parents" factory=".attributes.path_parents" />
 
   <adapter
       factory=".exportimport.SolrConfigXMLAdapter"

@@ -31,7 +31,7 @@ class PloneFlare(AttrDict):
 
     def getPath(self):
         """ convenience alias """
-        return self['physicalPath']
+        return self['path_string']
 
     def getObject(self, REQUEST=None):
         """ return the actual object corresponding to this flare while

@@ -4,6 +4,11 @@ Changelog
 2.1a1 - unreleased
 ------------------
 
+* Changed the names of the indexes used to emulate the `path` index. You need
+  to adjust your schema and rename `physicalPath` to `path_string`, 
+  `physicalDepth` to `path_depth` and `parentPaths` to `path_parents`.
+  [hannosch]
+
 * Added documentation on Java process, monitoring production settings and
   include a number of useful munin plugin configurations.
   [hannosch]

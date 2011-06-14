@@ -80,15 +80,15 @@ def mangleQuery(keywords, config, schema):
                 keywords[key] = '(%s* OR %s)' % (value.lower(), value)
                 continue
         if key == 'path':
-            path = keywords['parentPaths'] = value
+            path = keywords['path_parents'] = value
             del keywords[key]
             if 'depth' in args:
                 depth = int(args['depth'])
                 if depth >= 0:
                     if not isinstance(value, (list, tuple)):
                         path = [path]
-                    tmpl = '(+physicalDepth:[%d TO %d] AND +parentPaths:%s)'
-                    params = keywords['parentPaths'] = set()
+                    tmpl = '(+path_depth:[%d TO %d] AND +path_parents:%s)'
+                    params = keywords['path_parents'] = set()
                     for p in path:
                         base = len(p.split('/'))
                         params.add(tmpl % (base, base + depth, p))

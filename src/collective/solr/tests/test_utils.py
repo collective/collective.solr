@@ -147,22 +147,22 @@ class MaintenanceHelperTests(TestCase):
     def testMissingWithEmptyAttributes(self):
         missing, stored = self.missing(attributes=[])
         self.assertEqual(missing, set(['UID', 'default', 'SearchableText',
-            'physicalDepth', 'parentPaths']))
+            'path_depth', 'path_parents']))
         self.assertEqual(stored, set(['id', 'UID', 'Title', 'Subject',
-            'physicalPath', 'review_state']))
+            'path_string', 'review_state']))
 
     def testMissingWithSomeAttributes(self):
         missing, stored = self.missing(attributes=['UID', 'Title', 'Subject'])
         self.assertEqual(missing, set(['default', 'SearchableText',
-            'physicalDepth', 'parentPaths']))
-        self.assertEqual(stored, set(['id', 'physicalPath', 'review_state']))
+            'path_depth', 'path_parents']))
+        self.assertEqual(stored, set(['id', 'path_string', 'review_state']))
 
     def testMissingWithStoredAttributes(self):
         missing, stored = self.missing(attributes=['SearchableText', 'UID'])
-        self.assertEqual(missing, set(['default', 'physicalDepth',
-            'parentPaths']))
+        self.assertEqual(missing, set(['default', 'path_depth',
+            'path_parents']))
         self.assertEqual(stored, set(['id', 'Title', 'Subject',
-            'physicalPath', 'review_state']))
+            'path_string', 'review_state']))
 
 
 class BatchingHelperTests(TestCase):
