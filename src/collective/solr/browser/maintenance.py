@@ -9,7 +9,7 @@ from collective.indexing.indexer import getOwnIndexMethod
 from collective.solr.interfaces import ISolrConnectionManager
 from collective.solr.interfaces import ISolrMaintenanceView
 from collective.solr.interfaces import ISearch
-from collective.solr.indexer import indexable, handlers, SolrIndexProcessor
+from collective.solr.indexer import indexable, SolrIndexProcessor
 from collective.solr.indexer import boost_values
 from collective.solr.utils import findObjects
 from collective.solr.utils import prepareData
@@ -51,56 +51,6 @@ def notimeout(func):
     return wrapper
 
 
-def missingAndStored(attributes, schema):
-    """ determine the sets of attributes that need to be fetched from
-        the objects and what can be completed using data in solr """
-    missing = set()
-    stored = set()
-    if attributes is not None:
-        key = schema.uniqueKey
-        if not key in attributes:
-            missing.add(key)
-        for field in schema.fields:
-            if field.name in attributes:
-                continue
-            elif not field.stored:      # fields not stored need to be added
-                missing.add(field.name)
-            elif not field.name in attributes:
-                stored.add(field.name)
-    return missing, stored
-
-
-def solrDataFor(uids, fields):
-    """ fetch existing index data from solr for object with given uids """
-    manager = queryUtility(ISolrConnectionManager)
-    search = queryUtility(ISearch)
-    schema = manager.getSchema()
-    # set up data converters
-    converters = {}
-    for field in schema.fields:
-        name = field['name']
-        handler = handlers.get(field.class_, None)
-        if handler is not None:
-            converters[name] = handler
-        elif not field.multiValued:
-            separator = getattr(field, 'separator', ' ')
-            def conv(value):
-                if isinstance(value, (list, tuple)):
-                    value = separator.join(value)
-                return value
-            converters[name] = conv
-    # query & convert data for given uids
-    key = schema.uniqueKey
-    query = '+%s:(%s)' % (key, ' OR '.join(uids))
-    for flare in search(query, rows=len(uids), fl=' '.join(fields)):
-        uid = getattr(flare, key)
-        assert uid, 'empty unique key?'
-        for name, conv in converters.items():
-            if name in flare:
-                flare[name] = conv(flare[name])
-        yield uid, flare
-
-
 class SolrMaintenanceView(BrowserView):
     """ helper view for indexing all portal content in Solr """
     implements(ISolrMaintenanceView)
@@ -132,7 +82,7 @@ class SolrMaintenanceView(BrowserView):
         conn.commit()
         return 'solr index cleared.'
 
-    def reindex(self, batch=1000, skip=0, cache=50000, attributes=None):
+    def reindex(self, batch=1000, skip=0, cache=50000):
         """ find all contentish objects (meaning all objects derived from one
             of the catalog mixin classes) and (re)indexes them """
         manager = queryUtility(ISolrConnectionManager)
@@ -149,21 +99,13 @@ class SolrMaintenanceView(BrowserView):
         processed = 0
         schema = manager.getSchema()
         key = schema.uniqueKey
-        stored = None
-        if attributes is not None:
-            missing, stored = missingAndStored(attributes, schema)
-            attributes.extend(list(missing))
         updates = {}            # list to hold data to be updated
         flush = lambda: conn.flush()
         flush = notimeout(flush)
         def checkPoint():
-            if stored:          # only populate with data from solr if necessary
-                uids = updates.keys()
-                for uid, flare in solrDataFor(uids, stored):
-                    updates[uid][1].update(flare)
             for boost_values, data in updates.values():
                 conn.add(boost_values=boost_values, **data)
-            updates.clear()     # clear pending updates
+            updates.clear()
             msg = 'intermediate commit (%d items processed, ' \
                   'last batch in %s)...\n' % (processed, lap.next())
             log(msg)
@@ -184,7 +126,7 @@ class SolrMaintenanceView(BrowserView):
                 count += 1
                 if count <= skip:
                     continue
-                data, missing = proc.getData(obj, attributes)
+                data, missing = proc.getData(obj)
                 prepareData(data)
                 if data.get(key, None) is not None and not missing:
                     updates[data[key]] = boost_values(obj, data), data
