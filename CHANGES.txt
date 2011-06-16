@@ -4,6 +4,10 @@ Changelog
 2.1a1 - unreleased
 ------------------
 
+* Rewrote the `maintenance/sync` method for more performance and dropped the
+  optional `path` restriction from it.
+  [hannosch]
+
 * Changed the `maintenance/reindex` method to only flush data to Solr but not
   commit after each batch. Instead we only commit once at the end. You should
   configure auto commit policies on the Solr server side.
