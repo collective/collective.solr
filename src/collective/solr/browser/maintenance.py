@@ -188,7 +188,6 @@ class SolrMaintenanceView(BrowserView):
                 data, missing = proc.getData(obj, attributes)
                 prepareData(data)
                 if data.get(key, None) is not None and not missing:
-                    log('indexing %r' % obj)
                     updates[data[key]] = boost_values(obj, data), data
                     processed += 1
                     log(' (%s).\n' % single.next(), timestamp=False)
