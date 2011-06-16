@@ -132,11 +132,12 @@ class SolrMaintenanceView(BrowserView):
         conn.commit()
         return 'solr index cleared.'
 
-    def reindex(self, batch=100, skip=0, cache=10000, attributes=None, wait=True):
+    def reindex(self, batch=1000, skip=0, cache=50000, attributes=None):
         """ find all contentish objects (meaning all objects derived from one
             of the catalog mixin classes) and (re)indexes them """
         manager = queryUtility(ISolrConnectionManager)
         proc = SolrIndexProcessor(manager)
+        conn = manager.getConnection()
         db = self.context.getPhysicalRoot()._p_jar.db()
         log = self.mklog()
         log('reindexing solr catalog...\n')
@@ -146,7 +147,6 @@ class SolrMaintenanceView(BrowserView):
         lap = timer()           # real lap time (for intermediate commits)
         cpu = timer(clock)      # cpu time
         processed = 0
-        conn = manager.getConnection()
         schema = manager.getSchema()
         key = schema.uniqueKey
         stored = None
@@ -154,8 +154,8 @@ class SolrMaintenanceView(BrowserView):
             missing, stored = missingAndStored(attributes, schema)
             attributes.extend(list(missing))
         updates = {}            # list to hold data to be updated
-        commit = lambda: conn.commit(waitFlush=wait, waitSearcher=wait)
-        commit = notimeout(commit)
+        flush = lambda: conn.flush()
+        flush = notimeout(flush)
         def checkPoint():
             if stored:          # only populate with data from solr if necessary
                 uids = updates.keys()
@@ -168,8 +168,7 @@ class SolrMaintenanceView(BrowserView):
                   'last batch in %s)...\n' % (processed, lap.next())
             log(msg)
             logger.info(msg)
-            commit()
-            manager.getConnection().reset()     # force new connection
+            flush()
             if cache:
                 size = db.cacheSize()
                 if size > cache:
@@ -197,7 +196,8 @@ class SolrMaintenanceView(BrowserView):
                     single.next()   # don't count commit time here...
                 else:
                     log('missing data, skipping indexing of %r.\n' % obj)
-        checkPoint()            # make sure to process the last batch
+        checkPoint()
+        conn.commit()
         log('solr index rebuilt.\n')
         msg = 'processed %d items in %s (%s cpu time).'
         msg = msg % (processed, real.next(), cpu.next())
