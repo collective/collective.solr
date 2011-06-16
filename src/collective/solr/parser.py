@@ -45,7 +45,12 @@ def parse_date_as_datetime(value):
     if value.find('-') < 4:
         year, rest = value.split('-', 1)
         value = '%04d-%s' % (int(year), rest)
-    return datetime.strptime(value, '%Y-%m-%dT%H:%M:%S.%fZ')
+    format = '%Y-%m-%dT%H:%M:%S'
+    if '.' in value:
+        format += '.%fZ'
+    else:
+        format += 'Z'
+    return datetime.strptime(value, format)
 
 
 # unmarshallers for basic types
