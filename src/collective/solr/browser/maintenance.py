@@ -232,6 +232,16 @@ class SolrMaintenanceView(BrowserView):
                     db.cacheMinimize()
         cpi = checkpointIterator(checkPoint, batch)
         lookup = getToolByName(self.context, 'reference_catalog').lookupObject
+        log('processing %d "unindex" operations next...\n' % len(unindex))
+        op = notimeout(lambda uid: conn.delete(id=uid))
+        for uid in unindex:
+            obj = lookup(uid)
+            if obj is None:
+                op(uid)
+                processed += 1
+                cpi.next()
+            else:
+                log('not unindexing existing object %r (%r).\n' % (obj, uid))
         log('processing %d "index" operations next...\n' % len(index))
         op = notimeout(lambda obj: proc.index(obj))
         for uid in index:
@@ -252,16 +262,6 @@ class SolrMaintenanceView(BrowserView):
                 cpi.next()
             else:
                 log('not reindexing unindexable object %r.\n' % obj)
-        log('processing %d "unindex" operations next...\n' % len(unindex))
-        op = notimeout(lambda uid: conn.delete(id=uid))
-        for uid in unindex:
-            obj = lookup(uid)
-            if obj is None:
-                op(uid)
-                processed += 1
-                cpi.next()
-            else:
-                log('not unindexing existing object %r (%r).\n' % (obj, uid))
         conn.commit()
         log('solr index synced.\n')
         msg = 'processed %d object(s) in %s (%s cpu time).'
