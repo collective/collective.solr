@@ -128,10 +128,12 @@ class SolrMaintenanceView(BrowserView):
                     continue
                 data, missing = proc.getData(obj)
                 prepareData(data)
-                if data.get(key, None) is not None and not missing:
-                    updates[data[key]] = boost_values(obj, data), data
-                    processed += 1
-                    cpi.next()
+                if not missing:
+                    value = data.get(key, None)
+                    if value is not None:
+                        updates[value] = (boost_values(obj, data), data)
+                        processed += 1
+                        cpi.next()
                 else:
                     log('missing data, skipping indexing of %r.\n' % obj)
         checkPoint()
