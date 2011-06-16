@@ -1,5 +1,6 @@
 from logging import getLogger
 from time import time, clock, strftime
+
 from zope.interface import implements
 from zope.component import queryUtility
 from Products.Five.browser import BrowserView
@@ -16,6 +17,7 @@ from collective.solr.utils import prepareData
 
 
 logger = getLogger('collective.solr.maintenance')
+MAX_ROWS = 1000000000
 
 
 def timer(func=time):
@@ -144,7 +146,7 @@ class SolrMaintenanceView(BrowserView):
         log(msg)
         logger.info(msg)
 
-    def metadata(self, index, key, func=lambda x: x, path='/'):
+    def metadata(self, index, key, func=lambda x: x):
         """ build a mapping between a unique key and a given attribute from
             the portal catalog; catalog metadata must exist for the given
             index """
@@ -155,21 +157,20 @@ class SolrMaintenanceView(BrowserView):
         for uid, rids in cat.getIndex(key).items():
             for rid in rids:
                 value = cat.data[rid][pos]
-                if value is not None and cat.paths[rid].startswith(path):
+                if value is not None:
                     data[uid] = func(value)
         return data
 
-    def diff(self, path):
+    def diff(self):
         """ determine objects that need to be indexed/reindex/unindexed by
             diff'ing the records in the portal catalog and solr """
         key = queryUtility(ISolrConnectionManager).getSchema().uniqueKey
         uids = self.metadata('modified', key=key,
-            func=lambda x: x.millis(), path=path)
+            func=lambda x: x.millis())
         search = queryUtility(ISearch)
         reindex = []
-        unindex = []
         rows = len(uids) * 10               # sys.maxint makes solr choke :(
-        query = '+%s:[* TO *] +path_parents:%s' % (key, path)
+        query = '+%s:[* TO *]' % key
         for flare in search(query, rows=rows, fl='%s modified' % key):
             uid = getattr(flare, key)
             assert uid, 'empty unique key?'
@@ -177,10 +178,7 @@ class SolrMaintenanceView(BrowserView):
                 if uids[uid] > flare.modified.millis():
                     reindex.append(uid)     # item isn't current
                 del uids[uid]               # remove from the list in any case
-            else:
-                unindex.append(uid)         # item doesn't exist in catalog
-        index = uids.keys()
-        return index, reindex, unindex
+        return reindex
 
     def sync(self, batch=1000, cache=50000):
         """Sync the Solr index with the portal catalog. Records contained
@@ -195,13 +193,30 @@ class SolrMaintenanceView(BrowserView):
         real = timer()          # real time
         lap = timer()           # real lap time (for intermediate commits)
         cpu = timer(clock)      # cpu time
-        path = '/'.join(self.context.getPhysicalPath())
-        log('determining differences between portal catalog and solr '
-            '(from "%s")...' % path)
-        index, reindex, unindex = self.diff(path)
-        log(' (%s).\n' % lap.next(), timestamp=False)
-        log('operations needed: %d "index", %d "reindex", %d "unindex"\n' % (
-            len(index), len(reindex), len(unindex)))
+        # get Solr status
+        search = queryUtility(ISearch)
+        key = queryUtility(ISolrConnectionManager).getSchema().uniqueKey
+        query = '+%s:[* TO *]' % key
+        flares = search(query, rows=MAX_ROWS, fl='%s modified' % key)
+        solr_results = {}
+        solr_uids = set()
+        for flare in flares:
+            uid = flare[key]
+            solr_uids.add(uid)
+            # TODO the search creates DateTime instances from the XML, we
+            # don't need that overhead
+            solr_results[uid] = flare['modified'].millis()
+        # get catalog status
+        catalog = getToolByName(self.context, 'portal_catalog')
+        cat_uids = set(catalog._catalog.getIndex(key)._index.keys())
+        # differences
+        index = cat_uids.difference(solr_uids)
+        solr_uids.difference_update(cat_uids)
+        unindex = solr_uids
+
+        # unoptimized
+        reindex = self.diff()
+
         processed = 0
         flush = notimeout(lambda: conn.flush())
         def checkPoint():

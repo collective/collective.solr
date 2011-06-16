@@ -213,24 +213,6 @@ class SolrMaintenanceTests(SolrTestCase):
         found, counts = self.counts()
         self.assertEqual(found, 8)
 
-    def test_sync_path(self):
-        maintenance = self.portal.unrestrictedTraverse('news/solr-maintenance')
-        self.assertEqual(numFound(self.search()), 0)
-        maintenance.sync()
-        found, counts = self.counts()
-        self.assertEqual(found, 2)
-
-    def test_sync_multistep(self):
-        maintenance = self.portal.unrestrictedTraverse('news/solr-maintenance')
-        self.assertEqual(numFound(self.search()), 0)
-        maintenance.sync()
-        found, counts = self.counts()
-        self.assertEqual(found, 2)
-        maintenance = self.portal.unrestrictedTraverse('solr-maintenance')
-        maintenance.sync()
-        found, counts = self.counts()
-        self.assertEqual(found, 8)
-
     def test_sync_update(self):
         maintenance = self.portal.unrestrictedTraverse('solr-maintenance')
         maintenance.sync()
