@@ -218,6 +218,8 @@ class SolrMaintenanceView(BrowserView):
                 cpi.next()
             else:
                 log('not indexing unindexable object %r.\n' % obj)
+            if obj is not None:
+                obj._p_deactivate()
         log('processing "reindex" operations next...\n')
         op = notimeout(lambda obj: proc.reindex(obj))
         cat_mod_get = modified_index._unindex.get
@@ -234,6 +236,8 @@ class SolrMaintenanceView(BrowserView):
                     cpi.next()
                 else:
                     log('not reindexing unindexable object %r.\n' % obj)
+                if obj is not None:
+                    obj._p_deactivate()
         conn.commit()
         log('solr index synced.\n')
         msg = 'processed %d object(s) in %s (%s cpu time).'
