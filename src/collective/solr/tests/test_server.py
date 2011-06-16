@@ -49,14 +49,13 @@ class SolrMaintenanceTests(SolrTestCase):
     def search(self, query='+UID:[* TO *]'):
         return self.connection.search(q=query).read()
 
-    def counts(self, attributes=None):
+    def counts(self):
         """ crude count of metadata records in the database """
         info = {}
         result = self.search()
         for record in split(r'<(str|date) name="', result)[1:]:
             name = record[:record.find('"')]
-            if not attributes or name in attributes:
-                info[name] = info.get(name, 0) + 1
+            info[name] = info.get(name, 0) + 1
         return numFound(result), info
 
     def testClear(self):
@@ -114,54 +113,6 @@ class SolrMaintenanceTests(SolrTestCase):
         self.assertEqual(counts['path_string'], 2)
         self.assertEqual(counts['portal_type'], 2)
         self.assertEqual(counts['review_state'], 2)
-
-    def testReindexSingleOrFewAttributes(self):
-        # reindexing a set of attributes (or a single one) should not destroy
-        # any of the existing data fields, but merely add the new data...
-        maintenance = self.portal.unrestrictedTraverse('solr-maintenance')
-        maintenance.reindex(attributes=['UID', 'Title', 'modified'])
-        # even after adding only one index all the data should already exist
-        attributes = 'Title', 'modified', 'portal_type', 'review_state', 'path_string'
-        self.assertEqual(self.counts(attributes),
-            (8, dict(Title=8, modified=8)))
-        # reindexing `portal_type` should add the new metadata column
-        maintenance.reindex(attributes=['portal_type'])
-        self.assertEqual(self.counts(attributes),
-            (8, dict(Title=8, modified=8, portal_type=8)))
-        # let's try that again with an EIOW, i.e. `path_string`...
-        maintenance.reindex(attributes=['path_string'])
-        self.assertEqual(self.counts(attributes),
-            (8, dict(Title=8, modified=8, portal_type=8, path_string=8)))
-        # as well as with the extra catalog variables...
-        maintenance.reindex(attributes=['review_state'])
-        self.assertEqual(self.counts(attributes),
-            (8, dict(Title=8, modified=8, portal_type=8, path_string=8, review_state=8)))
-
-    def testReindexKeepsExistingData(self):
-        # add subjects for testing multi-value fields
-        self.portal.news.setSubject(['foo', 'bar'])
-        attributes = ['UID', 'Title', 'Date', 'Subject']
-        maintenance = self.portal.unrestrictedTraverse('solr-maintenance')
-        maintenance.reindex(attributes=attributes)
-        # reindexing a single/few attributes shouldn't destroy existing data
-        # to check we remember the original results first...
-        search = getUtility(ISearch)
-        original = search('+UID:[* TO *]', sort='UID asc').results()
-        self.assertEqual(original.numFound, '8')
-        # let's sync and compare the data from a new search
-        maintenance.reindex(attributes=['portal_type', 'review_state'])
-        results = search('+UID:[* TO *]', sort='UID asc').results()
-        self.assertEqual(results.numFound, '8')
-        for idx, result in enumerate(results):
-            self.failUnless('portal_type' in result)
-            org = original[idx]
-            for attr in attributes:
-                self.assertEqual(org.get(attr, 42), result.get(attr, 42),
-                    '%r vs %r' % (org, result))
-        # data not stored (but only indexed) in solr must also be preserved
-        # so that querying against the according indices still works...
-        results = search('+path_parents:/plone/news').results()
-        self.assertEqual(results.numFound, '2')
 
     def testReindexKeepsBoostValues(self):
         # "special" documents get boosted during indexing...
