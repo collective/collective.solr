@@ -146,40 +146,6 @@ class SolrMaintenanceView(BrowserView):
         log(msg)
         logger.info(msg)
 
-    def metadata(self, index, key, func=lambda x: x):
-        """ build a mapping between a unique key and a given attribute from
-            the portal catalog; catalog metadata must exist for the given
-            index """
-        catalog = getToolByName(self.context, 'portal_catalog')
-        cat = catalog._catalog      # get the real catalog...
-        pos = cat.schema[index]
-        data = {}
-        for uid, rids in cat.getIndex(key).items():
-            for rid in rids:
-                value = cat.data[rid][pos]
-                if value is not None:
-                    data[uid] = func(value)
-        return data
-
-    def diff(self):
-        """ determine objects that need to be indexed/reindex/unindexed by
-            diff'ing the records in the portal catalog and solr """
-        key = queryUtility(ISolrConnectionManager).getSchema().uniqueKey
-        uids = self.metadata('modified', key=key,
-            func=lambda x: x.millis())
-        search = queryUtility(ISearch)
-        reindex = []
-        rows = len(uids) * 10               # sys.maxint makes solr choke :(
-        query = '+%s:[* TO *]' % key
-        for flare in search(query, rows=rows, fl='%s modified' % key):
-            uid = getattr(flare, key)
-            assert uid, 'empty unique key?'
-            if uid in uids:
-                if uids[uid] > flare.modified.millis():
-                    reindex.append(uid)     # item isn't current
-                del uids[uid]               # remove from the list in any case
-        return reindex
-
     def sync(self, batch=1000, cache=50000):
         """Sync the Solr index with the portal catalog. Records contained
         in the catalog but not in Solr will be indexed and records not
@@ -189,6 +155,9 @@ class SolrMaintenanceView(BrowserView):
         proc = SolrIndexProcessor(manager)
         conn = manager.getConnection()
         db = self.context.getPhysicalRoot()._p_jar.db()
+        catalog = getToolByName(self.context, 'portal_catalog')
+        getIndex = catalog._catalog.getIndex
+        modified_index = getIndex('modified')
         log = self.mklog()
         real = timer()          # real time
         lap = timer()           # real lap time (for intermediate commits)
@@ -200,23 +169,23 @@ class SolrMaintenanceView(BrowserView):
         flares = search(query, rows=MAX_ROWS, fl='%s modified' % key)
         solr_results = {}
         solr_uids = set()
+        _convert = modified_index._convert
         for flare in flares:
             uid = flare[key]
             solr_uids.add(uid)
             # TODO the search creates DateTime instances from the XML, we
             # don't need that overhead
-            solr_results[uid] = flare['modified'].millis()
+            solr_results[uid] = _convert(flare['modified'])
         # get catalog status
-        catalog = getToolByName(self.context, 'portal_catalog')
-        cat_uids = set(catalog._catalog.getIndex(key)._index.keys())
+        cat_results = {}
+        cat_uids = set()
+        for uid, rid in getIndex(key)._index.items():
+            cat_uids.add(uid)
+            cat_results[uid] = rid
         # differences
         index = cat_uids.difference(solr_uids)
         solr_uids.difference_update(cat_uids)
         unindex = solr_uids
-
-        # unoptimized
-        reindex = self.diff()
-
         processed = 0
         flush = notimeout(lambda: conn.flush())
         def checkPoint():
@@ -252,16 +221,22 @@ class SolrMaintenanceView(BrowserView):
                 cpi.next()
             else:
                 log('not indexing unindexable object %r.\n' % obj)
-        log('processing %d "reindex" operations next...\n' % len(reindex))
+        log('processing "reindex" operations next...\n')
         op = notimeout(lambda obj: proc.reindex(obj))
-        for uid in reindex:
-            obj = lookup(uid)
-            if indexable(obj):
-                op(obj)
-                processed += 1
-                cpi.next()
-            else:
-                log('not reindexing unindexable object %r.\n' % obj)
+        cat_mod_get = modified_index._unindex.get
+        solr_mod_get = solr_results.get
+        done = unindex.union(index)
+        for uid, rid in cat_results.items():
+            if uid in done:
+                continue
+            if cat_mod_get(rid) != solr_mod_get(uid):
+                obj = lookup(uid)
+                if indexable(obj):
+                    op(obj)
+                    processed += 1
+                    cpi.next()
+                else:
+                    log('not reindexing unindexable object %r.\n' % obj)
         conn.commit()
         log('solr index synced.\n')
         msg = 'processed %d object(s) in %s (%s cpu time).'

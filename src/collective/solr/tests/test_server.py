@@ -218,10 +218,13 @@ class SolrMaintenanceTests(SolrTestCase):
         maintenance.sync()
         found, counts = self.counts()
         self.assertEqual(found, 8)
-        # after a network outtage some items might need (re|un)indexing...
+        # after a network outage some items might need (re|un)indexing...
         activate(active=False)
         self.setRoles(['Manager'])
         self.portal.news.processForm(values={'title': 'Foos'})
+        # we only have minute based time resolution, so force an older date
+        self.portal.news.setModificationDate(DateTime() - 2)
+        self.portal.news.reindexObject(idxs=['modified'])
         self.portal.manage_delObjects('events')
         commit()
         activate(active=True)
@@ -232,6 +235,12 @@ class SolrMaintenanceTests(SolrTestCase):
         news_uid = self.portal.news.UID()
         news_result = [r for r in results if r['UID'] == news_uid][0]
         self.assertEqual(news_result['Title'], 'Foos')
+        results = [(r.path_string, r.modified) for r in results]
+        for path, solr_mod in results:
+            obj = self.portal.unrestrictedTraverse(path)
+            obj_mod = obj.modified().toZone('UTC').millis() / 1000
+            solr_mod = solr_mod.toZone('UTC').millis() / 1000
+            self.assertEqual(solr_mod, obj_mod)
 
 
 class SolrErrorHandlingTests(SolrTestCase):
