@@ -92,7 +92,7 @@ class SolrMaintenanceView(BrowserView):
         manager = queryUtility(ISolrConnectionManager)
         proc = SolrIndexProcessor(manager)
         conn = manager.getConnection()
-        db = self.context.getPhysicalRoot()._p_jar.db()
+        zodb_conn = self.context._p_jar
         log = self.mklog()
         log('reindexing solr catalog...\n')
         if skip:
@@ -115,7 +115,7 @@ class SolrMaintenanceView(BrowserView):
             log(msg)
             logger.info(msg)
             flush()
-            db.cacheGC()
+            zodb_conn.cacheGC()
         cpi = checkpointIterator(checkPoint, batch)
         count = 0
         for path, obj in findObjects(self.context):
@@ -152,7 +152,7 @@ class SolrMaintenanceView(BrowserView):
         manager = queryUtility(ISolrConnectionManager)
         proc = SolrIndexProcessor(manager)
         conn = manager.getConnection()
-        db = self.context.getPhysicalRoot()._p_jar.db()
+        zodb_conn = self.context._p_jar
         catalog = getToolByName(self.context, 'portal_catalog')
         getIndex = catalog._catalog.getIndex
         modified_index = getIndex('modified')
@@ -194,7 +194,7 @@ class SolrMaintenanceView(BrowserView):
             log(msg)
             logger.info(msg)
             flush()
-            db.cacheGC()
+            zodb_conn.cacheGC()
         cpi = checkpointIterator(checkPoint, batch)
         # TODO: replace lookupObject with a _catalog.paths based traversal
         lookup = getToolByName(self.context, 'reference_catalog').lookupObject
