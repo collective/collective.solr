@@ -186,11 +186,11 @@ class ISolrMaintenanceView(Interface):
     def clear():
         """ clear all data from solr, i.e. delete all indexed objects """
 
-    def reindex(batch=100, skip=0, cache=1000):
+    def reindex(batch=1000, skip=0):
         """ find all contentish objects (meaning all objects derived from one
             of the catalog mixin classes) and (re)indexes them """
 
-    def sync(batch=100, cache=1000):
+    def sync(batch=1000):
         """ sync the solr index with the portal catalog;  records contained
             in the catalog but not in solr will be indexed and records not
             contained in the catalog can be optionally removed;  this can

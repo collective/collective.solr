@@ -86,7 +86,7 @@ class SolrMaintenanceView(BrowserView):
         conn.commit()
         return 'solr index cleared.'
 
-    def reindex(self, batch=1000, skip=0, cache=50000):
+    def reindex(self, batch=1000, skip=0):
         """ find all contentish objects (meaning all objects derived from one
             of the catalog mixin classes) and (re)indexes them """
         manager = queryUtility(ISolrConnectionManager)
@@ -115,11 +115,7 @@ class SolrMaintenanceView(BrowserView):
             log(msg)
             logger.info(msg)
             flush()
-            if cache:
-                size = db.cacheSize()
-                if size > cache:
-                    log('minimizing zodb cache with %d objects...\n' % size)
-                    db.cacheMinimize()
+            db.cacheGC()
         cpi = checkpointIterator(checkPoint, batch)
         count = 0
         for path, obj in findObjects(self.context):
@@ -148,7 +144,7 @@ class SolrMaintenanceView(BrowserView):
         log(msg)
         logger.info(msg)
 
-    def sync(self, batch=1000, cache=50000):
+    def sync(self, batch=1000):
         """Sync the Solr index with the portal catalog. Records contained
         in the catalog but not in Solr will be indexed and records not
         contained in the catalog will be removed.
@@ -198,11 +194,7 @@ class SolrMaintenanceView(BrowserView):
             log(msg)
             logger.info(msg)
             flush()
-            if cache:
-                size = db.cacheSize()
-                if size > cache:
-                    log('minimizing zodb cache with %d objects...\n' % size)
-                    db.cacheMinimize()
+            db.cacheGC()
         cpi = checkpointIterator(checkPoint, batch)
         # TODO: replace lookupObject with a _catalog.paths based traversal
         lookup = getToolByName(self.context, 'reference_catalog').lookupObject
