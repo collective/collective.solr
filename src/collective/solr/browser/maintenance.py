@@ -174,7 +174,6 @@ class SolrMaintenanceView(BrowserView):
                 if size > cache:
                     log('minimizing zodb cache with %d objects...\n' % size)
                     db.cacheMinimize()
-        single = timer()        # real time for single object
         cpi = checkpointIterator(checkPoint, batch)
         count = 0
         for path, obj in findObjects(self.context):
@@ -190,9 +189,7 @@ class SolrMaintenanceView(BrowserView):
                 if data.get(key, None) is not None and not missing:
                     updates[data[key]] = boost_values(obj, data), data
                     processed += 1
-                    log(' (%s).\n' % single.next(), timestamp=False)
                     cpi.next()
-                    single.next()   # don't count commit time here...
                 else:
                     log('missing data, skipping indexing of %r.\n' % obj)
         checkPoint()
