@@ -20,6 +20,7 @@ from collective.solr.indexer import SolrIndexProcessor
 from collective.solr.indexer import logger as logger_indexer
 from collective.solr.manager import logger as logger_manager
 from collective.solr.flare import PloneFlare
+from collective.solr.parser import SolrResponse
 from collective.solr.search import Search
 from collective.solr.solr import logger as logger_solr
 from collective.solr.utils import activate
@@ -202,91 +203,53 @@ class SolrMaintenanceTests(SolrTestCase):
         config.index_timeout = None
         self.assertEqual(numFound(self.search()), 8)
 
-    def testMetadataHelper(self):
+    def test_sync(self):
         search = self.portal.portal_catalog.unrestrictedSearchResults
         maintenance = self.portal.unrestrictedTraverse('solr-maintenance')
         items = dict([(b.UID, b.modified) for b in search()])
-        metadata = maintenance.metadata('modified', key='UID')
-        self.assertEqual(len(metadata), 8)
-        self.assertEqual(items, metadata)
-        # getting partial metadata should also be possible...
-        path = '/plone/news'
-        items = dict([(b.UID, b.modified) for b in search(path=path)])
-        metadata = maintenance.metadata('modified', key='UID', path=path)
-        self.assertEqual(len(metadata), 2)
-        self.assertEqual(items, metadata)
+        self.assertEqual(len(items), 8)
+        self.assertEqual(numFound(self.search()), 0)
+        maintenance.sync()
+        found, counts = self.counts()
+        self.assertEqual(found, 8)
 
-    def testDiffHelper(self):
-        search = self.portal.portal_catalog.unrestrictedSearchResults
+    def test_sync_path(self):
+        maintenance = self.portal.unrestrictedTraverse('news/solr-maintenance')
+        self.assertEqual(numFound(self.search()), 0)
+        maintenance.sync()
+        found, counts = self.counts()
+        self.assertEqual(found, 2)
+
+    def test_sync_multistep(self):
+        maintenance = self.portal.unrestrictedTraverse('news/solr-maintenance')
+        self.assertEqual(numFound(self.search()), 0)
+        maintenance.sync()
+        found, counts = self.counts()
+        self.assertEqual(found, 2)
         maintenance = self.portal.unrestrictedTraverse('solr-maintenance')
-        full_items = set([b.UID for b in search()])
-        news_items = set([b.UID for b in search(path='/plone/news')])
-        event_items = set([b.UID for b in search(path='/plone/events')])
-        # without an index run all items should need indexing...
-        index, reindex, unindex = maintenance.diff(path='/plone')
-        self.assertEqual(set(index), full_items)
-        self.assertEqual(reindex, [])
-        self.assertEqual(unindex, [])
-        # after partially reindexing only some are still needed...
-        self.portal.unrestrictedTraverse('news/solr-maintenance').reindex()
-        index, reindex, unindex = maintenance.diff(path='/plone')
-        self.assertEqual(set(index), full_items.difference(news_items))
-        self.assertEqual(reindex, [])
-        self.assertEqual(unindex, [])
-        # a full reindex brings things up to date, i.e. no syncing required...
-        maintenance.reindex()
-        index, reindex, unindex = maintenance.diff(path='/plone')
-        self.assertEqual(index, [])
-        self.assertEqual(reindex, [])
-        self.assertEqual(unindex, [])
+        maintenance.sync()
+        found, counts = self.counts()
+        self.assertEqual(found, 8)
+
+    def test_sync_update(self):
+        maintenance = self.portal.unrestrictedTraverse('solr-maintenance')
+        maintenance.sync()
+        found, counts = self.counts()
+        self.assertEqual(found, 8)
         # after a network outtage some items might need (re|un)indexing...
         activate(active=False)
         self.setRoles(['Manager'])
         self.portal.news.processForm(values={'title': 'Foos'})
         self.portal.manage_delObjects('events')
-        commit()                        # indexing happens on commit
+        commit()
         activate(active=True)
-        index, reindex, unindex = maintenance.diff(path='/plone')
-        self.assertEqual(index, [])
-        self.assertEqual(reindex, [self.portal.news.UID()])
-        self.assertEqual(set(unindex), event_items)
-
-    def testDiffHelperForPartialContent(self):
-        # the helper to determine index differences also works from
-        # a given path, returning only partial differences...
-        search = self.portal.portal_catalog.unrestrictedSearchResults
-        maintenance = self.portal.unrestrictedTraverse('solr-maintenance')
-        news_items = set([b.UID for b in search(path='/plone/news')])
-        # initially only the items within the given path need indexing...
-        index, reindex, unindex = maintenance.diff(path='/plone/news')
-        self.assertEqual(set(index), news_items)
-        self.assertEqual(reindex, [])
-        self.assertEqual(unindex, [])
-        # after reindexing that subtree there should be no differences left...
-        self.portal.unrestrictedTraverse('news/solr-maintenance').reindex()
-        index, reindex, unindex = maintenance.diff(path='/plone/news')
-        self.assertEqual(index, [])
-        self.assertEqual(reindex, [])
-        self.assertEqual(unindex, [])
-        # the same is true after a full reindex, of course...
-        maintenance.reindex()
-        index, reindex, unindex = maintenance.diff(path='/plone/news')
-        self.assertEqual(index, [])
-        self.assertEqual(reindex, [])
-        self.assertEqual(unindex, [])
-        # after a network outtage some items might need (re|un)indexing...
-        aggregator = self.portal.news.aggregator.UID()
-        activate(active=False)
-        self.setRoles(['Manager'])
-        self.portal.news.processForm(values={'title': 'Foos'})
-        self.portal.news.manage_delObjects('aggregator')
-        self.portal.manage_delObjects('events')
-        commit()                        # indexing happens on commit
-        activate(active=True)
-        index, reindex, unindex = maintenance.diff(path='/plone/news')
-        self.assertEqual(index, [])
-        self.assertEqual(reindex, [self.portal.news.UID()])
-        self.assertEqual(unindex, [aggregator])
+        maintenance.sync()
+        response = SolrResponse(self.search())
+        self.assertEqual(len(response), 5)
+        results = response.results()
+        news_uid = self.portal.news.UID()
+        news_result = [r for r in results if r['UID'] == news_uid][0]
+        self.assertEqual(news_result['Title'], 'Foos')
 
 
 class SolrErrorHandlingTests(SolrTestCase):
