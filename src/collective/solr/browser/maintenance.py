@@ -9,9 +9,11 @@ from Products.CMFCore.utils import getToolByName
 from collective.indexing.indexer import getOwnIndexMethod
 from collective.solr.interfaces import ISolrConnectionManager
 from collective.solr.interfaces import ISolrMaintenanceView
-from collective.solr.interfaces import ISearch
 from collective.solr.indexer import indexable, SolrIndexProcessor
 from collective.solr.indexer import boost_values
+from collective.solr.parser import parse_date_as_datetime
+from collective.solr.parser import SolrResponse
+from collective.solr.parser import unmarshallers
 from collective.solr.utils import findObjects
 from collective.solr.utils import prepareData
 
@@ -163,18 +165,20 @@ class SolrMaintenanceView(BrowserView):
         lap = timer()           # real lap time (for intermediate commits)
         cpu = timer(clock)      # cpu time
         # get Solr status
-        search = queryUtility(ISearch)
         key = queryUtility(ISolrConnectionManager).getSchema().uniqueKey
         query = '+%s:[* TO *]' % key
-        flares = search(query, rows=MAX_ROWS, fl='%s modified' % key)
+        response = conn.search(q=query, rows=MAX_ROWS, fl='%s modified' % key)
+        # avoid creating DateTime instances
+        simple_unmarshallers = unmarshallers.copy()
+        simple_unmarshallers['date'] = parse_date_as_datetime
+        flares = SolrResponse(response, simple_unmarshallers)
+        response.close()
         solr_results = {}
         solr_uids = set()
         _convert = modified_index._convert
         for flare in flares:
             uid = flare[key]
             solr_uids.add(uid)
-            # TODO the search creates DateTime instances from the XML, we
-            # don't need that overhead
             solr_results[uid] = _convert(flare['modified'])
         # get catalog status
         cat_results = {}

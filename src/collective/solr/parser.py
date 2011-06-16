@@ -1,6 +1,9 @@
+from datetime import datetime
 from StringIO import StringIO
+
 from DateTime import DateTime
 from zope.interface import implements
+
 from collective.solr.interfaces import ISolrFlare
 from collective.solr.iterparse import iterparse
 
@@ -33,9 +36,16 @@ def parseDate(value):
     """ use `DateTime` to parse a date, but take care of solr 1.4
         stripping away leading zeros for the year representation """
     if value.find('-') < 4:
-        year, rest = value.split('-', 1)        # re-add leading zeros
+        year, rest = value.split('-', 1)
         value = '%04d-%s' % (int(year), rest)
     return DateTime(value)
+
+
+def parse_date_as_datetime(value):
+    if value.find('-') < 4:
+        year, rest = value.split('-', 1)
+        value = '%04d-%s' % (int(year), rest)
+    return datetime.strptime(value, '%Y-%m-%dT%H:%M:%S.%fZ')
 
 
 # unmarshallers for basic types
@@ -74,7 +84,8 @@ class SolrResponse(object):
 
     __allow_access_to_unprotected_subobjects__ = True
 
-    def __init__(self, data=None):
+    def __init__(self, data=None, unmarshallers=unmarshallers):
+        self.unmarshallers = unmarshallers
         if data is not None:
             self.parse(data)
 
@@ -97,8 +108,8 @@ class SolrResponse(object):
                 if tag in nested:
                     data = stack.pop()
                     setter(stack[-1], elem.get('name'), data)
-                elif tag in unmarshallers:
-                    data = unmarshallers[tag](elem.text)
+                elif tag in self.unmarshallers:
+                    data = self.unmarshallers[tag](elem.text)
                     setter(stack[-1], elem.get('name'), data)
         return self
 
