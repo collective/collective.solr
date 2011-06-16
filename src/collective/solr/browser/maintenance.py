@@ -182,14 +182,14 @@ class SolrMaintenanceView(BrowserView):
         index = uids.keys()
         return index, reindex, unindex
 
-    def sync(self, batch=100, cache=10000):
-        """ sync the solr index with the portal catalog;  records contained
-            in the catalog but not in solr will be indexed and records not
-            contained in the catalog can be optionally removed;  this can
-            be used to ensure consistency between zope and solr after the
-            solr server has been unavailable etc """
+    def sync(self, batch=1000, cache=50000):
+        """Sync the Solr index with the portal catalog. Records contained
+        in the catalog but not in Solr will be indexed and records not
+        contained in the catalog will be removed.
+        """
         manager = queryUtility(ISolrConnectionManager)
         proc = SolrIndexProcessor(manager)
+        conn = manager.getConnection()
         db = self.context.getPhysicalRoot()._p_jar.db()
         log = self.mklog()
         real = timer()          # real time
@@ -203,20 +203,18 @@ class SolrMaintenanceView(BrowserView):
         log('operations needed: %d "index", %d "reindex", %d "unindex"\n' % (
             len(index), len(reindex), len(unindex)))
         processed = 0
-        commit = notimeout(lambda: proc.commit(wait=True))
+        flush = notimeout(lambda: conn.flush())
         def checkPoint():
             msg = 'intermediate commit (%d items processed, ' \
                   'last batch in %s)...\n' % (processed, lap.next())
             log(msg)
             logger.info(msg)
-            commit()
-            manager.getConnection().reset()     # force new connection
+            flush()
             if cache:
                 size = db.cacheSize()
                 if size > cache:
                     log('minimizing zodb cache with %d objects...\n' % size)
                     db.cacheMinimize()
-        single = timer()        # real time for single object
         cpi = checkpointIterator(checkPoint, batch)
         lookup = getToolByName(self.context, 'reference_catalog').lookupObject
         log('processing %d "index" operations next...\n' % len(index))
@@ -224,12 +222,9 @@ class SolrMaintenanceView(BrowserView):
         for uid in index:
             obj = lookup(uid)
             if indexable(obj):
-                log('indexing %r' % obj)
                 op(obj)
                 processed += 1
-                log(' (%s).\n' % single.next(), timestamp=False)
                 cpi.next()
-                single.next()   # don't count commit time here...
             else:
                 log('not indexing unindexable object %r.\n' % obj)
         log('processing %d "reindex" operations next...\n' % len(reindex))
@@ -237,29 +232,22 @@ class SolrMaintenanceView(BrowserView):
         for uid in reindex:
             obj = lookup(uid)
             if indexable(obj):
-                log('reindexing %r' % obj)
                 op(obj)
                 processed += 1
-                log(' (%s).\n' % single.next(), timestamp=False)
                 cpi.next()
-                single.next()   # don't count commit time here...
             else:
                 log('not reindexing unindexable object %r.\n' % obj)
         log('processing %d "unindex" operations next...\n' % len(unindex))
-        conn = manager.getConnection()
         op = notimeout(lambda uid: conn.delete(id=uid))
         for uid in unindex:
             obj = lookup(uid)
             if obj is None:
-                log('unindexing %r' % uid)
                 op(uid)
                 processed += 1
-                log(' (%s).\n' % single.next(), timestamp=False)
                 cpi.next()
-                single.next()   # don't count commit time here...
             else:
                 log('not unindexing existing object %r (%r).\n' % (obj, uid))
-        commit()                # make sure to commit in the end...
+        conn.commit()
         log('solr index synced.\n')
         msg = 'processed %d object(s) in %s (%s cpu time).'
         msg = msg % (processed, real.next(), cpu.next())
