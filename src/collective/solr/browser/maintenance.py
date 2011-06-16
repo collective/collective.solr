@@ -204,6 +204,7 @@ class SolrMaintenanceView(BrowserView):
                     log('minimizing zodb cache with %d objects...\n' % size)
                     db.cacheMinimize()
         cpi = checkpointIterator(checkPoint, batch)
+        # TODO: replace lookupObject with a _catalog.paths based traversal
         lookup = getToolByName(self.context, 'reference_catalog').lookupObject
         log('processing %d "unindex" operations next...\n' % len(unindex))
         op = notimeout(lambda uid: conn.delete(id=uid))
