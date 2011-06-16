@@ -197,7 +197,15 @@ class SolrMaintenanceView(BrowserView):
             zodb_conn.cacheGC()
         cpi = checkpointIterator(checkPoint, batch)
         # TODO: replace lookupObject with a _catalog.paths based traversal
-        lookup = getToolByName(self.context, 'reference_catalog').lookupObject
+        def lookup(uid):
+            brains = catalog.unrestrictedSearchResults(UID=uid)
+            if not len(brains):
+                return None
+            try:
+                obj = brains[0].getObject()
+            except AttributeError:
+                return None
+            return obj
         log('processing %d "unindex" operations next...\n' % len(unindex))
         op = notimeout(lambda uid: conn.delete(id=uid))
         for uid in unindex:
@@ -207,7 +215,7 @@ class SolrMaintenanceView(BrowserView):
                 processed += 1
                 cpi.next()
             else:
-                log('not unindexing existing object %r (%r).\n' % (obj, uid))
+                log('not unindexing existing object %r.\n' % uid)
         log('processing %d "index" operations next...\n' % len(index))
         op = notimeout(lambda obj: proc.index(obj))
         for uid in index:
@@ -217,7 +225,7 @@ class SolrMaintenanceView(BrowserView):
                 processed += 1
                 cpi.next()
             else:
-                log('not indexing unindexable object %r.\n' % obj)
+                log('not indexing unindexable object %r.\n' % uid)
             if obj is not None:
                 obj._p_deactivate()
         log('processing "reindex" operations next...\n')
@@ -235,7 +243,7 @@ class SolrMaintenanceView(BrowserView):
                     processed += 1
                     cpi.next()
                 else:
-                    log('not reindexing unindexable object %r.\n' % obj)
+                    log('not reindexing unindexable object %r.\n' % uid)
                 if obj is not None:
                     obj._p_deactivate()
         conn.commit()
