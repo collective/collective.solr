@@ -172,11 +172,14 @@ class SolrMaintenanceView(BrowserView):
         response.close()
         solr_results = {}
         solr_uids = set()
-        _convert = modified_index._convert
+        def _utc_convert(value):
+            t_tup = value.utctimetuple()
+            return ((((t_tup[0] * 12 + t_tup[1]) * 31 + t_tup[2])
+                      * 24 + t_tup[3]) * 60 + t_tup[4])
         for flare in flares:
             uid = flare[key]
             solr_uids.add(uid)
-            solr_results[uid] = _convert(flare['modified'])
+            solr_results[uid] = _utc_convert(flare['modified'])
         # get catalog status
         cat_results = {}
         cat_uids = set()
