@@ -4,8 +4,8 @@ Changelog
 2.1a1 - unreleased
 ------------------
 
-* Rewrote the `maintenance/sync` method for more performance and dropped the
-  optional `path` restriction from it.
+* Rewrote the `maintenance/sync` method for more performance, dropped the
+  optional `path` restriction from it and removed the `cache` argument.
   [hannosch]
 
 * Changed the `maintenance/reindex` method to only flush data to Solr but not
