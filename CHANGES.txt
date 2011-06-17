@@ -16,6 +16,10 @@ Upgrade notes
 Changes
 *******
 
+* Added `object_provides` index to example schema, as it's used in the
+  collection portlet to find collections.
+  [hannosch]
+
 * Rewrote the `maintenance/sync` method for more performance, dropped the
   optional `path` restriction from it and removed the `cache` argument. It
   should be able to sync datasets in the 100,000 object range in the matter of
