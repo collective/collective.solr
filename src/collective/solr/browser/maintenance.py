@@ -152,16 +152,17 @@ class SolrMaintenanceView(BrowserView):
         manager = queryUtility(ISolrConnectionManager)
         proc = SolrIndexProcessor(manager)
         conn = manager.getConnection()
+        key = queryUtility(ISolrConnectionManager).getSchema().uniqueKey
         zodb_conn = self.context._p_jar
         catalog = getToolByName(self.context, 'portal_catalog')
         getIndex = catalog._catalog.getIndex
         modified_index = getIndex('modified')
+        uid_index = getIndex(key)
         log = self.mklog()
         real = timer()          # real time
         lap = timer()           # real lap time (for intermediate commits)
         cpu = timer(clock)      # cpu time
         # get Solr status
-        key = queryUtility(ISolrConnectionManager).getSchema().uniqueKey
         query = '+%s:[* TO *]' % key
         response = conn.search(q=query, rows=MAX_ROWS, fl='%s modified' % key)
         # avoid creating DateTime instances
@@ -179,7 +180,7 @@ class SolrMaintenanceView(BrowserView):
         # get catalog status
         cat_results = {}
         cat_uids = set()
-        for uid, rid in getIndex(key)._index.items():
+        for uid, rid in uid_index._index.items():
             cat_uids.add(uid)
             cat_results[uid] = rid
         # differences
@@ -196,13 +197,24 @@ class SolrMaintenanceView(BrowserView):
             flush()
             zodb_conn.cacheGC()
         cpi = checkpointIterator(checkPoint, batch)
-        # TODO: replace lookupObject with a _catalog.paths based traversal
-        def lookup(uid):
-            brains = catalog.unrestrictedSearchResults(UID=uid)
-            if not len(brains):
+        # Look up objects
+        uid_rid_get = cat_results.get
+        rid_path_get = catalog._catalog.paths.get
+        catalog_traverse = catalog.unrestrictedTraverse
+        def lookup(uid, rid=None,
+                   uid_rid_get=uid_rid_get, rid_path_get=rid_path_get,
+                   catalog_traverse=catalog_traverse):
+            if rid is None:
+                rid = uid_rid_get(uid)
+            if not rid:
+                return None
+            if not isinstance(rid, int):
+                rid = rid[0]
+            path = rid_path_get(rid)
+            if not path:
                 return None
             try:
-                obj = brains[0].getObject()
+                obj = catalog_traverse(path)
             except AttributeError:
                 return None
             return obj
@@ -237,7 +249,7 @@ class SolrMaintenanceView(BrowserView):
             if uid in done:
                 continue
             if cat_mod_get(rid) != solr_mod_get(uid):
-                obj = lookup(uid)
+                obj = lookup(uid, rid=rid)
                 if indexable(obj):
                     op(obj)
                     processed += 1
