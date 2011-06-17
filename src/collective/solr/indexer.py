@@ -7,6 +7,7 @@ from ZODB.POSException import ConflictError
 from Products.CMFCore.utils import getToolByName
 from Products.CMFCore.CMFCatalogAware import CMFCatalogAware
 from Products.Archetypes.CatalogMultiplex import CatalogMultiplex
+from Products.ATContentTypes.content.base import ATCTFileContent
 from plone.app.content.interfaces import IIndexableObjectWrapper
 from plone.indexer.interfaces import IIndexableObject
 
@@ -16,6 +17,9 @@ from collective.solr.interfaces import ISolrIndexQueueProcessor
 from collective.solr.solr import SolrException
 from collective.solr.utils import prepareData
 from socket import error
+from urllib import urlencode
+
+from urllib3 import encode_multipart_formdata
 
 logger = getLogger('collective.solr.indexer')
 
@@ -30,7 +34,7 @@ def indexable(obj):
 def datehandler(value):
     # TODO: we might want to handle datetime and time as well;
     # check the enfold.solr implementation
-    if value is None:
+    if value is None or value is '':
         raise AttributeError
     if isinstance(value, str) and not value.endswith('Z'):
         value = DateTime(value)
@@ -86,10 +90,36 @@ class SolrIndexProcessor(object):
                 msg = 'schema is missing unique key, skipping indexing of %r'
                 logger.warning(msg, obj)
                 return
-            if data.get(uniqueKey, None) is not None and not missing:
+            uniqueValue = data.get(uniqueKey, None)
+            if uniqueValue is not None and not missing:
                 try:
                     logger.debug('indexing %r (%r)', obj, data)
-                    conn.add(**data)
+                    if isinstance(obj, ATCTFileContent):
+                        field = obj.getPrimaryField()
+                        binary_data = str(field.get(obj).data)
+
+                        filename = field.getFilename(obj)
+                        body, content_type = encode_multipart_formdata(
+                            {'myfile':(field.getFilename(obj), binary_data)})
+
+                        headers = {}
+                        headers['Content-Type'] = content_type
+                        headers['Content-Length'] = len(body)
+
+                        params = {'commit':'true'}
+                        ignore = ('content_type', 'SearchableText')
+                        for key, val in data.iteritems():
+                            if key in ignore:
+                                continue
+                            params['literal.%s' % key] = val
+
+                        url = '%s/update/extract?%s' % (
+                            conn.solrBase, urlencode(params, doseq=1))
+
+                        conn.reset()
+                        conn.doPost(url, body, headers)
+                    else:
+                        conn.add(**data)
                 except (SolrException, error):
                     logger.exception('exception during indexing %r', obj)
 
