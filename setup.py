@@ -40,6 +40,7 @@ setup(name = 'collective.solr',
         'plone.browserlayer',
         'collective.js.showmore',
         'plone.indexer',
+        'urllib3',
       ],
       extras_require = { 'test': [
         'collective.testcaselayer',
