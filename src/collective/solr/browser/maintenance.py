@@ -209,7 +209,7 @@ class SolrMaintenanceView(BrowserView):
             if not rid:
                 return None
             if not isinstance(rid, int):
-                rid = rid[0]
+                rid = tuple(rid)[0]
             path = rid_path_get(rid)
             if not path:
                 return None
