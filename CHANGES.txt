@@ -17,18 +17,21 @@ Changes
 *******
 
 * Rewrote the `maintenance/sync` method for more performance, dropped the
-  optional `path` restriction from it and removed the `cache` argument.
+  optional `path` restriction from it and removed the `cache` argument. It
+  should be able to sync datasets in the 100,000 object range in the matter of
+  a couple minutes.
   [hannosch]
 
 * Changed the `maintenance/reindex` method to only flush data to Solr but not
   commit after each batch. Instead we only commit once at the end. You should
-  configure auto commit policies on the Solr server side.
+  configure auto commit policies on the Solr server side or `commitWithin`.
   [hannosch]
 
 * Adjusted the `mangleQuery` function to calculate extended path indexes from
-  the Solr schema instead of hardcoding `path`. You need to provide indexers
-  with the same three suffixes as we do ourselves in the `attributes` module
-  for the `path` index and add those to the Solr schema.
+  the Solr schema instead of hardcoding `path`. If you have any additional
+  extended path indexes, you need to provide indexers with the same three
+  suffixes as we do ourselves in the `attributes` module for the `path` index
+  and add those to the Solr schema.
   [hannosch]
 
 * Added documentation on Java process, monitoring production settings and
