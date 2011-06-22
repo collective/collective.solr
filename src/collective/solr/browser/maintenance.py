@@ -1,13 +1,15 @@
 from logging import getLogger
 from time import time, clock, strftime
 from zope.interface import implements
-from zope.component import queryUtility
+from zope.component import queryUtility, queryAdapter
 from Products.Five.browser import BrowserView
 from Products.CMFCore.utils import getToolByName
 
 from collective.indexing.indexer import getOwnIndexMethod
+from collective.solr.indexer import DefaultAdder
 from collective.solr.interfaces import ISolrConnectionManager
 from collective.solr.interfaces import ISolrMaintenanceView
+from collective.solr.interfaces import ISolrAddHandler
 from collective.solr.interfaces import ISearch
 from collective.solr.indexer import indexable, handlers, SolrIndexProcessor
 from collective.solr.utils import findObjects
@@ -160,7 +162,8 @@ class SolrMaintenanceView(BrowserView):
                 for uid, flare in solrDataFor(uids, stored):
                     updates[uid].update(flare)
             for data in updates.values():
-                conn.add(**data)
+                adder = data.pop('_solr_adder')
+                adder(conn, **data)
             updates.clear()     # clear pending updates
             msg = 'intermediate commit (%d items processed, ' \
                   'last batch in %s)...\n' % (processed, lap.next())
@@ -188,6 +191,12 @@ class SolrMaintenanceView(BrowserView):
                 prepareData(data)
                 if data.get(key, None) is not None and not missing:
                     log('indexing %r' % obj)
+                    pt = data.get('portal_type', 'default')
+                    adder = queryAdapter(obj, ISolrAddHandler, name=pt)
+                    if adder is None:
+                        adder = DefaultAdder(obj)
+                    data['_solr_adder'] = adder
+
                     updates[data[key]] = data
                     processed += 1
                     log(' (%s).\n' % single.next(), timestamp=False)

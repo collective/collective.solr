@@ -47,6 +47,21 @@
            factory="plone.app.layout.icons.icons.CatalogBrainContentIcon"
            provides="plone.app.layout.icons.interfaces.IContentIcon" />
 
+    <adapter
+        factory=".indexer.DefaultAdder"
+        name="default"
+        />
+
+    <adapter
+        factory=".indexer.BinaryAdder"
+        name="File"
+        />
+
+    <adapter
+        factory=".indexer.BinaryAdder"
+        name="Image"
+        />
+
   </configure>
 
   <configure zcml:condition="installed plone.app.controlpanel">

@@ -179,3 +179,6 @@ class ISolrMaintenanceView(Interface):
             contained in the catalog can be optionally removed;  this can
             be used to ensure consistency between zope and solr after the
             solr server has been unavailable etc """
+
+class ISolrAddHandler(Interface):
+    """ An adder for solr documents """

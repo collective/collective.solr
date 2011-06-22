@@ -2,18 +2,20 @@ from logging import getLogger
 from DateTime import DateTime
 from datetime import date, datetime
 from zope.component import getUtility, queryUtility, queryMultiAdapter
+from zope.component import queryAdapter, adapts
 from zope.interface import implements
 from ZODB.POSException import ConflictError
 from Products.CMFCore.utils import getToolByName
 from Products.CMFCore.CMFCatalogAware import CMFCatalogAware
 from Products.Archetypes.CatalogMultiplex import CatalogMultiplex
-from Products.ATContentTypes.content.base import ATCTFileContent
+from Products.Archetypes.interfaces import IBaseObject
 from plone.app.content.interfaces import IIndexableObjectWrapper
 from plone.indexer.interfaces import IIndexableObject
 
 from collective.solr.interfaces import ISolrConnectionConfig
 from collective.solr.interfaces import ISolrConnectionManager
 from collective.solr.interfaces import ISolrIndexQueueProcessor
+from collective.solr.interfaces import ISolrAddHandler
 from collective.solr.solr import SolrException
 from collective.solr.utils import prepareData
 from socket import error
@@ -56,6 +58,47 @@ handlers = {
     'solr.TrieDateField': datehandler,
 }
 
+class DefaultAdder(object):
+
+    implements(ISolrAddHandler)
+    adapts(IBaseObject)
+
+    def __init__(self, context):
+        self.context = context
+
+    def __call__(self, conn, **data):
+        conn.add(**data)
+
+class BinaryAdder(DefaultAdder):
+
+    def __call__(self, conn, **data):
+        print "BINARY"
+        field = self.context.getPrimaryField()
+        if field is None:
+            print "ERROR", self.context
+            return
+        binary_data = str(field.get(self.context).data)
+        if not binary_data:
+            return
+        filename = field.getFilename(self.context)
+        body, content_type = encode_multipart_formdata(
+            {'myfile':(field.getFilename(self.context), binary_data)})
+
+        headers = {}
+        headers['Content-Type'] = content_type
+        headers['Content-Length'] = len(body)
+
+        params = {'commit':'true'}
+        ignore = ('content_type', 'SearchableText', 'created')
+        for key, val in data.iteritems():
+            if key in ignore:
+                continue
+            params['literal.%s' % key] = val
+
+        url = '%s/update/extract?%s' % (
+            conn.solrBase, urlencode(params, doseq=1))
+        conn.reset()
+        conn.doPost(url, body, headers)
 
 class SolrIndexProcessor(object):
     """ a queue processor for solr """
@@ -93,33 +136,13 @@ class SolrIndexProcessor(object):
             uniqueValue = data.get(uniqueKey, None)
             if uniqueValue is not None and not missing:
                 try:
-                    logger.debug('indexing %r (%r)', obj, data)
-                    if isinstance(obj, ATCTFileContent):
-                        field = obj.getPrimaryField()
-                        binary_data = str(field.get(obj).data)
+                    pt = data.get('portal_type', 'default')
+                    logger.debug('indexing %r with %r adder (%r)', obj, pt, data)
 
-                        filename = field.getFilename(obj)
-                        body, content_type = encode_multipart_formdata(
-                            {'myfile':(field.getFilename(obj), binary_data)})
-
-                        headers = {}
-                        headers['Content-Type'] = content_type
-                        headers['Content-Length'] = len(body)
-
-                        params = {'commit':'true'}
-                        ignore = ('content_type', 'SearchableText')
-                        for key, val in data.iteritems():
-                            if key in ignore:
-                                continue
-                            params['literal.%s' % key] = val
-
-                        url = '%s/update/extract?%s' % (
-                            conn.solrBase, urlencode(params, doseq=1))
-
-                        conn.reset()
-                        conn.doPost(url, body, headers)
-                    else:
-                        conn.add(**data)
+                    adder = queryAdapter(obj, ISolrAddHandler, name=pt)
+                    if adder is None:
+                        adder = DefaultAdder(obj)
+                    adder(conn, **data)
                 except (SolrException, error):
                     logger.exception('exception during indexing %r', obj)
 
