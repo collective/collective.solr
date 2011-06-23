@@ -1,7 +1,7 @@
 Changelog
 =========
 
-2.1a1 - unreleased
+3.0a1 - 2011-06-23
 ------------------
 
 Upgrade notes
