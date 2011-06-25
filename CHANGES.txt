@@ -4,6 +4,10 @@ Changelog
 3.0a2 - unreleased
 ------------------
 
+* Added documentation on setting up a master-slave configuration using the
+  `SolrReplication` support.
+  [hannosch]
+
 * Adjust tests to work with latest `collective.recipe.solrinstance = 3.3` and
   its new ICU-based text field.
   [hannosch]
