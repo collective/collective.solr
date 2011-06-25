@@ -4,6 +4,9 @@ Changelog
 3.0a2 - unreleased
 ------------------
 
+* Adjust tests to work with latest `collective.recipe.solrinstance = 3.3` and
+  its new ICU-based text field.
+  [hannosch]
 
 3.0a1 - 2011-06-23
 ------------------

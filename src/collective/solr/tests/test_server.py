@@ -1001,8 +1001,10 @@ class SolrServerTests(SolrTestCase):
 
     def testSearchForTermWithColon(self):
         self.folder.processForm(values={'title': 'foo:bar'})
-        commit()                        # indexing happens on commit
-        results = solrSearchResults(SearchableText='foo foo:bar')
+        commit()
+        results = solrSearchResults(SearchableText='foo')
+        self.assertEqual(sorted([r.Title for r in results]), ['foo:bar'])
+        results = solrSearchResults(SearchableText='foo:bar')
         self.assertEqual(sorted([r.Title for r in results]), ['foo:bar'])
 
     def testBatchedSearchResults(self):
