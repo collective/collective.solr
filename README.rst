@@ -281,7 +281,7 @@ with the following contents::
   graph_category Solr
 
   solr_average_query_time.label time per request
-  solr_average_query_time.jmxObjectName solr/:type=standard,id=org.apache.solr.handler.component.SearchHandler
+  solr_average_query_time.jmxObjectName solr/:type=search,id=org.apache.solr.handler.component.SearchHandler
   solr_average_query_time.jmxAttributeName avgTimePerRequest
 
 Then add a symlink to add the plugin::
