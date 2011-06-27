@@ -67,38 +67,53 @@ class DefaultAdder(object):
         self.context = context
 
     def __call__(self, conn, **data):
+        # remove in Plone unused field links,
+        # which gives problems with some documents
+        data.pop('links', '')
         conn.add(**data)
 
 class BinaryAdder(DefaultAdder):
 
     def __call__(self, conn, **data):
-        print "BINARY"
         field = self.context.getPrimaryField()
         if field is None:
-            print "ERROR", self.context
             return
         binary_data = str(field.get(self.context).data)
         if not binary_data:
             return
         filename = field.getFilename(self.context)
-        body, content_type = encode_multipart_formdata(
-            {'myfile':(field.getFilename(self.context), binary_data)})
+        if filename is not None:
+            body, content_type = encode_multipart_formdata(
+                {'myfile':(filename , binary_data)})
+        else:
+            body, content_type = encode_multipart_formdata(
+                {'myfile': binary_data})
 
         headers = {}
         headers['Content-Type'] = content_type
         headers['Content-Length'] = len(body)
 
         params = {'commit':'true'}
-        ignore = ('content_type', 'SearchableText', 'created')
+        ignore = ('content_type', 'SearchableText', 'created', 'Type', 'links',
+                  'description', 'Date')
         for key, val in data.iteritems():
             if key in ignore:
                 continue
+            if isinstance(val, unicode):
+                val = val.encode('utf-8')
+            if isinstance(val, list):
+                for i, item in enumerate(val):
+                    if isinstance(item, unicode):
+                        val[i] = item.encode('utf-8')
             params['literal.%s' % key] = val
 
         url = '%s/update/extract?%s' % (
             conn.solrBase, urlencode(params, doseq=1))
         conn.reset()
-        conn.doPost(url, body, headers)
+        try:
+            conn.doPost(url, body, headers)
+        except SolrException, e:
+            logger.warn('Error @ %s', data['physicalPath'])
 
 class SolrIndexProcessor(object):
     """ a queue processor for solr """
