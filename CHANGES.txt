@@ -4,6 +4,9 @@ Changelog
 3.0a2 - unreleased
 ------------------
 
+* Add `getRID` and `_unrestrictedGetObject` to our flare implementation.
+  [hannosch]
+
 * Added documentation on setting up a master-slave configuration using the
   `SolrReplication` support.
   [hannosch]
