@@ -999,12 +999,24 @@ class SolrServerTests(SolrTestCase):
             'context.portal_catalog(SearchableText="News")]')
         self.assertEqual(self.folder.foo(), ['News', 'News'])
 
+    def testSearchForTermWithDash(self):
+        self.folder.processForm(values={'title': 'foo-bar'})
+        commit()
+        results = solrSearchResults(SearchableText='foo')
+        self.assertEqual(sorted([r.Title for r in results]), ['foo-bar'])
+        results = solrSearchResults(SearchableText='foo-bar')
+        self.assertEqual(sorted([r.Title for r in results]), ['foo-bar'])
+        results = solrSearchResults(SearchableText='bar')
+        self.assertEqual(sorted([r.Title for r in results]), ['foo-bar'])
+
     def testSearchForTermWithColon(self):
         self.folder.processForm(values={'title': 'foo:bar'})
         commit()
         results = solrSearchResults(SearchableText='foo')
         self.assertEqual(sorted([r.Title for r in results]), ['foo:bar'])
         results = solrSearchResults(SearchableText='foo:bar')
+        self.assertEqual(sorted([r.Title for r in results]), ['foo:bar'])
+        results = solrSearchResults(SearchableText='bar')
         self.assertEqual(sorted([r.Title for r in results]), ['foo:bar'])
 
     def testBatchedSearchResults(self):
