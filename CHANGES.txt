@@ -4,6 +4,9 @@ Changelog
 3.0a2 - unreleased
 ------------------
 
+* Update example configuration to Solr 3.3.
+  [hannosch]
+
 * Add `getRID` and `_unrestrictedGetObject` to our flare implementation.
   [hannosch]
 
