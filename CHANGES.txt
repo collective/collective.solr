@@ -4,6 +4,10 @@ Changelog
 3.0a2 - unreleased
 ------------------
 
+* Adjust munin configs for query cache handlers to `c.r.solrinstance 3.5`
+  changes using `FastLRUCache`.
+  [hannosch]
+
 * Added munin configs for the `/update/extract` and the direct update handler.
   [hannosch]
 
