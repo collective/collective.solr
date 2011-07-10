@@ -29,8 +29,6 @@ First some initial setup code:
     0
     >>> config.required
     ('SearchableText',)
-    >>> config.search_pattern
-    '(Title:{value}^10 OR Description:{value}^3 OR SearchableText:{value})'
     >>> config.facets
     ('portal_type', 'review_state')
     >>> config.filter_queries
