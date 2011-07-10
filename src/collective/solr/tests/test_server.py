@@ -456,9 +456,21 @@ class SolrServerTests(SolrTestCase):
 
     def testSolrSearchResultsWithUnicodeTitle(self):
         self.folder.processForm(values={'title': u'Føø'})
-        commit()                        # indexing happens on commit
+        commit()
         results = solrSearchResults(SearchableText=u'Føø')
         self.assertEqual([r.Title for r in results], [u'Føø'])
+        results = solrSearchResults(SearchableText=u'foo')
+        self.assertEqual([r.Title for r in results], [u'Føø'])
+        self.folder.processForm(values={'title': u'Åge Þor'})
+        commit()
+        results = solrSearchResults(SearchableText=u'Åge')
+        self.assertEqual([r.Title for r in results], [u'Åge Þor'])
+        results = solrSearchResults(SearchableText=u'age')
+        self.assertEqual([r.Title for r in results], [u'Åge Þor'])
+        results = solrSearchResults(SearchableText=u'Þor')
+        self.assertEqual([r.Title for r in results], [u'Åge Þor'])
+        results = solrSearchResults(SearchableText=u'thor')
+        self.assertEqual([r.Title for r in results], [u'Åge Þor'])
 
     def testSolrSearchResultsInformationWithoutCustomSearchPattern(self):
         self.maintenance.reindex()
