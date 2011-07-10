@@ -72,7 +72,8 @@ If you have an existing site with a large volume of content, you can create an
 initial Solr index on a staging server or development machine, then rsync it
 over to the live machine, enable Solr and call `@@solr-maintenance/sync`. The
 sync will usually take just a couple of minutes for catching up with changes in
-the live database.
+the live database. You can also use this approach when making changes to the
+index structure or changing the settings of existing fields.
 
 Note that the example solr.cfg is bound to change. Always copy the file to your
 local buildout. In general you should never rely on extending buildout config
