@@ -148,6 +148,22 @@ You likely want to override it with a custom implementation for your specific
 site.
 
 
+Indexing binary documents
+-------------------------
+
+At this point collective.solr uses Plone's default capabilities to index binary
+documents via `portal_transforms` and installing command line tools like `wv2`
+or `pdftotext`. Work is under way to expose and use the `Apache Tika`_ Solr
+integration available via the `update/extract` handler.
+
+Once finished this will speed up indexing of binary documents considerably, as
+the extraction will happen out-of-process on the Solr server side. Apache Tika
+also supports a much larger list of formats than can be supported by adding
+external command line tools.
+
+.. _`Apache Tika`: http://tika.apache.org/
+
+
 Architecture
 ============
 
