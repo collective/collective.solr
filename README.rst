@@ -144,7 +144,7 @@ explanation here, refer to the literature and documentation of Lucene/Solr for
 much more detailed information.
 
 If you do searches in normal Plone, you have a search term and query the
-SearchableText index with it. The SearchableText is a simple concentration of
+SearchableText index with it. The SearchableText is a simple concatenation of
 all searchable fields, by default title, description and the body text.
 
 The default ZCTextIndex in Plone uses a simplified version of the Okapi BM25
