@@ -165,6 +165,12 @@ the extraction will happen out-of-process on the Solr server side. Apache Tika
 also supports a much larger list of formats than can be supported by adding
 external command line tools.
 
+There is room for more improvements in this area, as c.solr will still send the
+binary data to Solr as part of the end-user request/transaction. To further
+optimize this, Solr index operations can be stored in a task queue as provided
+by `plone.app.async` or solutions build on top of `Celery`. This is currently
+outside the scope of `collective.solr`.
+
 .. _`Apache Tika`: http://tika.apache.org/
 
 
