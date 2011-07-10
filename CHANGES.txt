@@ -4,7 +4,7 @@ Changelog
 3.0a2 - unreleased
 ------------------
 
-* Added munin configs for the `/update/extract` handler.
+* Added munin configs for the `/update/extract` and the direct update handler.
   [hannosch]
 
 * Added tests for splitting words on `:` and `-`.
