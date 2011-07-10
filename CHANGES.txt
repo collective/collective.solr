@@ -8,7 +8,8 @@ Changelog
   changes using `FastLRUCache`.
   [hannosch]
 
-* Added munin configs for the `/update/extract` and the direct update handler.
+* Added munin configs for the `/update/extract`, the direct update handler and
+  query cache size and warmup time.
   [hannosch]
 
 * Added tests for splitting words on `:` and `-`.
