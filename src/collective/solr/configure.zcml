@@ -12,10 +12,12 @@
 
   <i18n:registerTranslations directory="locales" />
 
+  <include package="archetypes.schemaextender" />
   <include package="collective.indexing" />
   <include package="plone.browserlayer" />
   <include package="collective.js.showmore" />
 
+  <include file="extender.zcml" />
   <include file="profiles.zcml" />
 
   <cmf:registerDirectory name="solr_site_search" />

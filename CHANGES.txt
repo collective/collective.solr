@@ -4,6 +4,13 @@ Changelog
 3.0a3 - unreleased
 ------------------
 
+* Added an `archetypes.schemaextender` dependency and register two fields for
+  all objects providing `IATContentType`. `showinsearch` is a boolean field that
+  can be used to hide specific content items from search results. `searchwords`
+  is a lines field, which lets you specify words that an object should be found
+  under. Both fields need to be added to the standard query to take effect.
+  [hannosch]
+
 * Standardize on `solr` as the i18n domain.
   [hannosch]
 

@@ -1,0 +1,11 @@
+<configure xmlns="http://namespaces.zope.org/zope" i18n_domain="solr">
+
+  <adapter factory=".extender.searchwords" name="searchwords" />
+  <adapter factory=".extender.showinsearch" name="showinsearch" />
+
+  <adapter
+      for="Products.ATContentTypes.interface.IATContentType"
+      name="collective.solr.SearchExtender"
+      factory=".extender.SearchExtender" />
+
+</configure>
