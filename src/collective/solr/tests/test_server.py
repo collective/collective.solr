@@ -1025,6 +1025,17 @@ class SolrServerTests(SolrTestCase):
         self.assertEqual(sorted([r.Title for r in results]), ['foo-bar'])
         results = solrSearchResults(SearchableText='bar')
         self.assertEqual(sorted([r.Title for r in results]), ['foo-bar'])
+        # second round
+        self.folder.processForm(values={'title': '2010-123'})
+        commit()
+        results = solrSearchResults(SearchableText='2010-123')
+        self.assertEqual(sorted([r.Title for r in results]), ['2010-123'])
+        results = solrSearchResults(SearchableText='2010:123')
+        self.assertEqual(sorted([r.Title for r in results]), ['2010-123'])
+        results = solrSearchResults(SearchableText='2010')
+        self.assertEqual(sorted([r.Title for r in results]), ['2010-123'])
+        results = solrSearchResults(SearchableText='123')
+        self.assertEqual(sorted([r.Title for r in results]), ['2010-123'])
 
     def testSearchForTermWithColon(self):
         self.folder.processForm(values={'title': 'foo:bar'})
@@ -1035,6 +1046,15 @@ class SolrServerTests(SolrTestCase):
         self.assertEqual(sorted([r.Title for r in results]), ['foo:bar'])
         results = solrSearchResults(SearchableText='bar')
         self.assertEqual(sorted([r.Title for r in results]), ['foo:bar'])
+        # second round
+        self.folder.processForm(values={'title': u'2010:ändern'})
+        commit()
+        results = solrSearchResults(SearchableText='2010')
+        self.assertEqual(sorted([r.Title for r in results]), [u'2010:ändern'])
+        results = solrSearchResults(SearchableText=u'2010:ändern')
+        self.assertEqual(sorted([r.Title for r in results]), [u'2010:ändern'])
+        results = solrSearchResults(SearchableText=u'andern')
+        self.assertEqual(sorted([r.Title for r in results]), [u'2010:ändern'])
 
     def testBatchedSearchResults(self):
         self.maintenance.reindex()
