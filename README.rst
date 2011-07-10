@@ -63,6 +63,17 @@ you can call the provided maintenance view::
 
   http://localhost:8080/plone/@@solr-maintenance/reindex
 
+Creating the initial index can take some considerably time. A typical indexing
+rate for a Plone site running of a local disk is 20 index operations per second.
+While Solr scales to orders of magnitude more than that, the limiting factor is
+database access time in Plone.
+
+If you have an existing site with a large volume of content, you can create an
+initial Solr index on a staging server or development machine, then rsync it
+over to the live machine, enable Solr and call `@@solr-maintenance/sync`. The
+sync will usually take just a couple of minutes for catching up with changes in
+the live database.
+
 Note that the example solr.cfg is bound to change. Always copy the file to your
 local buildout. In general you should never rely on extending buildout config
 files from servers that aren't under your control.
