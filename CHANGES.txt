@@ -4,6 +4,8 @@ Changelog
 3.0a3 - unreleased
 ------------------
 
+* Standardize on `solr` as the i18n domain.
+  [hannosch]
 
 3.0a2 - 2011-07-10
 ------------------

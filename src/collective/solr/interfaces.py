@@ -1,9 +1,8 @@
+from collective.indexing.interfaces import IIndexQueueProcessor
 from zope.interface import Interface
 from zope.schema import Bool, TextLine, Int, Float, List
-from zope.i18nmessageid import MessageFactory
-from collective.indexing.interfaces import IIndexQueueProcessor
 
-_ = MessageFactory('collective.solr')
+from collective.solr import SolrMessageFactory as _
 
 
 class ISolrSchema(Interface):
