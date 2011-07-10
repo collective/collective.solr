@@ -9,8 +9,8 @@ Changelog
   [hannosch]
 
 * Added munin configs for the `/update/extract`, the direct update handler,
-  query cache size and warmup time and admin file requests used to get the
-  Solr schema.
+  query cache size and warmup time, admin file requests used to get the
+  Solr schema and the searcher warmup time.
   [hannosch]
 
 * Added tests for splitting words on `:` and `-`.
