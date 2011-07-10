@@ -1,7 +1,7 @@
 Changelog
 =========
 
-3.0a2 - unreleased
+3.0a2 - 2011-07-10
 ------------------
 
 * Adjust munin configs for query cache handlers to `c.r.solrinstance 3.5`
