@@ -455,12 +455,17 @@ class SolrServerTests(SolrTestCase):
             [('News', '/plone/news'), ('News', '/plone/news/aggregator')])
 
     def testSolrSearchResultsWithUnicodeTitle(self):
-        self.folder.processForm(values={'title': u'Føø'})
+        self.folder.processForm(values={'title': u'Føø sekretær'})
         commit()
         results = solrSearchResults(SearchableText=u'Føø')
-        self.assertEqual([r.Title for r in results], [u'Føø'])
+        self.assertEqual([r.Title for r in results], [u'Føø sekretær'])
         results = solrSearchResults(SearchableText=u'foo')
-        self.assertEqual([r.Title for r in results], [u'Føø'])
+        self.assertEqual([r.Title for r in results], [u'Føø sekretær'])
+        results = solrSearchResults(SearchableText=u'Sekretær')
+        self.assertEqual([r.Title for r in results], [u'Føø sekretær'])
+        results = solrSearchResults(SearchableText=u'Sekretaer')
+        self.assertEqual([r.Title for r in results], [u'Føø sekretær'])
+        # second set of characters
         self.folder.processForm(values={'title': u'Åge Þor'})
         commit()
         results = solrSearchResults(SearchableText=u'Åge')
