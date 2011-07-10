@@ -999,7 +999,7 @@ class SolrServerTests(SolrTestCase):
             'context.portal_catalog(SearchableText="News")]')
         self.assertEqual(self.folder.foo(), ['News', 'News'])
 
-    def testSearchForTermWithDash(self):
+    def testSearchForTermWithHyphen(self):
         self.folder.processForm(values={'title': 'foo-bar'})
         commit()
         results = solrSearchResults(SearchableText='foo')
