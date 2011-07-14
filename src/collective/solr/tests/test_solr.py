@@ -1,4 +1,4 @@
-from unittest import TestCase, defaultTestLoader, main
+from unittest import TestCase
 from elementtree.ElementTree import fromstring
 from collective.solr.solr import SolrConnection
 from collective.solr.tests.utils import getData, fakehttp
@@ -25,6 +25,18 @@ class TestSolr(TestCase):
         self.failUnlessEqual(node.attrib['name'], 'QTime')
         self.failUnlessEqual(node.text, '4')
         res.find('QTime')
+
+    def test_add_with_boost_values(self):
+        add_request = getData('add_request_with_boost_values.txt')
+        add_response = getData('add_response.txt')
+        c = SolrConnection(host='localhost:8983', persistent=True)
+        output = fakehttp(c, add_response)
+        boost = {'': 2, 'id': 0.5, 'name': 5}
+        c.add(boost_values=boost, id='500', name='python test doc')
+        res = c.flush()
+        self.assertEqual(len(res), 1)   # one request was sent
+        res = res[0]
+        self.failUnlessEqual(str(output), add_request)
 
     def test_commit(self):
         commit_request = getData('commit_request.txt')
@@ -106,10 +118,3 @@ class TestSolr(TestCase):
         self.failUnlessEqual(node.attrib['name'], 'QTime')
         self.failUnlessEqual(node.text, '0')
         res.find('QTime')
-
-
-def test_suite():
-    return defaultTestLoader.loadTestsFromName(__name__)
-
-if __name__ == '__main__':
-    main(defaultTest='test_suite')

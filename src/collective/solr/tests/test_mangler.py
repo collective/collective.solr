@@ -1,4 +1,4 @@
-from unittest import TestCase, defaultTestLoader, main
+from unittest import TestCase
 from zope.component import provideUtility, getGlobalSiteManager
 from DateTime import DateTime
 
@@ -12,7 +12,7 @@ from collective.solr.parser import SolrSchema, SolrField
 
 
 def mangle(**keywords):
-    mangleQuery(keywords)
+    mangleQuery(keywords, None, {})
     return keywords
 
 
@@ -43,7 +43,7 @@ class QueryManglerTests(TestCase):
 
     def testComplainAboutUnknownUsages(self):
         keywords = dict(foo=23, foo_usage='bar:42')
-        self.assertRaises(AssertionError, mangleQuery, keywords)
+        self.assertRaises(AssertionError, mangleQuery, keywords, None, {})
 
     def testMinRange(self):
         keywords = mangle(foo=[23], foo_usage='range:min')
@@ -126,7 +126,8 @@ class QueryManglerTests(TestCase):
         })
         # and finally with a setting for steps
         self.config.effective_steps = 300
-        keywords = mangle(effectiveRange=date, show_inactive=False)
+        keywords = dict(effectiveRange=date, show_inactive=False)
+        mangleQuery(keywords, self.config, {})
         self.assertEqual(keywords, {
             'effective': '[* TO 1972-05-11T03:45:00.000Z]',
             'expires': '[1972-05-11T03:45:00.000Z TO *]',
@@ -143,57 +144,57 @@ class PathManglerTests(TestCase):
 
     def testSimplePathQuery(self):
         keywords = mangle(path='/foo')
-        self.assertEqual(keywords, {'parentPaths': '/foo'})
+        self.assertEqual(keywords, {'path_parents': '/foo'})
 
     def testSimplePathQueryAsDictionary(self):
         keywords = mangle(path=dict(query='/foo'))
-        self.assertEqual(keywords, {'parentPaths': '/foo'})
+        self.assertEqual(keywords, {'path_parents': '/foo'})
 
     def testSimplePathQueryAsObject(self):
         keywords = mangle(path=Query(query='/foo'))
-        self.assertEqual(keywords, {'parentPaths': '/foo'})
+        self.assertEqual(keywords, {'path_parents': '/foo'})
 
     def testPathQueryWithDepth(self):
         keywords = mangle(path=dict(query='/foo', depth=-1))
-        self.assertEqual(keywords, {'parentPaths': '/foo'})
+        self.assertEqual(keywords, {'path_parents': '/foo'})
         keywords = mangle(path=dict(query='/foo', depth=0))
-        self.assertEqual(keywords, {'parentPaths': set([
-            '(+physicalDepth:[2 TO 2] AND +parentPaths:/foo)'])})
+        self.assertEqual(keywords, {'path_parents': set([
+            '(+path_depth:[2 TO 2] AND +path_parents:/foo)'])})
         keywords = mangle(path=Query(query='/foo', depth=0))
-        self.assertEqual(keywords, {'parentPaths': set([
-            '(+physicalDepth:[2 TO 2] AND +parentPaths:/foo)'])})
+        self.assertEqual(keywords, {'path_parents': set([
+            '(+path_depth:[2 TO 2] AND +path_parents:/foo)'])})
         keywords = mangle(path=dict(query='/foo', depth=2))
-        self.assertEqual(keywords, {'parentPaths': set([
-            '(+physicalDepth:[2 TO 4] AND +parentPaths:/foo)'])})
+        self.assertEqual(keywords, {'path_parents': set([
+            '(+path_depth:[2 TO 4] AND +path_parents:/foo)'])})
         keywords = mangle(path=Query(query='/foo', depth=2))
-        self.assertEqual(keywords, {'parentPaths': set([
-            '(+physicalDepth:[2 TO 4] AND +parentPaths:/foo)'])})
+        self.assertEqual(keywords, {'path_parents': set([
+            '(+path_depth:[2 TO 4] AND +path_parents:/foo)'])})
 
     def testMultiplePathQuery(self):
         keywords = mangle(path=['/foo', '/bar'])
-        self.assertEqual(keywords, {'parentPaths': ['/foo', '/bar']})
+        self.assertEqual(keywords, {'path_parents': ['/foo', '/bar']})
         keywords = mangle(path=dict(query=['/foo', '/bar']))
-        self.assertEqual(keywords, {'parentPaths': ['/foo', '/bar']})
+        self.assertEqual(keywords, {'path_parents': ['/foo', '/bar']})
         keywords = mangle(path=dict(query=['/foo', '/bar'], depth=-1))
-        self.assertEqual(keywords, {'parentPaths': ['/foo', '/bar']})
+        self.assertEqual(keywords, {'path_parents': ['/foo', '/bar']})
         keywords = mangle(path=dict(query=['/foo', '/bar'], depth=0))
-        self.assertEqual(keywords, {'parentPaths': set([
-            '(+physicalDepth:[2 TO 2] AND +parentPaths:/foo)',
-            '(+physicalDepth:[2 TO 2] AND +parentPaths:/bar)'])})
+        self.assertEqual(keywords, {'path_parents': set([
+            '(+path_depth:[2 TO 2] AND +path_parents:/foo)',
+            '(+path_depth:[2 TO 2] AND +path_parents:/bar)'])})
         keywords = mangle(path=dict(query=['/foo', '/bar'], depth=1))
-        self.assertEqual(keywords, {'parentPaths': set([
-            '(+physicalDepth:[2 TO 3] AND +parentPaths:/foo)',
-            '(+physicalDepth:[2 TO 3] AND +parentPaths:/bar)'])})
+        self.assertEqual(keywords, {'path_parents': set([
+            '(+path_depth:[2 TO 3] AND +path_parents:/foo)',
+            '(+path_depth:[2 TO 3] AND +path_parents:/bar)'])})
         keywords = mangle(path=dict(query=['/a/b', '/c'], depth=-1))
-        self.assertEqual(keywords, {'parentPaths': ['/a/b', '/c']})
+        self.assertEqual(keywords, {'path_parents': ['/a/b', '/c']})
         keywords = mangle(path=dict(query=['/a/b', '/c'], depth=0))
-        self.assertEqual(keywords, {'parentPaths': set([
-            '(+physicalDepth:[3 TO 3] AND +parentPaths:/a/b)',
-            '(+physicalDepth:[2 TO 2] AND +parentPaths:/c)'])})
+        self.assertEqual(keywords, {'path_parents': set([
+            '(+path_depth:[3 TO 3] AND +path_parents:/a/b)',
+            '(+path_depth:[2 TO 2] AND +path_parents:/c)'])})
         keywords = mangle(path=dict(query=['/a/b', '/c'], depth=2))
-        self.assertEqual(keywords, {'parentPaths': set([
-            '(+physicalDepth:[3 TO 5] AND +parentPaths:/a/b)',
-            '(+physicalDepth:[2 TO 4] AND +parentPaths:/c)'])})
+        self.assertEqual(keywords, {'path_parents': set([
+            '(+path_depth:[3 TO 5] AND +path_parents:/a/b)',
+            '(+path_depth:[2 TO 4] AND +path_parents:/c)'])})
 
 
 class QueryParameterTests(TestCase):
@@ -370,10 +371,3 @@ class QueryParameterTests(TestCase):
         self.assertEqual(params, {'facet.foo': 'bar'})
         params = extract(dict(facet_foo=('foo:bar', 'bar:foo')))
         self.assertEqual(params, {'facet.foo': ('foo', 'bar')})
-
-
-def test_suite():
-    return defaultTestLoader.loadTestsFromName(__name__)
-
-if __name__ == '__main__':
-    main(defaultTest='test_suite')

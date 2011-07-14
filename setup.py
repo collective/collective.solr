@@ -1,14 +1,13 @@
 from setuptools import setup, find_packages
-from os.path import join
 
-version = open(join('src', 'collective', 'solr', 'version.txt')).read().strip()
-readme = open("README.txt").read()
-history = open(join('docs', 'HISTORY.txt')).read()
+version = '3.0a3'
+
 
 setup(name = 'collective.solr',
       version = version,
       description = 'Solr integration for external indexing and searching.',
-      long_description = readme[readme.find('\n\n'):] + '\n' + history,
+      long_description = open("README.rst").read() + '\n' +
+                         open('CHANGES.txt').read(),
       classifiers = [
         'Development Status :: 5 - Production/Stable',
         'Environment :: Web Environment',
@@ -19,14 +18,14 @@ setup(name = 'collective.solr',
         'License :: OSI Approved :: GNU General Public License (GPL)',
         'Operating System :: OS Independent',
         'Programming Language :: Python',
-        'Topic :: Software Development :: Libraries :: Python Modules',
+        'Programming Language :: Python :: 2.6',
+        'Programming Language :: Python :: 2.7',
       ],
       keywords = 'plone cmf zope indexing searching solr lucene',
-      author = 'Plone Foundation',
-      author_email = 'plone-developers@lists.sourceforge.net',
+      author = 'Jarn AS',
+      author_email = 'info@jarn.com',
       url = 'http://plone.org/products/collective.solr',
-      download_url = 'http://cheeseshop.python.org/pypi/collective.solr/',
-      license = 'GPL',
+      license = 'GPL version 2',
       packages = find_packages('src'),
       package_dir = {'': 'src'},
       namespace_packages = ['collective'],
@@ -34,22 +33,46 @@ setup(name = 'collective.solr',
       platforms = 'Any',
       zip_safe = False,
       install_requires=[
-        'setuptools',
-        'elementtree',
+        'Acquisition',
+        'archetypes.schemaextender',
         'collective.indexing >1.6',
-        'plone.browserlayer',
         'collective.js.showmore',
+        'DateTime',
+        'elementtree',
+        'Plone',
+        'plone.app.content',
+        'plone.app.controlpanel',
+        'plone.app.layout',
+        'plone.browserlayer',
         'plone.indexer',
+        'Products.Archetypes',
+        'Products.CMFCore',
+        'Products.CMFDefault',
+        'Products.GenericSetup',
+        'setuptools',
+        'transaction',
+        'ZODB3',
+        'zope.component',
+        'zope.formlib',
+        'zope.i18nmessageid',
+        'zope.interface',
+        'zope.publisher',
+        'zope.schema',
+#        'Zope2',
         'urllib3',
       ],
-      extras_require = { 'test': [
-        'collective.testcaselayer',
+      extras_require = {'test': [
         'cElementTree',
-        'PIL',
+        'collective.testcaselayer',
         'Products.LinguaPlone >=3.1a1',
+        'Products.PloneTestCase',
       ]},
       entry_points = '''
         [z3c.autoinclude.plugin]
         target = plone
+        [zopectl.command]
+        solr_clear_index = collective.solr.commands:solr_clear_index
+        solr_dump_catalog = collective.solr.commands:solr_dump_catalog
+        solr_import_dump = collective.solr.commands:solr_import_dump
       ''',
 )

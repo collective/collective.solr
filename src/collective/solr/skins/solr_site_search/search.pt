@@ -8,6 +8,7 @@
 <head>
     <metal:block metal:fill-slot="head_slot">
         <link rel="alternate" title="RSS 1.0" type="application/rss+xml"
+              tal:define="here_url context/@@plone_context_state/object_url;"
               tal:condition="request/SearchableText|nothing"
               tal:attributes="href string:$here_url/search_rss?${request/QUERY_STRING}"/>
     </metal:block>
@@ -34,6 +35,7 @@
                  Batch python:modules['Products.CMFPlone'].Batch;
                  b_size python:30;b_start python:0;b_start request/b_start | b_start;
                  results python:here.queryCatalog(REQUEST=request,use_types_blacklist=use_types_blacklist, use_navigation_root=use_navigation_root, b_start=b_start, b_size=b_size+1);
+                 site_properties context/portal_properties/site_properties;
                  desc_length site_properties/search_results_description_length;
                  desc_ellipsis site_properties/ellipsis;
                  searchterm request/SearchableText|nothing;
@@ -86,10 +88,12 @@
     </h1>
 
     <p class="discreet"
+       tal:define="syntool context/portal_syndication;"
        tal:condition="syntool/isSiteSyndicationAllowed">
         <a href=""
            class="link-feed"
            i18n:translate="title_rss_feed"
+           tal:define="here_url context/@@plone_context_state/object_url;"
            tal:attributes="href string:$here_url/search_rss?${request/QUERY_STRING}">
              Subscribe to an always-updated feed of these search terms</a>
     </p>
@@ -104,7 +108,9 @@
          tal:replace="structure python: view(results=results)" />
 
     <div tal:condition="results"
-         tal:define="batch python:Batch(results, b_size, int(b_start), orphan=1);">
+         tal:define="batch python:Batch(results, b_size, int(b_start), orphan=1);
+                     normalizeString nocall:context/@@plone/normalizeString;
+                     toLocalizedTime nocall:context/@@plone/toLocalizedTime;">
 
         <dl class="searchResults">
         <tal:results repeat="result batch">
@@ -128,6 +134,7 @@
                 </span>
 
             <span class="documentByLine"
+                  tal:define="isAnon context/@@plone_portal_state/anonymous;"
                   tal:condition="python:not isAnon or site_properties.allowAnonymousViewAbout">
                 <span class="documentAuthor"
                     i18n:translate="label_by_author">

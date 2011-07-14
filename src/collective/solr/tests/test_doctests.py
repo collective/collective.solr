@@ -1,12 +1,12 @@
+import doctest
 from unittest import TestSuite
-from zope.testing import doctest
+
 from Testing import ZopeTestCase as ztc
 from collective.solr.tests.base import SolrFunctionalTestCase
 from collective.solr.tests.base import SolrControlPanelTestCase
 from collective.solr.tests.utils import pingSolr
 
-optionflags = (doctest.REPORT_ONLY_FIRST_FAILURE |
-               doctest.ELLIPSIS | doctest.NORMALIZE_WHITESPACE)
+optionflags = (doctest.ELLIPSIS | doctest.NORMALIZE_WHITESPACE)
 
 
 def test_suite():

@@ -3,7 +3,6 @@
 from unittest import TestSuite, defaultTestLoader
 from zope.interface import alsoProvides
 from zope.component import getMultiAdapter
-from zope.publisher.browser import TestRequest
 
 from collective.solr.tests.utils import pingSolr
 from collective.solr.tests.base import SolrTestCase
@@ -26,51 +25,55 @@ class SolrFacettingTests(SolrTestCase):
         activate(active=False)
 
     def testFacettedSearchWithKeywordArguments(self):
-        results = solrSearchResults(SearchableText='News', facet='true',
+        self.setRoles(('Manager',))
+        self.portal.invokeFactory('Event', id='event1', title='Welcome')
+        self.maintenance.reindex()
+        results = solrSearchResults(SearchableText='Welcome', facet='true',
             facet_field='portal_type')
-        self.assertEqual(sorted([r.physicalPath for r in results]),
-            ['/plone/news', '/plone/news/aggregator'])
+        self.assertEqual(sorted([r.path_string for r in results]),
+            ['/plone/event1', '/plone/front-page'])
         types = results.facet_counts['facet_fields']['portal_type']
-        self.assertEqual(types['Document'], 0)
-        self.assertEqual(types['Folder'], 0)
-        self.assertEqual(types['Large Plone Folder'], 1)
-        self.assertEqual(types['Topic'], 1)
+        self.assertEqual(types['Document'], 1)
+        self.assertEqual(types['Event'], 1)
 
     def testFacettedSearchWithRequestArguments(self):
-        request = TestRequest()
+        request = self.app.REQUEST
         request.form['SearchableText'] = 'News'
         request.form['facet'] = 'true'
         request.form['facet_field'] = 'review_state'
         results = solrSearchResults(request)
-        self.assertEqual(sorted([r.physicalPath for r in results]),
+        self.assertEqual(sorted([r.path_string for r in results]),
             ['/plone/news', '/plone/news/aggregator'])
         states = results.facet_counts['facet_fields']['review_state']
         self.assertEqual(states, dict(private=0, published=2))
 
     def testMultiFacettedSearch(self):
-        results = solrSearchResults(SearchableText='News', facet='true',
+        self.setRoles(('Manager',))
+        self.portal.invokeFactory('Event', id='event1', title='Welcome')
+        self.maintenance.reindex()
+        results = solrSearchResults(SearchableText='Welcome', facet='true',
             facet_field=['portal_type', 'review_state'])
-        self.assertEqual(sorted([r.physicalPath for r in results]),
-            ['/plone/news', '/plone/news/aggregator'])
+        self.assertEqual(sorted([r.path_string for r in results]),
+            ['/plone/event1', '/plone/front-page'])
         facets = results.facet_counts['facet_fields']
-        self.assertEqual(facets['portal_type']['Large Plone Folder'], 1)
-        self.assertEqual(facets['review_state']['published'], 2)
+        self.assertEqual(facets['portal_type']['Event'], 1)
+        self.assertEqual(facets['review_state']['published'], 1)
 
     def testFacettedSearchWithFilterQuery(self):
-        request = TestRequest()
+        request = self.app.REQUEST
         request.form['SearchableText'] = 'News'
         request.form['fq'] = 'portal_type:Topic'
         request.form['facet'] = 'true'
         request.form['facet_field'] = 'review_state'
         results = solrSearchResults(request)
-        self.assertEqual([r.physicalPath for r in results],
+        self.assertEqual([r.path_string for r in results],
             ['/plone/news/aggregator'])
         states = results.facet_counts['facet_fields']['review_state']
         self.assertEqual(states, dict(private=0, published=1))
 
     def testFacettedSearchWithDependencies(self):
         # facets depending on others should not show up initially
-        request = TestRequest()
+        request = self.app.REQUEST
         request.form['SearchableText'] = 'News'
         request.form['facet'] = 'true'
         request.form['facet_field'] = ['portal_type',
@@ -88,7 +91,7 @@ class SolrFacettingTests(SolrTestCase):
     def testFacettedSearchWithUnicodeFilterQuery(self):
         self.portal.news.portal_type = u'Føø'.encode('utf-8')
         self.maintenance.reindex()
-        request = TestRequest()
+        request = self.app.REQUEST
         request.form['SearchableText'] = 'News'
         request.form['facet'] = 'true'
         request.form['facet_field'] = 'portal_type'
@@ -106,8 +109,11 @@ class SolrFacettingTests(SolrTestCase):
             html = html[position:]
 
     def testFacetsInformationView(self):
-        request = TestRequest()
-        request.form['SearchableText'] = 'News'
+        self.setRoles(('Manager',))
+        self.portal.invokeFactory('Event', id='event1', title='Welcome')
+        self.maintenance.reindex()
+        request = self.app.REQUEST
+        request.form['SearchableText'] = 'Welcome'
         request.form['facet'] = 'true'
         request.form['facet_field'] = 'portal_type'
         alsoProvides(request, IThemeSpecific)
@@ -116,7 +122,7 @@ class SolrFacettingTests(SolrTestCase):
         results = solrSearchResults(request)
         output = view(results=results)
         self.checkOrder(output, 'portal-searchfacets', 'Content type',
-            'Topic', '1', 'Large Folder', '1')
+            'Document', '1', 'Event', '1')
 
     def testFacetFieldsInSearchBox(self):
         request = self.portal.REQUEST
@@ -139,7 +145,7 @@ class SolrFacettingTests(SolrTestCase):
         self.failIf('portal_type' in output)
 
     def testUnknownFacetField(self):
-        request = TestRequest()
+        request = self.app.REQUEST
         request.form['SearchableText'] = 'News'
         request.form['facet'] = 'true'
         request.form['facet_field'] = 'foo'
@@ -149,7 +155,7 @@ class SolrFacettingTests(SolrTestCase):
         self.assertEqual(view.facets(), [])
 
     def testNoFacetFields(self):
-        request = TestRequest()
+        request = self.app.REQUEST
         request.form['SearchableText'] = 'News'
         request.form['facet'] = 'true'
         request.form['facet_field'] = []
@@ -166,7 +172,7 @@ class SolrFacettingTests(SolrTestCase):
         self.portal.news.portal_type = ''
         self.maintenance.reindex()
         # after updating the solr index the view can be checked...
-        request = TestRequest()
+        request = self.app.REQUEST
         request.form['SearchableText'] = 'News'
         request.form['facet'] = 'true'
         request.form['facet_field'] = 'portal_type'
@@ -182,7 +188,7 @@ class SolrFacettingTests(SolrTestCase):
         self.failIf('fq=portal_type%3A&amp;' in output)
 
     def testFacetOrder(self):
-        request = TestRequest()
+        request = self.app.REQUEST
         request.form['SearchableText'] = 'News'
         request.form['facet'] = 'true'
         request.form['facet_field'] = ['portal_type', 'review_state']

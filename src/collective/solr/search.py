@@ -10,6 +10,8 @@ from collective.solr.interfaces import ISearch
 from collective.solr.parser import SolrResponse
 from collective.solr.exceptions import SolrInactiveException
 from collective.solr.queryparser import quote
+from collective.solr.utils import isWildCard
+
 
 logger = getLogger('collective.solr.search')
 
@@ -99,10 +101,15 @@ class Search(object):
                         quoted = quote('"' + term + '"')
                     return quoted
                 value = '(%s)' % ' OR '.join(map(quoteitem, value))
-            elif isinstance(value, set):        # set are taken literally
-                query[name] = '(%s)' % ' OR '.join(value)
+            elif isinstance(value, set):        # sets are taken literally
+                if len(value) == 1:
+                    query[name] = ''.join(value)
+                else:
+                    query[name] = '(%s)' % ' OR '.join(value)
                 continue
             elif isinstance(value, basestring):
+                if isWildCard(value) and field.class_ == 'solr.TextField':
+                    value = value.lower()   # wildcard searches need lower-case
                 value = quote(value)
                 if not value:   # don't search for empty strings, even quoted
                     continue

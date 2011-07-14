@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 
-from unittest import TestCase, defaultTestLoader, main
+from unittest import TestCase
 from Testing import ZopeTestCase as ztc
 
 from collective.solr.tests.utils import getData
-from collective.solr.parser import SolrSchema, SolrResponse
-from collective.solr.utils import findObjects, isSimpleTerm
+from collective.solr.parser import SolrResponse
+from collective.solr.utils import findObjects, isSimpleTerm, isSimpleSearch
+from collective.solr.utils import isWildCard
 from collective.solr.utils import setupTranslationMap, prepareData
 from collective.solr.utils import padResults
 
@@ -52,6 +53,64 @@ class UtilsTests(ztc.ZopeTestCase):
         self.failIf(isSimpleTerm(u'føø!'))
         self.failIf(isSimpleTerm(unicode('föö', 'latin')))
 
+    def testSimpleSearch(self):
+        self.failUnless(isSimpleSearch('foo'))
+        self.failUnless(isSimpleSearch('foo bar'))
+        self.failUnless(isSimpleSearch('foo bar '))
+        self.failUnless(isSimpleSearch('foo   bar'))
+        self.failUnless(isSimpleSearch('foo 42 bar11'))
+        self.failUnless(isSimpleSearch(u'føø bär'))
+        self.failUnless(isSimpleSearch('føø bär'))
+        self.failUnless(isSimpleSearch('foo*'))
+        self.failUnless(isSimpleSearch('foo* bar*'))
+        self.failUnless(isSimpleSearch('*foo*'))
+        self.failUnless(isSimpleSearch('"foo"'))
+        self.failUnless(isSimpleSearch('"foo bar"'))
+        self.failUnless(isSimpleSearch('"foo AND bar"'))
+        self.failUnless(isSimpleSearch('foo "AND" bar'))
+        self.failUnless(isSimpleSearch('"foo" "bar"'))
+        self.failUnless(isSimpleSearch('fo?bar'))
+        self.failUnless(isSimpleSearch('foo bar?'))
+        self.failUnless(isSimpleSearch('areallyverylongword '
+            'andanotherreallylongwordwithsomecake'))
+        self.failUnless(isSimpleSearch('areallyverylongword '
+            'andanotherreallylongwordwithsomecake *'))
+        self.failIf(isSimpleSearch(''))
+        self.failIf(isSimpleSearch(u'føø bär!'))
+        self.failIf(isSimpleSearch(unicode('föö bär', 'latin')))
+        self.failIf(isSimpleSearch('foo AND bar'))
+        self.failIf(isSimpleSearch('foo OR bar'))
+        self.failIf(isSimpleSearch('foo NOT bar'))
+        self.failIf(isSimpleSearch('"foo" OR bar'))
+        self.failIf(isSimpleSearch('(foo OR bar)'))
+        self.failIf(isSimpleSearch('+foo'))
+        self.failIf(isSimpleSearch('name:foo'))
+        self.failIf(isSimpleSearch('foo && bar'))
+
+    def testIsWildCard(self):
+        self.failUnless(isWildCard('foo*'))
+        self.failUnless(isWildCard('fo?'))
+        self.failUnless(isWildCard('fo?o'))
+        self.failUnless(isWildCard('fo*oo'))
+        self.failUnless(isWildCard('fo?o*'))
+        self.failUnless(isWildCard('*foo'))
+        self.failUnless(isWildCard('*foo*'))
+        self.failUnless(isWildCard('foo* bar'))
+        self.failUnless(isWildCard('foo bar?'))
+        self.failUnless(isWildCard('*'))
+        self.failUnless(isWildCard('?'))
+        self.failUnless(isWildCard(u'føø*'))
+        self.failUnless(isWildCard(u'føø*'.encode('utf-8')))
+        self.failUnless(isWildCard(u'*føø*'))
+        self.failIf(isWildCard('foo'))
+        self.failIf(isWildCard('fo#o'))
+        self.failIf(isWildCard('foo bar'))
+        self.failIf(isWildCard(u'føø'))
+        self.failIf(isWildCard(u'føø'.encode('utf-8')))
+        # other characters might be meaningful in solr, but we don't
+        # distinguish them properly (yet)
+        self.failIf(isWildCard('foo#?'))
+
 
 class TranslationTests(TestCase):
 
@@ -70,40 +129,6 @@ class TranslationTests(TestCase):
         data = {'SearchableText': u'f\xf8\xf8 bar'}
         prepareData(data)
         self.assertEqual(data, {'SearchableText': 'f\xc3\xb8\xc3\xb8 bar'})
-
-
-class MaintenanceHelperTests(TestCase):
-
-    def missing(self, attributes):
-        from collective.solr.browser.maintenance import missingAndStored
-        xml = getData('plone_schema.xml')
-        schema = SolrSchema(xml.split('\n\n', 1)[1])
-        return missingAndStored(attributes, schema)
-
-    def testMissingWithoutAttributes(self):
-        missing, stored = self.missing(attributes=None)
-        self.assertEqual(missing, set())
-        self.assertEqual(stored, set())
-
-    def testMissingWithEmptyAttributes(self):
-        missing, stored = self.missing(attributes=[])
-        self.assertEqual(missing, set(['UID', 'default', 'SearchableText',
-            'physicalDepth', 'parentPaths']))
-        self.assertEqual(stored, set(['id', 'UID', 'Title', 'Subject',
-            'physicalPath', 'review_state']))
-
-    def testMissingWithSomeAttributes(self):
-        missing, stored = self.missing(attributes=['UID', 'Title', 'Subject'])
-        self.assertEqual(missing, set(['default', 'SearchableText',
-            'physicalDepth', 'parentPaths']))
-        self.assertEqual(stored, set(['id', 'physicalPath', 'review_state']))
-
-    def testMissingWithStoredAttributes(self):
-        missing, stored = self.missing(attributes=['SearchableText', 'UID'])
-        self.assertEqual(missing, set(['default', 'physicalDepth',
-            'parentPaths']))
-        self.assertEqual(stored, set(['id', 'Title', 'Subject',
-            'physicalPath', 'review_state']))
 
 
 class BatchingHelperTests(TestCase):
@@ -133,10 +158,3 @@ class BatchingHelperTests(TestCase):
         self.assertEqual(results[:50], [None] * 50)
         self.assertEqual(results[50].UID, '7c31adb20d5eee314233abfe48515cf3')
         self.assertEqual(results[187:], [None] * (1204 - 187))
-
-
-def test_suite():
-    return defaultTestLoader.loadTestsFromName(__name__)
-
-if __name__ == '__main__':
-    main(defaultTest='test_suite')

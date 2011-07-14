@@ -1,9 +1,11 @@
 from logging import getLogger
+from Acquisition import aq_get
 from DateTime import DateTime
 from datetime import date, datetime
 from zope.component import getUtility, queryUtility, queryMultiAdapter
 from zope.component import queryAdapter, adapts
 from zope.interface import implements
+from zope.contenttype import guess_content_type
 from ZODB.POSException import ConflictError
 from Products.CMFCore.utils import getToolByName
 from Products.CMFCore.CMFCatalogAware import CMFCatalogAware
@@ -20,8 +22,6 @@ from collective.solr.solr import SolrException
 from collective.solr.utils import prepareData
 from socket import error
 from urllib import urlencode
-
-from urllib3 import encode_multipart_formdata
 
 logger = getLogger('collective.solr.indexer')
 
@@ -72,6 +72,52 @@ class DefaultAdder(object):
         data.pop('links', '')
         conn.add(**data)
 
+BOUNDARY = '----------ThIs_Is_tHe_bouNdaRY_$'
+
+def fieldsnippet(name, value):
+    L = ['--' + BOUNDARY]
+    L.append('Content-Disposition: form-data; name="%s"' % name)
+    L.append('')
+    if isinstance(value, unicode):
+        L.append(value.encode('utf-8'))
+    elif isinstance(value, bool):
+        L.append(str(value).lower())
+    else:
+        L.append(str(value))
+    return L
+
+
+def encode_multipart_formdata(fields, files):
+    """
+    fields is a sequence of (name, value) elements for regular form fields.
+    files is a sequence of (name, filename, value) elements for data to be uploaded as files
+    Return (content_type, body) ready for httplib.HTTP instance
+    """
+
+    CRLF = '\r\n'
+    L = []
+    for (key, value) in fields:
+        if isinstance(value, list) or isinstance(value, tuple):
+            for item in value:
+                L.extend(fieldsnippet(key, item))
+        else:
+            L.extend(fieldsnippet(key, value))
+    for (key, filename, value) in files:
+        L.append('--' + BOUNDARY)
+        if filename is not None:
+            L.append('Content-Disposition: form-data; name="%s"; filename="%s"' % (key, filename))
+        else:
+            L.append('Content-Disposition: form-data; name="%s"' % (key,))
+        L.append('Content-Type: %s' % guess_content_type(filename, value)[0])
+        L.append('')
+        L.append(value)
+    L.append('--' + BOUNDARY + '--')
+    L.append('')
+    body = CRLF.join(L)
+    content_type = 'multipart/form-data; boundary=%s' % BOUNDARY
+    return content_type, body
+
+
 class BinaryAdder(DefaultAdder):
 
     def __call__(self, conn, **data):
@@ -82,38 +128,32 @@ class BinaryAdder(DefaultAdder):
         if not binary_data:
             return
         filename = field.getFilename(self.context)
-        if filename is not None:
-            body, content_type = encode_multipart_formdata(
-                {'myfile':(filename , binary_data)})
-        else:
-            body, content_type = encode_multipart_formdata(
-                {'myfile': binary_data})
+        ignore = ('content_type', 'SearchableText', 'created', 'Type', 'links',
+                  'description', 'Date')
+        postdata = dict([('literal.%s' % key, val) for key, val in data.iteritems()
+                     if key not in ignore])
+        postdata['commit'] = True
+        content_type, body = encode_multipart_formdata(
+            postdata.items(), (('__myfile__', filename, binary_data),))
 
         headers = {}
         headers['Content-Type'] = content_type
         headers['Content-Length'] = len(body)
 
-        params = {'commit':'true'}
-        ignore = ('content_type', 'SearchableText', 'created', 'Type', 'links',
-                  'description', 'Date')
-        for key, val in data.iteritems():
-            if key in ignore:
-                continue
-            if isinstance(val, unicode):
-                val = val.encode('utf-8')
-            if isinstance(val, list):
-                for i, item in enumerate(val):
-                    if isinstance(item, unicode):
-                        val[i] = item.encode('utf-8')
-            params['literal.%s' % key] = val
-
-        url = '%s/update/extract?%s' % (
-            conn.solrBase, urlencode(params, doseq=1))
-        conn.reset()
+        url = '%s/update/extract' % conn.solrBase
         try:
             conn.doPost(url, body, headers)
         except SolrException, e:
-            logger.warn('Error @ %s', data['physicalPath'])
+            logger.warn('Error @ %s', data['path_string'])
+
+
+def boost_values(obj, data):
+    """ calculate boost values using a method or skin script;  returns
+        a dictionary with the values or `None` """
+    boost_index_getter = aq_get(obj, 'solr_boost_index_values', None)
+    if boost_index_getter is not None:
+        return boost_index_getter(data)
+
 
 class SolrIndexProcessor(object):
     """ a queue processor for solr """
@@ -135,6 +175,11 @@ class SolrIndexProcessor(object):
                 msg = 'unable to fetch schema, skipping indexing of %r'
                 logger.warning(msg, obj)
                 return
+            uniqueKey = schema.get('uniqueKey', None)
+            if uniqueKey is None:
+                msg = 'schema is missing unique key, skipping indexing of %r'
+                logger.warning(msg, obj)
+                return
             if attributes is not None:
                 attributes = set(schema.keys()).intersection(attributes)
                 if not attributes:
@@ -143,21 +188,19 @@ class SolrIndexProcessor(object):
             if not data:
                 return          # don't index with no data...
             prepareData(data)
-            uniqueKey = schema.get('uniqueKey', None)
-            if uniqueKey is None:
-                msg = 'schema is missing unique key, skipping indexing of %r'
-                logger.warning(msg, obj)
-                return
-            uniqueValue = data.get(uniqueKey, None)
-            if uniqueValue is not None and not missing:
+            if data.get(uniqueKey, None) is not None and not missing:
+                config = getUtility(ISolrConnectionConfig)
+                if config.commit_within:
+                    data['commitWithin'] = config.commit_within
                 try:
+                    logger.debug('indexing %r (%r)', obj, data)
                     pt = data.get('portal_type', 'default')
                     logger.debug('indexing %r with %r adder (%r)', obj, pt, data)
 
                     adder = queryAdapter(obj, ISolrAddHandler, name=pt)
                     if adder is None:
                         adder = DefaultAdder(obj)
-                    adder(conn, **data)
+                    adder(conn, boost_values=boost_values(obj, data), **data)
                 except (SolrException, error):
                     logger.exception('exception during indexing %r', obj)
 
@@ -198,16 +241,20 @@ class SolrIndexProcessor(object):
         pass
 
     def commit(self, wait=None):
-        config = getUtility(ISolrConnectionConfig)
-        if not config.auto_commit:
-            return
         conn = self.getConnection()
         if conn is not None:
+            config = getUtility(ISolrConnectionConfig)
             if not isinstance(wait, bool):
                 wait = not config.async
             try:
                 logger.debug('committing')
-                conn.commit(waitFlush=wait, waitSearcher=wait)
+                if not config.auto_commit or config.commit_within:
+                    # If we have commitWithin enabled, we never want to do
+                    # explicit commits. Even though only add's support this
+                    # and we might wait a bit longer on delete's this way
+                    conn.flush()
+                else:
+                    conn.commit(waitFlush=wait, waitSearcher=wait)
             except (SolrException, error):
                 logger.exception('exception during commit')
             self.manager.closeConnection()
@@ -264,13 +311,13 @@ class SolrIndexProcessor(object):
                 value = getattr(obj, name)
                 if callable(value):
                     value = value()
-            except (ConflictError, KeyboardInterrupt):
+            except ConflictError:
                 raise
             except AttributeError:
                 continue
-            except Exception, e:
-                logger.warn(('Error %s occured when getting data '
-                             'for indexing!'), e)
+            except Exception:
+                logger.exception('Error occured while getting data for '
+                    'indexing!')
                 continue
             field = schema[name]
             handler = handlers.get(field.class_, None)

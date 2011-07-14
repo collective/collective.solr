@@ -88,6 +88,17 @@ class SolrControlPanelAdapter(SchemaAdapterBase):
 
     auto_commit = property(getAutoCommit, setAutoCommit)
 
+    def getCommitWithin(self):
+        util = queryUtility(ISolrConnectionConfig)
+        return getattr(util, 'commit_within', '')
+
+    def setCommitWithin(self, value):
+        util = queryUtility(ISolrConnectionConfig)
+        if util is not None:
+            util.commit_within = value
+
+    commit_within = property(getCommitWithin, setCommitWithin)
+
     def getIndexTimeout(self):
         util = queryUtility(ISolrConnectionConfig)
         return getattr(util, 'index_timeout', '')
@@ -131,6 +142,17 @@ class SolrControlPanelAdapter(SchemaAdapterBase):
             util.required = value
 
     required = property(getRequiredParameters, setRequiredParameters)
+
+    def getSearchPattern(self):
+        util = queryUtility(ISolrConnectionConfig)
+        return getattr(util, 'search_pattern', '')
+
+    def setSearchPattern(self, value):
+        util = queryUtility(ISolrConnectionConfig)
+        if util is not None:
+            util.search_pattern = value
+
+    search_pattern = property(getSearchPattern, setSearchPattern)
 
     def getDefaultFacets(self):
         util = queryUtility(ISolrConnectionConfig)

@@ -1,16 +1,193 @@
 Changelog
 =========
 
-1.2 - Unreleased
-----------------
+1.2 - unreleased
+-----------------
+
+Upgrade notes
+*************
+
+* Changed the names of the indexes used to emulate the `path` index. You need
+  to adjust your schema and rename `physicalPath` to `path_string`, 
+  `physicalDepth` to `path_depth` and `parentPaths` to `path_parents`. This
+  also requires a full Solr reindex to pick up the new data.
+  [hannosch]
+
+* Added an `archetypes.schemaextender` dependency and register two fields for
+  all objects providing `IATContentType`. `showinsearch` is a boolean field that
+  can be used to hide specific content items from search results. `searchwords`
+  is a lines field, which lets you specify words that an object should be found
+  under.
+  [hannosch]
+
+* Standardize on `solr` as the i18n domain.
+  [hannosch]
+
+* Adjust munin configs for query cache handlers to `c.r.solrinstance 3.5`
+  changes using `FastLRUCache`.
+  [hannosch]
+
+* Added munin configs for the `/update/extract`, the direct update handler,
+  query cache size and warmup time, admin file requests used to get the
+  Solr schema and the searcher warmup time.
+  [hannosch]
+
+* Added tests for splitting words on `:` and `-`.
+  [hannosch]
+
+* Update example configuration to Solr 3.3.
+  [hannosch]
+
+* Add `getRID` and `_unrestrictedGetObject` to our flare implementation.
+  [hannosch]
+
+* Added documentation on setting up a master-slave configuration using the
+  `SolrReplication` support.
+  [hannosch]
+
+* Adjust tests to work with latest `collective.recipe.solrinstance = 3.3` and
+  its new ICU-based text field.
+  [hannosch]
+
+* Added `object_provides` index to example schema, as it's used in the
+  collection portlet to find collections.
+  [hannosch]
+
+* Rewrote the `maintenance/sync` method for more performance, dropped the
+  optional `path` restriction from it and removed the `cache` argument. It
+  should be able to sync datasets in the 100,000 object range in the matter of
+  a couple minutes.
+  [hannosch]
+
+* Changed the `maintenance/reindex` method to only flush data to Solr but not
+  commit after each batch. Instead we only commit once at the end. You should
+  configure auto commit policies on the Solr server side or `commitWithin`.
+  [hannosch]
+
+* Adjusted the `mangleQuery` function to calculate extended path indexes from
+  the Solr schema instead of hardcoding `path`. If you have any additional
+  extended path indexes, you need to provide indexers with the same three
+  suffixes as we do ourselves in the `attributes` module for the `path` index
+  and add those to the Solr schema.
+  [hannosch]
+
+* Added documentation on Java process, monitoring production settings and
+  include a number of useful munin plugin configurations.
+  [hannosch]
+
+* Updated example config to include production settings and JMX.
+  [hannosch]
+
+* Updated example config to collective.recipe.solrinstance 3.1 and Solr 3.2.
+  [hannosch]
+
+* Updated readme and project description, adding detailed information about how
+  Solr works and how we integrate with it.
+  [hannosch]
+
+* Added optional support for the `Lazy` backports founds in catalogqueryplan.
+  [hannosch]
+
+* Fixed patch of LazyCat's `__add__` method to patch the base class instead, as
+  the method was moved.
+  [hannosch]
+
+* Updated test config to Solr 3.1, which should be supported but hasn't seen
+  extensive production use.
+  [hannosch]
+
+* Avoid using the deprecated `five:implements` directive.
+  [hannosch]
+
+* Rewrite the `isSimpleSearch` function to use a less complex regular
+  expression, which doesn't have O(2**n) scaling properties.
+  [hannosch]
+
+* Use the standard libraries doctest module.
+  [hannosch]
+
+* Fix the pretty_title_or_id method from PloneFlare; the implementation
+  was broken, now delegates to the standard Plone implementation.
+  [mj]
+
+* In `solr_dump_catalog` correctly handle boolean values and empty text fields.
+  [hannosch]
+
+* Provide a dummy request in the `solr_dump_catalog` command.
+  [hannosch]
+
+* Handle utf-8 encoded data correctly in `utils.isWildCard`.
+  [hannosch]
+
+* Gracefully handle exceptions raised during index data retrieval.
+  [tom_gross, hannosch]
+
+* Added `zopectl.command` entry points for three new scripts.
+  `solr_clear_index` will remove all entries from Solr. `solr_dump_catalog`
+  will efficiently dump the content of the catalog onto the filesystem and
+  `solr_import_dump` will import the dump into Solr. This can be used to
+  bootstrap an empty Solr index or update it when the boost logic has changed.
+  All scripts will either take the first Plone site found in the database or
+  accept an unnamed command line argument to specify the id. The Solr server
+  needs to be running and the connection info needs to be configured in the
+  Plone site. Example use: ``bin/instance solr_dump_catalog Plone``. In this
+  example the data would be stored in `var/instance/solr_dump_plone`. The data
+  can be transferred between machines and calling `solr_dump_catalog` multiple
+  times will append new data to the existing dump. To get Solr up-to-date you
+  should still call `@@solr-maintenance/sync`.
+  [hannosch, witsch]
+
+* Changed search pattern syntax to use `str.format` syntax and make both
+  `{value}` and `{base_value}` available in the pattern.
+  [hannosch]
+
+* Add possibility to calculate site-specific boost values via a skin script.
+  [hannosch, witsch]
+
+* Fix wildcard searches for patterns other than just ending with an asterisk.
+  [hannosch, witsch]
+
+* Require Plone 4.x, declare package dependencies & remove BBB bits.
+  [hannosch, witsch]
+
+* Add configurable setting for custom search pattern for simple searches,
+  allowing to include multiple fields with specific boost values.
+  [hannosch, witsch]
+
+* Don't modify search parameters during indexing.
+  [hannosch, witsch]
+
+* Fixed auto-commit support to actually sent the data to Solr, but omit the
+  commit message.
+  [hannosch]
+
+* Added support for ``commitWithin`` support on add messages as per SOLR-793.
+  This feature requires a Solr 1.4 server.
+  [hannosch]
+
+* Split out 404 auto-suggestion tests into a separate file and disabled them
+  under Plone 4 - the feature is no longer part of Plone.
+  [hannosch]
+
+* Fixed error handling code to deal with different exception string
+  representations in Python 2.6.
+  [hannosch]
+
+* Made tests independent of the ``Large Folder`` content type, as it no longer
+  exists in Plone 4.
+  [hannosch]
+
+* Avoid using the incompatible TestRequest from zope.publisher inside Zope 2.
+  [hannosch]
+
+* Fixed undefined variables in ``search.pt`` for Plone 4 compatibility.
+  [hannosch]
 
 
 1.1 - Released March 17, 2011
 -----------------------------
 
-* add uninstall profile [kiorky]
-
-* still index, if a field can't be accessed
+* Still index, if a field can't be accessed.
   [tom_gross]
 
 * Fix the pretty_title_or_id method from PloneFlare; the implementation
@@ -491,4 +668,3 @@ Changelog
 
 * Initial release
   [witsch]
-

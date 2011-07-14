@@ -1,1 +1,3 @@
-# the existance of __init__.py make this a module...
+from zope.i18nmessageid import MessageFactory
+
+SolrMessageFactory = MessageFactory('solr')

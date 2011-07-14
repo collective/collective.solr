@@ -1,44 +1,59 @@
+import sys
 from urllib2 import build_opener, HTTPHandler
 from httplib import HTTPConnection
-from socket import getaddrinfo, socket, error, SOCK_STREAM
+
+if sys.version_info < (2, 6):
+
+    from socket import getaddrinfo, socket, error, SOCK_STREAM
+
+    class HTTPConnectionWithTimeout(HTTPConnection):
+
+        def __init__(self, host, port=None, strict=None, timeout=None):
+            HTTPConnection.__init__(self, host, port, strict)
+            self.timeout = timeout
+
+        def connect(self):
+            """ copied from httplib.py and added timeout handling """
+            msg = "getaddrinfo returns an empty list"
+            for res in getaddrinfo(self.host, self.port, 0, SOCK_STREAM):
+                af, socktype, proto, canonname, sa = res
+                try:
+                    self.sock = socket(af, socktype, proto)
+                    # set the timeout if given...
+                    if self.timeout is not None:
+                        self.sock.settimeout(self.timeout)
+                    if self.debuglevel > 0:
+                        print "connect: (%s, %s)" % (self.host, self.port)
+                    self.sock.connect(sa)
+                except error, msg:
+                    if self.debuglevel > 0:
+                        print 'connect fail:', (self.host, self.port)
+                    if self.sock:
+                        self.sock.close()
+                    self.sock = None
+                    continue
+                break
+            if not self.sock:
+                raise error(msg)
+
+        def setTimeout(self, timeout):
+            """ set a timeout value for the currently open connection as well
+                as for future ones """
+            self.timeout = timeout
+            if self.sock is not None:
+                self.sock.settimeout(timeout)
 
 
-class HTTPConnectionWithTimeout(HTTPConnection):
+else:    # we are on 2.6 or greater. timeout is implemented for us
 
-    def __init__(self, host, port=None, strict=None, timeout=None):
-        HTTPConnection.__init__(self, host, port, strict)
-        self.timeout = timeout
+    class HTTPConnectionWithTimeout(HTTPConnection):
 
-    def connect(self):
-        """ copied from httplib.py and added timeout handling """
-        msg = "getaddrinfo returns an empty list"
-        for res in getaddrinfo(self.host, self.port, 0, SOCK_STREAM):
-            af, socktype, proto, canonname, sa = res
-            try:
-                self.sock = socket(af, socktype, proto)
-                # set the timeout if given...
-                if self.timeout is not None:
-                    self.sock.settimeout(self.timeout)
-                if self.debuglevel > 0:
-                    print "connect: (%s, %s)" % (self.host, self.port)
-                self.sock.connect(sa)
-            except error, msg:
-                if self.debuglevel > 0:
-                    print 'connect fail:', (self.host, self.port)
-                if self.sock:
-                    self.sock.close()
-                self.sock = None
-                continue
-            break
-        if not self.sock:
-            raise error(msg)
-
-    def setTimeout(self, timeout):
-        """ set a timeout value for the currently open connection as well
-            as for future ones """
-        self.timeout = timeout
-        if self.sock is not None:
-            self.sock.settimeout(timeout)
+        def setTimeout(self, timeout):
+            """ set a timeout value for the currently open connection as well
+                as for future ones """
+            self.timeout = timeout
+            if self.sock is not None:
+                self.sock.settimeout(timeout)
 
 
 class HTTPHandlerWithTimeout(HTTPHandler):

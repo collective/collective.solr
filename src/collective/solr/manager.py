@@ -24,10 +24,12 @@ class BaseSolrConnectionConfig(object):
         self.base = None
         self.async = False
         self.auto_commit = True
+        self.commit_within = 0
         self.index_timeout = 0
         self.search_timeout = 0
         self.max_results = 0
         self.required = []
+        self.search_pattern = None
         self.facets = []
         self.filter_queries = []
         self.slow_query_threshold = 0
@@ -39,7 +41,9 @@ class SolrConnectionConfig(BaseSolrConnectionConfig, Persistent):
 
     max_results = 0             # provide backwards compatibility
     auto_commit = True
+    commit_within = 0
     required = ()
+    search_pattern = None
     facets = ()
     filter_queries = ()
     slow_query_threshold = 0

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from unittest import TestCase, defaultTestLoader, main
+from unittest import TestCase
 from DateTime import DateTime
 from Missing import MV
 from zope.component import provideUtility
@@ -269,7 +269,11 @@ class QueryTests(TestCase):
 
     def testLiterateQueries(self):
         bq = self.bq
-        self.assertEqual(bq(name=set(['bar'])), '(bar)')
+        self.assertEqual(bq(name=set(['bar'])), 'bar')
+        self.assertEqual(bq(name=set(['foo OR bar'])), 'foo OR bar')
+        self.assertEqual(bq(name=set(['(foo OR bar)'])), '(foo OR bar)')
+        self.assertEqual(bq(name=set(['(Title:foo^10 OR Description:foo)'])),
+            '(Title:foo^10 OR Description:foo)')
         self.failUnless(bq(name=set(['foo', 'bar'])) in
             ['(foo OR bar)', '(bar OR foo)'])
         self.failUnless(bq(name=set(['foo!', '+bar:camp'])) in
@@ -318,10 +322,3 @@ class SearchTests(TestCase):
         self.assertEqual(match.sku, '500')
         self.assertEqual(match.timestamp,
             DateTime('2008-02-29 16:11:46.998 GMT'))
-
-
-def test_suite():
-    return defaultTestLoader.loadTestsFromName(__name__)
-
-if __name__ == '__main__':
-    main(defaultTest='test_suite')

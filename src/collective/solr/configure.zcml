@@ -6,16 +6,18 @@
     xmlns:browser="http://namespaces.zope.org/browser"
     xmlns:genericsetup="http://namespaces.zope.org/genericsetup"
     xmlns:i18n="http://namespaces.zope.org/i18n"
-    i18n_domain="collective.solr">
+    i18n_domain="solr">
 
   <five:registerPackage package="." />
 
   <i18n:registerTranslations directory="locales" />
 
+  <include package="archetypes.schemaextender" />
   <include package="collective.indexing" />
   <include package="plone.browserlayer" />
   <include package="collective.js.showmore" />
 
+  <include file="extender.zcml" />
   <include file="profiles.zcml" />
 
   <cmf:registerDirectory name="solr_site_search" />
@@ -24,28 +26,17 @@
     factory=".search.Search"
     provides=".interfaces.ISearch" />
 
-  <five:implements
-    class="Products.CMFPlone.CatalogTool.CatalogTool"
-    interface=".interfaces.ICatalogTool" />
+  <class class="Products.CMFPlone.CatalogTool.CatalogTool">
+    <implements interface=".interfaces.ICatalogTool" />
+  </class>
 
-  <configure zcml:condition="installed Products.CMFPlone">
-
-    <include package=".browser" />
+  <include package=".browser" />
 
     <adapter
         for=".interfaces.ICatalogTool"
         provides=".interfaces.ISearchDispatcher"
         factory=".dispatcher.SearchDispatcher" />
 
-    <adapter
-        factory=".flare.PloneFlare" />
-
-    <adapter
-        for="*
-             zope.publisher.interfaces.browser.IBrowserRequest
-             .flare.PloneFlare"
-           factory="plone.app.layout.icons.icons.CatalogBrainContentIcon"
-           provides="plone.app.layout.icons.interfaces.IContentIcon" />
 
     <adapter
         factory=".indexer.DefaultAdder"
@@ -62,27 +53,31 @@
         name="Image"
         / -->
 
-  </configure>
+  <adapter
+      factory=".flare.PloneFlare" />
 
-  <configure zcml:condition="installed plone.app.controlpanel">
+  <adapter
+      for="*
+           zope.publisher.interfaces.browser.IBrowserRequest
+           .flare.PloneFlare"
+         factory="plone.app.layout.icons.icons.CatalogBrainContentIcon"
+         provides="plone.app.layout.icons.interfaces.IContentIcon" />
 
-    <adapter factory=".configlet.SolrControlPanelAdapter" />
+  <adapter factory=".configlet.SolrControlPanelAdapter" />
 
-    <browser:page
-        name="solr-controlpanel"
-        for="Products.CMFPlone.interfaces.IPloneSiteRoot"
-        class=".configlet.SolrControlPanel"
-        permission="cmf.ManagePortal" />
+  <browser:page
+      name="solr-controlpanel"
+      for="Products.CMFPlone.interfaces.IPloneSiteRoot"
+      class=".configlet.SolrControlPanel"
+      permission="cmf.ManagePortal" />
 
-    <utility
-        factory=".vocabularies.SolrIndexes"
-        name="collective.solr.indexes" />
+  <utility
+      factory=".vocabularies.SolrIndexes"
+      name="collective.solr.indexes" />
 
-  </configure>
-
-  <adapter name="physicalPath" factory=".attributes.physicalPathIndexer" />
-  <adapter name="physicalDepth" factory=".attributes.physicalDepthIndexer" />
-  <adapter name="parentPaths" factory=".attributes.parentPathsIndexer" />
+  <adapter name="path_string" factory=".attributes.path_string" />
+  <adapter name="path_depth" factory=".attributes.path_depth" />
+  <adapter name="path_parents" factory=".attributes.path_parents" />
 
   <adapter
       factory=".exportimport.SolrConfigXMLAdapter"

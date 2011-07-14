@@ -1,3 +1,15 @@
+bin
+build
+develop-eggs
+dist
+downloads
+eggs
+include
+lib
+parts
+htmlcov
+var
+.*
 *.egg-info
 *.pyc
 *.mo

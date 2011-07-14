@@ -17,7 +17,7 @@ to activate Solr support and reindex the site's content, though:
   'http://nohost/plone/foo'
   >>> browser.contents
   '...Info...Changes saved...
-   ...Foo...This item does not have any body text...'
+   ...documentFirstHeading...Foo...'
 
   >>> browser.getControl('Search Site').value = 'Foo'
   >>> browser.getForm(name='searchform').submit()
@@ -69,43 +69,35 @@ Plone's advanced search should also work.  However, we only test the default
 settings here in order to make sure including the extra query parameters
 doesn't lead to problems:
 
-  >>> browser.getLink('Advanced Search').click()
-  >>> browser.getControl('Search Text').value = 'Foo'
+  >>> browser.open('http://nohost/plone/search_form')
+  >>> browser.getControl(name='SearchableText', index=1).value = 'Foo'
   >>> browser.getControl(name='submit').click()
   >>> browser.contents
   '...Search results...1...items matching your search terms...
    ...http://nohost/plone/foo...Foo...'
 
 
-404 Responses
+Batch padding
 -------------
 
-We also test that searching for suggestions when a page hasn't been found,
-a.k.a. a 404 response, still works:
+Searches which return one more result than the current batch size will
+skip the batching and show all results on one page instead (see `orphans`
+setting):
 
-  >>> browser.handleErrors = False    # this is not debug code in this case...
-  >>> browser.open('http://nohost/plone/welcome')
+  >>> for n in range(31):
+  ...   _ = self.portal.invokeFactory('Document', id='doc%d' % n, title='Bar')
+  >>> from transaction import commit
+  >>> commit()                        # indexing happens on commit
+
+  >>> browser.open('http://nohost/plone/search_form')
+  >>> browser.getControl(name='SearchableText', index=1).value = 'Bar'
+  >>> browser.getControl(name='submit').click()
+  >>> browser.contents
+  '...Search results...31...items matching your search terms...'
+
+The batching link should not show up:
+
+  >>> browser.getLink('Next')
   Traceback (most recent call last):
   ...
-  NotFound: ...
-    ...We...re sorry, but that page doesn...t exist...
-    ...You might have been looking for...
-    ...href="http://nohost/plone/"...Plone site...
-    ...href="http://nohost/plone/front-page/"...Welcome to Plone...
-
-Suggestions are searched for using parts of the non-existent url, starting
-from the end.  If the search doesn't yield any results, the next part is
-considered and so on, until at the end, an empty string is passed in as the
-search term.  This however breaks searching with Solr and needs to be fixed.
-An easy way to make sure no results are ever returned is to clear the index:
-
-  >>> maintenance = portal.unrestrictedTraverse('@@solr-maintenance')
-  >>> maintenance.clear()
-  'solr index cleared.'
-  >>> browser.open('http://nohost/plone/welcome')
-  Traceback (most recent call last):
-  ...
-  NotFound: ...
-    ...We...re sorry, but that page doesn...t exist...
-    ...You might have been looking for...
-
+  LinkNotFoundError

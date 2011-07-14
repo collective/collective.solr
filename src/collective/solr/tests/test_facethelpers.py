@@ -1,4 +1,4 @@
-from unittest import TestCase, defaultTestLoader, main
+from unittest import TestCase
 from zope.component import provideUtility, getGlobalSiteManager
 from zope.publisher.browser import TestRequest
 from collective.solr.tests.utils import getData
@@ -275,10 +275,3 @@ class FacettingHelperTest(TestCase):
             ('bar', 4),
             ('foo', 2),
         ])
-
-
-def test_suite():
-    return defaultTestLoader.loadTestsFromName(__name__)
-
-if __name__ == '__main__':
-    main(defaultTest='test_suite')

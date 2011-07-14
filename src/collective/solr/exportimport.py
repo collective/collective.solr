@@ -31,10 +31,12 @@ class SolrConfigXMLAdapter(XMLAdapterBase):
         self.context.base = ''
         self.context.async = False
         self.context.auto_commit = True
+        self.context.commit_within = 0
         self.context.index_timeout = 0
         self.context.search_timeout = 0
         self.context.max_results = 0
         self.context.required = []
+        self.context.search_pattern = ''
         self.context.facets = []
         self.context.filter_queries = []
         self.context.slow_query_threshold = 0
@@ -68,6 +70,9 @@ class SolrConfigXMLAdapter(XMLAdapterBase):
                 elif child.nodeName == 'auto-commit':
                     value = str(child.getAttribute('value'))
                     self.context.auto_commit = self._convertToBoolean(value)
+                elif child.nodeName == 'commit-within':
+                    value = int(child.getAttribute('value'))
+                    self.context.commit_within = value
                 elif child.nodeName == 'index-timeout':
                     value = float(str(child.getAttribute('value')))
                     self.context.index_timeout = value
@@ -82,6 +87,9 @@ class SolrConfigXMLAdapter(XMLAdapterBase):
                     for elem in child.getElementsByTagName('parameter'):
                         value.append(elem.getAttribute('name'))
                     self.context.required = tuple(map(str, value))
+                elif child.nodeName == 'search-pattern':
+                    value = str(child.getAttribute('value'))
+                    self.context.search_pattern = value
                 elif child.nodeName == 'search-facets':
                     value = []
                     for elem in child.getElementsByTagName('parameter'):
@@ -122,6 +130,7 @@ class SolrConfigXMLAdapter(XMLAdapterBase):
         append = settings.appendChild
         append(create('async', str(bool(self.context.async))))
         append(create('auto-commit', str(bool(self.context.auto_commit))))
+        append(create('commit-within', str(self.context.commit_within)))
         append(create('index-timeout', str(self.context.index_timeout)))
         append(create('search-timeout', str(self.context.search_timeout)))
         append(create('max-results', str(self.context.max_results)))
@@ -131,6 +140,7 @@ class SolrConfigXMLAdapter(XMLAdapterBase):
             param = self._doc.createElement('parameter')
             param.setAttribute('name', name)
             required.appendChild(param)
+        append(create('search-pattern', self.context.search_pattern))
         facets = self._doc.createElement('search-facets')
         append(facets)
         for name in self.context.facets:

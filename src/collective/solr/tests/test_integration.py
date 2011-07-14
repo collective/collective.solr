@@ -49,16 +49,18 @@ class QueryManglerTests(SolrTestCase):
 
     def testExcludeUserFromAllowedRolesAndUsers(self):
         config = queryUtility(ISolrConnectionConfig)
+        search = queryUtility(ISearch)
+        schema = search.getManager().getSchema() or {}
         # first test the default setting, i.e. not removing the user
-        keywords = dict(allowedRolesAndUsers=['Member', 'user:test_user_1_'])
-        mangleQuery(keywords)
+        keywords = dict(allowedRolesAndUsers=['Member', 'user$test_user_1_'])
+        mangleQuery(keywords, config, schema)
         self.assertEqual(keywords, {
-            'allowedRolesAndUsers': ['Member', 'user:test_user_1_'],
+            'allowedRolesAndUsers': ['Member', 'user$test_user_1_'],
         })
         # now let's remove it...
         config.exclude_user = True
-        keywords = dict(allowedRolesAndUsers=['Member', 'user:test_user_1_'])
-        mangleQuery(keywords)
+        keywords = dict(allowedRolesAndUsers=['Member', 'user$test_user_1_'])
+        mangleQuery(keywords, config, schema)
         self.assertEqual(keywords, {
             'allowedRolesAndUsers': ['Member'],
         })
@@ -167,15 +169,17 @@ class SiteSearchTests(SolrTestCase):
     def testSearchTimeout(self):
         config = queryUtility(ISolrConnectionConfig)
         config.active = True
-        config.search_timeout = 5   # specify the timeout
+        config.search_timeout = 2   # specify the timeout
         config.port = 55555         # don't let the real solr disturb us
         def quick(handler):         # set up fake http response
-            sleep(3)                # and wait a bit before sending it
+            sleep(0.5)              # and wait a bit before sending it
             handler.send_response(200, getData('search_response.txt'))
         def slow(handler):          # set up another http response
-            sleep(7)                # but wait longer before sending it
+            sleep(3)                # but wait longer before sending it
             handler.send_response(200, getData('search_response.txt'))
-        thread = fakeServer([quick, slow], port=55555)
+        # We need a third handler, as the second one will timeout, which causes
+        # the SolrConnection.doPost method to catch it and try to reconnect.
+        thread = fakeServer([quick, slow, slow], port=55555)
         search = queryUtility(ISearch)
         search('foo')               # the first search should succeed
         try:

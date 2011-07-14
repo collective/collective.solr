@@ -1,7 +1,7 @@
 <configure
     xmlns="http://namespaces.zope.org/zope"
     xmlns:genericsetup="http://namespaces.zope.org/genericsetup"
-    i18n_domain="collective.solr">
+    i18n_domain="solr">
 
   <genericsetup:registerProfile
       name="default"
@@ -17,15 +17,6 @@
       title="collective.solr (site search)"
       directory="profiles/search"
       description="Solr integration for Plone's site search"
-      for="Products.CMFPlone.interfaces.IPloneSiteRoot"
-      provides="Products.GenericSetup.interfaces.EXTENSION"
-      />
-
-  <genericsetup:registerProfile
-      name="uninstall"
-      title="collective.solr (uninstall)"
-      directory="profiles/uninstall"
-      description="Solr uninstall integration for Plone's site"
       for="Products.CMFPlone.interfaces.IPloneSiteRoot"
       provides="Products.GenericSetup.interfaces.EXTENSION"
       />

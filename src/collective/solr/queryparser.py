@@ -1,6 +1,7 @@
 from re import compile
 
 # Solr/lucene reserved characters/terms: + - && || ! ( ) { } [ ] ^ " ~ * ? : \
+# (see http://wiki.apache.org/solr/SolrQuerySyntax)
 # Four groups for tokenizer:
 # 1) Whitespace (\s+)
 # 2) Any non reserved characters (normal text) ([^(){}\[\]+\-!^\"~*?:\\\&\|\s]+)
@@ -87,7 +88,7 @@ def quote(term):
     if isinstance(term, unicode):
         term = term.encode('utf-8')
     stack = Stack()
-    tokens = query_tokenizer.findall(term)
+    tokens = query_tokenizer.findall(term.strip())
     # Counter enables lookahead
     i = 0
     stop = len(tokens)

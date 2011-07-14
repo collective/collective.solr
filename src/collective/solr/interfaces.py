@@ -1,9 +1,8 @@
+from collective.indexing.interfaces import IIndexQueueProcessor
 from zope.interface import Interface
 from zope.schema import Bool, TextLine, Int, Float, List
-from zope.i18nmessageid import MessageFactory
-from collective.indexing.interfaces import IIndexQueueProcessor
 
-_ = MessageFactory('collective.solr')
+from collective.solr import SolrMessageFactory as _
 
 
 class ISolrSchema(Interface):
@@ -32,6 +31,15 @@ class ISolrSchema(Interface):
                        'index. If you disable this, you need to configure '
                        'commit policies on the Solr server side.'))
 
+    commit_within = Int(title=_(u'Commit within'), default=0,
+        description=_(u'Maximum number of milliseconds after which adds '
+                       'should be processed by Solr. Defaults to 0, meaning '
+                       'immediate commits. Enabling this feature implicitly '
+                       'disables automatic commit and you should configure '
+                       'commit policies on the Solr server side. Otherwise '
+                       'large numbers of deletes without adds will not be '
+                       'processed. This feature requires a Solr 1.4 server.'))
+
     index_timeout = Float(title=_(u'Index timeout'),
         description=_(u'Number of seconds after which an index request will '
                        'time out. Set to "0" to disable timeouts.'))
@@ -51,6 +59,14 @@ class ISolrSchema(Interface):
                          'of the listed parameters is present in the query. '
                          'Leave empty to dispatch all searches.'),
         value_type = TextLine(), default = [], required = False)
+
+    search_pattern = TextLine(title=_(u'Pattern for simple search queries'),
+        description = _(u'Specify a query pattern used for simple queries '
+                         'consisting only of words and numbers, i.e. not '
+                         'using any of Solr\'s advanced query expressions. '
+                         '{value} and {base_value} are available in the '
+                         'pattern and will be replaced by the search word '
+                         'and the search word stripped of wildcard symbols.'))
 
     facets = List(title=_(u'Default search facets'),
         description = _(u'Specify catalog indexes that should be queried for '
@@ -169,11 +185,11 @@ class ISolrMaintenanceView(Interface):
     def clear():
         """ clear all data from solr, i.e. delete all indexed objects """
 
-    def reindex(batch=100, skip=0, cache=1000):
+    def reindex(batch=1000, skip=0):
         """ find all contentish objects (meaning all objects derived from one
             of the catalog mixin classes) and (re)indexes them """
 
-    def sync(batch=100, cache=1000):
+    def sync(batch=1000):
         """ sync the solr index with the portal catalog;  records contained
             in the catalog but not in solr will be indexed and records not
             contained in the catalog can be optionally removed;  this can

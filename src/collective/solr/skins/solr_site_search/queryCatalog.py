@@ -32,7 +32,7 @@ def quotequery(s):
         terms = s.split()
     except ConflictError:
         raise
-    except:
+    except Exception:
         return s
     tokens = ('OR', 'AND', 'NOT')
     s_tokens = ('OR', 'AND')

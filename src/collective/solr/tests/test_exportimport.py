@@ -17,10 +17,12 @@ class SetupToolTests(SolrTestCase, TarballTester):
         config.base = '/bar'
         config.async = False
         config.auto_commit = True
+        config.commit_within = 1000
         config.index_timeout = 7
         config.search_timeout = 3.1415
         config.max_results = 42
         config.required = ('foo', 'bar')
+        config.search_pattern = 'foo:{value}'
         config.facets = ('type', 'state')
         config.filter_queries = ('type', )
         config.slow_query_threshold = 2342
@@ -41,6 +43,7 @@ class SetupToolTests(SolrTestCase, TarballTester):
         self.assertEqual(config.base, '/solr')
         self.assertEqual(config.async, False)
         self.assertEqual(config.auto_commit, True)
+        self.assertEqual(config.commit_within, 1000)
         self.assertEqual(config.index_timeout, 0)
         self.assertEqual(config.search_timeout, 0)
         self.assertEqual(config.max_results, 0)
@@ -94,6 +97,7 @@ SOLR_XML = """\
   <settings>
     <async value="False" />
     <auto-commit value="True" />
+    <commit-within value="1000" />
     <index-timeout value="7" />
     <search-timeout value="3.1415" />
     <max-results value="42" />
@@ -101,6 +105,7 @@ SOLR_XML = """\
       <parameter name="foo" />
       <parameter name="bar" />
     </required-query-parameters>
+    <search-pattern value="foo:{value}" />
     <search-facets>
       <parameter name="type" />
       <parameter name="state" />
