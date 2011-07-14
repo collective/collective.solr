@@ -107,8 +107,9 @@ def encode_multipart_formdata(fields, files):
         if filename is not None:
             L.append('Content-Disposition: form-data; name="%s"; filename="%s"' % (key, filename))
         else:
+            filename = ''
             L.append('Content-Disposition: form-data; name="%s"' % (key,))
-        L.append('Content-Type: %s' % guess_content_type(filename, value)[0])
+        L.append('Content-Type: %s' % guess_content_type(filename, value and value or '')[0])
         L.append('')
         L.append(value)
     L.append('--' + BOUNDARY + '--')
