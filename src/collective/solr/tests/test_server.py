@@ -24,7 +24,7 @@ from collective.solr.parser import SolrResponse
 from collective.solr.search import Search
 from collective.solr.solr import logger as logger_solr
 from collective.solr.utils import activate
-from collective.indexing.utils import getIndexer
+from collective.indexing.queue import getQueue, processQueue
 
 
 class SolrMaintenanceTests(SolrTestCase):
@@ -858,20 +858,19 @@ class SolrServerTests(SolrTestCase):
         # we cannot use `commit` here, since the transaction should get
         # aborted, so let's make sure processing the queue directly works...
         self.folder.processForm(values={'title': 'Foo'})
-        indexer = getIndexer()
-        indexer.process()
+        processQueue()
         result = connection.search(q='+Title:Foo').read()
         self.assertEqual(numFound(result), 0)
-        indexer.commit()
+        getQueue().commit()
         result = connection.search(q='+Title:Foo').read()
         self.assertEqual(numFound(result), 1)
         # now let's test aborting, but make sure there's nothing left in
         # the queue (by calling `commit`)
         self.folder.processForm(values={'title': 'Bar'})
-        indexer.process()
+        processQueue()
         result = connection.search(q='+Title:Bar').read()
         self.assertEqual(numFound(result), 0)
-        indexer.abort()
+        getQueue().abort()
         commit()
         result = connection.search(q='+Title:Bar').read()
         self.assertEqual(numFound(result), 0)

@@ -4,7 +4,6 @@ from collective.solr.tests.base import SolrTestCase
 # test-specific imports go here...
 from zope.component import queryUtility, getUtilitiesFor
 from Products.CMFCore.utils import getToolByName
-from collective.indexing.interfaces import IIndexingConfig
 from collective.indexing.interfaces import IIndexQueueProcessor
 from collective.solr.interfaces import ISolrConnectionConfig
 from collective.solr.interfaces import ISolrConnectionManager
@@ -75,8 +74,6 @@ class IndexingTests(SolrTestCase):
         conn = self.proc.getConnection()
         fakehttp(conn, schema)              # fake schema response
         self.proc.getSchema()               # read and cache the schema
-        self.config = queryUtility(IIndexingConfig)
-        self.config.auto_flush = False      # disable auto-flushes...
         self.folder.unmarkCreationFlag()    # stop LinguaPlone from renaming
 
     def beforeTearDown(self):
@@ -84,7 +81,6 @@ class IndexingTests(SolrTestCase):
         # due to the `commit()` in the tests below the activation of the
         # solr support in `afterSetUp` needs to be explicitly reversed...
         self.proc.setHost(active=False)
-        self.config.auto_flush = True   # reset to default
         commit()
 
     def testIndexObject(self):
