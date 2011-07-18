@@ -8,7 +8,6 @@ from Products.ZCatalog.Lazy import Lazy
 from Products.ZCatalog.Lazy import LazyCat
 
 from collective.solr.interfaces import ISearchDispatcher
-from collective.indexing.utils import autoFlushQueue
 from collective.solr.parser import SolrResponse
 
 HAS_EXPCAT = True
@@ -26,10 +25,6 @@ def searchResults(self, REQUEST=None, **kw):
     kw['allowedRolesAndUsers'] = self._listAllowedRolesAndUsers(user)
     if only_active and not _checkPermission(AccessInactivePortalContent, self):
         kw['effectiveRange'] = DateTime()
-
-    # support collective.indexing's "auto-flush" feature
-    # see http://dev.plone.org/collective/changeset/73602
-    autoFlushQueue(hint='restricted/solr search', request=REQUEST, **kw)
 
     adapter = queryAdapter(self, ISearchDispatcher)
     if adapter is not None:
