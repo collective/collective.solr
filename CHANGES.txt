@@ -4,6 +4,9 @@ Changelog
 3.0a3 - unreleased
 ------------------
 
+* Depend on the new c.indexing 2.0a1.
+  [hannosch]
+
 * Added an `archetypes.schemaextender` dependency and register two fields for
   all objects providing `IATContentType`. `showinsearch` is a boolean field that
   can be used to hide specific content items from search results. `searchwords`
