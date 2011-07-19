@@ -1056,14 +1056,14 @@ class SolrServerTests(SolrTestCase):
         search = lambda **kw: [getattr(i, 'Title', None) for i in
             solrSearchResults(SearchableText='a*', sort_on='Title', **kw)]
         self.assertEqual(search(),
-            ['Events', 'News', 'Past Events', 'Welcome to Plone'])
+            ['Events', 'News', 'Welcome to Plone'])
         # when a batch size is given, the length should remain the same,
         # but only items in the batch actually exist...
         self.assertEqual(search(b_size=2),
-            ['Events', 'News', None, None])
+            ['Events', 'News', None])
         # given a start value, the batch is moved within the search results
         self.assertEqual(search(b_size=2, b_start=1),
-            [None, 'News', 'Past Events', None])
+            [None, 'News', 'Welcome to Plone'])
 
     def testGetObjectOnPrivateObject(self):
         self.maintenance.reindex()
