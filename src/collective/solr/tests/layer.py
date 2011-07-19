@@ -16,7 +16,7 @@ class SolrLayer(BasePTCLayer):
         installPackage('collective.solr', quiet=True)
         self.addProfile('collective.solr:search')
         # account for difference in default content in Plone 4.0 / 4.1
-        _createObjectByType('Topic', self.portal.events, 'previous')
+        _createObjectByType('Document', self.portal.events, 'previous')
 
 layer = solr = SolrLayer(bases=[ptc_layer])
 
