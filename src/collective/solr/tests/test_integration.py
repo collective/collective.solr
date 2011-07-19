@@ -99,18 +99,18 @@ class IndexingTests(SolrTestCase):
         self.setRoles(['Manager'])
         output = []
         connection = self.proc.getConnection()
-        responses = [getData('dummy_response.txt')] * 42    # set up enough...
-        output = fakehttp(connection, *responses)           # fake responses
+        responses = [getData('dummy_response.txt')] * 42
+        output = fakehttp(connection, *responses)
         self.folder.invokeFactory('Topic', id='coll', title='a collection')
         self.folder.coll.addCriterion('Type', 'ATPortalTypeCriterion')
-        self.assertEqual(str(output), '', 'reindexed unqueued!')
-        commit()                        # indexing happens on commit
+        self.assertTrue('crit__Type_ATPortalTypeCriterion' not in str(output))
+        commit()
         self.assert_(repr(output).find('a collection') > 0,
             '"title" data not found')
         self.assert_(repr(output).find('crit') == -1, 'criterion indexed?')
         objs = self.portal.portal_catalog(portal_type='ATPortalTypeCriterion')
         self.assertEqual(list(objs), [])
-        self.folder.manage_delObjects('coll')               # clean up again
+        self.folder.manage_delObjects('coll')
 
     def testNoIndexingForNonCatalogAwareContent(self):
         self.setRoles(['Manager'])
