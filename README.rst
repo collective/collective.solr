@@ -22,7 +22,7 @@ Current Status
 ==============
 
 The code is used in production in many sites and considered stable. This
-add-on can be installed in a `Plone`_ 4.x site to enable indexing operations
+add-on can be installed in a `Plone`_ 4.1 site to enable indexing operations
 as well as searching (site and live search) using `Solr`_. Doing so will not
 only significantly improve search quality and performance - especially for a
 large number of indexed objects, but also reduce the memory footprint of your

@@ -4,6 +4,9 @@ Changelog
 3.0a3 - unreleased
 ------------------
 
+* Explicitly require Plone 4.1 / Zope 2.13.
+  [hannosch]
+
 * Depend on the new c.indexing 2.0a1.
   [hannosch]
 
