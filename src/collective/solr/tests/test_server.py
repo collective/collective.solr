@@ -574,7 +574,7 @@ class SolrServerTests(SolrTestCase):
 
     def testPathSearches(self):
         self.maintenance.reindex()
-        request = dict(SearchableText='"[* TO *]"')
+        request = dict(SearchableText='[* TO *]')
         search = lambda path: sorted([r.path_string for r in
             solrSearchResults(request, path=path)])
         self.assertEqual(len(search(path='/plone')), 8)
@@ -593,36 +593,37 @@ class SolrServerTests(SolrTestCase):
 
     def testMultiplePathSearches(self):
         self.maintenance.reindex()
-        request = dict(SearchableText='"[* TO *]"')
+        request = dict(SearchableText='[* TO *]')
         search = lambda path, **kw: sorted([r.path_string for r in
             solrSearchResults(request, path=dict(query=path, **kw))])
         # multiple paths with equal length...
         path = ['/plone/news', '/plone/events']
         self.assertEqual(search(path),
             ['/plone/events', '/plone/events/aggregator',
-             '/plone/events/aggregator/previous',
+             '/plone/events/previous',
              '/plone/news', '/plone/news/aggregator'])
         self.assertEqual(search(path, depth=-1),
             ['/plone/events', '/plone/events/aggregator',
-             '/plone/events/aggregator/previous',
+            '/plone/events/previous',
              '/plone/news', '/plone/news/aggregator'])
         self.assertEqual(search(path, depth=0),
             ['/plone/events', '/plone/news'])
         self.assertEqual(search(path, depth=1),
             ['/plone/events', '/plone/events/aggregator',
+            '/plone/events/previous',
              '/plone/news', '/plone/news/aggregator'])
         # multiple paths with different length...
         path = ['/plone/news', '/plone/events/aggregator']
         self.assertEqual(search(path),
-            ['/plone/events/aggregator', '/plone/events/aggregator/previous',
+            ['/plone/events/aggregator',
              '/plone/news', '/plone/news/aggregator'])
         self.assertEqual(search(path, depth=-1),
-            ['/plone/events/aggregator', '/plone/events/aggregator/previous',
+            ['/plone/events/aggregator',
              '/plone/news', '/plone/news/aggregator'])
         self.assertEqual(search(path, depth=0),
             ['/plone/events/aggregator', '/plone/news'])
         self.assertEqual(search(path, depth=1),
-            ['/plone/events/aggregator', '/plone/events/aggregator/previous',
+            ['/plone/events/aggregator',
              '/plone/news', '/plone/news/aggregator'])
         self.assertEqual(search(['/plone/news', '/plone'], depth=1),
             ['/plone/Members', '/plone/events',
@@ -633,7 +634,7 @@ class SolrServerTests(SolrTestCase):
         self.portal.events.setSubject(['Events'])
         self.portal['front-page'].setSubject(['News', 'Events'])
         self.maintenance.reindex()
-        request = dict(SearchableText='"[* TO *]"')
+        request = dict(SearchableText='[* TO *]')
         search = lambda subject: sorted([r.path_string for r in
             solrSearchResults(request, Subject=subject)])
         self.assertEqual(search(dict(operator='and', query=['News'])),
@@ -647,13 +648,13 @@ class SolrServerTests(SolrTestCase):
 
     def testBooleanValues(self):
         self.maintenance.reindex()
-        request = dict(SearchableText='"[* TO *]"')
+        request = dict(SearchableText='[* TO *]')
         results = solrSearchResults(request, is_folderish=True)
-        self.assertEqual(len(results), 7)
+        self.assertEqual(len(results), 6)
         self.failIf('/plone/front-page' in [r.path_string for r in results])
         results = solrSearchResults(request, is_folderish=False)
         self.assertEqual(sorted([r.path_string for r in results]),
-            ['/plone/front-page'])
+            ['/plone/events/previous', '/plone/front-page'])
 
     def testSearchSecurity(self):
         self.setRoles(['Manager'])
@@ -662,9 +663,8 @@ class SolrServerTests(SolrTestCase):
         wfAction(self.portal.news.aggregator, 'retract')
         wfAction(self.portal.events, 'retract')
         wfAction(self.portal.events.aggregator, 'retract')
-        wfAction(self.portal.events.aggregator.previous, 'retract')
         self.maintenance.reindex()
-        request = dict(SearchableText='"[* TO *]"')
+        request = dict(SearchableText='[* TO *]')
         results = self.portal.portal_catalog(request)
         self.assertEqual(len(results), 8)
         self.setRoles(())                   # again as anonymous user
@@ -678,17 +678,17 @@ class SolrServerTests(SolrTestCase):
         self.portal.news.setEffectiveDate(DateTime() + 1)
         self.portal.events.setExpirationDate(DateTime() - 1)
         self.maintenance.reindex()
-        request = dict(SearchableText='"[* TO *]"')
+        request = dict(SearchableText='[* TO *]')
         results = self.portal.portal_catalog(request)
         self.assertEqual(len(results), 8)
         self.setRoles(())                   # again as anonymous user
         results = self.portal.portal_catalog(request)
-        self.assertEqual(len(results), 6)
+        self.assertEqual(len(results), 5)
         paths = [r.path_string for r in results]
         self.failIf('/plone/news' in paths)
         self.failIf('/plone/events' in paths)
         results = self.portal.portal_catalog(request, show_inactive=True)
-        self.assertEqual(len(results), 8)
+        self.assertEqual(len(results), 7)
         paths = [r.path_string for r in results]
         self.failUnless('/plone/news' in paths)
         self.failUnless('/plone/events' in paths)
@@ -782,7 +782,7 @@ class SolrServerTests(SolrTestCase):
     def testSortParameters(self):
         self.maintenance.reindex()
         search = lambda attr, **kw: ', '.join([getattr(r, attr, '?') for r in
-            solrSearchResults(request=dict(SearchableText='"[* TO *]"',
+            solrSearchResults(request=dict(SearchableText='[* TO *]',
                               path=dict(query='/plone', depth=1)), **kw)])
         self.assertEqual(search('Title', sort_on='Title'),
             'Events, News, Users, Welcome to Plone')
@@ -1000,8 +1000,8 @@ class SolrServerTests(SolrTestCase):
         config.required = []
         config.filter_queries = ['portal_type', 'Language']
         results = solrSearchResults(portal_type=['Document'])
-        self.assertEqual(len(results), 1)
-        self.assertEqual(results[0].path_string, '/plone/front-page')
+        paths = [p.path_string for p in results]
+        self.assertTrue('/plone/front-page' in paths)
 
     def testAccessSearchResultsFromPythonScript(self):
         self.maintenance.reindex()
@@ -1079,13 +1079,13 @@ class SolrServerTests(SolrTestCase):
         self.maintenance.reindex()
         # first test the default of not removing the user
         results = self.portal.portal_catalog(use_solr=True)
-        self.assertEqual(len(results), 8)
+        self.assertEqual(len(results), 7)
         paths = [r.path_string for r in results]
         self.failUnless('/plone/Members/test_user_1_' in paths)
         # now we have it removed...
         self.config.exclude_user = True
         results = self.portal.portal_catalog(use_solr=True)
-        self.assertEqual(len(results), 7)
+        self.assertEqual(len(results), 6)
         paths = [r.path_string for r in results]
         self.failIf('/plone/Members/test_user_1_' in paths)
 
