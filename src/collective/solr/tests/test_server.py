@@ -148,17 +148,13 @@ class SolrMaintenanceTests(SolrTestCase):
         self.setRoles(['Manager'])
         container.invokeFactory('Topic', id='coll', title='a collection')
         crit = container.coll.addCriterion('Type', 'ATPortalTypeCriterion')
-        self.assertEqual(crit.UID(), None)
-        commit()                        # indexing happens on commit
+        self.assertTrue(crit.UID() is None)
+        commit()
         self.assertEqual(numFound(self.search()), 2)
-        # calling one of a number of methods related to references will
-        # generated a UID for the criterion, however, which in turn would
-        # cause the object to be added via the "reindex" maintenance view.
-        # this shouldn't happen, of course...
+        # calling methods on a criterion won't generate an UID
         crit.getRefs()
-        self.assertNotEqual(crit.UID(), None)
-        # however, the call to `manage_afterAdd` generated a UID, which can
-        # cause the object to be added via the "reindex" maintenance view...
+        self.assertTrue(crit.UID() is None)
+        # so calling reindex won't add it to Solr
         maintenance.reindex()
         self.assertEqual(numFound(self.search()), 2)
         criterions = self.search('+portal_type:ATPortalTypeCriterion')
