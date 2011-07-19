@@ -1,3 +1,4 @@
+from Products.CMFPlone.utils import _createObjectByType
 from Testing.ZopeTestCase import installPackage, installProduct
 from Zope2.App import zcml
 
@@ -14,6 +15,8 @@ class SolrLayer(BasePTCLayer):
         installPackage('collective.indexing', quiet=True)
         installPackage('collective.solr', quiet=True)
         self.addProfile('collective.solr:search')
+        # account for difference in default content in Plone 4.0 / 4.1
+        _createObjectByType('Topic', self.portal.events, 'previous')
 
 layer = solr = SolrLayer(bases=[ptc_layer])
 
