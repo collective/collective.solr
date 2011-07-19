@@ -1,9 +1,10 @@
-from Testing.ZopeTestCase import Sandboxed
-from Products.Five.testbrowser import Browser
-from Products.PloneTestCase import PloneTestCase as ptc
 from plone.app.controlpanel.tests.cptc import ControlPanelTestCase
-from collective.solr.utils import activate
+from Products.PloneTestCase import PloneTestCase as ptc
+from Testing.testbrowser import Browser
+from Testing.ZopeTestCase import Sandboxed
+
 from collective.solr.tests.layer import layer
+from collective.solr.utils import activate
 
 
 ptc.setupPloneSite()
