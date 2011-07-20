@@ -301,9 +301,9 @@ def solr_import_dump(app, args):
                 # mangle EPI data into Solr representation
                 path = data.get('path')
                 tuple_path = path.split('/')
-                data['physicalPath'] = path
-                data['physicalDepth'] = len(tuple_path)
-                data['parentPaths'] = ['/'.join(tuple_path[:n+1])
+                data['path_string'] = path
+                data['path_depth'] = len(tuple_path)
+                data['path_parents'] = ['/'.join(tuple_path[:n+1])
                     for n in xrange(1, len(tuple_path))]
                 del data['path']
                 data['commitWithin'] = 120000 # 2 minutes

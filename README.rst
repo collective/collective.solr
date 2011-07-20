@@ -22,7 +22,7 @@ Current Status
 ==============
 
 The code is used in production in many sites and considered stable. This
-add-on can be installed in a `Plone`_ 4.x site to enable indexing operations
+add-on can be installed in a `Plone`_ 4.1 site to enable indexing operations
 as well as searching (site and live search) using `Solr`_. Doing so will not
 only significantly improve search quality and performance - especially for a
 large number of indexed objects, but also reduce the memory footprint of your
@@ -63,9 +63,128 @@ you can call the provided maintenance view::
 
   http://localhost:8080/plone/@@solr-maintenance/reindex
 
+Creating the initial index can take some considerably time. A typical indexing
+rate for a Plone site running of a local disk is 20 index operations per second.
+While Solr scales to orders of magnitude more than that, the limiting factor is
+database access time in Plone.
+
+If you have an existing site with a large volume of content, you can create an
+initial Solr index on a staging server or development machine, then rsync it
+over to the live machine, enable Solr and call `@@solr-maintenance/sync`. The
+sync will usually take just a couple of minutes for catching up with changes in
+the live database. You can also use this approach when making changes to the
+index structure or changing the settings of existing fields.
+
 Note that the example solr.cfg is bound to change. Always copy the file to your
 local buildout. In general you should never rely on extending buildout config
 files from servers that aren't under your control.
+
+
+Features
+========
+
+Once installed and configured, this add-on introduces a number of end-user
+features.
+
+Supported scripts and languages
+-------------------------------
+
+In the default configuration all languages and scripts should be supported.
+This broad support comes at the expense of avoiding any language specific
+configuration.
+
+The default text analysis uses libraries based on ICU standards to fold and
+normalize any text as well as find token boundaries - in most languages word
+boundaries.
+
+Accented characters are folder into their unaccented base form and many other
+characters are normalized. This normalization is similar to what Plone does when
+generating url identifiers from titles. These changes are applied both to the
+indexed text and the user provided search query, so in general there's a large
+number of matches at the expense of specificity.
+
+Non-alphabetic characters like hyphens, dots and colons are interpreted as word
+boundaries, while case changes and alphanumeric combinations are left intact;
+for example `WiFi` or `IPv4` will only be lower-cased but not split.
+
+For any specific site, you likely know the supported content languages and could
+further tune the text analysis. A common example is the use of stemming, to
+generate base words for terms. This helps to avoid distinctions between singular
+and plural forms of a word or it being used as an adjective. Stemming broadens
+the found result even more, at a greater expense of specificity and needs to be
+used carefully.
+
+There's a plethora of text analysis options available in Solr if you are
+interested in the subject or have specific needs.
+
+
+Exclude from search and elevation
+---------------------------------
+
+By default this add-on introduces two new fields to the default content types
+or any custom type derived from ATContentTypes.
+
+The `showinsearch` boolean field lets you hide specific content items from the
+search results, by setting the value to `false`.
+
+The `searchwords` lines field allows you to specify multiple phrases per content
+item. A phrase is specified per line. User searches containing any of these
+phrases will show the content item as the first result for the search. This
+technique is also known as `elevation`.
+
+Both of these features depend on the default `search-pattern` to include the
+required parts as included in the default configuration. The `searchwords`
+approach to elevation doesn't depend on the Solr elevation feature, as that
+would require maintaining a xml file as part of the Solr server configuration.
+
+
+Facets
+------
+
+Plone's default search form is overridden to provide faceting support. The
+available facets can be configured in the control panel. The provided search
+form is currently more of an example and not used in many real world projects.
+You likely want to override it with a custom implementation for your specific
+site.
+
+Starting with Plone 4.2, Plone will contain a modernized search form whose UI
+supports faceting more naturally. At some point `c.solr` will extend this new
+search form rather than providing its own.
+
+
+Indexing binary documents
+-------------------------
+
+At this point collective.solr uses Plone's default capabilities to index binary
+documents via `portal_transforms` and installing command line tools like `wv2`
+or `pdftotext`. Work is under way to expose and use the `Apache Tika`_ Solr
+integration available via the `update/extract` handler.
+
+Once finished this will speed up indexing of binary documents considerably, as
+the extraction will happen out-of-process on the Solr server side. Apache Tika
+also supports a much larger list of formats than can be supported by adding
+external command line tools.
+
+There is room for more improvements in this area, as c.solr will still send the
+binary data to Solr as part of the end-user request/transaction. To further
+optimize this, Solr index operations can be stored in a task queue as provided
+by `plone.app.async` or solutions build on top of `Celery`. This is currently
+outside the scope of `collective.solr`.
+
+.. _`Apache Tika`: http://tika.apache.org/
+
+
+Spelling checking / suggestions
+-------------------------------
+
+Solr supports spell checking - or rather suggestions, as it doesn't contain a
+formal dictionary but bases suggestions on the indexed corpus. The idea is to
+present the user with alternative search terms for any query that is likely to
+produce more or better results.
+
+Currently this is not yet exposed in the `collective.solr` API's even though
+the Solr server as set up by the buildout recipe already contains the required
+configuration for this.
 
 
 Architecture
@@ -74,6 +193,19 @@ Architecture
 When working with Solr it's good to keep some things about it in mind. This
 information is targeted at developers and integrators trying to use and extend
 Solr in their Plone projects.
+
+Dependencies
+------------
+
+Currently we depend on `collective.indexing` as a means to hook into the normal
+catalog machinery of Plone to detect content changes. `c.indexing` before
+version two had some persistent data structures that frequently caused problems
+when removing the add-on. These problems have been fixed in version two.
+Unfortunately `c.indexing` still has to hook the catalog machinery in various
+evil ways, as the machinery lacks the required hooks for its use-case. Going
+forward it is expected for `c.indexing` to be merged into the underlying
+`ZCatalog` implementation, at which point `collective.solr` can use those hooks
+directly.
 
 Indexing
 --------
@@ -144,7 +276,7 @@ explanation here, refer to the literature and documentation of Lucene/Solr for
 much more detailed information.
 
 If you do searches in normal Plone, you have a search term and query the
-SearchableText index with it. The SearchableText is a simple concentration of
+SearchableText index with it. The SearchableText is a simple concatenation of
 all searchable fields, by default title, description and the body text.
 
 The default ZCTextIndex in Plone uses a simplified version of the Okapi BM25
@@ -221,6 +353,138 @@ like boosting certain content types over others, taking into account ratings or
 number of comments as a measure of user feedback or anything else that can be
 derived from each content item.
 
+
+Production
+==========
+
+Java settings
+-------------
+
+Make sure you are using a `server` version of Java in production. The output
+of::
+
+  $ java -version
+
+should include `Java HotSpot(TM) Server VM` or
+`Java HotSpot(TM) 64-Bit Server VM`. You can force the Java VM into server mode
+by calling it with the `-server` command. Do not try to run Solr with versions
+of OpenJDK or other non-official Java versions. They tend to not work well or
+at all.
+
+Depending on the size of your Solr index, you need to configure the Java VM to
+have enough memory. Good starting values are `-Xms128M -Xmx256M`, as a rule of
+thumb keep `Xmx` double the size of `Xms`.
+
+You can configure these settings via the `java_opts` value in the
+`collective.recipe.solrinstance` recipe section like::
+
+  java_opts =
+    -server
+    -Xms128M
+    -Xmx256M
+
+
+Monitoring
+----------
+
+Java has a general monitoring framework called JMX. You can use this to get
+a huge number of details about the Java process in general and Solr in
+particular. Some hints are at http://wiki.apache.org/solr/SolrJmx. The default
+`collective.recipe.solrinstance` config uses `<jmx />`, so we can use command
+line arguments to configure it. Our example `buildout/solr.cfg` includes all
+the relevant values in its `java_opts` variable.
+
+To view all the available metrics, start Solr and then the `jconsole` command
+included in the Java SDK and connect to the local process named `start.jar`.
+Solr specific information is available from the MBeans tab under the `solr`
+section. For example you'll find `avgTimePerRequest` within
+`search/org.apache.solr.handler.component.SearchHandler` under `Attributes`.
+
+If you want to integrate with munin, you can install the JMX plugin at:
+http://exchange.munin-monitoring.org/plugins/jmx/details
+
+Follow its install instructions and tweak the included examples to query the
+information you want to track. To track the average time per search request,
+add a file called `solr_avg_query_time.conf` into `/usr/share/munin/plugins`
+with the following contents::
+
+  graph_title Average Query Time
+  graph_vlabel ms
+  graph_category Solr
+
+  solr_average_query_time.label time per request
+  solr_average_query_time.jmxObjectName solr/:type=search,id=org.apache.solr.handler.component.SearchHandler
+  solr_average_query_time.jmxAttributeName avgTimePerRequest
+
+Then add a symlink to add the plugin::
+
+  $ ln -s /usr/share/munin/plugins/jmx_ /etc/munin/plugins/jmx_solr_avg_query_time
+
+Point the jmx plugin to the Solr process, by
+opening `/etc/munin/plugin-conf.d/munin-node.conf` and adding something like::
+
+  [jmx_*]
+  env.jmxurl service:jmx:rmi:///jndi/rmi://127.0.0.1:8984/jmxrmi
+
+The host and port need to match those passed via `java_opts` to Solr. To check
+if the plugins are working do::
+
+  $ export jmxurl="service:jmx:rmi:///jndi/rmi://127.0.0.1:8984/jmxrmi"
+  $ cd /etc/munin/plugins
+
+And call the plugin you configured directly, like for example::
+
+  $ ./solr_avg_query_time
+  solr_average_query_time.value NaN
+
+We include a number of useful configurations inside the package, in the
+`collective/solr/munin_config` directory. You can copy all of them into the
+`/usr/share/munin/plugins` directory and create the symlinks for all of them.
+
+
+Replication
+-----------
+
+At this point Solr doesn't yet allow for a full fault tolerance setup. You can
+read more about the `Solr Cloud`__ effort which aims to provide this.
+
+But we can setup a simple master/slave replication using Solr's built-in
+`Solr Replication`__ support, which is a first step in the right direction.
+
+  .. __: http://wiki.apache.org/solr/SolrCloud
+  .. __: http://wiki.apache.org/solr/SolrReplication
+
+In order to use this, you can setup a Solr master server and give it some
+extra config::
+
+  [solr-instance]
+  additional-solrconfig =
+    <requestHandler name="/replication" class="solr.ReplicationHandler" >
+      <lst name="master">
+        <str name="replicateAfter">commit</str>
+        <str name="replicateAfter">startup</str>
+        <str name="replicateAfter">optimize</str>
+      </lst>
+    </requestHandler>
+
+Then you can point one or multiple slave servers to the master. Assuming the
+master runs on `solr-master.domain.com` at port `8983`, we could write::
+
+  [solr-instance]
+  additional-solrconfig =
+    <requestHandler name="/replication" class="solr.ReplicationHandler" >
+      <lst name="slave">
+        <str name="masterUrl">http://solr-master.domain.com:8983/solr/replication</str>
+        <str name="pollInterval">00:00:30</str>
+      </lst>
+    </requestHandler>
+
+A poll interval of 30 seconds should be fast enough without creating too much
+overhead.
+
+At this point `collective.solr` does not yet have support for connecting to
+multiple servers and using the slaves as a fallback for querying. As there's no
+master-master setup yet, fault tolerance for index changes cannot be provided.
 
 Development
 ===========

@@ -1,6 +1,6 @@
 from setuptools import setup, find_packages
 
-version = '2.1a1'
+version = '3.0a3'
 
 
 setup(name = 'collective.solr',
@@ -34,11 +34,12 @@ setup(name = 'collective.solr',
       zip_safe = False,
       install_requires=[
         'Acquisition',
-        'collective.indexing >1.6',
+        'archetypes.schemaextender',
+        'collective.indexing >= 2.0a2',
         'collective.js.showmore',
         'DateTime',
         'elementtree',
-        'Plone >=4.0',
+        'Plone >= 4.1',
         'plone.app.content',
         'plone.app.controlpanel',
         'plone.app.layout',
@@ -57,7 +58,7 @@ setup(name = 'collective.solr',
         'zope.interface',
         'zope.publisher',
         'zope.schema',
-        'Zope2',
+        'Zope2 >= 2.13',
       ],
       extras_require = {'test': [
         'cElementTree',

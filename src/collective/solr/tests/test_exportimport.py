@@ -48,8 +48,6 @@ class SetupToolTests(SolrTestCase, TarballTester):
         self.assertEqual(config.search_timeout, 0)
         self.assertEqual(config.max_results, 0)
         self.assertEqual(config.required, ('SearchableText', ))
-        self.assertEqual(config.search_pattern, '(Title:{value}^10 OR '
-            'Description:{value}^3 OR SearchableText:{value})')
         self.assertEqual(config.facets, ('portal_type', 'review_state'))
         self.assertEqual(config.filter_queries, ('portal_type', ))
         self.assertEqual(config.slow_query_threshold, 0)

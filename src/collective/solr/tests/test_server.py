@@ -20,10 +20,11 @@ from collective.solr.indexer import SolrIndexProcessor
 from collective.solr.indexer import logger as logger_indexer
 from collective.solr.manager import logger as logger_manager
 from collective.solr.flare import PloneFlare
+from collective.solr.parser import SolrResponse
 from collective.solr.search import Search
 from collective.solr.solr import logger as logger_solr
 from collective.solr.utils import activate
-from collective.indexing.utils import getIndexer
+from collective.indexing.queue import getQueue, processQueue
 
 
 class SolrMaintenanceTests(SolrTestCase):
@@ -49,14 +50,13 @@ class SolrMaintenanceTests(SolrTestCase):
     def search(self, query='+UID:[* TO *]'):
         return self.connection.search(q=query).read()
 
-    def counts(self, attributes=None):
+    def counts(self):
         """ crude count of metadata records in the database """
         info = {}
         result = self.search()
         for record in split(r'<(str|date) name="', result)[1:]:
             name = record[:record.find('"')]
-            if not attributes or name in attributes:
-                info[name] = info.get(name, 0) + 1
+            info[name] = info.get(name, 0) + 1
         return numFound(result), info
 
     def testClear(self):
@@ -80,7 +80,7 @@ class SolrMaintenanceTests(SolrTestCase):
         self.assertEqual(found, 8)
         # let's also make sure the data is complete
         self.assertEqual(counts['Title'], 8)
-        self.assertEqual(counts['physicalPath'], 8)
+        self.assertEqual(counts['path_string'], 8)
         self.assertEqual(counts['portal_type'], 8)
         self.assertEqual(counts['review_state'], 8)
 
@@ -111,57 +111,9 @@ class SolrMaintenanceTests(SolrTestCase):
         self.assertEqual(found, 2)
         # let's also make sure their data is complete
         self.assertEqual(counts['Title'], 2)
-        self.assertEqual(counts['physicalPath'], 2)
+        self.assertEqual(counts['path_string'], 2)
         self.assertEqual(counts['portal_type'], 2)
         self.assertEqual(counts['review_state'], 2)
-
-    def testReindexSingleOrFewAttributes(self):
-        # reindexing a set of attributes (or a single one) should not destroy
-        # any of the existing data fields, but merely add the new data...
-        maintenance = self.portal.unrestrictedTraverse('solr-maintenance')
-        maintenance.reindex(attributes=['UID', 'Title', 'modified'])
-        # even after adding only one index all the data should already exist
-        attributes = 'Title', 'modified', 'portal_type', 'review_state', 'physicalPath'
-        self.assertEqual(self.counts(attributes),
-            (8, dict(Title=8, modified=8)))
-        # reindexing `portal_type` should add the new metadata column
-        maintenance.reindex(attributes=['portal_type'])
-        self.assertEqual(self.counts(attributes),
-            (8, dict(Title=8, modified=8, portal_type=8)))
-        # let's try that again with an EIOW, i.e. `physicalPath`...
-        maintenance.reindex(attributes=['physicalPath'])
-        self.assertEqual(self.counts(attributes),
-            (8, dict(Title=8, modified=8, portal_type=8, physicalPath=8)))
-        # as well as with the extra catalog variables...
-        maintenance.reindex(attributes=['review_state'])
-        self.assertEqual(self.counts(attributes),
-            (8, dict(Title=8, modified=8, portal_type=8, physicalPath=8, review_state=8)))
-
-    def testReindexKeepsExistingData(self):
-        # add subjects for testing multi-value fields
-        self.portal.news.setSubject(['foo', 'bar'])
-        attributes = ['UID', 'Title', 'Date', 'Subject']
-        maintenance = self.portal.unrestrictedTraverse('solr-maintenance')
-        maintenance.reindex(attributes=attributes)
-        # reindexing a single/few attributes shouldn't destroy existing data
-        # to check we remember the original results first...
-        search = getUtility(ISearch)
-        original = search('+UID:[* TO *]', sort='UID asc').results()
-        self.assertEqual(original.numFound, '8')
-        # let's sync and compare the data from a new search
-        maintenance.reindex(attributes=['portal_type', 'review_state'])
-        results = search('+UID:[* TO *]', sort='UID asc').results()
-        self.assertEqual(results.numFound, '8')
-        for idx, result in enumerate(results):
-            self.failUnless('portal_type' in result)
-            org = original[idx]
-            for attr in attributes:
-                self.assertEqual(org.get(attr, 42), result.get(attr, 42),
-                    '%r vs %r' % (org, result))
-        # data not stored (but only indexed) in solr must also be preserved
-        # so that querying against the according indices still works...
-        results = search('+parentPaths:/plone/news').results()
-        self.assertEqual(results.numFound, '2')
 
     def testReindexKeepsBoostValues(self):
         # "special" documents get boosted during indexing...
@@ -196,17 +148,13 @@ class SolrMaintenanceTests(SolrTestCase):
         self.setRoles(['Manager'])
         container.invokeFactory('Topic', id='coll', title='a collection')
         crit = container.coll.addCriterion('Type', 'ATPortalTypeCriterion')
-        self.assertEqual(crit.UID(), None)
-        commit()                        # indexing happens on commit
+        self.assertTrue(crit.UID() is None)
+        commit()
         self.assertEqual(numFound(self.search()), 2)
-        # calling one of a number of methods related to references will
-        # generated a UID for the criterion, however, which in turn would
-        # cause the object to be added via the "reindex" maintenance view.
-        # this shouldn't happen, of course...
+        # calling methods on a criterion won't generate an UID
         crit.getRefs()
-        self.assertNotEqual(crit.UID(), None)
-        # however, the call to `manage_afterAdd` generated a UID, which can
-        # cause the object to be added via the "reindex" maintenance view...
+        self.assertTrue(crit.UID() is None)
+        # so calling reindex won't add it to Solr
         maintenance.reindex()
         self.assertEqual(numFound(self.search()), 2)
         criterions = self.search('+portal_type:ATPortalTypeCriterion')
@@ -251,91 +199,44 @@ class SolrMaintenanceTests(SolrTestCase):
         config.index_timeout = None
         self.assertEqual(numFound(self.search()), 8)
 
-    def testMetadataHelper(self):
+    def test_sync(self):
         search = self.portal.portal_catalog.unrestrictedSearchResults
         maintenance = self.portal.unrestrictedTraverse('solr-maintenance')
         items = dict([(b.UID, b.modified) for b in search()])
-        metadata = maintenance.metadata('modified', key='UID')
-        self.assertEqual(len(metadata), 8)
-        self.assertEqual(items, metadata)
-        # getting partial metadata should also be possible...
-        path = '/plone/news'
-        items = dict([(b.UID, b.modified) for b in search(path=path)])
-        metadata = maintenance.metadata('modified', key='UID', path=path)
-        self.assertEqual(len(metadata), 2)
-        self.assertEqual(items, metadata)
+        self.assertEqual(len(items), 8)
+        self.assertEqual(numFound(self.search()), 0)
+        maintenance.sync()
+        found, counts = self.counts()
+        self.assertEqual(found, 8)
 
-    def testDiffHelper(self):
-        search = self.portal.portal_catalog.unrestrictedSearchResults
+    def test_sync_update(self):
         maintenance = self.portal.unrestrictedTraverse('solr-maintenance')
-        full_items = set([b.UID for b in search()])
-        news_items = set([b.UID for b in search(path='/plone/news')])
-        event_items = set([b.UID for b in search(path='/plone/events')])
-        # without an index run all items should need indexing...
-        index, reindex, unindex = maintenance.diff(path='/plone')
-        self.assertEqual(set(index), full_items)
-        self.assertEqual(reindex, [])
-        self.assertEqual(unindex, [])
-        # after partially reindexing only some are still needed...
-        self.portal.unrestrictedTraverse('news/solr-maintenance').reindex()
-        index, reindex, unindex = maintenance.diff(path='/plone')
-        self.assertEqual(set(index), full_items.difference(news_items))
-        self.assertEqual(reindex, [])
-        self.assertEqual(unindex, [])
-        # a full reindex brings things up to date, i.e. no syncing required...
-        maintenance.reindex()
-        index, reindex, unindex = maintenance.diff(path='/plone')
-        self.assertEqual(index, [])
-        self.assertEqual(reindex, [])
-        self.assertEqual(unindex, [])
-        # after a network outtage some items might need (re|un)indexing...
+        maintenance.sync()
+        found, counts = self.counts()
+        self.assertEqual(found, 8)
+        # after a network outage some items might need (re|un)indexing...
         activate(active=False)
         self.setRoles(['Manager'])
         self.portal.news.processForm(values={'title': 'Foos'})
+        # we only have minute based time resolution, so force an older date
+        self.portal.news.setModificationDate(DateTime() - 2)
+        self.portal.news.reindexObject(idxs=['modified'])
         self.portal.manage_delObjects('events')
-        commit()                        # indexing happens on commit
+        commit()
         activate(active=True)
-        index, reindex, unindex = maintenance.diff(path='/plone')
-        self.assertEqual(index, [])
-        self.assertEqual(reindex, [self.portal.news.UID()])
-        self.assertEqual(set(unindex), event_items)
-
-    def testDiffHelperForPartialContent(self):
-        # the helper to determine index differences also works from
-        # a given path, returning only partial differences...
-        search = self.portal.portal_catalog.unrestrictedSearchResults
-        maintenance = self.portal.unrestrictedTraverse('solr-maintenance')
-        news_items = set([b.UID for b in search(path='/plone/news')])
-        # initially only the items within the given path need indexing...
-        index, reindex, unindex = maintenance.diff(path='/plone/news')
-        self.assertEqual(set(index), news_items)
-        self.assertEqual(reindex, [])
-        self.assertEqual(unindex, [])
-        # after reindexing that subtree there should be no differences left...
-        self.portal.unrestrictedTraverse('news/solr-maintenance').reindex()
-        index, reindex, unindex = maintenance.diff(path='/plone/news')
-        self.assertEqual(index, [])
-        self.assertEqual(reindex, [])
-        self.assertEqual(unindex, [])
-        # the same is true after a full reindex, of course...
-        maintenance.reindex()
-        index, reindex, unindex = maintenance.diff(path='/plone/news')
-        self.assertEqual(index, [])
-        self.assertEqual(reindex, [])
-        self.assertEqual(unindex, [])
-        # after a network outtage some items might need (re|un)indexing...
-        aggregator = self.portal.news.aggregator.UID()
-        activate(active=False)
-        self.setRoles(['Manager'])
-        self.portal.news.processForm(values={'title': 'Foos'})
-        self.portal.news.manage_delObjects('aggregator')
-        self.portal.manage_delObjects('events')
-        commit()                        # indexing happens on commit
-        activate(active=True)
-        index, reindex, unindex = maintenance.diff(path='/plone/news')
-        self.assertEqual(index, [])
-        self.assertEqual(reindex, [self.portal.news.UID()])
-        self.assertEqual(unindex, [aggregator])
+        maintenance.sync()
+        response = SolrResponse(self.search())
+        self.assertEqual(len(response), 5)
+        results = response.results()
+        news_uid = self.portal.news.UID()
+        news_result = [r for r in results if r['UID'] == news_uid][0]
+        self.assertEqual(news_result['Title'], 'Foos')
+        results = [(r.path_string, r.modified) for r in results]
+        for path, solr_mod in results:
+            obj = self.portal.unrestrictedTraverse(path)
+            obj_mod = obj.modified().toZone('UTC').millis() / 1000
+            solr_mod = solr_mod.toZone('UTC').millis() / 1000
+            self.assertEqual(solr_mod, obj_mod)
 
 
 class SolrErrorHandlingTests(SolrTestCase):
@@ -446,14 +347,14 @@ class SolrServerTests(SolrTestCase):
         proc.reindex(self.folder)
         proc.commit()
         self.assertEqual(search('+Title:Foo'), 0)
-        self.assertEqual(search('+parentPaths:/plone'), 1)
+        self.assertEqual(search('+path_parents:/plone'), 1)
         self.assertEqual(search('+portal_type:Folder'), 1)
         # now let's only update one index, which shouldn't change anything...
         self.folder.setTitle('Foo')
         proc.reindex(self.folder, ['UID', 'Title'])
         proc.commit()
         self.assertEqual(search('+Title:Foo'), 1)
-        self.assertEqual(search('+parentPaths:/plone'), 1)
+        self.assertEqual(search('+path_parents:/plone'), 1)
         self.assertEqual(search('+portal_type:Folder'), 1)
 
     def testReindexObjectWithEmptyDate(self):
@@ -546,14 +447,31 @@ class SolrServerTests(SolrTestCase):
     def testSolrSearchResults(self):
         self.maintenance.reindex()
         results = solrSearchResults(SearchableText='News')
-        self.assertEqual(sorted([(r.Title, r.physicalPath) for r in results]),
+        self.assertEqual(sorted([(r.Title, r.path_string) for r in results]),
             [('News', '/plone/news'), ('News', '/plone/news/aggregator')])
 
     def testSolrSearchResultsWithUnicodeTitle(self):
-        self.folder.processForm(values={'title': u'Føø'})
-        commit()                        # indexing happens on commit
+        self.folder.processForm(values={'title': u'Føø sekretær'})
+        commit()
         results = solrSearchResults(SearchableText=u'Føø')
-        self.assertEqual([r.Title for r in results], [u'Føø'])
+        self.assertEqual([r.Title for r in results], [u'Føø sekretær'])
+        results = solrSearchResults(SearchableText=u'foo')
+        self.assertEqual([r.Title for r in results], [u'Føø sekretær'])
+        results = solrSearchResults(SearchableText=u'Sekretær')
+        self.assertEqual([r.Title for r in results], [u'Føø sekretær'])
+        results = solrSearchResults(SearchableText=u'Sekretaer')
+        self.assertEqual([r.Title for r in results], [u'Føø sekretær'])
+        # second set of characters
+        self.folder.processForm(values={'title': u'Åge Þor'})
+        commit()
+        results = solrSearchResults(SearchableText=u'Åge')
+        self.assertEqual([r.Title for r in results], [u'Åge Þor'])
+        results = solrSearchResults(SearchableText=u'age')
+        self.assertEqual([r.Title for r in results], [u'Åge Þor'])
+        results = solrSearchResults(SearchableText=u'Þor')
+        self.assertEqual([r.Title for r in results], [u'Åge Þor'])
+        results = solrSearchResults(SearchableText=u'thor')
+        self.assertEqual([r.Title for r in results], [u'Åge Þor'])
 
     def testSolrSearchResultsInformationWithoutCustomSearchPattern(self):
         self.maintenance.reindex()
@@ -598,7 +516,7 @@ class SolrServerTests(SolrTestCase):
         self.maintenance.reindex()
         results = solrSearchResults({'SearchableText': 'News'})
         self.failUnless([r for r in results if isinstance(r, PloneFlare)])
-        self.assertEqual(sorted([(r.Title, r.physicalPath) for r in results]),
+        self.assertEqual(sorted([(r.Title, r.path_string) for r in results]),
             [('News', '/plone/news'), ('News', '/plone/news/aggregator')])
 
     def testSolrSearchResultsWithCustomSearchPattern(self):
@@ -628,12 +546,12 @@ class SolrServerTests(SolrTestCase):
         config = getUtility(ISolrConnectionConfig)
         config.required = []
         results = solrSearchResults(Title='News')
-        self.assertEqual(sorted([(r.Title, r.physicalPath) for r in results]),
+        self.assertEqual(sorted([(r.Title, r.path_string) for r in results]),
             [('News', '/plone/news'), ('News', '/plone/news/aggregator')])
         # specifying multiple values should required only one of them...
         config.required = ['Title', 'foo']
         results = solrSearchResults(Title='News')
-        self.assertEqual(sorted([(r.Title, r.physicalPath) for r in results]),
+        self.assertEqual(sorted([(r.Title, r.path_string) for r in results]),
             [('News', '/plone/news'), ('News', '/plone/news/aggregator')])
         # but solr won't be used if none of them is present...
         config.required = ['foo', 'bar']
@@ -642,12 +560,12 @@ class SolrServerTests(SolrTestCase):
         # except if you force it via `use_solr`...
         config.required = ['foo', 'bar']
         results = solrSearchResults(Title='News', use_solr=True)
-        self.assertEqual(sorted([(r.Title, r.physicalPath) for r in results]),
+        self.assertEqual(sorted([(r.Title, r.path_string) for r in results]),
             [('News', '/plone/news'), ('News', '/plone/news/aggregator')])
         # which also works if nothing is required...
         config.required = []
         results = solrSearchResults(Title='News', use_solr=True)
-        self.assertEqual(sorted([(r.Title, r.physicalPath) for r in results]),
+        self.assertEqual(sorted([(r.Title, r.path_string) for r in results]),
             [('News', '/plone/news'), ('News', '/plone/news/aggregator')])
         # it does respect a `False` though...
         config.required = ['foo', 'bar']
@@ -656,8 +574,8 @@ class SolrServerTests(SolrTestCase):
 
     def testPathSearches(self):
         self.maintenance.reindex()
-        request = dict(SearchableText='"[* TO *]"')
-        search = lambda path: sorted([r.physicalPath for r in
+        request = dict(SearchableText='[* TO *]')
+        search = lambda path: sorted([r.path_string for r in
             solrSearchResults(request, path=path)])
         self.assertEqual(len(search(path='/plone')), 8)
         self.assertEqual(len(search(path={'query': '/plone', 'depth': -1})), 8)
@@ -675,36 +593,37 @@ class SolrServerTests(SolrTestCase):
 
     def testMultiplePathSearches(self):
         self.maintenance.reindex()
-        request = dict(SearchableText='"[* TO *]"')
-        search = lambda path, **kw: sorted([r.physicalPath for r in
+        request = dict(SearchableText='[* TO *]')
+        search = lambda path, **kw: sorted([r.path_string for r in
             solrSearchResults(request, path=dict(query=path, **kw))])
         # multiple paths with equal length...
         path = ['/plone/news', '/plone/events']
         self.assertEqual(search(path),
             ['/plone/events', '/plone/events/aggregator',
-             '/plone/events/aggregator/previous',
+             '/plone/events/previous',
              '/plone/news', '/plone/news/aggregator'])
         self.assertEqual(search(path, depth=-1),
             ['/plone/events', '/plone/events/aggregator',
-             '/plone/events/aggregator/previous',
+            '/plone/events/previous',
              '/plone/news', '/plone/news/aggregator'])
         self.assertEqual(search(path, depth=0),
             ['/plone/events', '/plone/news'])
         self.assertEqual(search(path, depth=1),
             ['/plone/events', '/plone/events/aggregator',
+            '/plone/events/previous',
              '/plone/news', '/plone/news/aggregator'])
         # multiple paths with different length...
         path = ['/plone/news', '/plone/events/aggregator']
         self.assertEqual(search(path),
-            ['/plone/events/aggregator', '/plone/events/aggregator/previous',
+            ['/plone/events/aggregator',
              '/plone/news', '/plone/news/aggregator'])
         self.assertEqual(search(path, depth=-1),
-            ['/plone/events/aggregator', '/plone/events/aggregator/previous',
+            ['/plone/events/aggregator',
              '/plone/news', '/plone/news/aggregator'])
         self.assertEqual(search(path, depth=0),
             ['/plone/events/aggregator', '/plone/news'])
         self.assertEqual(search(path, depth=1),
-            ['/plone/events/aggregator', '/plone/events/aggregator/previous',
+            ['/plone/events/aggregator',
              '/plone/news', '/plone/news/aggregator'])
         self.assertEqual(search(['/plone/news', '/plone'], depth=1),
             ['/plone/Members', '/plone/events',
@@ -715,8 +634,8 @@ class SolrServerTests(SolrTestCase):
         self.portal.events.setSubject(['Events'])
         self.portal['front-page'].setSubject(['News', 'Events'])
         self.maintenance.reindex()
-        request = dict(SearchableText='"[* TO *]"')
-        search = lambda subject: sorted([r.physicalPath for r in
+        request = dict(SearchableText='[* TO *]')
+        search = lambda subject: sorted([r.path_string for r in
             solrSearchResults(request, Subject=subject)])
         self.assertEqual(search(dict(operator='and', query=['News'])),
             ['/plone/front-page', '/plone/news'])
@@ -729,13 +648,13 @@ class SolrServerTests(SolrTestCase):
 
     def testBooleanValues(self):
         self.maintenance.reindex()
-        request = dict(SearchableText='"[* TO *]"')
+        request = dict(SearchableText='[* TO *]')
         results = solrSearchResults(request, is_folderish=True)
-        self.assertEqual(len(results), 7)
-        self.failIf('/plone/front-page' in [r.physicalPath for r in results])
+        self.assertEqual(len(results), 6)
+        self.failIf('/plone/front-page' in [r.path_string for r in results])
         results = solrSearchResults(request, is_folderish=False)
-        self.assertEqual(sorted([r.physicalPath for r in results]),
-            ['/plone/front-page'])
+        self.assertEqual(sorted([r.path_string for r in results]),
+            ['/plone/events/previous', '/plone/front-page'])
 
     def testSearchSecurity(self):
         self.setRoles(['Manager'])
@@ -744,14 +663,13 @@ class SolrServerTests(SolrTestCase):
         wfAction(self.portal.news.aggregator, 'retract')
         wfAction(self.portal.events, 'retract')
         wfAction(self.portal.events.aggregator, 'retract')
-        wfAction(self.portal.events.aggregator.previous, 'retract')
         self.maintenance.reindex()
-        request = dict(SearchableText='"[* TO *]"')
+        request = dict(SearchableText='[* TO *]')
         results = self.portal.portal_catalog(request)
         self.assertEqual(len(results), 8)
         self.setRoles(())                   # again as anonymous user
         results = self.portal.portal_catalog(request)
-        self.assertEqual(sorted([r.physicalPath for r in results]),
+        self.assertEqual(sorted([r.path_string for r in results]),
             ['/plone/Members', '/plone/Members/test_user_1_',
              '/plone/front-page'])
 
@@ -760,18 +678,18 @@ class SolrServerTests(SolrTestCase):
         self.portal.news.setEffectiveDate(DateTime() + 1)
         self.portal.events.setExpirationDate(DateTime() - 1)
         self.maintenance.reindex()
-        request = dict(SearchableText='"[* TO *]"')
+        request = dict(SearchableText='[* TO *]')
         results = self.portal.portal_catalog(request)
         self.assertEqual(len(results), 8)
         self.setRoles(())                   # again as anonymous user
         results = self.portal.portal_catalog(request)
-        self.assertEqual(len(results), 6)
-        paths = [r.physicalPath for r in results]
+        self.assertEqual(len(results), 5)
+        paths = [r.path_string for r in results]
         self.failIf('/plone/news' in paths)
         self.failIf('/plone/events' in paths)
         results = self.portal.portal_catalog(request, show_inactive=True)
-        self.assertEqual(len(results), 8)
-        paths = [r.physicalPath for r in results]
+        self.assertEqual(len(results), 7)
+        paths = [r.path_string for r in results]
         self.failUnless('/plone/news' in paths)
         self.failUnless('/plone/events' in paths)
 
@@ -788,21 +706,21 @@ class SolrServerTests(SolrTestCase):
         request = dict(use_solr=True, show_inactive=True, effectiveRange=now)
         results = self.portal.portal_catalog(request)
         self.assertEqual(len(results), 7)
-        paths = [r.physicalPath for r in results]
+        paths = [r.path_string for r in results]
         self.failUnless('/plone/news' in paths)
         self.failIf('/plone/events' in paths)
         # with a granularity of 5 minutes the news item isn't effective yet
         self.config.effective_steps = 300
         results = self.portal.portal_catalog(request)
         self.assertEqual(len(results), 6)
-        paths = [r.physicalPath for r in results]
+        paths = [r.path_string for r in results]
         self.failIf('/plone/news' in paths)
         self.failIf('/plone/events' in paths)
         # with 15 minutes the event hasn't expired yet, though
         self.config.effective_steps = 900
         results = self.portal.portal_catalog(request)
         self.assertEqual(len(results), 7)
-        paths = [r.physicalPath for r in results]
+        paths = [r.path_string for r in results]
         self.failIf('/plone/news' in paths)
         self.failUnless('/plone/events' in paths)
 
@@ -847,24 +765,24 @@ class SolrServerTests(SolrTestCase):
 
     def testLimitSearchResults(self):
         self.maintenance.reindex()
-        results = self.search('+parentPaths:/plone').results()
+        results = self.search('+path_parents:/plone').results()
         self.assertEqual(results.numFound, '8')
         self.assertEqual(len(results), 8)
         # now let's limit the returned results
         config = getUtility(ISolrConnectionConfig)
         config.max_results = 2
-        results = self.search('+parentPaths:/plone').results()
+        results = self.search('+path_parents:/plone').results()
         self.assertEqual(results.numFound, '8')
         self.assertEqual(len(results), 2)
         # an explicit value should still override things
-        results = self.search('+parentPaths:/plone', rows=5).results()
+        results = self.search('+path_parents:/plone', rows=5).results()
         self.assertEqual(results.numFound, '8')
         self.assertEqual(len(results), 5)
 
     def testSortParameters(self):
         self.maintenance.reindex()
         search = lambda attr, **kw: ', '.join([getattr(r, attr, '?') for r in
-            solrSearchResults(request=dict(SearchableText='"[* TO *]"',
+            solrSearchResults(request=dict(SearchableText='[* TO *]',
                               path=dict(query='/plone', depth=1)), **kw)])
         self.assertEqual(search('Title', sort_on='Title'),
             'Events, News, Users, Welcome to Plone')
@@ -936,20 +854,19 @@ class SolrServerTests(SolrTestCase):
         # we cannot use `commit` here, since the transaction should get
         # aborted, so let's make sure processing the queue directly works...
         self.folder.processForm(values={'title': 'Foo'})
-        indexer = getIndexer()
-        indexer.process()
+        processQueue()
         result = connection.search(q='+Title:Foo').read()
         self.assertEqual(numFound(result), 0)
-        indexer.commit()
+        getQueue().commit()
         result = connection.search(q='+Title:Foo').read()
         self.assertEqual(numFound(result), 1)
         # now let's test aborting, but make sure there's nothing left in
         # the queue (by calling `commit`)
         self.folder.processForm(values={'title': 'Bar'})
-        indexer.process()
+        processQueue()
         result = connection.search(q='+Title:Bar').read()
         self.assertEqual(numFound(result), 0)
-        indexer.abort()
+        getQueue().abort()
         commit()
         result = connection.search(q='+Title:Bar').read()
         self.assertEqual(numFound(result), 0)
@@ -978,7 +895,7 @@ class SolrServerTests(SolrTestCase):
         crit = news.addCriterion('SearchableText', 'ATSimpleStringCriterion')
         crit.setValue('News')
         results = news.queryCatalog()
-        self.assertEqual(sorted([(r.Title, r.physicalPath) for r in results]),
+        self.assertEqual(sorted([(r.Title, r.path_string) for r in results]),
             [('News', '/plone/news'), ('News', '/plone/news/aggregator')])
 
     def testSearchDateRange(self):
@@ -991,8 +908,8 @@ class SolrServerTests(SolrTestCase):
         vocab = getUtility(IVocabularyFactory, name='collective.solr.indexes')
         indexes = [i.token for i in vocab(self.portal)]
         self.failUnless('SearchableText' in indexes)
-        self.failUnless('physicalDepth' in indexes)
-        self.failIf('physicalPath' in indexes)
+        self.failUnless('path_depth' in indexes)
+        self.failIf('path_string' in indexes)
 
     def testFilterQuerySubstitutionDuringSearch(self):
         self.maintenance.reindex()
@@ -1008,14 +925,14 @@ class SolrServerTests(SolrTestCase):
         # by using a keyword parameter...
         request = dict(SearchableText='News')
         results = solrSearchResults(request, portal_type='Topic')
-        self.assertEqual([(r.Title, r.physicalPath) for r in results],
+        self.assertEqual([(r.Title, r.path_string) for r in results],
             [('News', '/plone/news/aggregator')])
         self.assertEqual(len(log), 1)
         self.assertEqual(log[-1][1]['fq'], ['+portal_type:Topic'], log)
         # let's test again with an already existing filter query parameter
         request = dict(SearchableText='News', fq='+review_state:published')
         results = solrSearchResults(request, portal_type='Topic')
-        self.assertEqual([(r.Title, r.physicalPath) for r in results],
+        self.assertEqual([(r.Title, r.path_string) for r in results],
             [('News', '/plone/news/aggregator')])
         self.assertEqual(len(log), 2)
         self.assertEqual(sorted(log[-1][1]['fq']),
@@ -1063,7 +980,7 @@ class SolrServerTests(SolrTestCase):
         results = solrSearchResults(SearchableText='Welcome',
             portal_type=['Event', 'Document'])
         self.assertEqual(len(results), 2)
-        self.assertEqual(sorted([r.physicalPath for r in results]),
+        self.assertEqual(sorted([r.path_string for r in results]),
             ['/plone/event1', '/plone/front-page'])
 
     def testFlareHasDataForAllMetadataColumns(self):
@@ -1083,8 +1000,8 @@ class SolrServerTests(SolrTestCase):
         config.required = []
         config.filter_queries = ['portal_type', 'Language']
         results = solrSearchResults(portal_type=['Document'])
-        self.assertEqual(len(results), 1)
-        self.assertEqual(results[0].physicalPath, '/plone/front-page')
+        paths = [p.path_string for p in results]
+        self.assertTrue('/plone/front-page' in paths)
 
     def testAccessSearchResultsFromPythonScript(self):
         self.maintenance.reindex()
@@ -1094,25 +1011,59 @@ class SolrServerTests(SolrTestCase):
             'context.portal_catalog(SearchableText="News")]')
         self.assertEqual(self.folder.foo(), ['News', 'News'])
 
+    def testSearchForTermWithHyphen(self):
+        self.folder.processForm(values={'title': 'foo-bar'})
+        commit()
+        results = solrSearchResults(SearchableText='foo')
+        self.assertEqual(sorted([r.Title for r in results]), ['foo-bar'])
+        results = solrSearchResults(SearchableText='foo-bar')
+        self.assertEqual(sorted([r.Title for r in results]), ['foo-bar'])
+        results = solrSearchResults(SearchableText='bar')
+        self.assertEqual(sorted([r.Title for r in results]), ['foo-bar'])
+        # second round
+        self.folder.processForm(values={'title': '2010-123'})
+        commit()
+        results = solrSearchResults(SearchableText='2010-123')
+        self.assertEqual(sorted([r.Title for r in results]), ['2010-123'])
+        results = solrSearchResults(SearchableText='2010:123')
+        self.assertEqual(sorted([r.Title for r in results]), ['2010-123'])
+        results = solrSearchResults(SearchableText='2010')
+        self.assertEqual(sorted([r.Title for r in results]), ['2010-123'])
+        results = solrSearchResults(SearchableText='123')
+        self.assertEqual(sorted([r.Title for r in results]), ['2010-123'])
+
     def testSearchForTermWithColon(self):
         self.folder.processForm(values={'title': 'foo:bar'})
-        commit()                        # indexing happens on commit
-        results = solrSearchResults(SearchableText='foo foo:bar')
+        commit()
+        results = solrSearchResults(SearchableText='foo')
         self.assertEqual(sorted([r.Title for r in results]), ['foo:bar'])
+        results = solrSearchResults(SearchableText='foo:bar')
+        self.assertEqual(sorted([r.Title for r in results]), ['foo:bar'])
+        results = solrSearchResults(SearchableText='bar')
+        self.assertEqual(sorted([r.Title for r in results]), ['foo:bar'])
+        # second round
+        self.folder.processForm(values={'title': u'2010:ändern'})
+        commit()
+        results = solrSearchResults(SearchableText='2010')
+        self.assertEqual(sorted([r.Title for r in results]), [u'2010:ändern'])
+        results = solrSearchResults(SearchableText=u'2010:ändern')
+        self.assertEqual(sorted([r.Title for r in results]), [u'2010:ändern'])
+        results = solrSearchResults(SearchableText=u'andern')
+        self.assertEqual(sorted([r.Title for r in results]), [u'2010:ändern'])
 
     def testBatchedSearchResults(self):
         self.maintenance.reindex()
         search = lambda **kw: [getattr(i, 'Title', None) for i in
             solrSearchResults(SearchableText='a*', sort_on='Title', **kw)]
         self.assertEqual(search(),
-            ['Events', 'News', 'Past Events', 'Welcome to Plone'])
+            ['Events', 'News', 'Welcome to Plone'])
         # when a batch size is given, the length should remain the same,
         # but only items in the batch actually exist...
         self.assertEqual(search(b_size=2),
-            ['Events', 'News', None, None])
+            ['Events', 'News', None])
         # given a start value, the batch is moved within the search results
         self.assertEqual(search(b_size=2, b_start=1),
-            [None, 'News', 'Past Events', None])
+            [None, 'News', 'Welcome to Plone'])
 
     def testGetObjectOnPrivateObject(self):
         self.maintenance.reindex()
@@ -1128,14 +1079,14 @@ class SolrServerTests(SolrTestCase):
         self.maintenance.reindex()
         # first test the default of not removing the user
         results = self.portal.portal_catalog(use_solr=True)
-        self.assertEqual(len(results), 8)
-        paths = [r.physicalPath for r in results]
+        self.assertEqual(len(results), 7)
+        paths = [r.path_string for r in results]
         self.failUnless('/plone/Members/test_user_1_' in paths)
         # now we have it removed...
         self.config.exclude_user = True
         results = self.portal.portal_catalog(use_solr=True)
-        self.assertEqual(len(results), 7)
-        paths = [r.physicalPath for r in results]
+        self.assertEqual(len(results), 6)
+        paths = [r.path_string for r in results]
         self.failIf('/plone/Members/test_user_1_' in paths)
 
 

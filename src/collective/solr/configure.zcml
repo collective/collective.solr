@@ -6,16 +6,18 @@
     xmlns:browser="http://namespaces.zope.org/browser"
     xmlns:genericsetup="http://namespaces.zope.org/genericsetup"
     xmlns:i18n="http://namespaces.zope.org/i18n"
-    i18n_domain="collective.solr">
+    i18n_domain="solr">
 
   <five:registerPackage package="." />
 
   <i18n:registerTranslations directory="locales" />
 
+  <include package="archetypes.schemaextender" />
   <include package="collective.indexing" />
   <include package="plone.browserlayer" />
   <include package="collective.js.showmore" />
 
+  <include file="extender.zcml" />
   <include file="profiles.zcml" />
 
   <cmf:registerDirectory name="solr_site_search" />
@@ -57,9 +59,9 @@
       factory=".vocabularies.SolrIndexes"
       name="collective.solr.indexes" />
 
-  <adapter name="physicalPath" factory=".attributes.physicalPath" />
-  <adapter name="physicalDepth" factory=".attributes.physicalDepth" />
-  <adapter name="parentPaths" factory=".attributes.parentPaths" />
+  <adapter name="path_string" factory=".attributes.path_string" />
+  <adapter name="path_depth" factory=".attributes.path_depth" />
+  <adapter name="path_parents" factory=".attributes.path_parents" />
 
   <adapter
       factory=".exportimport.SolrConfigXMLAdapter"

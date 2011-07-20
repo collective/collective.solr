@@ -31,9 +31,13 @@ class PloneFlare(AttrDict):
 
     def getPath(self):
         """ convenience alias """
-        return self['physicalPath']
+        return self['path_string']
 
-    def getObject(self, REQUEST=None):
+    def getRID(self):
+        """Return a record id"""
+        return self['UID']
+
+    def getObject(self, REQUEST=None, restricted=True):
         """ return the actual object corresponding to this flare while
             mimicking what publisher's traversal does, i.e. potentially
             allowing access to the final object even if intermediate objects
@@ -44,8 +48,13 @@ class PloneFlare(AttrDict):
         if not path:
             return None
         path = path.split('/')
-        parent = site.unrestrictedTraverse(path[:-1])
-        return parent.restrictedTraverse(path[-1])
+        if restricted:
+            parent = site.unrestrictedTraverse(path[:-1])
+            return parent.restrictedTraverse(path[-1])
+        return site.unrestrictedTraverse(path)
+
+    def _unrestrictedGetObject(self):
+        return self.getObject(restricted=False)
 
     def getURL(self, relative=False):
         """ convert the physical path into a url, if it was stored """
