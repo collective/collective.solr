@@ -36,6 +36,14 @@ def iso8601date(value):
     return value
 
 
+class py26string(str):
+
+    def format(self, **kw):
+        result = self[:]
+        for key, val in kw.iteritems():
+            result = result.replace('{%s}' % key, val)
+        return result
+
 def mangleQuery(keywords, config, schema):
     """ translate / mangle query parameters to replace zope specifics
         with equivalent constructs for solr """
@@ -85,7 +93,7 @@ def mangleQuery(keywords, config, schema):
                     value = value.lower()
                     base_value = quote(value.replace('*', '').replace('?', ''))
                 # simple queries use custom search pattern
-                value = pattern.format(value=quote(value),
+                value = py26string(pattern).format(value=quote(value),
                     base_value=base_value)
                 keywords[key] = set([value])    # add literal query parameter
                 continue

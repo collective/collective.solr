@@ -23,6 +23,8 @@ from collective.solr.utils import prepareData
 from socket import error
 from urllib import urlencode
 
+from ZODB.POSException import POSKeyError
+
 logger = getLogger('collective.solr.indexer')
 
 
@@ -107,8 +109,9 @@ def encode_multipart_formdata(fields, files):
         if filename is not None:
             L.append('Content-Disposition: form-data; name="%s"; filename="%s"' % (key, filename))
         else:
+            filename = ''
             L.append('Content-Disposition: form-data; name="%s"' % (key,))
-        L.append('Content-Type: %s' % guess_content_type(filename, value)[0])
+        L.append('Content-Type: %s' % guess_content_type(filename, value and value or '')[0])
         L.append('')
         L.append(value)
     L.append('--' + BOUNDARY + '--')
@@ -122,9 +125,17 @@ class BinaryAdder(DefaultAdder):
 
     def __call__(self, conn, **data):
         field = self.context.getPrimaryField()
+        path_string = data['path_string']
         if field is None:
             return
-        binary_data = str(field.get(self.context).data)
+        try:
+            binary_data = str(field.get(self.context).data)
+        except POSKeyError:
+            logger.warn('Error: No blob @ %s', path_string)
+            return
+        except AttributeError:
+            logger.warn('Error: Wrong field contents @ %s', path_string)
+            return
         if not binary_data:
             return
         filename = field.getFilename(self.context)
@@ -133,18 +144,20 @@ class BinaryAdder(DefaultAdder):
         postdata = dict([('literal.%s' % key, val) for key, val in data.iteritems()
                      if key not in ignore])
         postdata['commit'] = True
+        del data
         content_type, body = encode_multipart_formdata(
             postdata.items(), (('__myfile__', filename, binary_data),))
 
         headers = {}
         headers['Content-Type'] = content_type
         headers['Content-Length'] = len(body)
+        del postdata
 
         url = '%s/update/extract' % conn.solrBase
         try:
             conn.doPost(url, body, headers)
         except SolrException, e:
-            logger.warn('Error @ %s', data['path_string'])
+            logger.warn('Error %s @ %s', e, path_string)
 
 
 def boost_values(obj, data):
