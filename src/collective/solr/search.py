@@ -113,6 +113,10 @@ class Search(object):
                         # wildcard searches need lower-case
                         value = value.lower()
                     value = quote(value, textfield=True)
+                    # if we have an intra-word hyphen, we need quotes
+                    if '\\-' in value or '\\+' in value:
+                        if value[0] != '"':
+                            value = '"%s"' % value
                 else:
                     value = quote(value)
                 if not value:   # don't search for empty strings, even quoted
