@@ -4,6 +4,10 @@ Changelog
 3.0a3 - unreleased
 ------------------
 
+* Fixed handling of intra-word hyphens to be taken literally instead of being
+  interpreted as syntax for text fields.
+  [hannosch]
+
 * Explicitly require Plone 4.1 / Zope 2.13.
   [hannosch]
 

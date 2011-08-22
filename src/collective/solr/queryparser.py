@@ -84,7 +84,7 @@ class Stack(list):
         return ''.join([str(x) for x in self[0]])
 
 
-def quote(term):
+def quote(term, textfield=False):
     if isinstance(term, unicode):
         term = term.encode('utf-8')
     stack = Stack()
@@ -170,7 +170,12 @@ def quote(term):
                     _, t2, g2, _ = tokens[i+1]
                     # We allow + and - in front of phrase and text
                     if t2 or g2 == '"':
-                        stack.current.append(special)
+                        if textfield and i > 0 and tokens[i-1][1]:
+                            # Quote intra-word hyphens, so they are normal text
+                            # and not syntax
+                            stack.current.append('\\%s' % special)
+                        else:
+                            stack.current.append(special)
                     else:
                         # Quote it
                         stack.current.append('\\%s' % special)
