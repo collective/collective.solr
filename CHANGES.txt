@@ -1,7 +1,7 @@
 Changelog
 =========
 
-3.0a3 - unreleased
+3.0a3 - 2011-08-22
 ------------------
 
 * Fixed handling of intra-word hyphens to be taken literally instead of being
