@@ -232,6 +232,8 @@ class QueryTests(TestCase):
         self.assertEqual(bq('foo bar?'), '+(foo bar?)')
         self.assertEqual(bq('-foo +bar'), '+(-foo +bar)')
         self.assertEqual(bq('"-foo +bar"'), '+"\-foo \+bar"')
+        self.assertEqual(bq('foo-bar'), '+foo-bar')
+        self.assertEqual(bq('"foo-bar"'), '+"foo\-bar"')
         self.assertEqual(bq(name='"foo"'), '+name:"foo"')
         self.assertEqual(bq(name='"foo bar'), '+name:(\\"foo bar)')
         self.assertEqual(bq(name='"foo bar*'), '+name:(\\"foo bar\\*)')
