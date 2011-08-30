@@ -13,7 +13,6 @@ from collective.solr.interfaces import ISolrMaintenanceView
 from collective.solr.interfaces import ISolrAddHandler
 from collective.solr.interfaces import ISearch
 from collective.solr.indexer import indexable, handlers, SolrIndexProcessor
-from collective.solr.indexer import indexable, SolrIndexProcessor
 from collective.solr.indexer import boost_values
 from collective.solr.parser import parse_date_as_datetime
 from collective.solr.parser import SolrResponse
