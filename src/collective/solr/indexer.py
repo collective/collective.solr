@@ -158,6 +158,7 @@ class BinaryAdder(DefaultAdder):
             conn.doPost(url, body, headers)
         except SolrException, e:
             logger.warn('Error %s @ %s', e, path_string)
+            conn.reset()
 
 
 def boost_values(obj, data):

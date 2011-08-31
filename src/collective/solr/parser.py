@@ -1,3 +1,4 @@
+import time
 from datetime import datetime
 from StringIO import StringIO
 
@@ -47,11 +48,9 @@ def parse_date_as_datetime(value):
         value = '%04d-%s' % (int(year), rest)
     format = '%Y-%m-%dT%H:%M:%S'
     if '.' in value:
-        format += '.%fZ'
-    else:
-        format += 'Z'
-    return datetime.strptime(value, format)
-
+        value = value[:value.find('.')] + 'Z'
+    format += 'Z'
+    return datetime(*(time.strptime(value, format)[0:6]))
 
 # unmarshallers for basic types
 unmarshallers = {
