@@ -4,6 +4,8 @@ Changelog
 3.0a5 - unreleased
 ------------------
 
+- Include CMFCore's `permissions.zcml`.
+  [witekdev, hannosch]
 
 3.0a4 - 2011-08-22
 ------------------
