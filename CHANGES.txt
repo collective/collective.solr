@@ -1,7 +1,7 @@
 Changelog
 =========
 
-3.0a5 - unreleased
+3.0a5 - 2011-09-26
 ------------------
 
 - Don't treat search terms ending in numbers as `simple`, as Solr doesn't deal
