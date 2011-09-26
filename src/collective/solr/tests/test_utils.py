@@ -44,21 +44,22 @@ class UtilsTests(ztc.ZopeTestCase):
     def testSimpleTerm(self):
         self.failUnless(isSimpleTerm('foo'))
         self.failUnless(isSimpleTerm('foo '))
-        self.failUnless(isSimpleTerm('foo42'))
         self.failUnless(isSimpleTerm(u'føø'))
         self.failUnless(isSimpleTerm('føø'))
         self.failIf(isSimpleTerm('foo!'))
-        self.failIf(isSimpleTerm('foo 42'))
         self.failIf(isSimpleTerm('"foo"'))
         self.failIf(isSimpleTerm(u'føø!'))
         self.failIf(isSimpleTerm(unicode('föö', 'latin')))
+        self.failIf(isSimpleTerm('foo42'))
+        self.failIf(isSimpleTerm('foo 42'))
+        self.failIf(isSimpleTerm('42 foo'))
+        self.failUnless(isSimpleTerm('42foo'))
 
     def testSimpleSearch(self):
         self.failUnless(isSimpleSearch('foo'))
         self.failUnless(isSimpleSearch('foo bar'))
         self.failUnless(isSimpleSearch('foo bar '))
         self.failUnless(isSimpleSearch('foo   bar'))
-        self.failUnless(isSimpleSearch('foo 42 bar11'))
         self.failUnless(isSimpleSearch(u'føø bär'))
         self.failUnless(isSimpleSearch('føø bär'))
         self.failUnless(isSimpleSearch('foo*'))
@@ -86,6 +87,11 @@ class UtilsTests(ztc.ZopeTestCase):
         self.failIf(isSimpleSearch('+foo'))
         self.failIf(isSimpleSearch('name:foo'))
         self.failIf(isSimpleSearch('foo && bar'))
+        self.failIf(isSimpleSearch('2000'))
+        self.failIf(isSimpleSearch('foo 2000'))
+        self.failIf(isSimpleSearch('foo 1/2000'))
+        self.failIf(isSimpleSearch('foo 42 bar11'))
+        self.failUnless(isSimpleSearch('2000 foo'))
 
     def testIsWildCard(self):
         self.failUnless(isWildCard('foo*'))

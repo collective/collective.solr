@@ -4,6 +4,10 @@ Changelog
 3.0a5 - unreleased
 ------------------
 
+- Don't treat search terms ending in numbers as `simple`, as Solr doesn't deal
+  with wildcard searches for numbers.
+  [hannosch]
+
 - Include CMFCore's `permissions.zcml`.
   [witekdev, hannosch]
 

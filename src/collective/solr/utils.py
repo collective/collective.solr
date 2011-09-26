@@ -61,11 +61,16 @@ simpleTerm = compile(r'^[\w\d]+$', UNICODE)
 def isSimpleTerm(term):
     if isinstance(term, str):
         term = unicode(term, 'utf-8', 'ignore')
-    return bool(simpleTerm.match(term.strip()))
+    term = term.strip()
+    simple = bool(simpleTerm.match(term))
+    if simple and is_digit.match(term[-1]):
+        return False
+    return simple
 
 
 operators = compile(r'(.*)\s+(AND|OR|NOT)\s+', UNICODE)
 simpleCharacters = compile(r'^[\w\d\?\*\s]+$', UNICODE)
+is_digit = compile('\d', UNICODE)
 def isSimpleSearch(term):
     term = term.strip()
     if isinstance(term, str):
@@ -87,6 +92,8 @@ def isSimpleSearch(term):
                 new_parts.append('quoted')
         term = u''.join(new_parts)
     if bool(operators.match(term)):
+        return False
+    if is_digit.match(term[-1]):
         return False
     if bool(simpleCharacters.match(term)):
         return True
