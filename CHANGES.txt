@@ -4,6 +4,9 @@ Changelog
 3.0a6 - unreleased
 ------------------
 
+- Extend the wildcard search term manipulation to do Unicode to ascii folding,
+  to keep up with the default field settings of the text field.
+  [hannosch, mj]
 
 3.0a5 - 2011-09-26
 ------------------

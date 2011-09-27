@@ -1,7 +1,9 @@
-from zope.component import queryUtility
-from Acquisition import aq_base
 from string import maketrans
 from re import compile, UNICODE
+
+from Acquisition import aq_base
+from unidecode import unidecode
+from zope.component import queryUtility
 
 from collective.solr.interfaces import ISolrConnectionConfig
 
@@ -108,6 +110,17 @@ def isWildCard(term):
     if isinstance(term, str):
         term = unicode(term, 'utf-8', 'ignore')
     return bool(wildCard.match(term))
+
+
+def prepare_wildcard(value):
+    # wildcards prevent Solr's field analyzer to run. So we need to replicate
+    # all logic that's usually done in the text field.
+    # Unfortunately we cannot easily inspect the field analyzer and tokenizer,
+    # so we assume the default config contains ICUFoldingFilterFactory and hope
+    # unidecode will produce the same results
+    if not isinstance(value, unicode):
+        value = unicode(value, 'utf-8', 'ignore')
+    return str(unidecode(value).lower())
 
 
 def findObjects(origin):

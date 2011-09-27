@@ -7,6 +7,7 @@ from collective.solr.queryparser import quote
 from collective.solr.utils import isSimpleTerm
 from collective.solr.utils import isSimpleSearch
 from collective.solr.utils import isWildCard
+from collective.solr.utils import prepare_wildcard
 
 
 ranges = {
@@ -79,18 +80,19 @@ def mangleQuery(keywords, config, schema):
             simple_term = isSimpleTerm(value)
             if pattern and isSimpleSearch(value):
                 base_value = value
-                if simple_term:             # use prefix/wildcard search
-                    value = '(%s* OR %s)' % (value.lower(), value)
-                elif isWildCard(value):     # wildcard searches need lower-case
-                    value = value.lower()
+                if simple_term: # use prefix/wildcard search
+                    value = '(%s* OR %s)' % (prepare_wildcard(value), value)
+                elif isWildCard(value):
+                    value = prepare_wildcard(value)
                     base_value = quote(value.replace('*', '').replace('?', ''))
                 # simple queries use custom search pattern
                 value = pattern.format(value=quote(value),
                     base_value=base_value)
                 keywords[key] = set([value])    # add literal query parameter
                 continue
-            elif simple_term:               # use prefix/wildcard search
-                keywords[key] = '(%s* OR %s)' % (value.lower(), value)
+            elif simple_term: # use prefix/wildcard search
+                keywords[key] = '(%s* OR %s)' % (
+                    prepare_wildcard(value), value)
                 continue
         if key in epi_indexes:
             path = keywords['%s_parents' % key] = value

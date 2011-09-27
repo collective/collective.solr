@@ -849,6 +849,19 @@ class SolrServerTests(SolrTestCase):
         results = solrSearchResults(SearchableText='Brazil Germa*')
         self.assertEqual(len(results), 1)
 
+    def testWildcardSearchesUnicode(self):
+        self.maintenance.reindex()
+        self.folder.processForm(values={'title': u'Ärger nøkkel'})
+        commit()
+        results = solrSearchResults(SearchableText=u'Ärger')
+        self.assertEqual(len(results), 1)
+        results = solrSearchResults(SearchableText=u'Ärg*')
+        self.assertEqual(len(results), 1)
+        results = solrSearchResults(SearchableText=u'nøkkel')
+        self.assertEqual(len(results), 1)
+        results = solrSearchResults(SearchableText=u'nø*')
+        self.assertEqual(len(results), 1)
+
     def testAbortedTransaction(self):
         connection = getUtility(ISolrConnectionManager).getConnection()
         # we cannot use `commit` here, since the transaction should get
