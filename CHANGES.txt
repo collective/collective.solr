@@ -1,7 +1,7 @@
 Changelog
 =========
 
-3.0a6 - unreleased
+3.0b1 - 2011-09-27
 ------------------
 
 - Extend the wildcard search term manipulation to do Unicode to ascii folding,
