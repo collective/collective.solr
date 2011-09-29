@@ -5,6 +5,7 @@ from plone.app.layout.viewlets.common import SearchBoxViewlet
 from collective.solr.interfaces import ISolrConnectionConfig
 from urllib import urlencode
 from copy import deepcopy
+from operator import itemgetter
 from string import strip
 
 
@@ -48,8 +49,7 @@ def convertFacets(fields, context=None, request={}, filter=None):
     selected = set([facet.split(':', 1)[0] for facet in fq])
     for field, values in fields.items():
         counts = []
-        second = lambda a, b: cmp(b[1], a[1])
-        for name, count in sorted(values.items(), cmp=second):
+        for name, count in sorted(values.items(), key=itemgetter(1)):
             p = deepcopy(params)
             p.setdefault('fq', []).append('%s:"%s"' % (field, name.encode('utf-8')))
             if field in p.get('facet.field', []):
