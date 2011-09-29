@@ -1,12 +1,12 @@
 from Products.Five import BrowserView
 from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
-from zope.component import queryUtility
-from plone.app.layout.viewlets.common import SearchBoxViewlet
 from collective.solr.interfaces import ISolrConnectionConfig
-from urllib import urlencode
 from copy import deepcopy
 from operator import itemgetter
+from plone.app.layout.viewlets.common import SearchBoxViewlet
 from string import strip
+from urllib import urlencode
+from zope.component import queryUtility
 
 
 def param(view, name):
