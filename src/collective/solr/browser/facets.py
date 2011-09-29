@@ -1,5 +1,6 @@
 from Products.Five import BrowserView
 from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
+from collective.solr.interfaces import IFacetTitleVocabularyFactory
 from collective.solr.interfaces import ISolrConnectionConfig
 from copy import deepcopy
 from operator import itemgetter
@@ -49,13 +50,20 @@ def convertFacets(fields, context=None, request={}, filter=None):
     selected = set([facet.split(':', 1)[0] for facet in fq])
     for field, values in fields.items():
         counts = []
+        vfactory = queryUtility(IFacetTitleVocabularyFactory, name=field)
+        vocabulary = vfactory and vfactory(context) or TranslatingVocabulary()
+
         for name, count in sorted(values.items(), key=itemgetter(1)):
             p = deepcopy(params)
             p.setdefault('fq', []).append('%s:"%s"' % (field, name.encode('utf-8')))
             if field in p.get('facet.field', []):
                 p['facet.field'].remove(field)
             if filter is None or filter(name, count):
-                counts.append(dict(name=name, count=count,
+                try:
+                    title = vocabulary.getTerm(name).title
+                except LookupError:
+                    title = name
+                counts.append(dict(name=name, count=count, title=title,
                     query=urlencode(p, doseq=True)))
         deps = dependencies.get(field, None)
         visible = deps is None or selected.intersection(deps)
