@@ -67,10 +67,10 @@ def convertFacets(fields, context=None, request={}, filter=None):
                 return facets.index(item)
             except ValueError:
                 return len(facets)      # position the item at the end
-        func = lambda a, b: cmp(pos(a), pos(b))
+        sortkey = pos
     else:               # otherwise sort by title
-        func = lambda a, b: cmp(a['title'], b['title'])
-    return sorted(info, cmp=func)
+        sortkey = itemgetter('title')
+    return sorted(info, key=sortkey)
 
 
 class FacetMixin:
