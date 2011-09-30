@@ -53,7 +53,7 @@ def convertFacets(fields, context=None, request={}, filter=None):
         vfactory = queryUtility(IFacetTitleVocabularyFactory, name=field)
         vocabulary = vfactory and vfactory(context) or TranslatingVocabulary()
 
-        for name, count in sorted(values.items(), key=itemgetter(1)):
+        for name, count in sorted(values.items(), key=itemgetter(1), reverse=True):
             p = deepcopy(params)
             p.setdefault('fq', []).append('%s:"%s"' % (field, name.encode('utf-8')))
             if field in p.get('facet.field', []):
