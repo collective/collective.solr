@@ -1,7 +1,10 @@
 from zope.interface import implements
 from zope.component import queryUtility
+from zope.schema.interfaces import IBaseVocabulary
 from zope.schema.interfaces import IVocabularyFactory
 from zope.schema.vocabulary import SimpleTerm, SimpleVocabulary
+from collective.solr import SolrMessageFactory
+from collective.solr.interfaces import IFacetTitleVocabularyFactory
 from collective.solr.interfaces import ISolrConnectionConfig
 from collective.solr.interfaces import ISolrConnectionManager
 
@@ -24,3 +27,25 @@ class SolrIndexes(object):
             if config is not None:
                 items = config.filter_queries
         return SimpleVocabulary([SimpleTerm(item) for item in items])
+
+
+class I18NFacetTitles(object):
+    """Vocabulary that wraps any term into message ids in the solr translation domain.
+
+    This is generally the default behaviour for facet titles.
+
+    """
+    implements(IBaseVocabulary)
+
+    def __contains__(self, term):
+        return True
+
+    def getTerm(self, term):
+        return SimpleTerm(term, title=SolrMessageFactory(term))
+
+
+class I18NFacetTitlesVocabularyFactory(object):
+    implements(IFacetTitleVocabularyFactory)
+
+    def __call__(self, context):
+        return I18NFacetTitles()

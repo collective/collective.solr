@@ -7,7 +7,7 @@ from operator import itemgetter
 from plone.app.layout.viewlets.common import SearchBoxViewlet
 from string import strip
 from urllib import urlencode
-from zope.component import queryUtility
+from zope.component import getUtility, queryUtility
 
 
 def param(view, name):
@@ -51,7 +51,10 @@ def convertFacets(fields, context=None, request={}, filter=None):
     for field, values in fields.items():
         counts = []
         vfactory = queryUtility(IFacetTitleVocabularyFactory, name=field)
-        vocabulary = vfactory and vfactory(context) or TranslatingVocabulary()
+        if vfactory is None:
+            # Use the default fallback
+            vfactory = getUtility(IFacetTitleVocabularyFactory)
+        vocabulary = vfactory(context)
 
         for name, count in sorted(values.items(), key=itemgetter(1), reverse=True):
             p = deepcopy(params)
@@ -59,10 +62,9 @@ def convertFacets(fields, context=None, request={}, filter=None):
             if field in p.get('facet.field', []):
                 p['facet.field'].remove(field)
             if filter is None or filter(name, count):
-                try:
+                title = name
+                if name in vocabulary:
                     title = vocabulary.getTerm(name).title
-                except LookupError:
-                    title = name
                 counts.append(dict(name=name, count=count, title=title,
                     query=urlencode(p, doseq=True)))
         deps = dependencies.get(field, None)

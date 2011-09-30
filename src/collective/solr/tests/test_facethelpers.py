@@ -1,7 +1,10 @@
 from unittest import TestCase
 from zope.component import provideUtility, getGlobalSiteManager
 from zope.publisher.browser import TestRequest
+from zope.schema.vocabulary import SimpleTerm
+from zope.testing import cleanup
 from collective.solr.tests.utils import getData
+from collective.solr.interfaces import IFacetTitleVocabularyFactory
 from collective.solr.interfaces import ISolrConnectionConfig
 from collective.solr.manager import SolrConnectionConfig
 from collective.solr.parser import SolrResponse
@@ -17,7 +20,37 @@ class Dummy(object):
         self.__dict__.update(kw)
 
 
-class FacettingHelperTest(TestCase):
+class DummyTitleVocabulary(object):
+    def __contains__(self, term):
+        return True
+
+    def getTerm(self, term):
+        return SimpleTerm(term, title='Title of %s' % term.capitalize())
+
+
+class DummyTitleVocabularyFactory(object):
+    def __call__(self, context):
+        return DummyTitleVocabulary()
+
+
+class DummyAllCapsVocabulary(object):
+    def __contains__(self, term):
+        return term != 'leavelowercase'
+
+    def getTerm(self, term):
+        return SimpleTerm(term, title=term.upper())
+
+
+class DummyAllCapsVocabularyFactory(object):
+    def __call__(self, context):
+        return DummyAllCapsVocabulary()
+
+
+class FacettingHelperTest(TestCase, cleanup.CleanUp):
+    def setUp(self):
+        provideUtility(DummyTitleVocabularyFactory(), IFacetTitleVocabularyFactory)
+        provideUtility(DummyAllCapsVocabularyFactory(), IFacetTitleVocabularyFactory,
+            name='capsFacet')
 
     def testConvertFacets(self):
         fields = dict(portal_type=dict(Document=10,
@@ -30,11 +63,11 @@ class FacettingHelperTest(TestCase):
         # and the fields contents
         types, = info
         self.assertEqual(types['title'], 'portal_type')
-        self.assertEqual([(c['name'], c['count']) for c in types['counts']], [
-            ('Document', 10),
-            ('Event', 5),
-            ('Folder', 3),
-            ('Topic', 2),
+        self.assertEqual([(c['name'], c['title'], c['count']) for c in types['counts']], [
+            ('Document', 'Title of Document', 10),
+            ('Event', 'Title of Event', 5),
+            ('Folder', 'Title of Folder', 3),
+            ('Topic', 'Title of Topic', 2),
         ])
 
     def testConvertFacetResponse(self):
@@ -48,11 +81,11 @@ class FacettingHelperTest(TestCase):
         # and the fields contents
         cat, inStock = info
         self.assertEqual(cat['title'], 'cat')
-        self.assertEqual([(c['name'], c['count']) for c in cat['counts']], [
-            ('search', 1),
-            ('software', 1),
-            ('electronics', 0),
-            ('monitor', 0),
+        self.assertEqual([(c['name'], c['title'], c['count']) for c in cat['counts']], [
+            ('search', 'Title of Search', 1),
+            ('software', 'Title of Software', 1),
+            ('electronics', 'Title of Electronics', 0),
+            ('monitor', 'Title of Monitor', 0),
         ])
         self.assertEqual(inStock['title'], 'inStock')
         self.assertEqual([(c['name'], c['count']) for c in inStock['counts']], [
@@ -104,6 +137,24 @@ class FacettingHelperTest(TestCase):
             (['foo : bar', 'bar  :foo'], dict(foo=['bar'], bar=['foo'])))
         # clean up...
         getGlobalSiteManager().unregisterUtility(cfg, ISolrConnectionConfig)
+
+    def testNamedFacetTitleVocabulary(self):
+        """Test use of IFacetTitleVocabularyFactory registrations
+
+        If a IFacetTitleVocabularyFactory is registered under the same name
+        as the facet field, use that to look up titles
+
+        """
+        context = Dummy(facet_fields=['capsFacet'])
+        request = {'foo': 'bar'}
+        fields = dict(capsFacet=dict(one=10, two=3, leavelowercase=5))
+        info = convertFacets(fields, context, request)
+        self.assertEqual(len(info), 1)
+        counts = info[0]['counts']
+        self.assertEqual(len(counts), 3)
+        self.assertEqual(counts[0]['title'], 'ONE')
+        self.assertEqual(counts[1]['title'], 'leavelowercase')
+        self.assertEqual(counts[2]['title'], 'TWO')
 
     def testFacetLinks(self):
         context = Dummy(facet_fields=['portal_type'])
