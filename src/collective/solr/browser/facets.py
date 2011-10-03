@@ -132,6 +132,16 @@ class SearchFacetsView(BrowserView, FacetMixin):
             if field not in facets:
                 params['facet.field'] = facets + [field]
             if value.startswith('"') and value.endswith('"'):
-                info.append(dict(title=field, value=value[1:-1],
+                # Look up a vocabulary to provide a title for this facet
+                vfactory = queryUtility(IFacetTitleVocabularyFactory, name=field)
+                if vfactory is None:
+                # Use the default fallback
+                    vfactory = getUtility(IFacetTitleVocabularyFactory)
+                vocabulary = vfactory(self.context)
+                value = value[1:-1]
+                if value in vocabulary:
+                    value = vocabulary.getTerm(value).title
+
+                info.append(dict(title=field, value=value,
                     query=urlencode(params, doseq=True)))
         return info

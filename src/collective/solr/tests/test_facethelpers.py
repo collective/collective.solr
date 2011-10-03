@@ -275,11 +275,11 @@ class FacettingHelperTest(TestCase, cleanup.CleanUp):
         selected = SearchFacetsView(Dummy(), request).selected
         info = lambda: [(i['title'], i['value']) for i in selected()]
         request.form['fq'] = 'foo:"xy"'
-        self.assertEqual(info(), [('foo', 'xy')])
+        self.assertEqual(info(), [('foo', 'Title of Xy')])
         request.form['fq'] = ['foo:"x"', 'bar:"y"']
-        self.assertEqual(info(), [('foo', 'x'), ('bar', 'y')])
+        self.assertEqual(info(), [('foo', 'Title of X'), ('bar', 'Title of Y')])
         request.form['fq'] = ['foo:"x"', 'bar:"y"', 'bah:"z"']
-        self.assertEqual(info(), [('foo', 'x'), ('bar', 'y'), ('bah', 'z')])
+        self.assertEqual(info(), [('foo', 'Title of X'), ('bar', 'Title of Y'), ('bah', 'Title of Z')])
 
     def testEmptyFacetField(self):
         context = Dummy()
