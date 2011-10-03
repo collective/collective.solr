@@ -41,7 +41,12 @@ class I18NFacetTitles(object):
         return True
 
     def getTerm(self, term):
-        return SimpleTerm(term, title=SolrMessageFactory(term))
+        value = term
+        title = SolrMessageFactory(term)
+        if isinstance(term, unicode):
+            # Terms must be byte strings
+            term = term.encode('utf8')
+        return SimpleTerm(value, term, title)
 
 
 class I18NFacetTitlesVocabularyFactory(object):
