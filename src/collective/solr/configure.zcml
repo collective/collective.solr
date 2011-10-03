@@ -60,6 +60,13 @@
       name="collective.solr.indexes" />
 
   <utility factory=".vocabularies.I18NFacetTitlesVocabularyFactory" />
+  <configure zcml:condition="installed plone.app.vocabularies">
+    <!-- Use the proper portal_types tool for type titles -->
+    <utility
+        component="plone.app.vocabularies.types.PortalTypesVocabularyFactory"
+        provides=".interfaces.IFacetTitleVocabularyFactory"
+        name="portal_types" />
+  </configure>
 
   <adapter name="path_string" factory=".attributes.path_string" />
   <adapter name="path_depth" factory=".attributes.path_depth" />
