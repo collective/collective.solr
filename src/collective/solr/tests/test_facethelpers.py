@@ -1,16 +1,18 @@
 from unittest import TestCase
-from zope.component import provideUtility, getGlobalSiteManager
+from urllib import unquote
+
+from zope.component import getGlobalSiteManager, provideUtility
 from zope.publisher.browser import TestRequest
 from zope.schema.vocabulary import SimpleTerm
 from zope.testing import cleanup
-from collective.solr.tests.utils import getData
+
+from collective.solr.browser.facets import convertFacets, facetParameters
+from collective.solr.browser.facets import SearchFacetsView
 from collective.solr.interfaces import IFacetTitleVocabularyFactory
 from collective.solr.interfaces import ISolrConnectionConfig
 from collective.solr.manager import SolrConnectionConfig
 from collective.solr.parser import SolrResponse
-from collective.solr.browser.facets import SearchFacetsView
-from collective.solr.browser.facets import facetParameters, convertFacets
-from urllib import unquote
+from collective.solr.tests.utils import getData
 
 
 class Dummy(object):
