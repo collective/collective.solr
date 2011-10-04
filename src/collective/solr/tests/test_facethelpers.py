@@ -283,7 +283,7 @@ class FacettingHelperTest(TestCase, cleanup.CleanUp):
         request.form['fq'] = ['foo:"x"', 'bar:"y"']
         self.assertEqual(info(),
             [('foo', 'Title of X'), ('bar', 'Title of Y')])
-        request.form['fq'] = ['foo: "x"', 'bar: "y"', 'bah: "z"']
+        request.form['fq'] = ['foo:"x"', 'bar:"y"', 'bah:"z"']
         self.assertEqual(info(), [('foo', 'Title of X'), ('bar', 'Title of Y'),
             ('bah', 'Title of Z')])
 
