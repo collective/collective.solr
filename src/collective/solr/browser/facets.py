@@ -137,7 +137,7 @@ class SearchFacetsView(BrowserView, FacetMixin):
                 # Look up a vocabulary to provide a title for this facet
                 vfactory = queryUtility(IFacetTitleVocabularyFactory, name=field)
                 if vfactory is None:
-                # Use the default fallback
+                    # Use the default fallback
                     vfactory = getUtility(IFacetTitleVocabularyFactory)
                 vocabulary = vfactory(self.context)
                 value = value[1:-1]
