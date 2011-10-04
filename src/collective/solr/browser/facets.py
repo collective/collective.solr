@@ -7,6 +7,8 @@ from plone.app.layout.viewlets.common import SearchBoxViewlet
 from Products.Five import BrowserView
 from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 from zope.component import getUtility, queryUtility
+from zope.i18n import translate
+from zope.i18nmessageid import Message
 
 from collective.solr.interfaces import IFacetTitleVocabularyFactory
 from collective.solr.interfaces import ISolrConnectionConfig
@@ -43,7 +45,7 @@ def facetParameters(context, request):
 def convertFacets(fields, context=None, request={}, filter=None):
     """ convert facet info to a form easy to process in templates """
     info = []
-    params = request.copy()   # request needs to be a dict, i.e. request.form
+    params = request.form.copy()
     facets, dependencies = list(facetParameters(context, request))
     params['facet.field'] = facets = list(facets)
     fq = params.get('fq', [])
@@ -67,6 +69,8 @@ def convertFacets(fields, context=None, request={}, filter=None):
                 title = name
                 if name in vocabulary:
                     title = vocabulary.getTerm(name).title
+                if isinstance(title, Message):
+                    title = translate(title, context=request)
                 counts.append(dict(name=name, count=count, title=title,
                     query=urlencode(p, doseq=True)))
         deps = dependencies.get(field, None)
@@ -117,7 +121,7 @@ class SearchFacetsView(BrowserView, FacetMixin):
         if results is not None and fcs is not None:
             filter = lambda name, count: name and count > 0
             return convertFacets(fcs.get('facet_fields', {}),
-                self.context, self.request.form, filter)
+                self.context, self.request, filter)
         else:
             return None
 
@@ -143,6 +147,8 @@ class SearchFacetsView(BrowserView, FacetMixin):
                 value = value[1:-1]
                 if value in vocabulary:
                     value = vocabulary.getTerm(value).title
+                if isinstance(value, Message):
+                    value = translate(value, context=self.request)
 
                 info.append(dict(title=field, value=value,
                     query=urlencode(params, doseq=True)))
