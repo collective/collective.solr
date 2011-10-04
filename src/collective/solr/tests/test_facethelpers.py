@@ -50,8 +50,10 @@ class DummyAllCapsVocabularyFactory(object):
 
 class FacettingHelperTest(TestCase, cleanup.CleanUp):
     def setUp(self):
-        provideUtility(DummyTitleVocabularyFactory(), IFacetTitleVocabularyFactory)
-        provideUtility(DummyAllCapsVocabularyFactory(), IFacetTitleVocabularyFactory,
+        provideUtility(
+            DummyTitleVocabularyFactory(), IFacetTitleVocabularyFactory)
+        provideUtility(
+            DummyAllCapsVocabularyFactory(), IFacetTitleVocabularyFactory,
             name='capsFacet')
 
     def testConvertFacets(self):
@@ -65,12 +67,12 @@ class FacettingHelperTest(TestCase, cleanup.CleanUp):
         # and the fields contents
         types, = info
         self.assertEqual(types['title'], 'portal_type')
-        self.assertEqual([(c['name'], c['title'], c['count']) for c in types['counts']], [
-            ('Document', 'Title of Document', 10),
-            ('Event', 'Title of Event', 5),
-            ('Folder', 'Title of Folder', 3),
-            ('Topic', 'Title of Topic', 2),
-        ])
+        self.assertEqual(
+            [(c['name'], c['title'], c['count']) for c in types['counts']],
+            [('Document', 'Title of Document', 10),
+             ('Event', 'Title of Event', 5),
+             ('Folder', 'Title of Folder', 3),
+             ('Topic', 'Title of Topic', 2)])
 
     def testConvertFacetResponse(self):
         response = SolrResponse(getData('facet_xml_response.txt'))
@@ -83,16 +85,16 @@ class FacettingHelperTest(TestCase, cleanup.CleanUp):
         # and the fields contents
         cat, inStock = info
         self.assertEqual(cat['title'], 'cat')
-        self.assertEqual([(c['name'], c['title'], c['count']) for c in cat['counts']], [
-            ('search', 'Title of Search', 1),
-            ('software', 'Title of Software', 1),
-            ('electronics', 'Title of Electronics', 0),
-            ('monitor', 'Title of Monitor', 0),
-        ])
+        self.assertEqual(
+            [(c['name'], c['title'], c['count']) for c in cat['counts']],
+            [('search', 'Title of Search', 1),
+             ('software', 'Title of Software', 1),
+             ('electronics', 'Title of Electronics', 0),
+             ('monitor', 'Title of Monitor', 0)])
         self.assertEqual(inStock['title'], 'inStock')
-        self.assertEqual([(c['name'], c['count']) for c in inStock['counts']], [
-            ('true', 1),
-        ])
+        self.assertEqual(
+            [(c['name'], c['count']) for c in inStock['counts']],
+            [('true', 1)])
 
     def testFacetParameters(self):
         context = Dummy()
@@ -279,9 +281,11 @@ class FacettingHelperTest(TestCase, cleanup.CleanUp):
         request.form['fq'] = 'foo:"xy"'
         self.assertEqual(info(), [('foo', 'Title of Xy')])
         request.form['fq'] = ['foo:"x"', 'bar:"y"']
-        self.assertEqual(info(), [('foo', 'Title of X'), ('bar', 'Title of Y')])
-        request.form['fq'] = ['foo:"x"', 'bar:"y"', 'bah:"z"']
-        self.assertEqual(info(), [('foo', 'Title of X'), ('bar', 'Title of Y'), ('bah', 'Title of Z')])
+        self.assertEqual(info(),
+            [('foo', 'Title of X'), ('bar', 'Title of Y')])
+        request.form['fq'] = ['foo: "x"', 'bar: "y"', 'bah: "z"']
+        self.assertEqual(info(), [('foo', 'Title of X'), ('bar', 'Title of Y'),
+            ('bah', 'Title of Z')])
 
     def testEmptyFacetField(self):
         context = Dummy()
