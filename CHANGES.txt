@@ -1,14 +1,13 @@
 Changelog
 =========
 
-3.0b2 - unreleased
+3.0b2 - 2011-10-05
 ------------------
 
 - Facet titles can now be provided by specialized vocabularies. Register a named
   IFacetTitleVocabularyFactory utility and it'll be used to get a vocabulary
   for the facet field with the same name.
   [mj]
-
 
 3.0b1 - 2011-09-27
 ------------------
