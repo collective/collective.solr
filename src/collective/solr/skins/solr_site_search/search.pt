@@ -176,6 +176,16 @@
 
             </span>
 
+            <br />
+
+            <tal:highlighting condition="python:hasattr(results,'highlighting')">
+                <span class ="highlighting" tal:condition="python:result['UID'] in results.highlighting" tal:repeat="snippets python:results.highlighting[result['UID']].values()">
+                    ...&nbsp;
+                    <tal:snippets repeat="snippet snippets">
+                        <tal:snippet content="snippet">highlighted snippet</tal:snippet> ... 
+                    </tal:snippets>
+                </span>
+            </tal:highlighting>
             </dd>
 
         </tal:entry>

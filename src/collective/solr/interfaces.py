@@ -99,6 +99,21 @@ class ISolrSchema(Interface):
                        'on the expense of finding content with local roles'
                        'given to specific users.'), default=False)
 
+    highlight_fields = List(title=_(u'Highlighting fields'),
+        description = _(u'Fields that should be used for highlighting. '
+                         'Snippets of text will be generated from the contents '
+                         ' of these fields, with the search keywords that'
+                         'matched highlighted inside the text.'),
+        value_type = TextLine(), default = [], required = False)
+
+    highlight_formatter_pre = TextLine(title=_(u'Highlight formatter: pre'),
+        description=_(u'The text to insert before the highlighted keyword.'),
+        default=u'[', required=False)
+
+    highlight_formatter_post = TextLine(title=_(u'Highlight formatter: post'),
+        description=_(u'The text to insert after the highlighted keyword.'),
+        default=u']', required=False)
+
 
 class ISolrConnectionConfig(ISolrSchema):
     """ utility to hold the connection configuration for the solr server """
