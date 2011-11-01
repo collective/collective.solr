@@ -4,6 +4,8 @@ Changelog
 3.0b3 - unreleased
 ------------------
 
+- Tweak search form to better match sunburst proportions.
+  [elro]
 
 3.0b2 - 2011-10-05
 ------------------
