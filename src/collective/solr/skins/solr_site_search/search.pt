@@ -14,7 +14,9 @@
     </metal:block>
 
     <metal:block fill-slot="top_slot"
-                 tal:define="dummy python:request.set('disable_border',1)" />
+                 tal:define="dummy python:request.set('disable_border',1);
+                             disable_column_one python:request.set('disable_plone.leftcolumn',1);
+                             disable_column_two python:request.set('disable_plone.rightcolumn',1);" />
     <metal:block fill-slot="column_one_slot" />
     <metal:block fill-slot="column_two_slot" />
 
@@ -107,7 +109,7 @@
          tal:condition="python: view"
          tal:replace="structure python: view(results=results)" />
 
-    <div tal:condition="results"
+    <div tal:condition="results" id="content-core"
          tal:define="batch python:Batch(results, b_size, int(b_start), orphan=1);
                      normalizeString nocall:context/@@plone/normalizeString;
                      toLocalizedTime nocall:context/@@plone/toLocalizedTime;">
