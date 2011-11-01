@@ -724,7 +724,7 @@ class SolrServerTests(SolrTestCase):
         self.failIf('/plone/news' in paths)
         self.failUnless('/plone/events' in paths)
 
-    def testAsyncIndexing(self):
+    def DISABLED_testAsyncIndexing(self):
         connection = getUtility(ISolrConnectionManager).getConnection()
         self.config.async = True        # enable async indexing
         self.folder.processForm(values={'title': 'Foo'})
