@@ -1,7 +1,7 @@
 Changelog
 =========
 
-3.0b3 - unreleased
+3.0b3 - 2011-11-09
 ------------------
 
 - Made maintenance sync view compatible with latest internals of field indexes.
