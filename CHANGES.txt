@@ -4,6 +4,9 @@ Changelog
 3.0b3 - unreleased
 ------------------
 
+- Made maintenance sync view compatible with latest internals of field indexes.
+  [hannosch]
+
 - Also dispatch `unrestrictedSearchResults` to the Solr server.
   https://github.com/Jarn/collective.solr/issues/5
   [reinhardt, hannosch]

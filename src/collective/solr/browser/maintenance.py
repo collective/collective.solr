@@ -1,10 +1,11 @@
 from logging import getLogger
 from time import time, clock, strftime
 
+from BTrees.IIBTree import IITreeSet
+from Products.CMFCore.utils import getToolByName
+from Products.Five.browser import BrowserView
 from zope.interface import implements
 from zope.component import queryUtility
-from Products.Five.browser import BrowserView
-from Products.CMFCore.utils import getToolByName
 
 from collective.indexing.indexer import getOwnIndexMethod
 from collective.solr.interfaces import ISolrConnectionManager
@@ -251,6 +252,8 @@ class SolrMaintenanceView(BrowserView):
         for uid, rid in cat_results.items():
             if uid in done:
                 continue
+            if isinstance(rid, IITreeSet):
+                rid = rid.keys()[0]
             if cat_mod_get(rid) != solr_mod_get(uid):
                 obj = lookup(uid, rid=rid)
                 if indexable(obj):
