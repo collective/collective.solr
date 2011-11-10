@@ -4,6 +4,8 @@ Changelog
 3.0b5 - unreleased
 ------------------
 
+- Fix control panel adapter to save the search_pattern as utf-8.
+  [ggozad]
 
 3.0b4 - 2011-11-10
 ------------------
