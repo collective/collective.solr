@@ -200,7 +200,7 @@ class SolrMaintenanceTests(SolrTestCase):
         self.assertEqual(numFound(self.search()), 8)
 
     def test_sync(self):
-        search = self.portal.portal_catalog._cs_old_unrestrictedSearchResults
+        search = self.portal.portal_catalog.unrestrictedSearchResults
         maintenance = self.portal.unrestrictedTraverse('solr-maintenance')
         items = dict([(b.UID, b.modified) for b in search()])
         self.assertEqual(len(items), 8)

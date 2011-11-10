@@ -4,6 +4,9 @@ Changelog
 3.0b4 - unreleased
 ------------------
 
+- Revert `unrestrictedSearchResults` change, as it breaks additional catalogs,
+  like the membrane catalogs.
+  [hannosch]
 
 3.0b3 - 2011-11-09
 ------------------
