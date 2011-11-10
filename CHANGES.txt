@@ -1,7 +1,7 @@
 Changelog
 =========
 
-3.0b4 - unreleased
+3.0b4 - 2011-11-10
 ------------------
 
 - Revert `unrestrictedSearchResults` change, as it breaks additional catalogs,
