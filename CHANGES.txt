@@ -1,9 +1,31 @@
 Changelog
 =========
 
-3.0b3 - unreleased
+3.0b5 - unreleased
 ------------------
 
+- Fix control panel adapter to save the search_pattern as utf-8.
+  [ggozad]
+
+3.0b4 - 2011-11-10
+------------------
+
+- Revert `unrestrictedSearchResults` change, as it breaks additional catalogs,
+  like the membrane catalogs.
+  [hannosch]
+
+3.0b3 - 2011-11-09
+------------------
+
+- Made maintenance sync view compatible with latest internals of field indexes.
+  [hannosch]
+
+- Also dispatch `unrestrictedSearchResults` to the Solr server.
+  https://github.com/Jarn/collective.solr/issues/5
+  [reinhardt, hannosch]
+
+- Tweak search form to better match sunburst proportions.
+  [elro]
 
 3.0b2 - 2011-10-05
 ------------------
