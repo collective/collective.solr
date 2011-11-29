@@ -59,6 +59,14 @@
       factory=".vocabularies.SolrIndexes"
       name="collective.solr.indexes" />
 
+  <utility factory=".vocabularies.I18NFacetTitlesVocabularyFactory" />
+
+  <!-- Use the proper portal_types tool for type titles -->
+  <utility
+      component="plone.app.vocabularies.types.PortalTypesVocabularyFactory"
+      provides=".interfaces.IFacetTitleVocabularyFactory"
+      name="portal_types" />
+
   <adapter name="path_string" factory=".attributes.path_string" />
   <adapter name="path_depth" factory=".attributes.path_depth" />
   <adapter name="path_parents" factory=".attributes.path_parents" />

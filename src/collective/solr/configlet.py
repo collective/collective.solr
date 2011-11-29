@@ -150,7 +150,7 @@ class SolrControlPanelAdapter(SchemaAdapterBase):
     def setSearchPattern(self, value):
         util = queryUtility(ISolrConnectionConfig)
         if util is not None:
-            util.search_pattern = value
+            util.search_pattern = value.encode('utf-8')
 
     search_pattern = property(getSearchPattern, setSearchPattern)
 

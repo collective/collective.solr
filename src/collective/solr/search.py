@@ -11,6 +11,7 @@ from collective.solr.parser import SolrResponse
 from collective.solr.exceptions import SolrInactiveException
 from collective.solr.queryparser import quote
 from collective.solr.utils import isWildCard
+from collective.solr.utils import prepare_wildcard
 
 
 logger = getLogger('collective.solr.search')
@@ -110,8 +111,7 @@ class Search(object):
             elif isinstance(value, basestring):
                 if field.class_ == 'solr.TextField':
                     if isWildCard(value):
-                        # wildcard searches need lower-case
-                        value = value.lower()
+                        value = prepare_wildcard(value)
                     value = quote(value, textfield=True)
                     # if we have an intra-word hyphen, we need quotes
                     if '\\-' in value or '\\+' in value:

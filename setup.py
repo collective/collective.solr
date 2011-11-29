@@ -1,6 +1,6 @@
 from setuptools import setup, find_packages
 
-version = '3.0a5'
+version = '3.0b5'
 
 
 setup(name = 'collective.solr',
@@ -43,6 +43,7 @@ setup(name = 'collective.solr',
         'plone.app.content',
         'plone.app.controlpanel',
         'plone.app.layout',
+        'plone.app.vocabularies',
         'plone.browserlayer',
         'plone.indexer',
         'Products.Archetypes',
@@ -51,6 +52,7 @@ setup(name = 'collective.solr',
         'Products.GenericSetup',
         'setuptools',
         'transaction',
+        'Unidecode',
         'ZODB3',
         'zope.component',
         'zope.formlib',

@@ -1,14 +1,18 @@
 /* styles related to solr integration */
 
+body.template-search #content-core {
+  width: 72.75%;
+}
+
 #portal-searchfacets {
   background-color: #ddd;
   padding: 0.5em;
-  min-width: 20%;
+  min-width: 22.75%;
   float: right;
 }
 
 * html #portal-searchfacets {
-  width: 20%;
+  width: 22.75%;
 }
 
 #portal-searchfacets h4 {

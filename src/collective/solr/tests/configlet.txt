@@ -124,7 +124,7 @@ Make sure the changes have been applied correctly to the tool:
     >>> config.required
     [u'foo', u'bar']
     >>> config.search_pattern
-    u'(Title:{value})'
+    '(Title:{value})'
     >>> config.facets
     [u'type', u'state']
     >>> config.slow_query_threshold

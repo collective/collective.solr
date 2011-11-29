@@ -1,11 +1,17 @@
+from copy import deepcopy
+from operator import itemgetter
+from string import strip
+from urllib import urlencode
+
+from plone.app.layout.viewlets.common import SearchBoxViewlet
 from Products.Five import BrowserView
 from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
-from zope.component import queryUtility
-from plone.app.layout.viewlets.common import SearchBoxViewlet
+from zope.component import getUtility, queryUtility
+from zope.i18n import translate
+from zope.i18nmessageid import Message
+
+from collective.solr.interfaces import IFacetTitleVocabularyFactory
 from collective.solr.interfaces import ISolrConnectionConfig
-from urllib import urlencode
-from copy import deepcopy
-from string import strip
 
 
 def param(view, name):
@@ -39,7 +45,7 @@ def facetParameters(context, request):
 def convertFacets(fields, context=None, request={}, filter=None):
     """ convert facet info to a form easy to process in templates """
     info = []
-    params = request.copy()   # request needs to be a dict, i.e. request.form
+    params = request.form.copy()
     facets, dependencies = list(facetParameters(context, request))
     params['facet.field'] = facets = list(facets)
     fq = params.get('fq', [])
@@ -48,14 +54,24 @@ def convertFacets(fields, context=None, request={}, filter=None):
     selected = set([facet.split(':', 1)[0] for facet in fq])
     for field, values in fields.items():
         counts = []
-        second = lambda a, b: cmp(b[1], a[1])
-        for name, count in sorted(values.items(), cmp=second):
+        vfactory = queryUtility(IFacetTitleVocabularyFactory, name=field)
+        if vfactory is None:
+            # Use the default fallback
+            vfactory = getUtility(IFacetTitleVocabularyFactory)
+        vocabulary = vfactory(context)
+
+        for name, count in sorted(values.items(), key=itemgetter(1), reverse=True):
             p = deepcopy(params)
             p.setdefault('fq', []).append('%s:"%s"' % (field, name.encode('utf-8')))
             if field in p.get('facet.field', []):
                 p['facet.field'].remove(field)
             if filter is None or filter(name, count):
-                counts.append(dict(name=name, count=count,
+                title = name
+                if name in vocabulary:
+                    title = vocabulary.getTerm(name).title
+                if isinstance(title, Message):
+                    title = translate(title, context=request)
+                counts.append(dict(name=name, count=count, title=title,
                     query=urlencode(p, doseq=True)))
         deps = dependencies.get(field, None)
         visible = deps is None or selected.intersection(deps)
@@ -67,10 +83,10 @@ def convertFacets(fields, context=None, request={}, filter=None):
                 return facets.index(item)
             except ValueError:
                 return len(facets)      # position the item at the end
-        func = lambda a, b: cmp(pos(a), pos(b))
+        sortkey = pos
     else:               # otherwise sort by title
-        func = lambda a, b: cmp(a['title'], b['title'])
-    return sorted(info, cmp=func)
+        sortkey = itemgetter('title')
+    return sorted(info, key=sortkey)
 
 
 class FacetMixin:
@@ -105,7 +121,7 @@ class SearchFacetsView(BrowserView, FacetMixin):
         if results is not None and fcs is not None:
             filter = lambda name, count: name and count > 0
             return convertFacets(fcs.get('facet_fields', {}),
-                self.context, self.request.form, filter)
+                self.context, self.request, filter)
         else:
             return None
 
@@ -122,6 +138,18 @@ class SearchFacetsView(BrowserView, FacetMixin):
             if field not in facets:
                 params['facet.field'] = facets + [field]
             if value.startswith('"') and value.endswith('"'):
-                info.append(dict(title=field, value=value[1:-1],
+                # Look up a vocabulary to provide a title for this facet
+                vfactory = queryUtility(IFacetTitleVocabularyFactory, name=field)
+                if vfactory is None:
+                    # Use the default fallback
+                    vfactory = getUtility(IFacetTitleVocabularyFactory)
+                vocabulary = vfactory(self.context)
+                value = value[1:-1]
+                if value in vocabulary:
+                    value = vocabulary.getTerm(value).title
+                if isinstance(value, Message):
+                    value = translate(value, context=self.request)
+
+                info.append(dict(title=field, value=value,
                     query=urlencode(params, doseq=True)))
         return info
