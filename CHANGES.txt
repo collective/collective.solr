@@ -1,7 +1,7 @@
 Changelog
 =========
 
-3.0b5 - unreleased
+3.0b5 - 2011-12-07
 ------------------
 
 - Removed `solr_dump_catalog` and `solr_import_dump` command line scripts.
