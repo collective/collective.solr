@@ -4,6 +4,9 @@ Changelog
 3.0b5 - unreleased
 ------------------
 
+- Sort arguments in `buildQuery` to get a stable ordering for test output.
+  [hannosch]
+
 - Solr facet queries on unknown fields will now raise a SolrException.
   [hannosch]
 
