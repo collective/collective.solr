@@ -4,6 +4,10 @@ Changelog
 3.0b5 - unreleased
 ------------------
 
+- Removed `solr_dump_catalog` and `solr_import_dump` command line scripts.
+  They were too dependent on internals and had subtle bugs.
+  [hannosch]
+
 - Sort arguments in `buildQuery` to get a stable ordering for test output.
   [hannosch]
 
