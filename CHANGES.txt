@@ -4,6 +4,9 @@ Changelog
 3.0b5 - unreleased
 ------------------
 
+- Update example configuration to Solr 3.5.
+  [hannosch]
+
 - Fix control panel adapter to save the search_pattern as utf-8.
   [ggozad]
 
