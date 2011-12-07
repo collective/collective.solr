@@ -4,6 +4,9 @@ Changelog
 3.0b5 - unreleased
 ------------------
 
+- Solr facet queries on unknown fields will now raise a SolrException.
+  [hannosch]
+
 - Update example configuration to Solr 3.5.
   [hannosch]
 
