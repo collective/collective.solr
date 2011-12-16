@@ -35,7 +35,7 @@ setup(name = 'collective.solr',
       install_requires=[
         'Acquisition',
         'archetypes.schemaextender',
-        'collective.indexing >1.6',
+        'collective.indexing >= 2.0a2',
         'collective.js.showmore',
         'DateTime',
         'elementtree',
@@ -43,6 +43,7 @@ setup(name = 'collective.solr',
         'plone.app.content',
         'plone.app.controlpanel',
         'plone.app.layout',
+        'plone.app.vocabularies',
         'plone.browserlayer',
         'plone.indexer',
         'Products.Archetypes',
@@ -51,6 +52,7 @@ setup(name = 'collective.solr',
         'Products.GenericSetup',
         'setuptools',
         'transaction',
+        'Unidecode',
         'ZODB3',
         'zope.component',
         'zope.formlib',
@@ -72,7 +74,5 @@ setup(name = 'collective.solr',
         target = plone
         [zopectl.command]
         solr_clear_index = collective.solr.commands:solr_clear_index
-        solr_dump_catalog = collective.solr.commands:solr_dump_catalog
-        solr_import_dump = collective.solr.commands:solr_import_dump
       ''',
 )

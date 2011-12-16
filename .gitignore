@@ -4,6 +4,7 @@ develop-eggs
 dist
 downloads
 eggs
+extras/*
 include
 lib
 parts

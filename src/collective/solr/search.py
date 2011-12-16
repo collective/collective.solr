@@ -11,6 +11,7 @@ from collective.solr.parser import SolrResponse
 from collective.solr.exceptions import SolrInactiveException
 from collective.solr.queryparser import quote
 from collective.solr.utils import isWildCard
+from collective.solr.utils import prepare_wildcard
 
 
 logger = getLogger('collective.solr.search')
@@ -70,7 +71,7 @@ class Search(object):
         defaultSearchField = getattr(schema, 'defaultSearchField', None)
         args[None] = default
         query = {}
-        for name, value in args.items():
+        for name, value in sorted(args.items()):
             field = schema.get(name or defaultSearchField, None)
             if field is None or not field.indexed:
                 logger.warning('dropping unknown search attribute "%s" '
@@ -108,9 +109,16 @@ class Search(object):
                     query[name] = '(%s)' % ' OR '.join(value)
                 continue
             elif isinstance(value, basestring):
-                if isWildCard(value) and field.class_ == 'solr.TextField':
-                    value = value.lower()   # wildcard searches need lower-case
-                value = quote(value)
+                if field.class_ == 'solr.TextField':
+                    if isWildCard(value):
+                        value = prepare_wildcard(value)
+                    value = quote(value, textfield=True)
+                    # if we have an intra-word hyphen, we need quotes
+                    if '\\-' in value or '\\+' in value:
+                        if value[0] != '"':
+                            value = '"%s"' % value
+                else:
+                    value = quote(value)
                 if not value:   # don't search for empty strings, even quoted
                     continue
             else:

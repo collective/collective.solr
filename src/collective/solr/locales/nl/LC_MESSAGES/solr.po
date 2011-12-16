@@ -25,6 +25,3 @@ msgstr "Content type"
 
 msgid "review_state"
 msgstr "Revisiestatus"
-
-msgid "Large Plone Folder"
-msgstr "Grote map"

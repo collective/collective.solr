@@ -22,7 +22,7 @@ Current Status
 ==============
 
 The code is used in production in many sites and considered stable. This
-add-on can be installed in a `Plone`_ 4.x site to enable indexing operations
+add-on can be installed in a `Plone`_ 4.1 site to enable indexing operations
 as well as searching (site and live search) using `Solr`_. Doing so will not
 only significantly improve search quality and performance - especially for a
 large number of indexed objects, but also reduce the memory footprint of your
@@ -185,6 +185,22 @@ produce more or better results.
 Currently this is not yet exposed in the `collective.solr` API's even though
 the Solr server as set up by the buildout recipe already contains the required
 configuration for this.
+
+
+Wildcard searches
+-----------------
+
+Wildcard search support in Solr is rather poor. Unfortunately Plone's live
+search uses this by default, so we have to support it. When doing wildcard
+searches, Solr ignores any of the tokenizer and analyzer settings of the field
+at query time. This often leads to a mismatch of the indexed data as modified
+by those settings and the query term. In order to work around this, we try to
+reproduce the essential parts of these analyzers on the `collective.solr` side.
+The most common changes are lower-casing characters and folding non-ascii
+characters to ascii as done by the `ICUFoldingFilterFactory`. Currently these
+two changes are hard-wired and applied to all fields of type `solr.TextField`.
+If you have different field settings you might need to overwrite
+`collective.solr.utils.prepare_wildcard`.
 
 
 Architecture
