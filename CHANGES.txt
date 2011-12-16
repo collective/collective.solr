@@ -1,8 +1,25 @@
 Changelog
 =========
 
-3.0b5 - unreleased
+3.0b6 - unreleased
 ------------------
+
+
+3.0b5 - 2011-12-07
+------------------
+
+- Removed `solr_dump_catalog` and `solr_import_dump` command line scripts.
+  They were too dependent on internals and had subtle bugs.
+  [hannosch]
+
+- Sort arguments in `buildQuery` to get a stable ordering for test output.
+  [hannosch]
+
+- Solr facet queries on unknown fields will now raise a SolrException.
+  [hannosch]
+
+- Update example configuration to Solr 3.5.
+  [hannosch]
 
 - Fix control panel adapter to save the search_pattern as utf-8.
   [ggozad]

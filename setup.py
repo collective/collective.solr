@@ -1,6 +1,6 @@
 from setuptools import setup, find_packages
 
-version = '3.0b5'
+version = '3.0b6'
 
 
 setup(name = 'collective.solr',
@@ -73,7 +73,5 @@ setup(name = 'collective.solr',
         target = plone
         [zopectl.command]
         solr_clear_index = collective.solr.commands:solr_clear_index
-        solr_dump_catalog = collective.solr.commands:solr_dump_catalog
-        solr_import_dump = collective.solr.commands:solr_import_dump
       ''',
 )

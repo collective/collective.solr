@@ -78,7 +78,7 @@ class Search(object):
         defaultSearchField = getattr(schema, 'defaultSearchField', None)
         args[None] = default
         query = {}
-        for name, value in args.items():
+        for name, value in sorted(args.items()):
             field = schema.get(name or defaultSearchField, None)
             if field is None or not field.indexed:
                 logger.warning('dropping unknown search attribute "%s" '

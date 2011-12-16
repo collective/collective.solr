@@ -4,6 +4,7 @@ from unittest import TestSuite, defaultTestLoader
 from zope.interface import alsoProvides
 from zope.component import getMultiAdapter
 
+from collective.solr.solr import SolrException
 from collective.solr.tests.utils import pingSolr
 from collective.solr.tests.base import SolrTestCase
 from collective.solr.browser.interfaces import IThemeSpecific
@@ -151,8 +152,7 @@ class SolrFacettingTests(SolrTestCase):
         request.form['facet_field'] = 'foo'
         alsoProvides(request, IThemeSpecific)
         view = getMultiAdapter((self.portal, request), name='search-facets')
-        view.kw = dict(results=solrSearchResults(request))
-        self.assertEqual(view.facets(), [])
+        self.assertRaises(SolrException, solrSearchResults, request)
 
     def testNoFacetFields(self):
         request = self.app.REQUEST
