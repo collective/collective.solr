@@ -35,7 +35,7 @@ setup(name = 'collective.solr',
       install_requires=[
         'Acquisition',
         'archetypes.schemaextender',
-        'collective.indexing >= 2.0a2',
+        'collective.indexing',
         'collective.js.showmore',
         'DateTime',
         'elementtree',
