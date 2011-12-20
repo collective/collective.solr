@@ -60,8 +60,6 @@ setup(name = 'collective.solr',
         'zope.interface',
         'zope.publisher',
         'zope.schema',
-#        'Zope2',
-        'urllib3',
       ],
       extras_require = {'test': [
         'cElementTree',
