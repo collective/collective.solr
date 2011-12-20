@@ -48,10 +48,10 @@
         name="File"
         />
 
-    <!-- adapter
+    <adapter
         factory=".indexer.BinaryAdder"
         name="Image"
-        / -->
+        />
 
   <adapter
       factory=".flare.PloneFlare" />

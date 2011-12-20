@@ -6,6 +6,7 @@ from zope.component import getUtility, queryUtility, queryMultiAdapter
 from zope.component import queryAdapter, adapts
 from zope.interface import implements
 from zope.contenttype import guess_content_type
+from zope.dottedname.resolve import resolve
 from ZODB.POSException import ConflictError
 from Products.CMFCore.utils import getToolByName
 from Products.CMFCore.CMFCatalogAware import CMFCatalogAware
@@ -21,18 +22,24 @@ from collective.solr.interfaces import ISolrAddHandler
 from collective.solr.solr import SolrException
 from collective.solr.utils import prepareData
 from socket import error
-from urllib import urlencode
+from urllib import urlencode, quote
 
 from ZODB.POSException import POSKeyError
 
 logger = getLogger('collective.solr.indexer')
 
+IGNORE_CLASSES = ['Products.PloneFormGen.content.fieldsBase.BaseFormField',]
 
+# XXX make this an adapter
 def indexable(obj):
     """ indicate whether a given object should be indexed; for now only
         objects inheriting one of the catalog mixin classes are considered """
-    return isinstance(obj, CatalogMultiplex) or \
-        isinstance(obj, CMFCatalogAware)
+    if not isinstance(obj, CatalogMultiplex) or not isinstance(obj, CMFCatalogAware):
+        return False
+    for iclass in IGNORE_CLASSES:
+        if isinstance(resolve(iclass)):
+            return False
+    return True
 
 
 def datehandler(value):
@@ -74,92 +81,26 @@ class DefaultAdder(object):
         data.pop('links', '')
         conn.add(**data)
 
-BOUNDARY = '----------ThIs_Is_tHe_bouNdaRY_$'
-
-def fieldsnippet(name, value):
-    L = ['--' + BOUNDARY]
-    L.append('Content-Disposition: form-data; name="%s"' % name)
-    L.append('')
-    if isinstance(value, unicode):
-        L.append(value.encode('utf-8'))
-    elif isinstance(value, bool):
-        L.append(str(value).lower())
-    else:
-        L.append(str(value))
-    return L
-
-
-def encode_multipart_formdata(fields, files):
-    """
-    fields is a sequence of (name, value) elements for regular form fields.
-    files is a sequence of (name, filename, value) elements for data to be uploaded as files
-    Return (content_type, body) ready for httplib.HTTP instance
-    """
-
-    CRLF = '\r\n'
-    L = []
-    for (key, value) in fields:
-        if isinstance(value, list) or isinstance(value, tuple):
-            for item in value:
-                L.extend(fieldsnippet(key, item))
-        else:
-            L.extend(fieldsnippet(key, value))
-    for (key, filename, value) in files:
-        L.append('--' + BOUNDARY)
-        if filename is not None:
-            L.append('Content-Disposition: form-data; name="%s"; filename="%s"' % (key, filename))
-        else:
-            filename = ''
-            L.append('Content-Disposition: form-data; name="%s"' % (key,))
-        L.append('Content-Type: %s' % guess_content_type(filename, value and value or '')[0])
-        L.append('')
-        L.append(value)
-    L.append('--' + BOUNDARY + '--')
-    L.append('')
-    body = CRLF.join(L)
-    content_type = 'multipart/form-data; boundary=%s' % BOUNDARY
-    return content_type, body
-
-
 class BinaryAdder(DefaultAdder):
 
-    def __call__(self, conn, **data):
-        field = self.context.getPrimaryField()
-        path_string = data['path_string']
-        if field is None:
-            return
-        try:
-            binary_data = str(field.get(self.context).data)
-        except POSKeyError:
-            logger.warn('Error: No blob @ %s', path_string)
-            return
-        except AttributeError:
-            logger.warn('Error: Wrong field contents @ %s', path_string)
-            return
-        if not binary_data:
-            return
-        filename = field.getFilename(self.context)
+    def __call__(self, conn, **data):        
         ignore = ('content_type', 'SearchableText', 'created', 'Type', 'links',
                   'description', 'Date')
         postdata = dict([('literal.%s' % key, val) for key, val in data.iteritems()
                      if key not in ignore])
-        postdata['commit'] = True
-        del data
-        content_type, body = encode_multipart_formdata(
-            postdata.items(), (('__myfile__', filename, binary_data),))
-
-        headers = {}
-        headers['Content-Type'] = content_type
-        headers['Content-Length'] = len(body)
-        del postdata
+        #postdata['commit'] = "true"
+        portal_state = self.context.restrictedTraverse('@@plone_portal_state')
+        portal_url = portal_state.portal_url()
+        postdata['stream.url'] = ''.join([portal_url, '/contentstream?uid=', data['UID']])
+        postdata['stream.contentTyp'] = data.get('content_type', 'XXX')
 
         url = '%s/update/extract' % conn.solrBase
+        
         try:
-            conn.doPost(url, body, headers)
+            conn.doPost(url, urlencode(postdata, doseq=True), conn.formheaders)
         except SolrException, e:
-            logger.warn('Error %s @ %s', e, path_string)
+            logger.warn('Error %s @ %s', e, data['path_string'])
             conn.reset()
-
 
 def boost_values(obj, data):
     """ calculate boost values using a method or skin script;  returns

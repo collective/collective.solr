@@ -43,4 +43,12 @@
       class=".facets.SearchFacetsView"
       permission="zope2.View" />
 
+  <browser:page
+      for="Products.CMFPlone.interfaces.IPloneSiteRoot"
+      name="contentstream"
+      class=".contentstream.ContentStreamView"
+      permission="zope2.View"
+      />
+      
+      
 </configure>
