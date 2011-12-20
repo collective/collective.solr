@@ -188,11 +188,11 @@ class QueryTests(TestCase):
 
     def testMultiArgumentQueries(self):
         bq = self.bq
-        self.assertEqual(bq('foo', name='bar'), '+name:bar +foo')
+        self.assertEqual(bq('foo', name='bar'), '+foo +name:bar')
         self.assertEqual(bq('foo', name=('bar', 'hmm')),
-            '+name:(bar OR hmm) +foo')
+            '+foo +name:(bar OR hmm)')
         self.assertEqual(bq('foo', name=('foo bar', 'hmm')),
-            '+name:("foo bar" OR hmm) +foo')
+            '+foo +name:("foo bar" OR hmm)')
         self.assertEqual(bq(name='foo', cat='bar'), '+name:foo +cat:bar')
         self.assertEqual(bq(name='foo', cat=['bar', 'hmm']),
             '+name:foo +cat:(bar OR hmm)')
@@ -246,9 +246,9 @@ class QueryTests(TestCase):
     def testComplexQueries(self):
         bq = self.bq
         self.assertEqual(bq('foo', name='"herb*"', cat=(u'bär', '"-hmm"')),
-            '+name:"herb\*" +foo +cat:(b\xc3\xa4r OR "\-hmm")')
+            '+foo +name:"herb\*" +cat:(b\xc3\xa4r OR "\-hmm")')
         self.assertEqual(bq('foo', name='herb*', cat=(u'bär', '-hmm')),
-            '+name:herb* +foo +cat:(b\xc3\xa4r OR -hmm)')
+            '+foo +name:herb* +cat:(b\xc3\xa4r OR -hmm)')
 
     def testBooleanQueries(self):
         bq = self.bq
