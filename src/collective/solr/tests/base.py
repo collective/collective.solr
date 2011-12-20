@@ -1,6 +1,9 @@
 from plone.app.controlpanel.tests.cptc import ControlPanelTestCase
 from Products.PloneTestCase import PloneTestCase as ptc
-from Testing.testbrowser import Browser
+try:
+    from Testing.testbrowser import Browser
+except ImportError:
+    from Products.Five.testbrowser import Browser
 from Testing.ZopeTestCase import Sandboxed
 
 from collective.solr.tests.layer import layer

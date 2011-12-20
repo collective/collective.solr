@@ -1,6 +1,9 @@
 from Products.CMFPlone.utils import _createObjectByType
 from Testing.ZopeTestCase import installPackage, installProduct
-from Zope2.App import zcml
+try:
+    from Zope2.App import zcml
+except ImportError:
+    from Products.Five import zcml
 
 from collective.testcaselayer.ptc import BasePTCLayer, ptc_layer
 
