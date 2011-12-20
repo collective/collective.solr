@@ -28,7 +28,13 @@ from ZODB.POSException import POSKeyError
 
 logger = getLogger('collective.solr.indexer')
 
-IGNORE_CLASSES = ['Products.PloneFormGen.content.fieldsBase.BaseFormField',]
+IGNORE_CLASSES = []
+for cdn in ['Products.PloneFormGen.content.fieldsBase.BaseFormField',]:
+    try:
+        cls = resolve(cdn)
+    except ImportError:
+        continue
+    IGNORE_CLASSES.append(cls)
 
 # XXX make this an adapter
 def indexable(obj):
