@@ -40,10 +40,10 @@ for cdn in ['Products.PloneFormGen.content.fieldsBase.BaseFormField',]:
 def indexable(obj):
     """ indicate whether a given object should be indexed; for now only
         objects inheriting one of the catalog mixin classes are considered """
-    if not isinstance(obj, CatalogMultiplex) or not isinstance(obj, CMFCatalogAware):
+    if not isinstance(obj, CatalogMultiplex) and not isinstance(obj, CMFCatalogAware):
         return False
     for iclass in IGNORE_CLASSES:
-        if isinstance(resolve(iclass)):
+        if isinstance(obj, iclass):
             return False
     return True
 
@@ -74,6 +74,8 @@ handlers = {
 }
 
 class DefaultAdder(object):
+    """
+    """
 
     implements(ISolrAddHandler)
     adapts(IBaseObject)
@@ -88,6 +90,8 @@ class DefaultAdder(object):
         conn.add(**data)
 
 class BinaryAdder(DefaultAdder):
+    """
+    """
 
     def __call__(self, conn, **data):        
         ignore = ('content_type', 'SearchableText', 'created', 'Type', 'links',

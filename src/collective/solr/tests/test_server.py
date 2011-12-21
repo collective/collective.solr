@@ -24,8 +24,7 @@ from collective.solr.parser import SolrResponse
 from collective.solr.search import Search
 from collective.solr.solr import logger as logger_solr
 from collective.solr.utils import activate
-from collective.indexing.queue import getQueue, processQueue
-
+from collective.indexing.utils import getIndexer
 
 class SolrMaintenanceTests(SolrTestCase):
 
@@ -121,7 +120,10 @@ class SolrMaintenanceTests(SolrTestCase):
         name = 'solr_boost_index_values'
         self.portal[name] = PythonScript(name)
         self.portal[name].write("##parameters=data\n"
-            "return {'': 100} if data['getId'] == 'special' else {}")
+            "if data['getId'] == 'special':\n"
+            "    return {'': 100}\n"
+            "else:\n"
+            "    return {}")
         self.folder.invokeFactory('Document', id='dull', title='foo',
             description='the bar is missing here')
         self.folder.invokeFactory('Document', id='special', title='bar',
@@ -148,12 +150,12 @@ class SolrMaintenanceTests(SolrTestCase):
         self.setRoles(['Manager'])
         container.invokeFactory('Topic', id='coll', title='a collection')
         crit = container.coll.addCriterion('Type', 'ATPortalTypeCriterion')
-        self.assertTrue(crit.UID() is None)
+        self.assertEqual(crit.UID(), None)
         commit()
         self.assertEqual(numFound(self.search()), 2)
         # calling methods on a criterion won't generate an UID
         crit.getRefs()
-        self.assertTrue(crit.UID() is None)
+        self.assertNotEqual(crit.UID(), None)
         # so calling reindex won't add it to Solr
         maintenance.reindex()
         self.assertEqual(numFound(self.search()), 2)
@@ -603,30 +605,29 @@ class SolrServerTests(SolrTestCase):
         path = ['/plone/news', '/plone/events']
         self.assertEqual(search(path),
             ['/plone/events', '/plone/events/aggregator',
-             '/plone/events/previous',
+             '/plone/events/aggregator/previous',
              '/plone/news', '/plone/news/aggregator'])
         self.assertEqual(search(path, depth=-1),
             ['/plone/events', '/plone/events/aggregator',
-            '/plone/events/previous',
+             '/plone/events/aggregator/previous',
              '/plone/news', '/plone/news/aggregator'])
         self.assertEqual(search(path, depth=0),
             ['/plone/events', '/plone/news'])
         self.assertEqual(search(path, depth=1),
             ['/plone/events', '/plone/events/aggregator',
-            '/plone/events/previous',
              '/plone/news', '/plone/news/aggregator'])
         # multiple paths with different length...
         path = ['/plone/news', '/plone/events/aggregator']
         self.assertEqual(search(path),
-            ['/plone/events/aggregator',
+            ['/plone/events/aggregator', '/plone/events/aggregator/previous',
              '/plone/news', '/plone/news/aggregator'])
         self.assertEqual(search(path, depth=-1),
-            ['/plone/events/aggregator',
+            ['/plone/events/aggregator','/plone/events/aggregator/previous',
              '/plone/news', '/plone/news/aggregator'])
         self.assertEqual(search(path, depth=0),
             ['/plone/events/aggregator', '/plone/news'])
         self.assertEqual(search(path, depth=1),
-            ['/plone/events/aggregator',
+            ['/plone/events/aggregator', '/plone/events/aggregator/previous',
              '/plone/news', '/plone/news/aggregator'])
         self.assertEqual(search(['/plone/news', '/plone'], depth=1),
             ['/plone/Members', '/plone/events',
@@ -653,11 +654,11 @@ class SolrServerTests(SolrTestCase):
         self.maintenance.reindex()
         request = dict(SearchableText='[* TO *]')
         results = solrSearchResults(request, is_folderish=True)
-        self.assertEqual(len(results), 6)
+        self.assertEqual(len(results), 7)
         self.failIf('/plone/front-page' in [r.path_string for r in results])
         results = solrSearchResults(request, is_folderish=False)
         self.assertEqual(sorted([r.path_string for r in results]),
-            ['/plone/events/previous', '/plone/front-page'])
+            ['/plone/front-page'])
 
     def testSearchSecurity(self):
         self.setRoles(['Manager'])
@@ -666,6 +667,7 @@ class SolrServerTests(SolrTestCase):
         wfAction(self.portal.news.aggregator, 'retract')
         wfAction(self.portal.events, 'retract')
         wfAction(self.portal.events.aggregator, 'retract')
+        wfAction(self.portal.events.aggregator.previous, 'retract')
         self.maintenance.reindex()
         request = dict(SearchableText='[* TO *]')
         results = self.portal.portal_catalog(request)
@@ -686,12 +688,12 @@ class SolrServerTests(SolrTestCase):
         self.assertEqual(len(results), 8)
         self.setRoles(())                   # again as anonymous user
         results = self.portal.portal_catalog(request)
-        self.assertEqual(len(results), 5)
+        self.assertEqual(len(results), 6)
         paths = [r.path_string for r in results]
         self.failIf('/plone/news' in paths)
         self.failIf('/plone/events' in paths)
         results = self.portal.portal_catalog(request, show_inactive=True)
-        self.assertEqual(len(results), 7)
+        self.assertEqual(len(results), 8)
         paths = [r.path_string for r in results]
         self.failUnless('/plone/news' in paths)
         self.failUnless('/plone/events' in paths)
@@ -870,19 +872,20 @@ class SolrServerTests(SolrTestCase):
         # we cannot use `commit` here, since the transaction should get
         # aborted, so let's make sure processing the queue directly works...
         self.folder.processForm(values={'title': 'Foo'})
-        processQueue()
+        indexer = getIndexer()
+        indexer.process()
         result = connection.search(q='+Title:Foo').read()
         self.assertEqual(numFound(result), 0)
-        getQueue().commit()
+        indexer.commit()
         result = connection.search(q='+Title:Foo').read()
         self.assertEqual(numFound(result), 1)
         # now let's test aborting, but make sure there's nothing left in
         # the queue (by calling `commit`)
         self.folder.processForm(values={'title': 'Bar'})
-        processQueue()
+        indexer.process()
         result = connection.search(q='+Title:Bar').read()
         self.assertEqual(numFound(result), 0)
-        getQueue().abort()
+        indexer.abort()
         commit()
         result = connection.search(q='+Title:Bar').read()
         self.assertEqual(numFound(result), 0)
@@ -1072,14 +1075,14 @@ class SolrServerTests(SolrTestCase):
         search = lambda **kw: [getattr(i, 'Title', None) for i in
             solrSearchResults(SearchableText='a*', sort_on='Title', **kw)]
         self.assertEqual(search(),
-            ['Events', 'News', 'Welcome to Plone'])
+            ['Events', 'News', 'Past Events', 'Welcome to Plone'])
         # when a batch size is given, the length should remain the same,
         # but only items in the batch actually exist...
         self.assertEqual(search(b_size=2),
-            ['Events', 'News', None])
+            ['Events', 'News', None, None])
         # given a start value, the batch is moved within the search results
         self.assertEqual(search(b_size=2, b_start=1),
-            [None, 'News', 'Welcome to Plone'])
+            [None, 'News', 'Past Events', None])
 
     def testGetObjectOnPrivateObject(self):
         self.maintenance.reindex()
@@ -1095,13 +1098,13 @@ class SolrServerTests(SolrTestCase):
         self.maintenance.reindex()
         # first test the default of not removing the user
         results = self.portal.portal_catalog(use_solr=True)
-        self.assertEqual(len(results), 7)
+        self.assertEqual(len(results), 8)
         paths = [r.path_string for r in results]
         self.failUnless('/plone/Members/test_user_1_' in paths)
         # now we have it removed...
         self.config.exclude_user = True
         results = self.portal.portal_catalog(use_solr=True)
-        self.assertEqual(len(results), 6)
+        self.assertEqual(len(results), 7)
         paths = [r.path_string for r in results]
         self.failIf('/plone/Members/test_user_1_' in paths)
 
