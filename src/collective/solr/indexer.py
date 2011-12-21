@@ -1,3 +1,5 @@
+import os
+
 from logging import getLogger
 from Acquisition import aq_get
 from DateTime import DateTime
@@ -29,7 +31,11 @@ from ZODB.POSException import POSKeyError
 logger = getLogger('collective.solr.indexer')
 
 IGNORE_CLASSES = []
-for cdn in ['Products.PloneFormGen.content.fieldsBase.BaseFormField',]:
+for cdn in [
+    'Products.PloneFormGen.content.fieldsBase.BaseFormField',
+    'Products.PloneFormGen.content.actionAdapter.FormActionAdapter',
+    'Products.ATVocabularyManager.types.simple.SimpleVocabulary',
+    'Products.ATVocabularyManager.types.simple.SimpleVocabularyTerm']:
     try:
         cls = resolve(cdn)
     except ImportError:
@@ -94,14 +100,16 @@ class BinaryAdder(DefaultAdder):
     """
 
     def __call__(self, conn, **data):        
+        if 'ZOPETESTCASE' in os.environ:
+            return super(BinaryAdder, self).__call__(conn, **data)
         ignore = ('content_type', 'SearchableText', 'created', 'Type', 'links',
                   'description', 'Date')
         postdata = dict([('literal.%s' % key, val) for key, val in data.iteritems()
                      if key not in ignore])
-        #postdata['commit'] = "true"
         portal_state = self.context.restrictedTraverse('@@plone_portal_state')
-        portal_url = portal_state.portal_url()
-        postdata['stream.url'] = ''.join([portal_url, '/contentstream?uid=', data['UID']])
+        field = self.context.getPrimaryField()
+        blob = field.get(self.context).blob
+        postdata['stream.file'] = blob._current_filename()
         postdata['stream.contentTyp'] = data.get('content_type', 'XXX')
 
         url = '%s/update/extract' % conn.solrBase

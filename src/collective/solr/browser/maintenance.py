@@ -109,7 +109,7 @@ class SolrMaintenanceView(BrowserView):
         schema = manager.getSchema()
         key = schema.uniqueKey
         updates = {}            # list to hold data to be updated
-        flush = lambda: conn.flush()
+        flush = lambda: conn.commit()
         flush = notimeout(flush)
         def checkPoint():
             for boost_values, data in updates.values():
