@@ -1,8 +1,87 @@
 Changelog
 =========
 
-3.0a3 - unreleased
+3.0b6 - unreleased
 ------------------
+
+
+3.0b5 - 2011-12-07
+------------------
+
+- Removed `solr_dump_catalog` and `solr_import_dump` command line scripts.
+  They were too dependent on internals and had subtle bugs.
+  [hannosch]
+
+- Sort arguments in `buildQuery` to get a stable ordering for test output.
+  [hannosch]
+
+- Solr facet queries on unknown fields will now raise a SolrException.
+  [hannosch]
+
+- Update example configuration to Solr 3.5.
+  [hannosch]
+
+- Fix control panel adapter to save the search_pattern as utf-8.
+  [ggozad]
+
+3.0b4 - 2011-11-10
+------------------
+
+- Revert `unrestrictedSearchResults` change, as it breaks additional catalogs,
+  like the membrane catalogs.
+  [hannosch]
+
+3.0b3 - 2011-11-09
+------------------
+
+- Made maintenance sync view compatible with latest internals of field indexes.
+  [hannosch]
+
+- Also dispatch `unrestrictedSearchResults` to the Solr server.
+  https://github.com/Jarn/collective.solr/issues/5
+  [reinhardt, hannosch]
+
+- Tweak search form to better match sunburst proportions.
+  [elro]
+
+3.0b2 - 2011-10-05
+------------------
+
+- Facet titles can now be provided by specialized vocabularies. Register a named
+  IFacetTitleVocabularyFactory utility and it'll be used to get a vocabulary
+  for the facet field with the same name.
+  [mj]
+
+3.0b1 - 2011-09-27
+------------------
+
+- Extend the wildcard search term manipulation to do Unicode to ascii folding,
+  to keep up with the default field settings of the text field.
+  [hannosch, mj]
+
+3.0a5 - 2011-09-26
+------------------
+
+- Don't treat search terms ending in numbers as `simple`, as Solr doesn't deal
+  with wildcard searches for numbers.
+  [hannosch]
+
+- Include CMFCore's `permissions.zcml`.
+  [witekdev, hannosch]
+
+3.0a4 - 2011-08-22
+------------------
+
+* Fixed bug in `extender.searchwords` indexer - terms need to be lowercased
+  explicitly.
+  [hannosch]
+
+3.0a3 - 2011-08-22
+------------------
+
+* Fixed handling of intra-word hyphens to be taken literally instead of being
+  interpreted as syntax for text fields.
+  [hannosch]
 
 * Explicitly require Plone 4.1 / Zope 2.13.
   [hannosch]

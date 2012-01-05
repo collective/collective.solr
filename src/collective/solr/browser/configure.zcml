@@ -3,6 +3,8 @@
     xmlns:browser="http://namespaces.zope.org/browser"
     i18n_domain="solr">
 
+  <include package="Products.CMFCore" file="permissions.zcml" />
+
   <browser:resourceDirectory
       name="collective.solr.images"
       directory="images" />
