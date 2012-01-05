@@ -5,19 +5,23 @@ from BTrees.IIBTree import IITreeSet
 from Products.CMFCore.utils import getToolByName
 from Products.Five.browser import BrowserView
 from zope.interface import implements
-from zope.component import queryUtility
+from zope.component import queryUtility, queryAdapter
+from Products.Five.browser import BrowserView
+from Products.CMFCore.utils import getToolByName
 
 from collective.indexing.indexer import getOwnIndexMethod
+from collective.solr.indexer import DefaultAdder
 from collective.solr.interfaces import ISolrConnectionManager
 from collective.solr.interfaces import ISolrMaintenanceView
-from collective.solr.indexer import indexable, SolrIndexProcessor
+from collective.solr.interfaces import ISolrAddHandler
+from collective.solr.interfaces import ISearch
+from collective.solr.indexer import indexable, handlers, SolrIndexProcessor
 from collective.solr.indexer import boost_values
 from collective.solr.parser import parse_date_as_datetime
 from collective.solr.parser import SolrResponse
 from collective.solr.parser import unmarshallers
 from collective.solr.utils import findObjects
 from collective.solr.utils import prepareData
-
 
 logger = getLogger('collective.solr.maintenance')
 MAX_ROWS = 1000000000
@@ -109,7 +113,8 @@ class SolrMaintenanceView(BrowserView):
         flush = notimeout(flush)
         def checkPoint():
             for boost_values, data in updates.values():
-                conn.add(boost_values=boost_values, **data)
+                adder = data.pop('_solr_adder')
+                adder(conn, boost_values=boost_values, **data)
             updates.clear()
             msg = 'intermediate commit (%d items processed, ' \
                   'last batch in %s)...\n' % (processed, lap.next())
@@ -132,6 +137,12 @@ class SolrMaintenanceView(BrowserView):
                 if not missing:
                     value = data.get(key, None)
                     if value is not None:
+                        log('indexing %r\n' % obj)
+                        pt = data.get('portal_type', 'default')
+                        adder = queryAdapter(obj, ISolrAddHandler, name=pt)
+                        if adder is None:
+                            adder = DefaultAdder(obj)
+                        data['_solr_adder'] = adder
                         updates[value] = (boost_values(obj, data), data)
                         processed += 1
                         cpi.next()
@@ -270,3 +281,4 @@ class SolrMaintenanceView(BrowserView):
         msg = msg % (processed, real.next(), cpu.next())
         log(msg)
         logger.info(msg)
+

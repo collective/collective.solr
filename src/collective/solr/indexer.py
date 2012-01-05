@@ -1,37 +1,63 @@
+import os
+
 from logging import getLogger
 from Acquisition import aq_get
 from DateTime import DateTime
 from datetime import date, datetime
 from zope.component import getUtility, queryUtility, queryMultiAdapter
+from zope.component import queryAdapter, adapts
 from zope.interface import implements
+from zope.contenttype import guess_content_type
+from zope.dottedname.resolve import resolve
 from ZODB.POSException import ConflictError
 from Products.CMFCore.utils import getToolByName
 from Products.CMFCore.CMFCatalogAware import CMFCatalogAware
 from Products.Archetypes.CatalogMultiplex import CatalogMultiplex
+from Products.Archetypes.interfaces import IBaseObject
 from plone.app.content.interfaces import IIndexableObjectWrapper
 from plone.indexer.interfaces import IIndexableObject
 
 from collective.solr.interfaces import ISolrConnectionConfig
 from collective.solr.interfaces import ISolrConnectionManager
 from collective.solr.interfaces import ISolrIndexQueueProcessor
+from collective.solr.interfaces import ISolrAddHandler
 from collective.solr.solr import SolrException
 from collective.solr.utils import prepareData
 from socket import error
+from urllib import urlencode, quote
+
+from ZODB.POSException import POSKeyError
 
 logger = getLogger('collective.solr.indexer')
 
+IGNORE_CLASSES = []
+for cdn in [
+    'Products.PloneFormGen.content.fieldsBase.BaseFormField',
+    'Products.PloneFormGen.content.actionAdapter.FormActionAdapter',
+    'Products.ATVocabularyManager.types.simple.SimpleVocabulary',
+    'Products.ATVocabularyManager.types.simple.SimpleVocabularyTerm']:
+    try:
+        cls = resolve(cdn)
+    except ImportError:
+        continue
+    IGNORE_CLASSES.append(cls)
 
+# XXX make this an adapter
 def indexable(obj):
     """ indicate whether a given object should be indexed; for now only
         objects inheriting one of the catalog mixin classes are considered """
-    return isinstance(obj, CatalogMultiplex) or \
-        isinstance(obj, CMFCatalogAware)
+    if not isinstance(obj, CatalogMultiplex) and not isinstance(obj, CMFCatalogAware):
+        return False
+    for iclass in IGNORE_CLASSES:
+        if isinstance(obj, iclass):
+            return False
+    return True
 
 
 def datehandler(value):
     # TODO: we might want to handle datetime and time as well;
     # check the enfold.solr implementation
-    if value is None:
+    if value is None or value is '':
         raise AttributeError
     if isinstance(value, str) and not value.endswith('Z'):
         value = DateTime(value)
@@ -53,6 +79,46 @@ handlers = {
     'solr.TrieDateField': datehandler,
 }
 
+class DefaultAdder(object):
+    """
+    """
+
+    implements(ISolrAddHandler)
+    adapts(IBaseObject)
+
+    def __init__(self, context):
+        self.context = context
+
+    def __call__(self, conn, **data):
+        # remove in Plone unused field links,
+        # which gives problems with some documents
+        data.pop('links', '')
+        conn.add(**data)
+
+class BinaryAdder(DefaultAdder):
+    """
+    """
+
+    def __call__(self, conn, **data):        
+        if 'ZOPETESTCASE' in os.environ:
+            return super(BinaryAdder, self).__call__(conn, **data)
+        ignore = ('content_type', 'SearchableText', 'created', 'Type', 'links',
+                  'description', 'Date')
+        postdata = dict([('literal.%s' % key, val) for key, val in data.iteritems()
+                     if key not in ignore])
+        portal_state = self.context.restrictedTraverse('@@plone_portal_state')
+        field = self.context.getPrimaryField()
+        blob = field.get(self.context).blob
+        postdata['stream.file'] = blob.committed()
+        postdata['stream.contentTyp'] = data.get('content_type',
+                                                 'application/octet-stream')
+        url = '%s/update/extract' % conn.solrBase
+        
+        try:
+            conn.doPost(url, urlencode(postdata, doseq=True), conn.formheaders)
+        except SolrException, e:
+            logger.warn('Error %s @ %s', e, data['path_string'])
+            conn.reset()
 
 def boost_values(obj, data):
     """ calculate boost values using a method or skin script;  returns
@@ -101,7 +167,13 @@ class SolrIndexProcessor(object):
                     data['commitWithin'] = config.commit_within
                 try:
                     logger.debug('indexing %r (%r)', obj, data)
-                    conn.add(boost_values=boost_values(obj, data), **data)
+                    pt = data.get('portal_type', 'default')
+                    logger.debug('indexing %r with %r adder (%r)', obj, pt, data)
+
+                    adder = queryAdapter(obj, ISolrAddHandler, name=pt)
+                    if adder is None:
+                        adder = DefaultAdder(obj)
+                    adder(conn, boost_values=boost_values(obj, data), **data)
                 except (SolrException, error):
                     logger.exception('exception during indexing %r', obj)
 

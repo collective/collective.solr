@@ -1,9 +1,20 @@
 Changelog
 =========
 
-3.0b6 - unreleased
-------------------
+Upgrade notes
+*************
 
+* Changed the names of the indexes used to emulate the `path` index. You need
+  to adjust your schema and rename `physicalPath` to `path_string`, 
+  `physicalDepth` to `path_depth` and `parentPaths` to `path_parents`. This
+  also requires a full Solr reindex to pick up the new data.
+  [hannosch]
+
+3.0b6 - unreleased
+-------------------
+
+- Use tika for extracting binary content
+  [tom_gross]
 
 3.0b5 - 2011-12-07
 ------------------
@@ -99,9 +110,6 @@ Changelog
 * Standardize on `solr` as the i18n domain.
   [hannosch]
 
-3.0a2 - 2011-07-10
-------------------
-
 * Adjust munin configs for query cache handlers to `c.r.solrinstance 3.5`
   changes using `FastLRUCache`.
   [hannosch]
@@ -127,21 +135,6 @@ Changelog
 * Adjust tests to work with latest `collective.recipe.solrinstance = 3.3` and
   its new ICU-based text field.
   [hannosch]
-
-3.0a1 - 2011-06-23
-------------------
-
-Upgrade notes
-*************
-
-* Changed the names of the indexes used to emulate the `path` index. You need
-  to adjust your schema and rename `physicalPath` to `path_string`, 
-  `physicalDepth` to `path_depth` and `parentPaths` to `path_parents`. This
-  also requires a full Solr reindex to pick up the new data.
-  [hannosch]
-
-Changes
-*******
 
 * Added `object_provides` index to example schema, as it's used in the
   collection portlet to find collections.
@@ -175,15 +168,9 @@ Changes
 * Updated example config to collective.recipe.solrinstance 3.1 and Solr 3.2.
   [hannosch]
 
-2.0 - 2011-06-04
-----------------
-
 * Updated readme and project description, adding detailed information about how
   Solr works and how we integrate with it.
   [hannosch]
-
-2.0b2 - 2011-05-18
-------------------
 
 * Added optional support for the `Lazy` backports founds in catalogqueryplan.
   [hannosch]
@@ -199,9 +186,6 @@ Changes
 * Avoid using the deprecated `five:implements` directive.
   [hannosch]
 
-2.0b1 - 2011-04-06
-------------------
-
 * Rewrite the `isSimpleSearch` function to use a less complex regular
   expression, which doesn't have O(2**n) scaling properties.
   [hannosch]
@@ -213,23 +197,11 @@ Changes
   was broken, now delegates to the standard Plone implementation.
   [mj]
 
-
-2.0a3 - 2011-01-26
-------------------
-
 * In `solr_dump_catalog` correctly handle boolean values and empty text fields.
   [hannosch]
 
-
-2.0a2 - 2011-01-10
-------------------
-
 * Provide a dummy request in the `solr_dump_catalog` command.
   [hannosch]
-
-
-2.0a1 - 2011-01-10
-------------------
 
 * Handle utf-8 encoded data correctly in `utils.isWildCard`.
   [hannosch]
