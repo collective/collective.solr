@@ -107,6 +107,7 @@ class BinaryAdder(DefaultAdder):
         
         try:
             conn.doPost(url, urlencode(postdata, doseq=True), conn.formheaders)
+            conn.flush()
         except SolrException, e:
             logger.warn('Error %s @ %s', e, data['path_string'])
             conn.reset()
