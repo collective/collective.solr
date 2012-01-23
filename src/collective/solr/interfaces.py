@@ -211,3 +211,10 @@ class IFacetTitleVocabularyFactory(IVocabularyFactory):
     vocabulary should return zope.schema.ITitledTokenizedTerm items, their
     title attribute is what is displayed in the UI.
     """
+
+class ICheckIndexable(Interface):
+    """ Check if an object is indexable """
+
+    def __call__():
+        """ Return `True`, if context is indexable and `False`otherwise
+        """
