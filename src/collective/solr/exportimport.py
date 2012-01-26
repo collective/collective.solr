@@ -42,6 +42,9 @@ class SolrConfigXMLAdapter(XMLAdapterBase):
         self.context.slow_query_threshold = 0
         self.context.effective_steps = 1
         self.context.exclude_user = False
+        self.context.highlight_fields = []
+        self.context.highlight_formatter_pre = ''
+        self.context.highlight_formatter_post = ''
 
     def _initProperties(self, node):
         elems = node.getElementsByTagName('connection')
@@ -109,6 +112,17 @@ class SolrConfigXMLAdapter(XMLAdapterBase):
                 elif child.nodeName == 'exclude-user':
                     value = str(child.getAttribute('value'))
                     self.context.exclude_user = self._convertToBoolean(value)
+                elif child.nodeName == 'highlight_fields':
+                    value = []
+                    for elem in child.getElementsByTagName('parameter'):
+                        value.append(elem.getAttribute('name'))
+                    self.context.highlight_fields = tuple(map(str, value))
+                elif child.nodeName == 'highlight_formatter_pre':
+                    value = str(child.getAttribute('value'))
+                    self.context.highlight_formatter_pre = value
+                elif child.nodeName == 'highlight_formatter_post':
+                    value = str(child.getAttribute('value'))
+                    self.context.highlight_formatter_post = value
 
     def _createNode(self, name, value):
         node = self._doc.createElement(name)
@@ -157,6 +171,14 @@ class SolrConfigXMLAdapter(XMLAdapterBase):
             str(self.context.slow_query_threshold)))
         append(create('effective-steps', str(self.context.effective_steps)))
         append(create('exclude-user', str(bool(self.context.exclude_user))))
+        highlight_fields = self._doc.createElement('highlight_fields')
+        append(highlight_fields)
+        for name in self.context.highlight_fields:
+            param = self._doc.createElement('parameter')
+            param.setAttribute('name', name)
+            highlight_fields.appendChild(param)
+        append(create('highlight_formatter_pre', self.context.highlight_formatter_pre))
+        append(create('highlight_formatter_post', self.context.highlight_formatter_post))
         return node
 
 

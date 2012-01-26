@@ -211,7 +211,7 @@ class SolrControlPanelAdapter(SchemaAdapterBase):
 
     def getHighlightFields(self):
         util = queryUtility(ISolrConnectionConfig)
-        return getattr(util, 'highlight_fields', 'SearchableText')
+        return getattr(util, 'highlight_fields', '')
 
     def setHighlightFields(self, value):
         util = queryUtility(ISolrConnectionConfig)
