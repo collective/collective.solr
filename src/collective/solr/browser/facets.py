@@ -76,7 +76,7 @@ def convertFacets(fields, context=None, request={}, filter=None):
         deps = dependencies.get(field, None)
         visible = deps is None or selected.intersection(deps)
         if counts and visible:
-            info.append(dict(title=field, counts=counts))
+            info.append(dict(title=field, counts=counts, name=name))
     if facets:          # sort according to given facets (if available)
         def pos(item):
             try:
