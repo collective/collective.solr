@@ -184,7 +184,7 @@
                 <span class ="highlighting" tal:condition="python:result['UID'] in results.highlighting" tal:repeat="snippets python:results.highlighting[result['UID']].values()">
                     ...&nbsp;
                     <tal:snippets repeat="snippet snippets">
-                        <tal:snippet content="snippet">highlighted snippet</tal:snippet> ... 
+                        <tal:snippet content="structure snippet">highlighted snippet</tal:snippet> ... 
                     </tal:snippets>
                 </span>
             </tal:highlighting>
