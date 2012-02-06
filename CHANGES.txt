@@ -4,6 +4,9 @@ Changelog
 3.0b6 - unreleased
 ------------------
 
+- Ignore a batch start parameter when selecting a facet to filter on.
+  https://github.com/Jarn/collective.solr/issues/12
+  [mj]
 
 3.0b5 - 2011-12-07
 ------------------
