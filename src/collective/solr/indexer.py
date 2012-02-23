@@ -90,6 +90,11 @@ class BinaryAdder(DefaultAdder):
     """
     """
 
+    def getpath(self):
+        field = self.context.getPrimaryField()
+        blob = field.get(self.context).blob
+        return blob._p_blob_committed or blob._p_blob_uncommitted
+
     def __call__(self, conn, **data):
         if 'ZOPETESTCASE' in os.environ:
             return super(BinaryAdder, self).__call__(conn, **data)
@@ -98,9 +103,7 @@ class BinaryAdder(DefaultAdder):
         postdata = dict([('literal.%s' % key, val) for key, val in data.iteritems()
                      if key not in ignore])
         portal_state = self.context.restrictedTraverse('@@plone_portal_state')
-        field = self.context.getPrimaryField()
-        blob = field.get(self.context).blob
-        postdata['stream.file'] = blob._p_blob_committed or blob._p_blob_uncommitted
+        postdata['stream.file'] = self.getpath()
         postdata['stream.contentTyp'] = data.get('content_type',
                                                  'application/octet-stream')
         postdata['fmap.content'] = 'SearchableText'
@@ -166,6 +169,7 @@ class SolrIndexProcessor(object):
                     logger.debug('indexing %r with %r adder (%r)', obj, pt, data)
 
                     adder = queryAdapter(obj, ISolrAddHandler, name=pt)
+                    
                     if adder is None:
                         adder = DefaultAdder(obj)
                     adder(conn, boost_values=boost_values(obj, data), **data)
