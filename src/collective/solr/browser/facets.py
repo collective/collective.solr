@@ -29,6 +29,8 @@ def facetParameters(view):
     if isinstance(fields, basestring):
         fields = [fields]
     if fields is marker:
+        fields = getattr(view, 'facet_fields', marker)
+    if fields is marker:
         fields = getattr(view.context, 'facet_fields', marker)
     if fields is marker:
         config = queryUtility(ISolrConnectionConfig)
@@ -96,7 +98,7 @@ class FacetMixin:
 
     def hiddenfields(self):
         """ render hidden fields suitable for inclusion in search forms """
-        facets, dependencies = facetParameters(self.context, self.request)
+        facets, dependencies = facetParameters(self)
         queries = param(self, 'fq')
         return self.hidden(facets=facets, queries=queries)
 
