@@ -48,6 +48,7 @@ class Search(object):
                 parameters['hl.fl'] = config.highlight_fields or []
                 parameters['hl.simple.pre'] = config.highlight_formatter_pre or ' '
                 parameters['hl.simple.post'] = config.highlight_formatter_post or ' '
+                parameters['hl.fragsize'] = getattr(config, 'highlight_fragsize', None) or 100
         if isinstance(query, dict):
             query = ' '.join(query.values())
         logger.debug('searching for %r (%r)', query, parameters)

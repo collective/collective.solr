@@ -45,6 +45,7 @@ class SolrConfigXMLAdapter(XMLAdapterBase):
         self.context.highlight_fields = []
         self.context.highlight_formatter_pre = ''
         self.context.highlight_formatter_post = ''
+        self.context.highlight_fragsize = 0
 
     def _initProperties(self, node):
         elems = node.getElementsByTagName('connection')
@@ -123,6 +124,9 @@ class SolrConfigXMLAdapter(XMLAdapterBase):
                 elif child.nodeName == 'highlight_formatter_post':
                     value = str(child.getAttribute('value'))
                     self.context.highlight_formatter_post = value
+                elif child.nodeName == 'highlight_fragsize':
+                    value = int(str(child.getAttribute('value')))
+                    self.context.highlight_fragsize = value
 
     def _createNode(self, name, value):
         node = self._doc.createElement(name)

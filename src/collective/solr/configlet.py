@@ -242,6 +242,17 @@ class SolrControlPanelAdapter(SchemaAdapterBase):
 
     highlight_formatter_post = property(getHighlightFormatterPost, setHighlightFormatterPost)
 
+    def getHighlightFragsize(self):
+        util = queryUtility(ISolrConnectionConfig)
+        return getattr(util, 'highlight_fragsize', '')
+
+    def setHighlightFragsize(self, value):
+        util = queryUtility(ISolrConnectionConfig)
+        if util is not None:
+            util.highlight_fragsize = value
+
+    highlight_fragsize = property(getHighlightFragsize, setHighlightFragsize)
+
 
 class SolrControlPanel(ControlPanelForm):
 

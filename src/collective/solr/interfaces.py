@@ -114,6 +114,10 @@ class ISolrSchema(Interface):
         description=_(u'The text to insert after the highlighted keyword.'),
         default=u']', required=False)
 
+    highlight_fragsize = Int(title=_(u'Highlight Fragment Size'), default=100,
+        description=_(u'The size, in characters, of the snippets (aka '
+                       'fragments) created by the highlighter.'))
+
 
 class ISolrConnectionConfig(ISolrSchema):
     """ utility to hold the connection configuration for the solr server """
