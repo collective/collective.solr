@@ -165,10 +165,10 @@ class PathManglerTests(TestCase):
             '(+path_depth:[2 TO 2] AND +path_parents:/foo)'])})
         keywords = mangle(path=dict(query='/foo', depth=2))
         self.assertEqual(keywords, {'path_parents': set([
-            '(+path_depth:[2 TO 4] AND +path_parents:/foo)'])})
+            '(+path_depth:[3 TO 4] AND +path_parents:/foo)'])})
         keywords = mangle(path=Query(query='/foo', depth=2))
         self.assertEqual(keywords, {'path_parents': set([
-            '(+path_depth:[2 TO 4] AND +path_parents:/foo)'])})
+            '(+path_depth:[3 TO 4] AND +path_parents:/foo)'])})
 
     def testMultiplePathQuery(self):
         keywords = mangle(path=['/foo', '/bar'])
@@ -183,8 +183,8 @@ class PathManglerTests(TestCase):
             '(+path_depth:[2 TO 2] AND +path_parents:/bar)'])})
         keywords = mangle(path=dict(query=['/foo', '/bar'], depth=1))
         self.assertEqual(keywords, {'path_parents': set([
-            '(+path_depth:[2 TO 3] AND +path_parents:/foo)',
-            '(+path_depth:[2 TO 3] AND +path_parents:/bar)'])})
+            '(+path_depth:[3 TO 3] AND +path_parents:/foo)',
+            '(+path_depth:[3 TO 3] AND +path_parents:/bar)'])})
         keywords = mangle(path=dict(query=['/a/b', '/c'], depth=-1))
         self.assertEqual(keywords, {'path_parents': ['/a/b', '/c']})
         keywords = mangle(path=dict(query=['/a/b', '/c'], depth=0))
@@ -193,8 +193,8 @@ class PathManglerTests(TestCase):
             '(+path_depth:[2 TO 2] AND +path_parents:/c)'])})
         keywords = mangle(path=dict(query=['/a/b', '/c'], depth=2))
         self.assertEqual(keywords, {'path_parents': set([
-            '(+path_depth:[3 TO 5] AND +path_parents:/a/b)',
-            '(+path_depth:[2 TO 4] AND +path_parents:/c)'])})
+            '(+path_depth:[4 TO 5] AND +path_parents:/a/b)',
+            '(+path_depth:[3 TO 4] AND +path_parents:/c)'])})
 
 
 class QueryParameterTests(TestCase):
