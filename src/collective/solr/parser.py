@@ -2,10 +2,16 @@ from datetime import datetime
 from StringIO import StringIO
 
 from DateTime import DateTime
+from Missing import MV
+from zope.component import queryUtility, queryMultiAdapter
 from zope.interface import implements
 
+from collective.solr.interfaces import ISolrConnectionManager
 from collective.solr.interfaces import ISolrFlare
+from collective.solr.interfaces import ISearch
+from collective.solr.interfaces import IFlare
 from collective.solr.iterparse import iterparse
+from collective.solr.utils import padResults
 
 
 class AttrDict(dict):
@@ -91,6 +97,7 @@ class SolrResponse(object):
 
     def __init__(self, data=None, unmarshallers=unmarshallers):
         self.unmarshallers = unmarshallers
+        self.manager = None
         if data is not None:
             self.parse(data)
 
@@ -126,6 +133,44 @@ class SolrResponse(object):
         return len(self.results())
 
     def __getitem__(self, index):
+        if len(self) > index and self.results()[index] is None:
+            if self.manager is None:
+                self.manager = queryUtility(ISolrConnectionManager)
+            connection = self.manager.getConnection()
+            if connection is None:
+                raise SolrInactiveException
+            parameters = self.responseHeader['params'].copy()
+            start = int(parameters.get('start', 0))
+            rows = int(parameters.get('rows', 0))
+            if index > start + rows:
+                if index > start + 2 * rows:
+                    rows = index - start + 1
+                else:
+                    rows = 2 * rows
+            elif index < start:
+                start = start - rows
+                if start < 0:
+                    start = 0
+                rows = 2 * rows
+            parameters['start'] = start
+            parameters['rows'] = rows
+            query = parameters['q']
+            del parameters['q']
+            self.parse(connection.search(q=query, **parameters))
+            def wrap(flare):
+                """ wrap a flare object with a helper class """
+                adapter = queryMultiAdapter((flare, query), IFlare)
+                return adapter is not None and adapter or flare
+            results = self.results()
+            search = queryUtility(ISearch)
+            schema = search.getManager().getSchema() or {}
+            for idx, flare in enumerate(results):
+                flare = wrap(flare)
+                for missing in set(schema.stored).difference(flare):
+                    flare[missing] = MV
+                results[idx] = wrap(flare)
+            padResults(results, **parameters)           # pad the batch
+            
         return self.results()[index]
 
 
