@@ -144,11 +144,20 @@ class SolrResponse(object):
             start = int(parameters.get('start', 0))
             rows = int(parameters.get('rows', 0))
             if index > start + rows:
-                if index > start + 2 * rows:
+                # requested element lies 'right' of batch
+                if index == start + rows + 1:
+                    # looks like we're iterating over all results, just shift 
+                    # the batch by rows
+                    start = start + rows
+                elif index > start + 2 * rows:
+                    # looks like random access, increase the batch size to
+                    # include the requested item
                     rows = index - start + 1
                 else:
+                    # looks like local access, double the batch size
                     rows = 2 * rows
             elif index < start:
+                # requested element lies 'left' of batch
                 start = start - rows
                 if start < 0:
                     start = 0
