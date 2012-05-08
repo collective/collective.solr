@@ -95,9 +95,10 @@ class SolrResponse(object):
 
     __allow_access_to_unprotected_subobjects__ = True
 
-    def __init__(self, data=None, unmarshallers=unmarshallers):
+    def __init__(self, data=None, request=None, unmarshallers=unmarshallers):
         self.unmarshallers = unmarshallers
         self.manager = None
+        self.request = request
         if data is not None:
             self.parse(data)
 
@@ -159,7 +160,7 @@ class SolrResponse(object):
             self.parse(connection.search(q=query, **parameters))
             def wrap(flare):
                 """ wrap a flare object with a helper class """
-                adapter = queryMultiAdapter((flare, query), IFlare)
+                adapter = queryMultiAdapter((flare, self.request), IFlare)
                 return adapter is not None and adapter or flare
             results = self.results()
             search = queryUtility(ISearch)
