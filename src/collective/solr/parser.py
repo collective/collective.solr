@@ -143,6 +143,8 @@ class SolrResponse(object):
             parameters = self.responseHeader['params'].copy()
             start = int(parameters.get('start', 0))
             rows = int(parameters.get('rows', 0))
+            if index < 0:
+                index = len(self) + index
             if index >= start + rows:
                 # requested element lies 'right' of batch
                 if index == start + rows:
@@ -156,12 +158,10 @@ class SolrResponse(object):
                 else:
                     # looks like local access, double the batch size
                     rows = 2 * rows
-            elif index < start:
+            elif index <= start:
                 # requested element lies 'left' of batch
-                start = start - rows
-                if start < 0:
-                    start = 0
-                rows = 2 * rows
+                rows = start - index + rows
+                start = index
             parameters['start'] = start
             parameters['rows'] = rows
             query = parameters['q']
