@@ -143,9 +143,9 @@ class SolrResponse(object):
             parameters = self.responseHeader['params'].copy()
             start = int(parameters.get('start', 0))
             rows = int(parameters.get('rows', 0))
-            if index > start + rows:
+            if index >= start + rows:
                 # requested element lies 'right' of batch
-                if index == start + rows + 1:
+                if index == start + rows:
                     # looks like we're iterating over all results, just shift 
                     # the batch by rows
                     start = start + rows
