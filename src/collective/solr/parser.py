@@ -6,10 +6,11 @@ from Missing import MV
 from zope.component import queryUtility, queryMultiAdapter
 from zope.interface import implements
 
+from collective.solr.exceptions import SolrInactiveException
+from collective.solr.interfaces import IFlare
+from collective.solr.interfaces import ISearch
 from collective.solr.interfaces import ISolrConnectionManager
 from collective.solr.interfaces import ISolrFlare
-from collective.solr.interfaces import ISearch
-from collective.solr.interfaces import IFlare
 from collective.solr.iterparse import iterparse
 from collective.solr.utils import padResults
 
@@ -141,8 +142,8 @@ class SolrResponse(object):
             if connection is None:
                 raise SolrInactiveException
             parameters = self.responseHeader['params'].copy()
-            start = int(parameters.get('start', 0))
-            rows = int(parameters.get('rows', 0))
+            start = int(parameters.get('start') or 0)
+            rows = int(parameters.get('rows') or 0)
             if index < 0:
                 index = len(self) + index
             if index >= start + rows:
