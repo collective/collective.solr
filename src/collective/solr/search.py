@@ -43,7 +43,7 @@ class Search(object):
             logger.info('falling back to "max_results" (%d) without a "rows" '
                 'parameter: %r (%r)', config.max_results, query, parameters)
         if getattr(config, 'highlight_fields', None):
-            if parameters.get('hl', 'true') == 'true' and not 'hl.fl' in parameters:
+            if parameters.get('hl', 'false') == 'true' and not 'hl.fl' in parameters:
                 parameters['hl'] = 'true'
                 parameters['hl.fl'] = config.highlight_fields or []
                 parameters['hl.simple.pre'] = config.highlight_formatter_pre or ' '
