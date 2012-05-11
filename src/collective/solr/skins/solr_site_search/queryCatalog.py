@@ -4,7 +4,7 @@
 ##bind namespace=
 ##bind script=script
 ##bind subpath=traverse_subpath
-##parameters=REQUEST=None,show_all=0,quote_logic=0,quote_logic_indexes=['SearchableText','Description','Title'],use_types_blacklist=False,show_inactive=False,use_navigation_root=False,b_start=None,b_size=None
+##parameters=REQUEST=None,show_all=0,quote_logic=0,quote_logic_indexes=['SearchableText','Description','Title'],use_types_blacklist=False,show_inactive=False,use_navigation_root=False,b_start=None,b_size=None,hl=False
 ##title=wraps the portal_catalog with a rules qualified query
 ##
 from ZODB.POSException import ConflictError
@@ -92,7 +92,7 @@ for k in REQUEST.keys():
             query[k] = int(v)
         else:
             query[k] = v
-    elif k in ('fq', 'fl', 'facet', 'b_start', 'b_size') or k.startswith('facet.'):
+    elif k in ('fq', 'fl', 'facet', 'b_start', 'b_size', 'hl') or k.startswith('facet.'):
         query[k] = v
 
 for k, v in second_pass.items():
