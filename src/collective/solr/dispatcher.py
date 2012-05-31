@@ -17,9 +17,19 @@ from collective.solr.mangler import cleanupQueryParameters
 from collective.solr.mangler import optimizeQueryParameters
 from collective.solr.lingua import languageFilter
 
-from collective.solr.monkey import patchCatalogTool, patchLazy
-patchCatalogTool() # patch catalog tool to use the dispatcher...
-patchLazy() # ...as well as ZCatalog's Lazy class
+
+from App.config import getConfiguration
+
+def doSearchPatch():
+    product_config = getattr(getConfiguration(), 'product_config', None)
+    config = product_config and product_config.get('collective.solr')
+    return config and config.get('patchsearch', '').strip() == 'off'
+patchsearch = doSearchPatch()
+
+if patchsearch:
+    from collective.solr.monkey import patchCatalogTool, patchLazy
+    patchCatalogTool() # patch catalog tool to use the dispatcher...
+    patchLazy() # ...as well as ZCatalog's Lazy class
 
 
 class FallBackException(Exception):
