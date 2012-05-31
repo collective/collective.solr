@@ -15,7 +15,8 @@ from collective.solr.interfaces import ISolrConnectionManager
 from collective.solr.interfaces import ISolrMaintenanceView
 from collective.solr.interfaces import ISolrAddHandler
 from collective.solr.interfaces import ISearch
-from collective.solr.indexer import indexable, handlers, SolrIndexProcessor
+from collective.solr.interfaces import ICheckIndexable
+from collective.solr.indexer import handlers, SolrIndexProcessor
 from collective.solr.indexer import boost_values
 from collective.solr.parser import parse_date_as_datetime
 from collective.solr.parser import SolrResponse
@@ -125,7 +126,7 @@ class SolrMaintenanceView(BrowserView):
         cpi = checkpointIterator(checkPoint, batch)
         count = 0
         for path, obj in findObjects(self.context):
-            if indexable(obj):
+            if ICheckIndexable(obj)():
                 if getOwnIndexMethod(obj, 'indexObject') is not None:
                     log('skipping indexing of %r via private method.\n' % obj)
                     continue
@@ -247,7 +248,7 @@ class SolrMaintenanceView(BrowserView):
         op = notimeout(lambda obj: proc.index(obj))
         for uid in index:
             obj = lookup(uid)
-            if indexable(obj):
+            if ICheckIndexable(obj)():
                 op(obj)
                 processed += 1
                 cpi.next()
@@ -267,7 +268,7 @@ class SolrMaintenanceView(BrowserView):
                 rid = rid.keys()[0]
             if cat_mod_get(rid) != solr_mod_get(uid):
                 obj = lookup(uid, rid=rid)
-                if indexable(obj):
+                if ICheckIndexable(obj)():
                     op(obj)
                     processed += 1
                     cpi.next()
