@@ -154,7 +154,7 @@ class SolrMaintenanceView(BrowserView):
         log(msg)
         logger.info(msg)
 
-    def sync(self, batch=1000):
+    def sync(self, batch=1000, preImportDeleteQuery='*:*'):
         """Sync the Solr index with the portal catalog. Records contained
         in the catalog but not in Solr will be indexed and records not
         contained in the catalog will be removed.
@@ -173,8 +173,7 @@ class SolrMaintenanceView(BrowserView):
         lap = timer()           # real lap time (for intermediate commits)
         cpu = timer(clock)      # cpu time
         # get Solr status
-        query = '+%s:[* TO *]' % key
-        response = conn.search(q=query, rows=MAX_ROWS, fl='%s modified' % key)
+        response = conn.search(q=preImportDeleteQuery, rows=MAX_ROWS, fl='%s modified' % key)
         # avoid creating DateTime instances
         simple_unmarshallers = unmarshallers.copy()
         simple_unmarshallers['date'] = parse_date_as_datetime
