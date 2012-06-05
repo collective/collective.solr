@@ -23,7 +23,9 @@ from App.config import getConfiguration
 def doSearchPatch():
     product_config = getattr(getConfiguration(), 'product_config', None)
     config = product_config and product_config.get('collective.solr')
-    return config and config.get('patchsearch', '').strip() == 'off'
+    if config and config.get('patchsearch', '').strip() == 'off':
+        return False
+    return True
 patchsearch = doSearchPatch()
 
 if patchsearch:
