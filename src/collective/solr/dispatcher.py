@@ -1,3 +1,4 @@
+from copy import deepcopy
 from zope.interface import implements
 from zope.component import queryUtility, queryMultiAdapter, getSiteManager
 from zope.publisher.interfaces.http import IHTTPRequest
@@ -57,13 +58,13 @@ def solrSearchResults(request=None, **keywords):
         # ploneflares and urls can be converted into absolute ones etc;
         # however, in this case any arguments from the request are ignored
         request = getattr(getSiteManager(), 'REQUEST', None)
-        args = keywords
+        args = deepcopy(keywords)
     elif IHTTPRequest.providedBy(request):
-        args = request.form.copy()  # ignore headers and other stuff
+        args = deepcopy(request.form)  # ignore headers and other stuff
         args.update(keywords)       # keywords take precedence
     else:
         assert isinstance(request, dict), request
-        args = request.copy()
+        args = deepcopy(request)
         args.update(keywords)       # keywords take precedence
         # if request is a dict, we need the real request in order to
         # be able to adapt to plone flares
