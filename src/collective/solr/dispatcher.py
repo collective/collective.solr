@@ -19,6 +19,7 @@ from collective.solr.mangler import optimizeQueryParameters
 from collective.solr.lingua import languageFilter
 
 from collective.solr.monkey import patchCatalogTool, patchLazy
+from collective.solr.parser import SolrResponse
 patchCatalogTool() # patch catalog tool to use the dispatcher...
 patchLazy() # ...as well as ZCatalog's Lazy class
 
@@ -86,9 +87,12 @@ def solrSearchResults(request=None, **keywords):
     prepareData(args)
     mangleQuery(args, config, schema)
     query = search.buildQuery(**args)
-    optimizeQueryParameters(query, params)
-    __traceback_info__ = (query, params, args)
-    response = search(query, fl='* score', **params)
+    if query is not None:
+        optimizeQueryParameters(query, params)
+        __traceback_info__ = (query, params, args)
+        response = search(query, fl='* score', **params)
+    else:
+        return SolrResponse()
     def wrap(flare):
         """ wrap a flare object with a helper class """
         adapter = queryMultiAdapter((flare, request), IFlare)
