@@ -7,8 +7,8 @@ from datetime import date, datetime
 from zope.component import getUtility, queryUtility, queryMultiAdapter
 from zope.component import queryAdapter, adapts
 from zope.interface import implements
+from zope.interface import Interface
 from zope.contenttype import guess_content_type
-from zope.dottedname.resolve import resolve
 from ZODB.POSException import ConflictError
 from Products.CMFCore.utils import getToolByName
 from Products.CMFCore.CMFCatalogAware import CMFCatalogAware
@@ -20,6 +20,7 @@ from plone.indexer.interfaces import IIndexableObject
 from collective.solr.interfaces import ISolrConnectionConfig
 from collective.solr.interfaces import ISolrConnectionManager
 from collective.solr.interfaces import ISolrIndexQueueProcessor
+from collective.solr.interfaces import ICheckIndexable
 from collective.solr.interfaces import ISolrAddHandler
 from collective.solr.solr import SolrException
 from collective.solr.utils import prepareData
@@ -30,28 +31,18 @@ from ZODB.POSException import POSKeyError
 
 logger = getLogger('collective.solr.indexer')
 
-IGNORE_CLASSES = []
-for cdn in [
-    'Products.PloneFormGen.content.fieldsBase.BaseFormField',
-    'Products.PloneFormGen.content.actionAdapter.FormActionAdapter',
-    'Products.ATVocabularyManager.types.simple.SimpleVocabulary',
-    'Products.ATVocabularyManager.types.simple.SimpleVocabularyTerm']:
-    try:
-        cls = resolve(cdn)
-    except ImportError:
-        continue
-    IGNORE_CLASSES.append(cls)
 
-# XXX make this an adapter
-def indexable(obj):
-    """ indicate whether a given object should be indexed; for now only
-        objects inheriting one of the catalog mixin classes are considered """
-    if not isinstance(obj, CatalogMultiplex) and not isinstance(obj, CMFCatalogAware):
-        return False
-    for iclass in IGNORE_CLASSES:
-        if isinstance(obj, iclass):
-            return False
-    return True
+class BaseIndexable(object):
+
+    implements(ICheckIndexable)
+    adapts(Interface)
+
+    def __init__(self, context):
+        self.context = context
+
+    def __call__(self):
+        return  isinstance(self.context, CatalogMultiplex) and \
+                isinstance(self.context, CMFCatalogAware)
 
 
 def datehandler(value):
@@ -99,23 +90,30 @@ class BinaryAdder(DefaultAdder):
     """
     """
 
-    def __call__(self, conn, **data):        
+    def getpath(self):
+        field = self.context.getPrimaryField()
+        blob = field.get(self.context).blob
+        return blob._p_blob_committed or blob._p_blob_uncommitted
+
+    def __call__(self, conn, **data):
         if 'ZOPETESTCASE' in os.environ:
             return super(BinaryAdder, self).__call__(conn, **data)
-        ignore = ('content_type', 'SearchableText', 'created', 'Type', 'links',
+        ignore = ('SearchableText', 'created', 'Type', 'links',
                   'description', 'Date')
         postdata = dict([('literal.%s' % key, val) for key, val in data.iteritems()
                      if key not in ignore])
         portal_state = self.context.restrictedTraverse('@@plone_portal_state')
-        field = self.context.getPrimaryField()
-        blob = field.get(self.context).blob
-        postdata['stream.file'] = blob.committed()
+        postdata['stream.file'] = self.getpath()
         postdata['stream.contentTyp'] = data.get('content_type',
                                                  'application/octet-stream')
+        postdata['fmap.content'] = 'SearchableText'
+        postdata['extractFormat'] = 'text'
+
         url = '%s/update/extract' % conn.solrBase
-        
+
         try:
             conn.doPost(url, urlencode(postdata, doseq=True), conn.formheaders)
+            conn.flush()
         except SolrException, e:
             logger.warn('Error %s @ %s', e, data['path_string'])
             conn.reset()
@@ -137,7 +135,7 @@ class SolrIndexProcessor(object):
 
     def index(self, obj, attributes=None):
         conn = self.getConnection()
-        if conn is not None and indexable(obj):
+        if conn is not None and ICheckIndexable(obj)():
             # unfortunately with current versions of solr we need to provide
             # data for _all_ fields during an <add> -- partial updates aren't
             # supported (see https://issues.apache.org/jira/browse/SOLR-139)
@@ -171,6 +169,7 @@ class SolrIndexProcessor(object):
                     logger.debug('indexing %r with %r adder (%r)', obj, pt, data)
 
                     adder = queryAdapter(obj, ISolrAddHandler, name=pt)
+                    
                     if adder is None:
                         adder = DefaultAdder(obj)
                     adder(conn, boost_values=boost_values(obj, data), **data)

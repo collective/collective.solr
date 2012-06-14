@@ -53,6 +53,9 @@
         name="Image"
         />
 
+    <adapter
+        factory=".indexer.BaseIndexable" />
+
   <adapter
       factory=".flare.PloneFlare" />
 
