@@ -33,12 +33,19 @@ def searchResults(self, REQUEST=None, **kw):
         return self._cs_old_searchResults(REQUEST, **kw)
 
 
+def indexes(self):
+    manager = queryUtility(ISolrConnectionManager)
+    schema = manager.getSchema() or {}
+    indexes = list(set(schema.keys()).union(set(self._catalog.indexes.keys())))
+    return indexes
+
 def patchCatalogTool():
     """ monkey patch plone's catalogtool with the solr dispatcher """
     CatalogTool._cs_old_searchResults = CatalogTool.searchResults
     CatalogTool.searchResults = searchResults
     CatalogTool.__call__ = searchResults
-
+    CatalogTool._cs_old_indexes = CatalogTool.indexes
+    CatalogTool.indexes = indexes
 
 if HAS_EXPCAT:
     def lazyExpCatAdd(self, other):
