@@ -1,6 +1,7 @@
 from copy import deepcopy
 from zope.interface import implements
-from zope.component import queryUtility, queryMultiAdapter, getSiteManager
+from zope.component import queryUtility, queryMultiAdapter
+from zope.component.hooks import getSite
 from zope.publisher.interfaces.http import IHTTPRequest
 from Acquisition import aq_base
 from Missing import MV
@@ -58,7 +59,7 @@ def solrSearchResults(request=None, **keywords):
         # try to get a request instance, so that flares can be adapted to
         # ploneflares and urls can be converted into absolute ones etc;
         # however, in this case any arguments from the request are ignored
-        request = getattr(getSiteManager(), 'REQUEST', None)
+        request = getattr(getSite(), 'REQUEST', None)
         args = deepcopy(keywords)
     elif IHTTPRequest.providedBy(request):
         args = deepcopy(request.form)  # ignore headers and other stuff
@@ -69,7 +70,7 @@ def solrSearchResults(request=None, **keywords):
         args.update(keywords)       # keywords take precedence
         # if request is a dict, we need the real request in order to
         # be able to adapt to plone flares
-        request = getattr(getSiteManager(), 'REQUEST', args)
+        request = getattr(getSite(), 'REQUEST', args)
     if 'path' in args and 'navtree' in args['path']:
         raise FallBackException     # we can't handle navtree queries yet
     use_solr = args.get('use_solr', False)  # A special key to force Solr
