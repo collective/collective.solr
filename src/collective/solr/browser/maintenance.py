@@ -62,13 +62,15 @@ class SolrMaintenanceView(BrowserView):
     """ helper view for indexing all portal content in Solr """
     implements(ISolrMaintenanceView)
 
-    def mklog(self):
+    def mklog(self, use_std_log=False):
         """ helper to prepend a time stamp to the output """
         write = self.request.RESPONSE.write
         def log(msg, timestamp=True):
             if timestamp:
                 msg = strftime('%Y/%m/%d-%H:%M:%S ') + msg
             write(msg)
+            if use_std_log:
+                logger.info(msg)
         return log
 
     def optimize(self):
