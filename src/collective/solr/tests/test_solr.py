@@ -1,5 +1,5 @@
 from unittest import TestCase
-from elementtree.ElementTree import fromstring
+from xml.etree.cElementTree import fromstring
 from collective.solr.solr import SolrConnection
 from collective.solr.tests.utils import getData, fakehttp
 
