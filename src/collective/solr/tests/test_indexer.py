@@ -3,6 +3,7 @@ from threading import Thread
 from re import search, findall, DOTALL
 from DateTime import DateTime
 from datetime import datetime
+from datetime import date
 from zope.component import provideUtility
 from Products.CMFCore.CMFCatalogAware import CMFCatalogAware
 
@@ -114,6 +115,14 @@ class QueueIndexerTests(TestCase):
         output = fakehttp(self.mngr.getConnection(), response)   # fake add response
         self.proc.index(foo)
         required = '<field name="timestamp">1980-09-29T14:02:00.000Z</field>'
+        self.assert_(str(output).find(required) > 0, '"date" data not found')
+
+    def testDateIndexingWithPythonDate(self):
+        foo = Foo(id='brand', name='jan-carel', cat='nerd', timestamp=date(1982, 8, 05))
+        response = getData('add_response.txt')
+        output = fakehttp(self.mngr.getConnection(), response)   # fake add response
+        self.proc.index(foo)
+        required = '<field name="timestamp">1982-08-05T00:00:00.000Z</field>'
         self.assert_(str(output).find(required) > 0, '"date" data not found')
 
     def testReindexObject(self):
