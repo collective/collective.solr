@@ -20,7 +20,7 @@ def searchwords(obj):
         raise AttributeError
     words = field.get(obj)
     words = [w.strip('\r ').decode('utf-8') for w in words.split('\n')]
-    return tuple([w.lower() for w in words if w])
+    return tuple([w for w in words if w])
 
 
 @indexer(Interface)
