@@ -238,6 +238,7 @@ class SolrConnection:
 
     def search(self, **params):
         request = urllib.urlencode(params, doseq=True)
+        logger.debug('sending request: %s' % request)
         try:
             response = self.doPost('%s/select' % self.solrBase, request,
                 self.formheaders)
