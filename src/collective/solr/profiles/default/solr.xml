@@ -25,5 +25,12 @@
     <slow-query-threshold value="0" />
     <effective-steps value="1" />
     <exclude-user value="False" />
+    <highlight_fields>
+      <parameter name="" />
+    </highlight_fields>
+    <highlight_formatter_pre
+        value="" />
+    <highlight_formatter_post
+        value="" />
   </settings>
 </object>

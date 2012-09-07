@@ -36,7 +36,7 @@
                  use_navigation_root request/use_navigation_root | python:True;
                  Batch python:modules['Products.CMFPlone'].Batch;
                  b_size python:30;b_start python:0;b_start request/b_start | b_start;
-                 results python:here.queryCatalog(REQUEST=request,use_types_blacklist=use_types_blacklist, use_navigation_root=use_navigation_root, b_start=b_start, b_size=b_size+1);
+                 results python:here.queryCatalog(REQUEST=request,use_types_blacklist=use_types_blacklist, use_navigation_root=use_navigation_root, b_start=b_start, b_size=b_size+1, hl='true');
                  site_properties context/portal_properties/site_properties;
                  desc_length site_properties/search_results_description_length;
                  desc_ellipsis site_properties/ellipsis;
@@ -178,6 +178,16 @@
 
             </span>
 
+            <br />
+
+            <tal:highlighting condition="python:hasattr(results,'highlighting')">
+                <span class ="highlighting" tal:condition="python:result['UID'] in results.highlighting" tal:repeat="snippets python:results.highlighting[result['UID']].values()">
+                    ...&nbsp;
+                    <tal:snippets repeat="snippet snippets">
+                        <tal:snippet content="structure snippet">highlighted snippet</tal:snippet> ... 
+                    </tal:snippets>
+                </span>
+            </tal:highlighting>
             </dd>
 
         </tal:entry>
