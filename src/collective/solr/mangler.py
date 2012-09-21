@@ -106,7 +106,7 @@ def mangleQuery(keywords, config, schema):
                     params = keywords['%s_parents' % key] = set()
                     for p in path:
                         base = len(p.split('/'))
-                        params.add(tmpl % (key, base, base + depth, key, p))
+                        params.add(tmpl % (key, base + (depth and 1), base + depth, key, p))
                 del args['depth']
         elif key == 'effectiveRange':
             if isinstance(value, DateTime):
