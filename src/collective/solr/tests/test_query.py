@@ -199,7 +199,10 @@ class QueryTests(TestCase):
         self.assertEqual(bq(name='foo', cat=['foo bar', 'hmm']),
             '+cat:("foo bar" OR hmm) +name:foo')
         self.assertEqual(bq('foo', name=' '), '+foo')
-        self.assertEqual(bq('foo', name=''), '+foo')
+
+        # empty value for a name should return no results like in ZCatalog, so
+        # empty query is returned
+        self.assertEqual(bq('foo', name=''), '')
 
     def testInvalidArguments(self):
         bq = self.bq

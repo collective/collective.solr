@@ -397,7 +397,7 @@ class SolrServerTests(SolrTestCase):
         conn.add(UID='bar', Title='foo', commitWithin='1000')
         conn.flush()
         self.assertEqual(self.search('+Title:Foo').results().numFound, '0')
-        sleep(1.5)
+        sleep(2.0)
         self.assertEqual(self.search('+Title:Foo').results().numFound, '2')
 
     def testFilterInvalidCharacters(self):
@@ -611,10 +611,11 @@ class SolrServerTests(SolrTestCase):
              '/plone/news', '/plone/news/aggregator'])
         self.assertEqual(search(path, depth=0),
             ['/plone/events', '/plone/news'])
+        # depth 1 doesn't return level 0 objs, see ZCatalog
         self.assertEqual(search(path, depth=1),
-            ['/plone/events', '/plone/events/aggregator',
+            ['/plone/events/aggregator',
             '/plone/events/previous',
-             '/plone/news', '/plone/news/aggregator'])
+             '/plone/news/aggregator'])
         # multiple paths with different length...
         path = ['/plone/news', '/plone/events/aggregator']
         self.assertEqual(search(path),
@@ -625,9 +626,9 @@ class SolrServerTests(SolrTestCase):
              '/plone/news', '/plone/news/aggregator'])
         self.assertEqual(search(path, depth=0),
             ['/plone/events/aggregator', '/plone/news'])
+        # depth 1 doesn't return level 0 objs, see ZCatalog
         self.assertEqual(search(path, depth=1),
-            ['/plone/events/aggregator',
-             '/plone/news', '/plone/news/aggregator'])
+            ['/plone/news/aggregator'])
         self.assertEqual(search(['/plone/news', '/plone'], depth=1),
             ['/plone/Members', '/plone/events',
              '/plone/front-page', '/plone/news', '/plone/news/aggregator'])
@@ -762,7 +763,7 @@ class SolrServerTests(SolrTestCase):
         result = connection.search(q='+Title:Foo').read()
         self.assertEqual(numFound(result), 0)
         # but after some time, results are there
-        sleep(1.5)
+        sleep(2.0)
         result = connection.search(q='+Title:Foo').read()
         self.assertEqual(numFound(result), 1)
 
