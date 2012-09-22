@@ -87,7 +87,7 @@ def solrSearchResults(request=None, **keywords):
     prepareData(args)
     mangleQuery(args, config, schema)
     query = search.buildQuery(**args)
-    if query is not None:
+    if query != {}:
         optimizeQueryParameters(query, params)
         __traceback_info__ = (query, params, args)
         response = search(query, fl='* score', **params)

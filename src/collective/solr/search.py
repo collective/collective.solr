@@ -90,8 +90,8 @@ class Search(object):
             elif not value:     # solr doesn't like empty fields (+foo:"")
                 if not name:
                     continue
-                logger.info('empty search term form %s:%s, aborting search' % (name,value))
-                return None
+                logger.info('empty search term form "%s:%s", aborting buildQuery' % (name,value))
+                return {}
             elif field.class_ == 'solr.BoolField':
                 if not isinstance(value, (tuple, list)):
                     value = [value]
