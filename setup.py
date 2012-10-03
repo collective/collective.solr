@@ -1,6 +1,6 @@
 from setuptools import setup, find_packages
 
-version = '3.0b6'
+version = '3.0-FHNW1'
 
 
 setup(name = 'collective.solr',

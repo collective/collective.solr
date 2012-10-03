@@ -10,8 +10,8 @@ Upgrade notes
   also requires a full Solr reindex to pick up the new data.
   [hannosch]
 
-3.0b6 - unreleased
--------------------
+3.0-FHNW1 (2012-10-03)
+----------------------
 
 - Use tika for extracting binary content
   [tom_gross]
