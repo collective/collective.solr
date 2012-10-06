@@ -253,6 +253,17 @@ class SolrControlPanelAdapter(SchemaAdapterBase):
 
     highlight_fragsize = property(getHighlightFragsize, setHighlightFragsize)
 
+    def getFieldList(self):
+        util = queryUtility(ISolrConnectionConfig)
+        return getattr(util, 'field_list', '')
+
+    def setFieldList(self, value):
+        util = queryUtility(ISolrConnectionConfig)
+        if util is not None:
+            util.field_list = value
+
+    field_list = property(getFieldList, setFieldList)
+
 
 class SolrControlPanel(ControlPanelForm):
 

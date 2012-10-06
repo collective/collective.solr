@@ -117,6 +117,11 @@ class ISolrSchema(Interface):
     highlight_fragsize = Int(title=_(u'Highlight Fragment Size'), default=100,
         description=_(u'The size, in characters, of the snippets (aka '
                        'fragments) created by the highlighter.'))
+    field_list = List(title=_(u'Default fields to be returned'),
+        description = _(u'Specify metadata fields that should be returned for '
+                         'items in the result set, one per line. Defaults to '
+                         'all available plus ranking score.'),
+        value_type = TextLine(), default = [], required = False)
 
 
 class ISolrConnectionConfig(ISolrSchema):

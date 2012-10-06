@@ -91,7 +91,7 @@ def solrSearchResults(request=None, **keywords):
     if query != {}:
         optimizeQueryParameters(query, params)
         __traceback_info__ = (query, params, args)
-        response = search(query, fl='* score', **params)
+        response = search(query, **params)
     else:
         return SolrResponse()
     def wrap(flare):

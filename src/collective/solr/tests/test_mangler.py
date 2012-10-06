@@ -295,6 +295,14 @@ class QueryParameterTests(TestCase):
         params = extract({'fl': ['foo', 'bar']})
         self.assertEqual(params, {'fl': ['foo', 'bar']})
 
+    def testAllowHighlightParameter(self):
+        extract = extractQueryParameters
+        # 'hl' should be passed on...
+        params = extract({'hl': 'foo'})
+        self.assertEqual(params, {'hl': 'foo'})
+        params = extract({'hl': ['foo', 'bar']})
+        self.assertEqual(params, {'hl': ['foo', 'bar']})
+
     def testSortIndexCleanup(self):
         cleanup = cleanupQueryParameters
         schema = SolrSchema()

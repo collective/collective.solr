@@ -49,6 +49,11 @@ class Search(object):
                 parameters['hl.simple.pre'] = config.highlight_formatter_pre or ' '
                 parameters['hl.simple.post'] = config.highlight_formatter_post or ' '
                 parameters['hl.fragsize'] = getattr(config, 'highlight_fragsize', None) or 100
+        if not 'fl' in parameters:
+            if config.field_list:
+                parameters['fl'] = ' '.join(config.field_list)
+            else:
+                parameters['fl'] = '* score'
         if isinstance(query, dict):
             query = ' '.join(query.values())
         logger.debug('searching for %r (%r)', query, parameters)

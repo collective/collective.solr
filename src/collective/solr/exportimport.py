@@ -127,6 +127,11 @@ class SolrConfigXMLAdapter(XMLAdapterBase):
                 elif child.nodeName == 'highlight_fragsize':
                     value = int(str(child.getAttribute('value')))
                     self.context.highlight_fragsize = value
+                elif child.nodeName == 'field-list':
+                    value = []
+                    for elem in child.getElementsByTagName('parameter'):
+                        value.append(elem.getAttribute('name'))
+                    self.context.field_list = tuple(map(str, value))
 
     def _createNode(self, name, value):
         node = self._doc.createElement(name)
@@ -184,6 +189,12 @@ class SolrConfigXMLAdapter(XMLAdapterBase):
         append(create('highlight_formatter_pre', self.context.highlight_formatter_pre))
         append(create('highlight_formatter_post', self.context.highlight_formatter_post))
         append(create('highlight_fragsize', str(self.context.highlight_fragsize)))
+        field_list = self._doc.createElement('field-list')
+        append(field_list)
+        for name in self.context.field_list:
+            param = self._doc.createElement('parameter')
+            param.setAttribute('name', name)
+            facets.appendChild(param)
         return node
 
 
