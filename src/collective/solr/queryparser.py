@@ -7,7 +7,7 @@ from re import compile
 # 2) Any non reserved characters (normal text) ([^(){}\[\]+\-!^\"~*?:\\\&\|\s]+)
 # 3) Any grouping characters ([(){}\[\]\"])
 # 4) Any special operators ([+\-!^~*?:\\\]|\&\&|\|\|))
-query_tokenizer = compile("(?:(\s+)|([^(){}\[\]+\-!^\"~*?:\\\&\|\s]+)|([(){}\[\]\"])|([+\-!^~*?:\\\]|\&\&|\|\|))")
+query_tokenizer = compile("(?:(\s+)|([^(){}\[\]+\-!^\"~*?:\\s]+)|([(){}\[\]\"])|([+\-!^~*?:\\\]|\&\&|\|\|))")
 
 
 class Whitespace(object):
