@@ -4,10 +4,10 @@ from re import compile
 # (see http://wiki.apache.org/solr/SolrQuerySyntax)
 # Four groups for tokenizer:
 # 1) Whitespace (\s+)
-# 2) Any non reserved characters (normal text) ([^(){}\[\]+\-!^\"~*?:\\\&\|\s]+)
-# 3) Any grouping characters ([(){}\[\]\"])
-# 4) Any special operators ([+\-!^~*?:\\\]|\&\&|\|\|))
-query_tokenizer = compile("(?:(\s+)|([^(){}\[\]+\-!^\"~*?:\\s]+)|([(){}\[\]\"])|([+\-!^~*?:\\\]|\&\&|\|\|))")
+# 2) Any non reserved characters (normal text) ([^(){}\[\]+\-!^\"~*?:\\\\\s]+)
+# 3) Any grouping characters ([(){}[\]\"])
+# 4) Any special operators ([+\-!^~*?:\\\]))
+query_tokenizer = compile("(?:(\s+)|([^(){}[\]+\-!^\"~*?:\\\\\s]+)|([(){}\[\]\"])|([+\-!^~*?:\\\]))")
 
 
 class Whitespace(object):
