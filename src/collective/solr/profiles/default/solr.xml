@@ -28,9 +28,9 @@
     <highlight_fields>
     </highlight_fields>
     <highlight_formatter_pre
-        value="" />
+        value="[" />
     <highlight_formatter_post
-        value="" />
+        value="]" />
     <highlight_fragsize
         value="100" />
   </settings>
