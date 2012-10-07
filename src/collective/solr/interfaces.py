@@ -221,6 +221,9 @@ class ISolrMaintenanceView(Interface):
             be used to ensure consistency between zope and solr after the
             solr server has been unavailable etc """
 
+    def cleanup(batch=1000):
+        """ remove entries from solr that don't have a corresponding Zope 
+            object  or have a different UID than the real object"""
 
 class IFacetTitleVocabularyFactory(IVocabularyFactory):
     """A vocabulary factory used to create a vocabulary that provides titles
