@@ -285,7 +285,10 @@ class SolrErrorHandlingTests(SolrTestCase):
         manager.closeConnection()   # which would trigger a reconnect
         self.folder.processForm(values={'title': 'Bar'})
         commit()                    # indexing (doesn't) happen on commit
+        # one of the 'exception while getting schema' is due to patching 
+        # CatalogTool.indexes
         self.assertEqual(log, ['exception while getting schema',
+            'exception while getting schema',
             'unable to fetch schema, skipping indexing of %r', self.folder,
             'exception during request %r', '<commit/>'])
 

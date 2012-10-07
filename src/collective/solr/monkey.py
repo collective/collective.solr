@@ -1,4 +1,4 @@
-from zope.component import queryAdapter
+from zope.component import queryAdapter, queryUtility
 from DateTime import DateTime
 from Products.CMFCore.permissions import AccessInactivePortalContent
 from Products.CMFCore.utils import _getAuthenticatedUser
@@ -7,7 +7,8 @@ from Products.CMFPlone.CatalogTool import CatalogTool
 from Products.ZCatalog.Lazy import Lazy
 from Products.ZCatalog.Lazy import LazyCat
 
-from collective.solr.interfaces import ISearchDispatcher
+from collective.solr.interfaces import (ISearchDispatcher,
+    ISolrConnectionManager)
 from collective.solr.parser import SolrResponse
 
 HAS_EXPCAT = True
@@ -35,6 +36,8 @@ def searchResults(self, REQUEST=None, **kw):
 
 def indexes(self):
     manager = queryUtility(ISolrConnectionManager)
+    if not manager:
+        return []
     schema = manager.getSchema() or {}
     indexes = list(set(schema.keys()).union(set(self._catalog.indexes.keys())))
     return indexes
