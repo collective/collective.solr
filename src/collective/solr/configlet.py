@@ -209,6 +209,61 @@ class SolrControlPanelAdapter(SchemaAdapterBase):
 
     exclude_user = property(getExcludeUser, setExcludeUser)
 
+    def getHighlightFields(self):
+        util = queryUtility(ISolrConnectionConfig)
+        return getattr(util, 'highlight_fields', '')
+
+    def setHighlightFields(self, value):
+        util = queryUtility(ISolrConnectionConfig)
+        if util is not None:
+            util.highlight_fields = value
+
+    highlight_fields = property(getHighlightFields, setHighlightFields)
+
+    def getHighlightFormatterPre(self):
+        util = queryUtility(ISolrConnectionConfig)
+        return getattr(util, 'highlight_formatter_pre', '')
+
+    def setHighlightFormatterPre(self, value):
+        util = queryUtility(ISolrConnectionConfig)
+        if util is not None:
+            util.highlight_formatter_pre = value
+
+    highlight_formatter_pre = property(getHighlightFormatterPre, setHighlightFormatterPre)
+
+    def getHighlightFormatterPost(self):
+        util = queryUtility(ISolrConnectionConfig)
+        return getattr(util, 'highlight_formatter_post', '')
+
+    def setHighlightFormatterPost(self, value):
+        util = queryUtility(ISolrConnectionConfig)
+        if util is not None:
+            util.highlight_formatter_post = value
+
+    highlight_formatter_post = property(getHighlightFormatterPost, setHighlightFormatterPost)
+
+    def getHighlightFragsize(self):
+        util = queryUtility(ISolrConnectionConfig)
+        return getattr(util, 'highlight_fragsize', '')
+
+    def setHighlightFragsize(self, value):
+        util = queryUtility(ISolrConnectionConfig)
+        if util is not None:
+            util.highlight_fragsize = value
+
+    highlight_fragsize = property(getHighlightFragsize, setHighlightFragsize)
+
+    def getFieldList(self):
+        util = queryUtility(ISolrConnectionConfig)
+        return getattr(util, 'field_list', '')
+
+    def setFieldList(self, value):
+        util = queryUtility(ISolrConnectionConfig)
+        if util is not None:
+            util.field_list = value
+
+    field_list = property(getFieldList, setFieldList)
+
 
 class SolrControlPanel(ControlPanelForm):
 

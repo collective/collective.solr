@@ -45,7 +45,7 @@ logger = getLogger(__name__)
 class SolrException(Exception):
     """ An exception thrown by solr connections """
 
-    def __init__(self, httpcode, reason=None, body=None):
+    def __init__(self, httpcode='000', reason=None, body=None):
         self.httpcode = httpcode
         self.reason = reason
         self.body = body
@@ -239,6 +239,7 @@ class SolrConnection:
 
     def search(self, **params):
         request = urllib.urlencode(params, doseq=True)
+        logger.debug('sending request: %s' % request)
         try:
             response = self.doPost('%s/select' % self.solrBase, request,
                 self.formheaders)

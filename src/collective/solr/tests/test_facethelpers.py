@@ -97,23 +97,25 @@ class FacettingHelperTest(TestCase, cleanup.CleanUp):
             [('true', 1)])
 
     def testFacetParameters(self):
-        context = Dummy()
-        request = {}
+        class DummyView(object):
+            context = Dummy()
+            request = {}
+        view = DummyView()
         # with nothing set up, no facets will be returned
-        self.assertEqual(facetParameters(context, request), ([], {}))
+        self.assertEqual(facetParameters(view), ([], {}))
         # setting up the regular config utility should give the default value
         cfg = SolrConnectionConfig()
         provideUtility(cfg, ISolrConnectionConfig)
-        self.assertEqual(facetParameters(context, request), ([], {}))
+        self.assertEqual(facetParameters(view), ([], {}))
         # so let's set it...
         cfg.facets = ['foo']
-        self.assertEqual(facetParameters(context, request), (['foo'], {}))
+        self.assertEqual(facetParameters(view), (['foo'], {}))
         # override the setting on the context
         context.facet_fields = ['bar']
-        self.assertEqual(facetParameters(context, request), (['bar'], {}))
+        self.assertEqual(facetParameters(view), (['bar'], {}))
         # and again via the request
         request['facet.field'] = ['foo', 'bar']
-        self.assertEqual(facetParameters(context, request),
+        self.assertEqual(facetParameters(view),
             (['foo', 'bar'], {}))
         # clean up...
         getGlobalSiteManager().unregisterUtility(cfg, ISolrConnectionConfig)

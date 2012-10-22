@@ -33,6 +33,7 @@ class QuoteTests(TestCase):
         self.assertEqual(quote('"foo bar"'), '"foo bar"')
         self.assertEqual(quote('"foo bar'), '(\\"foo bar)')
         self.assertEqual(quote('foo bar what?'), '(foo bar what?)')
+        self.assertEqual(quote('P|This&That'), 'P|This&That')
         self.assertEqual(quote('[]'), '')
         self.assertEqual(quote('()'), '')
         self.assertEqual(quote('{}'), '')
@@ -103,7 +104,7 @@ class QuoteTests(TestCase):
         self.assertEqual(quote('((a AND b) OR c)'), '((a AND b) OR c)')
 
     def testQuotingEscapingSpecialCharacters(self):
-        self.assertEqual(quote('-+&&||!^~:'), '\\-\\+\\&&\\||\\!\\^\\~\\:')
+        self.assertEqual(quote('-+!^~:'), '\\-\\+\\!\\^\\~\\:')
         # Only quote * and ? if quoted
         self.assertEqual(quote('"*?"'), '"\\*\\?"')
         # also quote multiple occurrences
@@ -157,7 +158,7 @@ class QueryTests(TestCase):
 
     def bq(self, *args, **kw):
         query = self.search.buildQuery(*args, **kw)
-        return ' '.join(query.values())
+        return ' '.join(sorted(query.values()))
 
     def testSimpleQueries(self):
         bq = self.bq
@@ -188,18 +189,21 @@ class QueryTests(TestCase):
 
     def testMultiArgumentQueries(self):
         bq = self.bq
-        self.assertEqual(bq('foo', name='bar'), '+name:bar +foo')
+        self.assertEqual(bq('foo', name='bar'), '+foo +name:bar')
         self.assertEqual(bq('foo', name=('bar', 'hmm')),
-            '+name:(bar OR hmm) +foo')
+            '+foo +name:(bar OR hmm)')
         self.assertEqual(bq('foo', name=('foo bar', 'hmm')),
-            '+name:("foo bar" OR hmm) +foo')
-        self.assertEqual(bq(name='foo', cat='bar'), '+name:foo +cat:bar')
+            '+foo +name:("foo bar" OR hmm)')
+        self.assertEqual(bq(name='foo', cat='bar'), '+cat:bar +name:foo')
         self.assertEqual(bq(name='foo', cat=['bar', 'hmm']),
-            '+name:foo +cat:(bar OR hmm)')
+            '+cat:(bar OR hmm) +name:foo')
         self.assertEqual(bq(name='foo', cat=['foo bar', 'hmm']),
-            '+name:foo +cat:("foo bar" OR hmm)')
+            '+cat:("foo bar" OR hmm) +name:foo')
         self.assertEqual(bq('foo', name=' '), '+foo')
-        self.assertEqual(bq('foo', name=''), '+foo')
+
+        # empty value for a name should return no results like in ZCatalog, so
+        # empty query is returned
+        self.assertEqual(bq('foo', name=''), '')
 
     def testInvalidArguments(self):
         bq = self.bq
@@ -214,9 +218,9 @@ class QueryTests(TestCase):
         self.assertEqual(bq(u'john@foo.com'), '+john@foo.com')
         self.assertEqual(bq(name=['foo', u'bar']), '+name:(foo OR bar)')
         self.assertEqual(bq(name=['foo', u'bär']), '+name:(foo OR b\xc3\xa4r)')
-        self.assertEqual(bq(name='foo', cat=(u'bar', 'hmm')), '+name:foo +cat:(bar OR hmm)')
-        self.assertEqual(bq(name='foo', cat=(u'bär', 'hmm')), '+name:foo +cat:(b\xc3\xa4r OR hmm)')
-        self.assertEqual(bq(name=u'john@foo.com', cat='spammer'), '+name:john@foo.com +cat:spammer')
+        self.assertEqual(bq(name='foo', cat=(u'bar', 'hmm')), '+cat:(bar OR hmm) +name:foo')
+        self.assertEqual(bq(name='foo', cat=(u'bär', 'hmm')), '+cat:(b\xc3\xa4r OR hmm) +name:foo')
+        self.assertEqual(bq(name=u'john@foo.com', cat='spammer'), '+cat:spammer +name:john@foo.com')
 
     def testQuotedQueries(self):
         bq = self.bq
@@ -238,7 +242,7 @@ class QueryTests(TestCase):
         self.assertEqual(bq(name='"foo bar'), '+name:(\\"foo bar)')
         self.assertEqual(bq(name='"foo bar*'), '+name:(\\"foo bar\\*)')
         self.assertEqual(bq(name='-foo', timestamp='[* TO NOW]'),
-            '+timestamp:[* TO NOW] +name:-foo')
+            '+name:-foo +timestamp:[* TO NOW]')
         self.assertEqual(bq(name='"john@foo.com"'), '+name:"john@foo.com"')
         self.assertEqual(bq(name='" "'), '+name:" "')
         self.assertEqual(bq(name='""'), '+name:\\"\\"')
@@ -246,9 +250,9 @@ class QueryTests(TestCase):
     def testComplexQueries(self):
         bq = self.bq
         self.assertEqual(bq('foo', name='"herb*"', cat=(u'bär', '"-hmm"')),
-            '+name:"herb\*" +foo +cat:(b\xc3\xa4r OR "\-hmm")')
+            '+cat:(b\xc3\xa4r OR "\-hmm") +foo +name:"herb\*"')
         self.assertEqual(bq('foo', name='herb*', cat=(u'bär', '-hmm')),
-            '+name:herb* +foo +cat:(b\xc3\xa4r OR -hmm)')
+            '+cat:(b\xc3\xa4r OR -hmm) +foo +name:herb*')
 
     def testBooleanQueries(self):
         bq = self.bq

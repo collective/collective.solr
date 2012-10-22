@@ -94,9 +94,10 @@ class TestSolr(TestCase):
         search_response = getData('search_response.txt')
         c = SolrConnection(host='localhost:8983', persistent=True)
         output = fakehttp(c, search_response)
-        res = c.search(q='+id:[* TO *]', wt='xml', rows='10', indent='on')
+        res = c.search(q='+id:[* TO *]', fl='* score', wt='xml', rows='10', indent='on')
         res = fromstring(res.read())
-        self.failUnlessEqual(str(output), search_request)
+        normalize = lambda x: sorted(x.split('&'))      # sort request params
+        self.assertEqual(normalize(output.get()), normalize(search_request))
         self.failUnless(res.find(('.//doc')))
 
     def test_delete(self):

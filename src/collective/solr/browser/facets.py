@@ -48,6 +48,8 @@ def convertFacets(fields, view, filter=None):
     """ convert facet info to a form easy to process in templates """
     info = []
     params = view.request.form.copy()
+    if 'b_start' in params:
+        del params['b_start'] # Clear the batch when limiting a result set
     facets, dependencies = list(facetParameters(view))
     params['facet.field'] = facets = list(facets)
     fq = params.get('fq', [])

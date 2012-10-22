@@ -3,7 +3,9 @@
     xmlns:browser="http://namespaces.zope.org/browser"
     i18n_domain="solr">
 
-  <include package="Products.CMFCore" file="permissions.zcml" />
+  <include package="Products.CMFCore" file="permissions.zcml"
+      xmlns:zcml="http://namespaces.zope.org/zcml"
+      zcml:condition="have plone-41" />
 
   <browser:resourceDirectory
       name="collective.solr.images"

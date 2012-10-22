@@ -10,6 +10,6 @@ lib
 parts
 htmlcov
 var
-.*
 *.egg-info
 *.pyc
+.*.cfg
