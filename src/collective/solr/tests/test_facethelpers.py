@@ -21,6 +21,17 @@ class Dummy(object):
     def __init__(self, **kw):
         self.__dict__.update(kw)
 
+class DummyView(object):
+
+    def __init__(self, context=None, request=None):
+        if context is not None:
+            self.context = context
+        else:
+            self.context = Dummy()
+        if request is not None:
+            self.request = request
+        else:
+            self.request = {}
 
 class DummyTitleVocabulary(object):
     def __contains__(self, term):
@@ -59,7 +70,8 @@ class FacettingHelperTest(TestCase, cleanup.CleanUp):
     def testConvertFacets(self):
         fields = dict(portal_type=dict(Document=10,
             Folder=3, Event=5, Topic=2))
-        info = convertFacets(fields, request=TestRequest())
+        view = DummyView(request=TestRequest())
+        info = convertFacets(fields, view=view)
         # the info should consist of 1 dict with `field` and `counts` keys
         self.assertEqual([sorted(i) for i in info], [['counts', 'title']] * 1)
         # next let's check the field names
@@ -77,7 +89,8 @@ class FacettingHelperTest(TestCase, cleanup.CleanUp):
     def testConvertFacetResponse(self):
         response = SolrResponse(getData('facet_xml_response.txt'))
         fields = response.facet_counts['facet_fields']
-        info = convertFacets(fields, request=TestRequest())
+        view = DummyView(request=TestRequest())
+        info = convertFacets(fields, view=view)
         # the info should consist of 2 dicts with `field` and `counts` keys
         self.assertEqual([sorted(i) for i in info], [['counts', 'title']] * 2)
         # next let's check the field names
@@ -97,9 +110,6 @@ class FacettingHelperTest(TestCase, cleanup.CleanUp):
             [('true', 1)])
 
     def testFacetParameters(self):
-        class DummyView(object):
-            context = Dummy()
-            request = {}
         view = DummyView()
         # with nothing set up, no facets will be returned
         self.assertEqual(facetParameters(view), ([], {}))

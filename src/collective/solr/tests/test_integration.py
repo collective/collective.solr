@@ -105,9 +105,8 @@ class IndexingTests(SolrTestCase):
         self.folder.coll.addCriterion('Type', 'ATPortalTypeCriterion')
         self.assertTrue('crit__Type_ATPortalTypeCriterion' not in str(output))
         commit()
-        self.assert_(repr(output).find('a collection') > 0,
-            '"title" data not found')
-        self.assert_(repr(output).find('crit') == -1, 'criterion indexed?')
+        self.assertIn('a collection', repr(output), '"title" data not found')
+        self.assertNotIn('crit', repr(output), 'criterion indexed?')
         objs = self.portal.portal_catalog(portal_type='ATPortalTypeCriterion')
         self.assertEqual(list(objs), [])
         self.folder.manage_delObjects('coll')

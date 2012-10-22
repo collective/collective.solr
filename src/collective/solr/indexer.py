@@ -41,7 +41,7 @@ class BaseIndexable(object):
         self.context = context
 
     def __call__(self):
-        return  isinstance(self.context, CatalogMultiplex) and \
+        return  isinstance(self.context, CatalogMultiplex) or \
                 isinstance(self.context, CMFCatalogAware)
 
 
