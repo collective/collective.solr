@@ -72,8 +72,10 @@ class FacettingHelperTest(TestCase, cleanup.CleanUp):
             Folder=3, Event=5, Topic=2))
         view = DummyView(context=Dummy(), request=TestRequest())
         info = convertFacets(fields, view=view)
-        # the info should consist of 1 dict with `field` and `counts` keys
-        self.assertEqual([sorted(i) for i in info], [['counts', 'title']] * 1)
+        # the info should consist of 1 dict with
+        # `counts`, `name` and `title` keys
+        self.assertEqual([sorted(i) for i in info],
+                         [['counts', 'name', 'title']] * 1)
         # next let's check the field names
         self.assertEqual([i['title'] for i in info], ['portal_type'])
         # and the fields contents
@@ -91,8 +93,9 @@ class FacettingHelperTest(TestCase, cleanup.CleanUp):
         fields = response.facet_counts['facet_fields']
         view = DummyView(request=TestRequest())
         info = convertFacets(fields, view=view)
-        # the info should consist of 2 dicts with `field` and `counts` keys
-        self.assertEqual([sorted(i) for i in info], [['counts', 'title']] * 2)
+        # the info should consist of 2 dicts with
+        # `counts`, `name` and `title` keys
+        self.assertEqual([sorted(i) for i in info], [['counts', 'name', 'title']] * 2)
         # next let's check the field names
         self.assertEqual([i['title'] for i in info], ['cat', 'inStock'])
         # and the fields contents

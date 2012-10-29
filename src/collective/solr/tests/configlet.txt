@@ -3,6 +3,12 @@ Solr control panel
 
 First some initial setup code:
 
+We need to patch the dispatcher because we want to test *setting* solr to
+active without *having* it active.
+    >>> from collective.solr import dispatcher
+    >>> _save_isActive = dispatcher.isActive
+    >>> dispatcher.isActive = lambda:False
+
     >>> self.loginAsManager()
     >>> from zope.component import getUtility
     >>> from collective.solr.interfaces import ISolrConnectionConfig
@@ -196,3 +202,6 @@ to an empty list (please see `issue #18`__ for more infos):
 
     >>> config.required
     []
+
+Clean up.
+    >>> dispatcher.isActive = _save_isActive
