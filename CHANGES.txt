@@ -4,8 +4,19 @@ Changelog
 3.1 - unreleased
 ----------------
     
-- Add datehandler support for python date objects. [jcbrand]
-- Use tika for extracting binary content
+- Add datehandler support for python date objects.
+  [jcbrand]
+
+- Use tika for extracting binary content.
+  [tom_gross]
+
+- Introduce ICheckIndexable-adapter for checking if an object is indexable.
+  [tom_gross]
+
+- Use proper i18n labels.
+  [tom_gross]
+
+- Drop dependency on elementree (in favour of lxml).
   [tom_gross]
 
 3.0 - 2012-02-06
