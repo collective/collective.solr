@@ -5,6 +5,8 @@ Changelog
 ----------------
     
 - Add datehandler support for python date objects. [jcbrand]
+- Use tika for extracting binary content
+  [tom_gross]
 
 3.0 - 2012-02-06
 ----------------
@@ -12,12 +14,6 @@ Changelog
 - Ignore a batch start parameter when selecting a facet to filter on.
   https://github.com/Jarn/collective.solr/issues/12
   [mj]
-
-3.0-FHNW1 (2012-10-03)
-----------------------
-
-- Use tika for extracting binary content
-  [tom_gross]
 
 3.0b5 - 2011-12-07
 ------------------
