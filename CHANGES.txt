@@ -147,7 +147,7 @@ Changelog
   [hannosch]
 
 3.0a1 - 2011-06-23
--------------------
+------------------
 
 Upgrade notes
 *************
@@ -194,7 +194,7 @@ Changes
   [hannosch]
 
 2.0 - 2011-06-04
------------------
+----------------
 
 * Updated readme and project description, adding detailed information about how
   Solr works and how we integrate with it.
@@ -231,17 +231,20 @@ Changes
   was broken, now delegates to the standard Plone implementation.
   [mj]
 
+
 2.0a3 - 2011-01-26
 ------------------
 
 * In `solr_dump_catalog` correctly handle boolean values and empty text fields.
   [hannosch]
 
+
 2.0a2 - 2011-01-10
 ------------------
 
 * Provide a dummy request in the `solr_dump_catalog` command.
   [hannosch]
+
 
 2.0a1 - 2011-01-10
 ------------------
