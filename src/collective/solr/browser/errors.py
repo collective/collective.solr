@@ -1,5 +1,5 @@
 from Products.Five import BrowserView
-from zope.app.component.hooks import getSite
+from zope.component.hooks import getSite
 
 
 class ErrorView(BrowserView):
