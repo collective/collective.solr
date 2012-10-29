@@ -120,6 +120,9 @@ Changelog
 * Standardize on `solr` as the i18n domain.
   [hannosch]
 
+3.0a2 - 2011-07-10
+------------------
+
 * Adjust munin configs for query cache handlers to `c.r.solrinstance 3.5`
   changes using `FastLRUCache`.
   [hannosch]
