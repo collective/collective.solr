@@ -6,6 +6,7 @@ from zope.component import getMultiAdapter, getUtility
 from zope.globalrequest import getRequest
 from zope.interface import implements
 
+
 class FlareContentListingObject(object):
     implements(IContentListingObject)
 
@@ -25,7 +26,7 @@ class FlareContentListingObject(object):
         return self.flare.getURL()
 
     def uuid(self):
-        if UID in self.flare:
+        if 'UID' in self.flare:
             return self.flare.UID
         else:
             return IUUID(self.getObject())
@@ -62,16 +63,16 @@ class FlareContentListingObject(object):
         return self.flare.Date
 
     def CreationDate(self, zone=None):
-        return self.flare.CreationDate
+        return self.flare.created
 
     def EffectiveDate(self, zone=None):
-        return self.flare.EffectiveDate
+        return self.flare.effective
 
     def ExpirationDate(self, zone=None):
-        return self.flare.ExpirationDate
+        return self.flare.expires
 
     def ModificationDate(self, zone=None):
-        return self.flare.ModificationDate
+        return self.flare.modified
 
     def Format(self):
         raise NotImplementedError
@@ -106,4 +107,3 @@ class FlareContentListingObject(object):
 
     def CroppedDescription(self):
         return self.flare.Description
-
