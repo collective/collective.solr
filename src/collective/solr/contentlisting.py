@@ -66,7 +66,9 @@ class FlareContentListingObject(object):
         return self.flare.created
 
     def EffectiveDate(self, zone=None):
-        return self.flare.effective
+        # Work around an incompatibility of Archetypes/DateTime
+        # in effective. See #13362
+        return self.getObject().EffectiveDate()
 
     def ExpirationDate(self, zone=None):
         return self.flare.expires
