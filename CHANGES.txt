@@ -6,6 +6,8 @@ Changelog
 - Add optional plone.app.contentlisting/plone.app.search support 
   [do3cc][csenger]    
 - Add datehandler support for python date objects. [jcbrand]
+- Add inthandler support for not indexing Integers that are None.
+  [do3cc]
 
 3.0 - 2012-02-06
 ----------------
