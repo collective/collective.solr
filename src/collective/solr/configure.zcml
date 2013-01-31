@@ -89,8 +89,8 @@
       for="collective.solr.flare.PloneFlare"
       />
 
-  <subscriber for="Products.CMFPlone.interfaces.IReorderedEvent"
-              handler=".events.reorderedEvent" />
+<!--  <subscriber for="Products.CMFPlone.interfaces.IReorderedEvent"
+              handler=".events.reorderedEvent" />-->
 
   <genericsetup:exportStep
       name="solr"
