@@ -1,6 +1,8 @@
 Introduction
 ============
 
+.. image:: https://secure.travis-ci.org/collective/collective.solr.png
+
 collective.solr integrates the `Solr`_ search engine with `Plone`_.
 
 Apache Solr is based on Lucene and is *the* enterprise open source search
