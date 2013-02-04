@@ -12,3 +12,6 @@ htmlcov
 var
 *.egg-info
 *.pyc
+.installed.cfg
+.mr.developer.cfg
+
