@@ -1,7 +1,7 @@
 Changelog
 =========
 
-3.1 - 2013-02-04
+3.1 - 2013-02-15
 ----------------
 
 - Add optional plone.app.contentlisting/plone.app.search support
