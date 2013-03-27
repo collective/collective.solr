@@ -146,7 +146,7 @@ class SolrMaintenanceTests(SolrTestCase):
         # after adding a topic and a criterion, only the topic should
         # get indexed...
         self.setRoles(['Manager'])
-        container.invokeFactory('Topic', id='coll', title='a collection')
+        container.invokeFactory('Collection', id='coll', title='a collection')
         crit = container.coll.addCriterion('Type', 'ATPortalTypeCriterion')
         self.assertTrue(crit.UID() is None)
         commit()
@@ -910,10 +910,9 @@ class SolrServerTests(SolrTestCase):
     def testSearchableTopic(self):
         self.maintenance.reindex()
         self.setRoles(['Manager'])
-        self.folder.invokeFactory('Topic', id='news', title='some news')
+        self.folder.invokeFactory('Collection', id='news', title='some news')
         news = self.folder.news
-        crit = news.addCriterion('SearchableText', 'ATSimpleStringCriterion')
-        crit.setValue('News')
+        news.setQuery({'SearchableText': 'News'})
         results = news.queryCatalog()
         self.assertEqual(sorted([(r.Title, r.path_string) for r in results]),
             [('News', '/plone/news'), ('News', '/plone/news/aggregator')])
@@ -944,14 +943,14 @@ class SolrServerTests(SolrTestCase):
         # we inject the "friendly types" into the query (in `queryCatalog.py`)
         # by using a keyword parameter...
         request = dict(SearchableText='News')
-        results = solrSearchResults(request, portal_type='Topic')
+        results = solrSearchResults(request, portal_type='Collection')
         self.assertEqual([(r.Title, r.path_string) for r in results],
             [('News', '/plone/news/aggregator')])
         self.assertEqual(len(log), 1)
         self.assertEqual(log[-1][1]['fq'], ['+portal_type:Topic'], log)
         # let's test again with an already existing filter query parameter
         request = dict(SearchableText='News', fq='+review_state:published')
-        results = solrSearchResults(request, portal_type='Topic')
+        results = solrSearchResults(request, portal_type='Collection')
         self.assertEqual([(r.Title, r.path_string) for r in results],
             [('News', '/plone/news/aggregator')])
         self.assertEqual(len(log), 2)
