@@ -137,34 +137,6 @@ class SolrMaintenanceTests(SolrTestCase):
         maintenance.reindex()
         self.assertEqual(search(), ['special', 'dull'])
 
-    def testReindexSkipsNonReferencableItems(self):
-        container = self.folder
-        maintenance = container.unrestrictedTraverse('solr-maintenance')
-        maintenance.reindex()
-        # initially the solr index should only hold the folder
-        self.assertEqual(numFound(self.search()), 1)
-        # after adding a topic and a criterion, only the topic should
-        # get indexed...
-        self.setRoles(['Manager'])
-        container.invokeFactory('Collection', id='coll', title='a collection')
-        crit = container.coll.addCriterion('Type', 'ATPortalTypeCriterion')
-        self.assertTrue(crit.UID() is None)
-        commit()
-        self.assertEqual(numFound(self.search()), 2)
-        # calling methods on a criterion won't generate an UID
-        crit.getRefs()
-        self.assertTrue(crit.UID() is None)
-        # so calling reindex won't add it to Solr
-        maintenance.reindex()
-        self.assertEqual(numFound(self.search()), 2)
-        criterions = self.search('+portal_type:ATPortalTypeCriterion')
-        self.assertEqual(numFound(criterions), 0)
-        # the "sync" maintenance view shouldn't add these object, either...
-        maintenance.reindex()
-        self.assertEqual(numFound(self.search()), 2)
-        criterions = self.search('+portal_type:ATPortalTypeCriterion')
-        self.assertEqual(numFound(criterions), 0)
-
     def testDisabledTimeoutDuringReindex(self):
         log = []
         def logger(*args):
