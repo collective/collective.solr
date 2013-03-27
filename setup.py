@@ -1,6 +1,6 @@
 from setuptools import setup, find_packages
 
-version = '3.1'
+version = '3.1.1dev'
 
 
 setup(name = 'collective.solr',
@@ -67,6 +67,8 @@ setup(name = 'collective.solr',
         'collective.testcaselayer',
         'Products.LinguaPlone >=3.1a1',
         'Products.PloneTestCase',
+        'plone.app.contentlisting', # Comes with Plone 4.2,
+                                    # only a test req for 4.1 compatibility
       ]},
       entry_points = '''
         [z3c.autoinclude.plugin]

@@ -116,6 +116,11 @@ SOLR_XML = """\
     <slow-query-threshold value="2342" />
     <effective-steps value="900" />
     <exclude-user value="True" />
+    <highlight_fields />
+    <highlight_formatter_pre value="["/>
+    <highlight_formatter_post value="]"/>
+    <highlight_fragsize value="100"/>
+    <field-list/>
   </settings>
 </object>
 """
