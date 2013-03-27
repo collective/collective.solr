@@ -1,0 +1,52 @@
+Sharing (Object Security Indexes)
+---------------------------------
+
+    >>> self.activateAndReindex()
+
+    >>> browser = self.getOwnerBrowser()
+    >>> browser.open('http://nohost/plone/')
+    >>> browser.getLink('Folder').click()
+    >>> browser.getControl('Title').value = 'Foo'
+    >>> browser.getControl('Save').click()
+    >>> browser.url
+    'http://nohost/plone/foo/'
+    >>> browser.contents
+    '...Info...Changes saved...
+     ...documentFirstHeading...Foo...'
+    >>> browser.getLink('Page').click()
+    >>> browser.getControl('Title').value = 'Bar'
+    >>> browser.getControl(name='description').value = 'chromatopseudoblepsis'
+    >>> browser.getControl('Save').click()
+    >>> browser.url
+    'http://nohost/plone/foo/bar'
+    >>> browser.contents
+    '...Info...Changes saved...
+     ...documentFirstHeading...Bar...'
+
+    >>> browser.getLink('Foo').click()
+    >>> browser.getLink('Sharing').click()
+    >>> browser.getControl(name='search_term').value = 'test_user_1_'
+    >>> browser.getControl(name='form.button.Search').click()
+    >>> browser.getControl(name='entries.role_Reader:records').controls[1].click()
+    >>> browser.getControl(name='form.button.Save').click()
+    >>> browser.contents
+    '...Info...Changes saved...
+     ...input...entries.role_Editor:records...value="True"...'
+
+    >>> browser = self.getBrowser()
+    >>> browser.open('http://nohost/plone/search?SearchableText=chromatopseudoblepsis')
+    >>> browser.contents
+    '...<dl class="searchResults">...
+     <a...Bar</a>...'
+
+    >>> browser = self.getOwnerBrowser()
+    >>> browser.open('http://nohost/plone/@@solr-controlpanel')
+    >>> browser.getControl(name='form.required.remove_0').controls[0].click()
+    >>> browser.getControl(name='form.required.remove').click()
+    >>> browser.getControl(name="form.actions.save").click()
+
+    >>> browser = self.getBrowser()
+    >>> browser.open('http://nohost/plone/foo')
+    >>> browser.contents
+    '...<div id="content-core">...
+     ...<a...Foo...'

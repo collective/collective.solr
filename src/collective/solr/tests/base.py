@@ -27,6 +27,14 @@ class SolrFunctionalTestCase(ptc.FunctionalTestCase):
 
     layer = layer
 
+    def getOwnerBrowser(self):
+        """ instantiate and return a testbrowser for convenience """
+        browser = Browser()
+        user = ptc.portal_owner
+        pwd = ptc.default_password
+        browser.addHeader('Authorization', 'Basic %s:%s' % (user, pwd))
+        return browser
+
     def getBrowser(self, loggedIn=True):
         """ instantiate and return a testbrowser for convenience """
         browser = Browser()

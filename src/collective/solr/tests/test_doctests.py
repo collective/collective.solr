@@ -47,4 +47,9 @@ def test_suite():
                'collections.txt', package='collective.solr.tests',
                test_class=SolrFunctionalTestCase, optionflags=optionflags),
         )
+        suite.addTest(
+            ztc.FunctionalDocFileSuite(
+               'sharing.txt', package='collective.solr.tests',
+               test_class=SolrFunctionalTestCase, optionflags=optionflags),
+        )
     return suite

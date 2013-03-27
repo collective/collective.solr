@@ -33,6 +33,17 @@ def searchResults(self, REQUEST=None, **kw):
     else:
         return self._cs_old_searchResults(REQUEST, **kw)
 
+def unrestrictedSearchResults(self, REQUEST=None, **kw):
+    kw = kw.copy()
+    only_active = not kw.get('show_inactive', False)
+    if only_active and not _checkPermission(AccessInactivePortalContent, self):
+        kw['effectiveRange'] = DateTime()
+
+    adapter = queryAdapter(self, ISearchDispatcher)
+    if adapter is not None:
+        return adapter(REQUEST, **kw)
+    else:
+        return self._cs_old_searchResults(REQUEST, **kw)
 
 def indexes(self):
     manager = queryUtility(ISolrConnectionManager)
@@ -46,6 +57,8 @@ def patchCatalogTool():
     """ monkey patch plone's catalogtool with the solr dispatcher """
     CatalogTool._cs_old_searchResults = CatalogTool.searchResults
     CatalogTool.searchResults = searchResults
+    CatalogTool._cs_old_unrestrictedSearchResults = CatalogTool.unrestrictedSearchResults
+    CatalogTool.unrestrictedSearchResults = unrestrictedSearchResults
     CatalogTool.__call__ = searchResults
     CatalogTool._cs_old_indexes = CatalogTool.indexes
     CatalogTool.indexes = indexes
