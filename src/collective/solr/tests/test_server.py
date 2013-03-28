@@ -881,7 +881,9 @@ class SolrServerTests(SolrTestCase):
         self.setRoles(['Manager'])
         self.folder.invokeFactory('Collection', id='news', title='some news')
         news = self.folder.news
-        news.setQuery({'SearchableText': 'News'})
+        news.setQuery([{'i': 'SearchableText',
+                        'o': 'plone.app.querystring.operation.string.contains',
+                        'v': 'News'}])
         results = news.queryCatalog()
         self.assertEqual(sorted([(r.Title, r.path_string) for r in results]),
             [('News', '/plone/news'), ('News', '/plone/news/aggregator')])
