@@ -1,5 +1,7 @@
+from copy import deepcopy
 from zope.interface import implements
-from zope.component import queryUtility, queryMultiAdapter, getSiteManager
+from zope.component import queryUtility, queryMultiAdapter
+from zope.component.hooks import getSite
 from zope.publisher.interfaces.http import IHTTPRequest
 from Acquisition import aq_base
 from Missing import MV
@@ -18,6 +20,7 @@ from collective.solr.mangler import optimizeQueryParameters
 from collective.solr.lingua import languageFilter
 
 from collective.solr.monkey import patchCatalogTool, patchLazy
+from collective.solr.parser import SolrResponse
 patchCatalogTool() # patch catalog tool to use the dispatcher...
 patchLazy() # ...as well as ZCatalog's Lazy class
 
@@ -56,18 +59,18 @@ def solrSearchResults(request=None, **keywords):
         # try to get a request instance, so that flares can be adapted to
         # ploneflares and urls can be converted into absolute ones etc;
         # however, in this case any arguments from the request are ignored
-        request = getattr(getSiteManager(), 'REQUEST', None)
-        args = keywords
+        request = getattr(getSite(), 'REQUEST', None)
+        args = deepcopy(keywords)
     elif IHTTPRequest.providedBy(request):
-        args = request.form.copy()  # ignore headers and other stuff
+        args = deepcopy(request.form)  # ignore headers and other stuff
         args.update(keywords)       # keywords take precedence
     else:
         assert isinstance(request, dict), request
-        args = request.copy()
+        args = deepcopy(request)
         args.update(keywords)       # keywords take precedence
         # if request is a dict, we need the real request in order to
         # be able to adapt to plone flares
-        request = getattr(getSiteManager(), 'REQUEST', args)
+        request = getattr(getSite(), 'REQUEST', args)
     if 'path' in args and 'navtree' in args['path']:
         raise FallBackException     # we can't handle navtree queries yet
     use_solr = args.get('use_solr', False)  # A special key to force Solr
@@ -85,9 +88,12 @@ def solrSearchResults(request=None, **keywords):
     prepareData(args)
     mangleQuery(args, config, schema)
     query = search.buildQuery(**args)
-    optimizeQueryParameters(query, params)
-    __traceback_info__ = (query, params, args)
-    response = search(query, fl='* score', **params)
+    if query != {}:
+        optimizeQueryParameters(query, params)
+        __traceback_info__ = (query, params, args)
+        response = search(query, **params)
+    else:
+        return SolrResponse()
     response.request = request
     def wrap(flare):
         """ wrap a flare object with a helper class """

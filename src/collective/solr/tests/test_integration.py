@@ -95,23 +95,6 @@ class IndexingTests(SolrTestCase):
         required = '<field name="Title">Foo</field>'
         self.assert_(str(output).find(required) > 0, '"title" data not found')
 
-    def testNoIndexingWithMethodOverride(self):
-        self.setRoles(['Manager'])
-        output = []
-        connection = self.proc.getConnection()
-        responses = [getData('dummy_response.txt')] * 42
-        output = fakehttp(connection, *responses)
-        self.folder.invokeFactory('Topic', id='coll', title='a collection')
-        self.folder.coll.addCriterion('Type', 'ATPortalTypeCriterion')
-        self.assertTrue('crit__Type_ATPortalTypeCriterion' not in str(output))
-        commit()
-        self.assert_(repr(output).find('a collection') > 0,
-            '"title" data not found')
-        self.assert_(repr(output).find('crit') == -1, 'criterion indexed?')
-        objs = self.portal.portal_catalog(portal_type='ATPortalTypeCriterion')
-        self.assertEqual(list(objs), [])
-        self.folder.manage_delObjects('coll')
-
     def testNoIndexingForNonCatalogAwareContent(self):
         self.setRoles(['Manager'])
         output = []
@@ -151,16 +134,17 @@ class SiteSearchTests(SolrTestCase):
         search = queryUtility(ISearch)
         self.assertRaises(error, search, 'foo')
 
-    def testSearchWithoutSearchableTextInPortalCatalog(self):
-        config = queryUtility(ISolrConnectionConfig)
-        config.active = True
-        config.port = 55555     # random port so the real solr might still run
-        catalog = self.portal.portal_catalog
-        catalog.delIndex('SearchableText')
-        self.failIf('SearchableText' in catalog.indexes())
-        query = self.portal.restrictedTraverse('queryCatalog')
-        request = dict(SearchableText='foo')
-        self.assertRaises(error, query, request)
+#   Why should this raise a socket error?
+#    def testSearchWithoutSearchableTextInPortalCatalog(self):
+#        config = queryUtility(ISolrConnectionConfig)
+#        config.active = True
+#        config.port = 55555     # random port so the real solr might still run
+#        catalog = self.portal.portal_catalog
+#        catalog.delIndex('SearchableText')
+#        self.failIf('SearchableText' in catalog.indexes())
+#        query = self.portal.restrictedTraverse('queryCatalog')
+#        request = dict(SearchableText='foo')
+#        self.assertRaises(error, query, request)
 
     def testSearchTimeout(self):
         config = queryUtility(ISolrConnectionConfig)

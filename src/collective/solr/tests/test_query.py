@@ -33,6 +33,7 @@ class QuoteTests(TestCase):
         self.assertEqual(quote('"foo bar"'), '"foo bar"')
         self.assertEqual(quote('"foo bar'), '(\\"foo bar)')
         self.assertEqual(quote('foo bar what?'), '(foo bar what?)')
+        self.assertEqual(quote('P|This&That'), 'P|This&That')
         self.assertEqual(quote('[]'), '')
         self.assertEqual(quote('()'), '')
         self.assertEqual(quote('{}'), '')
@@ -103,7 +104,7 @@ class QuoteTests(TestCase):
         self.assertEqual(quote('((a AND b) OR c)'), '((a AND b) OR c)')
 
     def testQuotingEscapingSpecialCharacters(self):
-        self.assertEqual(quote('-+&&||!^~:'), '\\-\\+\\&&\\||\\!\\^\\~\\:')
+        self.assertEqual(quote('-+!^~:'), '\\-\\+\\!\\^\\~\\:')
         # Only quote * and ? if quoted
         self.assertEqual(quote('"*?"'), '"\\*\\?"')
         # also quote multiple occurrences
@@ -199,7 +200,10 @@ class QueryTests(TestCase):
         self.assertEqual(bq(name='foo', cat=['foo bar', 'hmm']),
             '+cat:("foo bar" OR hmm) +name:foo')
         self.assertEqual(bq('foo', name=' '), '+foo')
-        self.assertEqual(bq('foo', name=''), '+foo')
+
+        # empty value for a name should return no results like in ZCatalog, so
+        # empty query is returned
+        self.assertEqual(bq('foo', name=''), '')
 
     def testInvalidArguments(self):
         bq = self.bq

@@ -7,7 +7,7 @@ from Products.CMFPlone.CatalogTool import CatalogTool
 from Products.ZCatalog.Lazy import Lazy
 from Products.ZCatalog.Lazy import LazyCat
 
-from collective.solr.interfaces import ISearchDispatcher
+from collective.solr.interfaces import (ISearchDispatcher)
 from collective.solr.parser import SolrResponse
 
 HAS_EXPCAT = True
@@ -38,7 +38,6 @@ def patchCatalogTool():
     CatalogTool._cs_old_searchResults = CatalogTool.searchResults
     CatalogTool.searchResults = searchResults
     CatalogTool.__call__ = searchResults
-
 
 if HAS_EXPCAT:
     def lazyExpCatAdd(self, other):

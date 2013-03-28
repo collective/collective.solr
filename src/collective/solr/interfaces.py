@@ -99,6 +99,30 @@ class ISolrSchema(Interface):
                        'on the expense of finding content with local roles'
                        'given to specific users.'), default=False)
 
+    highlight_fields = List(title=_(u'Highlighting fields'),
+        description = _(u'Fields that should be used for highlighting. '
+                         'Snippets of text will be generated from the contents '
+                         ' of these fields, with the search keywords that'
+                         'matched highlighted inside the text.'),
+        value_type = TextLine(), default = [], required = False)
+
+    highlight_formatter_pre = TextLine(title=_(u'Highlight formatter: pre'),
+        description=_(u'The text to insert before the highlighted keyword.'),
+        default=u'[', required=False)
+
+    highlight_formatter_post = TextLine(title=_(u'Highlight formatter: post'),
+        description=_(u'The text to insert after the highlighted keyword.'),
+        default=u']', required=False)
+
+    highlight_fragsize = Int(title=_(u'Highlight Fragment Size'), default=100,
+        description=_(u'The size, in characters, of the snippets (aka '
+                       'fragments) created by the highlighter.'))
+    field_list = List(title=_(u'Default fields to be returned'),
+        description = _(u'Specify metadata fields that should be returned for '
+                         'items in the result set, one per line. Defaults to '
+                         'all available plus ranking score.'),
+        value_type = TextLine(), default = [], required = False)
+
 
 class ISolrConnectionConfig(ISolrSchema):
     """ utility to hold the connection configuration for the solr server """
@@ -197,6 +221,9 @@ class ISolrMaintenanceView(Interface):
             be used to ensure consistency between zope and solr after the
             solr server has been unavailable etc """
 
+    def cleanup(batch=1000):
+        """ remove entries from solr that don't have a corresponding Zope 
+            object  or have a different UID than the real object"""
 
 class IFacetTitleVocabularyFactory(IVocabularyFactory):
     """A vocabulary factory used to create a vocabulary that provides titles

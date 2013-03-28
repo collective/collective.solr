@@ -137,34 +137,6 @@ class SolrMaintenanceTests(SolrTestCase):
         maintenance.reindex()
         self.assertEqual(search(), ['special', 'dull'])
 
-    def testReindexSkipsNonReferencableItems(self):
-        container = self.folder
-        maintenance = container.unrestrictedTraverse('solr-maintenance')
-        maintenance.reindex()
-        # initially the solr index should only hold the folder
-        self.assertEqual(numFound(self.search()), 1)
-        # after adding a topic and a criterion, only the topic should
-        # get indexed...
-        self.setRoles(['Manager'])
-        container.invokeFactory('Topic', id='coll', title='a collection')
-        crit = container.coll.addCriterion('Type', 'ATPortalTypeCriterion')
-        self.assertTrue(crit.UID() is None)
-        commit()
-        self.assertEqual(numFound(self.search()), 2)
-        # calling methods on a criterion won't generate an UID
-        crit.getRefs()
-        self.assertTrue(crit.UID() is None)
-        # so calling reindex won't add it to Solr
-        maintenance.reindex()
-        self.assertEqual(numFound(self.search()), 2)
-        criterions = self.search('+portal_type:ATPortalTypeCriterion')
-        self.assertEqual(numFound(criterions), 0)
-        # the "sync" maintenance view shouldn't add these object, either...
-        maintenance.reindex()
-        self.assertEqual(numFound(self.search()), 2)
-        criterions = self.search('+portal_type:ATPortalTypeCriterion')
-        self.assertEqual(numFound(criterions), 0)
-
     def testDisabledTimeoutDuringReindex(self):
         log = []
         def logger(*args):
@@ -397,7 +369,7 @@ class SolrServerTests(SolrTestCase):
         conn.add(UID='bar', Title='foo', commitWithin='1000')
         conn.flush()
         self.assertEqual(self.search('+Title:Foo').results().numFound, '0')
-        sleep(1.5)
+        sleep(2.0)
         self.assertEqual(self.search('+Title:Foo').results().numFound, '2')
 
     def testFilterInvalidCharacters(self):
@@ -611,10 +583,11 @@ class SolrServerTests(SolrTestCase):
              '/plone/news', '/plone/news/aggregator'])
         self.assertEqual(search(path, depth=0),
             ['/plone/events', '/plone/news'])
+        # depth 1 doesn't return level 0 objs, see ZCatalog
         self.assertEqual(search(path, depth=1),
-            ['/plone/events', '/plone/events/aggregator',
+            ['/plone/events/aggregator',
             '/plone/events/previous',
-             '/plone/news', '/plone/news/aggregator'])
+             '/plone/news/aggregator'])
         # multiple paths with different length...
         path = ['/plone/news', '/plone/events/aggregator']
         self.assertEqual(search(path),
@@ -625,9 +598,9 @@ class SolrServerTests(SolrTestCase):
              '/plone/news', '/plone/news/aggregator'])
         self.assertEqual(search(path, depth=0),
             ['/plone/events/aggregator', '/plone/news'])
+        # depth 1 doesn't return level 0 objs, see ZCatalog
         self.assertEqual(search(path, depth=1),
-            ['/plone/events/aggregator',
-             '/plone/news', '/plone/news/aggregator'])
+            ['/plone/news/aggregator'])
         self.assertEqual(search(['/plone/news', '/plone'], depth=1),
             ['/plone/Members', '/plone/events',
              '/plone/front-page', '/plone/news', '/plone/news/aggregator'])
@@ -762,7 +735,7 @@ class SolrServerTests(SolrTestCase):
         result = connection.search(q='+Title:Foo').read()
         self.assertEqual(numFound(result), 0)
         # but after some time, results are there
-        sleep(1.5)
+        sleep(2.0)
         result = connection.search(q='+Title:Foo').read()
         self.assertEqual(numFound(result), 1)
 
@@ -906,10 +879,11 @@ class SolrServerTests(SolrTestCase):
     def testSearchableTopic(self):
         self.maintenance.reindex()
         self.setRoles(['Manager'])
-        self.folder.invokeFactory('Topic', id='news', title='some news')
+        self.folder.invokeFactory('Collection', id='news', title='some news')
         news = self.folder.news
-        crit = news.addCriterion('SearchableText', 'ATSimpleStringCriterion')
-        crit.setValue('News')
+        news.setQuery([{'i': 'SearchableText',
+                        'o': 'plone.app.querystring.operation.string.contains',
+                        'v': 'News'}])
         results = news.queryCatalog()
         self.assertEqual(sorted([(r.Title, r.path_string) for r in results]),
             [('News', '/plone/news'), ('News', '/plone/news/aggregator')])
@@ -940,19 +914,19 @@ class SolrServerTests(SolrTestCase):
         # we inject the "friendly types" into the query (in `queryCatalog.py`)
         # by using a keyword parameter...
         request = dict(SearchableText='News')
-        results = solrSearchResults(request, portal_type='Topic')
+        results = solrSearchResults(request, portal_type='Collection')
         self.assertEqual([(r.Title, r.path_string) for r in results],
             [('News', '/plone/news/aggregator')])
         self.assertEqual(len(log), 1)
-        self.assertEqual(log[-1][1]['fq'], ['+portal_type:Topic'], log)
+        self.assertEqual(log[-1][1]['fq'], ['+portal_type:Collection'], log)
         # let's test again with an already existing filter query parameter
         request = dict(SearchableText='News', fq='+review_state:published')
-        results = solrSearchResults(request, portal_type='Topic')
+        results = solrSearchResults(request, portal_type='Collection')
         self.assertEqual([(r.Title, r.path_string) for r in results],
             [('News', '/plone/news/aggregator')])
         self.assertEqual(len(log), 2)
         self.assertEqual(sorted(log[-1][1]['fq']),
-            ['+portal_type:Topic', '+review_state:published'], log)
+            ['+portal_type:Collection', '+review_state:published'], log)
         Search.__call__ = original
 
     def testDefaultOperatorIsOR(self):

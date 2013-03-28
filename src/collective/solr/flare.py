@@ -1,5 +1,6 @@
 from zope.interface import implements
-from zope.component import adapts, getSiteManager
+from zope.component import adapts
+from zope.component.hooks import getSite
 from zope.publisher.interfaces.http import IHTTPRequest
 from OFS.Traversable import path2url
 from Products.CMFPlone.utils import pretty_title_or_id
@@ -43,7 +44,7 @@ class PloneFlare(AttrDict):
             allowing access to the final object even if intermediate objects
             cannot be accessed (much like the original implementation in
             `ZCatalog.CatalogBrains.AbstractCatalogBrain`) """
-        site = getSiteManager()
+        site = getSite()
         path = self.getPath()
         if not path:
             return None
@@ -66,7 +67,7 @@ class PloneFlare(AttrDict):
         return url
 
     def pretty_title_or_id(self):
-        context = getSiteManager()
+        context = getSite()
         return pretty_title_or_id(context, self)
 
     @property
