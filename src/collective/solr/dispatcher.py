@@ -94,6 +94,7 @@ def solrSearchResults(request=None, **keywords):
         response = search(query, **params)
     else:
         return SolrResponse()
+    response.request = request
     def wrap(flare):
         """ wrap a flare object with a helper class """
         adapter = queryMultiAdapter((flare, request), IFlare)

@@ -2,10 +2,16 @@ from datetime import datetime
 from StringIO import StringIO
 
 from DateTime import DateTime
+from Missing import MV
+from zope.component import queryUtility, queryMultiAdapter
 from zope.interface import implements
 
+from collective.solr.interfaces import ISolrConnectionManager
 from collective.solr.interfaces import ISolrFlare
+from collective.solr.interfaces import ISearch
+from collective.solr.interfaces import IFlare
 from collective.solr.iterparse import iterparse
+from collective.solr.utils import padResults
 
 
 class AttrDict(dict):
@@ -89,8 +95,10 @@ class SolrResponse(object):
 
     __allow_access_to_unprotected_subobjects__ = True
 
-    def __init__(self, data=None, unmarshallers=unmarshallers):
+    def __init__(self, data=None, request=None, unmarshallers=unmarshallers):
         self.unmarshallers = unmarshallers
+        self.manager = None
+        self.request = request
         if data is not None:
             self.parse(data)
 
@@ -126,6 +134,53 @@ class SolrResponse(object):
         return len(self.results())
 
     def __getitem__(self, index):
+        if len(self) > index and self.results()[index] is None:
+            if self.manager is None:
+                self.manager = queryUtility(ISolrConnectionManager)
+            connection = self.manager.getConnection()
+            if connection is None:
+                raise SolrInactiveException
+            parameters = self.responseHeader['params'].copy()
+            start = int(parameters.get('start', 0))
+            rows = int(parameters.get('rows', 0))
+            if index < 0:
+                index = len(self) + index
+            if index >= start + rows:
+                # requested element lies 'right' of batch
+                if index == start + rows:
+                    # looks like we're iterating over all results, just shift 
+                    # the batch by rows
+                    start = start + rows
+                elif index > start + 2 * rows:
+                    # looks like random access, increase the batch size to
+                    # include the requested item
+                    rows = index - start + 1
+                else:
+                    # looks like local access, double the batch size
+                    rows = 2 * rows
+            elif index <= start:
+                # requested element lies 'left' of batch
+                rows = start - index + rows
+                start = index
+            parameters['start'] = start
+            parameters['rows'] = rows
+            query = parameters['q']
+            del parameters['q']
+            self.parse(connection.search(q=query, **parameters))
+            def wrap(flare):
+                """ wrap a flare object with a helper class """
+                adapter = queryMultiAdapter((flare, self.request), IFlare)
+                return adapter is not None and adapter or flare
+            results = self.results()
+            search = queryUtility(ISearch)
+            schema = search.getManager().getSchema() or {}
+            for idx, flare in enumerate(results):
+                flare = wrap(flare)
+                for missing in set(schema.stored).difference(flare):
+                    flare[missing] = MV
+                results[idx] = wrap(flare)
+            padResults(results, **parameters)           # pad the batch
+            
         return self.results()[index]
 
 
