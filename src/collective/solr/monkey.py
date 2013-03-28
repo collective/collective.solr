@@ -1,4 +1,4 @@
-from zope.component import queryAdapter, queryUtility
+from zope.component import queryAdapter
 from DateTime import DateTime
 from Products.CMFCore.permissions import AccessInactivePortalContent
 from Products.CMFCore.utils import _getAuthenticatedUser
@@ -7,8 +7,7 @@ from Products.CMFPlone.CatalogTool import CatalogTool
 from Products.ZCatalog.Lazy import Lazy
 from Products.ZCatalog.Lazy import LazyCat
 
-from collective.solr.interfaces import (ISearchDispatcher,
-    ISolrConnectionManager)
+from collective.solr.interfaces import (ISearchDispatcher)
 from collective.solr.parser import SolrResponse
 
 HAS_EXPCAT = True
@@ -45,14 +44,6 @@ def unrestrictedSearchResults(self, REQUEST=None, **kw):
     else:
         return self._cs_old_searchResults(REQUEST, **kw)
 
-def indexes(self):
-    manager = queryUtility(ISolrConnectionManager)
-    if not manager:
-        return []
-    schema = manager.getSchema() or {}
-    indexes = list(set(schema.keys()).union(set(self._catalog.indexes.keys())))
-    return indexes
-
 def patchCatalogTool():
     """ monkey patch plone's catalogtool with the solr dispatcher """
     CatalogTool._cs_old_searchResults = CatalogTool.searchResults
@@ -60,8 +51,6 @@ def patchCatalogTool():
     CatalogTool._cs_old_unrestrictedSearchResults = CatalogTool.unrestrictedSearchResults
     CatalogTool.unrestrictedSearchResults = unrestrictedSearchResults
     CatalogTool.__call__ = searchResults
-    CatalogTool._cs_old_indexes = CatalogTool.indexes
-    CatalogTool.indexes = indexes
 
 if HAS_EXPCAT:
     def lazyExpCatAdd(self, other):
