@@ -2,6 +2,7 @@ from logging import getLogger
 from time import time, clock, strftime
 
 from BTrees.IIBTree import IITreeSet
+from DateTime import DateTime
 from Products.CMFCore.utils import getToolByName
 from Products.Five.browser import BrowserView
 from plone.uuid.interfaces import IUUID, IUUIDAware
@@ -178,6 +179,8 @@ class SolrMaintenanceView(BrowserView):
         solr_results = {}
         solr_uids = set()
         def _utc_convert(value):
+            if isinstance(value, DateTime):
+                value = value.asdatetime()
             t_tup = value.utctimetuple()
             return ((((t_tup[0] * 12 + t_tup[1]) * 31 + t_tup[2])
                       * 24 + t_tup[3]) * 60 + t_tup[4])
