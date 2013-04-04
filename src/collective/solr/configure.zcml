@@ -59,7 +59,9 @@
       factory=".vocabularies.SolrIndexes"
       name="collective.solr.indexes" />
 
-  <utility factory=".vocabularies.I18NFacetTitlesVocabularyFactory" />
+  <utility 
+      factory=".vocabularies.I18NFacetTitlesVocabularyFactory"
+      name="I18NFacetTitlesVocabularyFactory" />
 
   <!-- Use the proper portal_types tool for type titles -->
   <utility
