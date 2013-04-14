@@ -1,11 +1,8 @@
 Changelog
 =========
 
-3.1 - unreleased
-----------------
-    
-- Add datehandler support for python date objects.
-  [jcbrand]
+3.2 - unreleased
+------------------
 
 - Use tika for extracting binary content.
   [tom_gross]
@@ -18,6 +15,21 @@ Changelog
 
 - Drop dependency on elementree (in favour of lxml).
   [tom_gross]
+
+3.1 - 2013-02-16
+----------------
+    
+- Add datehandler support for python date objects.
+  [jcbrand]
+
+- Add optional plone.app.contentlisting/plone.app.search support
+  [do3cc][csenger]
+
+- Add datehandler support for python date objects.
+  [jcbrand]
+
+- Add inthandler support for not indexing Integers that are None.
+  [do3cc]
 
 3.0 - 2012-02-06
 ----------------
@@ -156,7 +168,7 @@ Upgrade notes
 *************
 
 * Changed the names of the indexes used to emulate the `path` index. You need
-  to adjust your schema and rename `physicalPath` to `path_string`, 
+  to adjust your schema and rename `physicalPath` to `path_string`,
   `physicalDepth` to `path_depth` and `parentPaths` to `path_parents`. This
   also requires a full Solr reindex to pick up the new data.
   [hannosch]

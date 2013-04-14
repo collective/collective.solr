@@ -65,10 +65,18 @@ def datehandler(value):
         value = '%s.000Z' % value.strftime('%Y-%m-%dT%H:%M:%S')
     return value
 
+def inthandler(value):
+    if value is None or value is "":
+        raise AttributeError("Solr cant handle none strings or empty values")
+    else:
+	return value
+
 
 handlers = {
     'solr.DateField': datehandler,
     'solr.TrieDateField': datehandler,
+    'solr.TrieIntField': inthandler,
+    'solr.IntField': inthandler,
 }
 
 class DefaultAdder(object):

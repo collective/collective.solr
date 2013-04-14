@@ -137,34 +137,6 @@ class SolrMaintenanceTests(SolrTestCase):
         maintenance.reindex()
         self.assertEqual(search(), ['special', 'dull'])
 
-    def testReindexSkipsNonReferencableItems(self):
-        container = self.folder
-        maintenance = container.unrestrictedTraverse('solr-maintenance')
-        maintenance.reindex()
-        # initially the solr index should only hold the folder
-        self.assertEqual(numFound(self.search()), 1)
-        # after adding a topic and a criterion, only the topic should
-        # get indexed...
-        self.setRoles(['Manager'])
-        container.invokeFactory('Topic', id='coll', title='a collection')
-        crit = container.coll.addCriterion('Type', 'ATPortalTypeCriterion')
-        self.assertTrue(crit.UID() is None)
-        commit()
-        self.assertEqual(numFound(self.search()), 2)
-        # calling methods on a criterion won't generate an UID
-        crit.getRefs()
-        self.assertTrue(crit.UID() is None)
-        # so calling reindex won't add it to Solr
-        maintenance.reindex()
-        self.assertEqual(numFound(self.search()), 2)
-        criterions = self.search('+portal_type:ATPortalTypeCriterion')
-        self.assertEqual(numFound(criterions), 0)
-        # the "sync" maintenance view shouldn't add these object, either...
-        maintenance.reindex()
-        self.assertEqual(numFound(self.search()), 2)
-        criterions = self.search('+portal_type:ATPortalTypeCriterion')
-        self.assertEqual(numFound(criterions), 0)
-
     def testDisabledTimeoutDuringReindex(self):
         log = []
         def logger(*args):
@@ -285,10 +257,7 @@ class SolrErrorHandlingTests(SolrTestCase):
         manager.closeConnection()   # which would trigger a reconnect
         self.folder.processForm(values={'title': 'Bar'})
         commit()                    # indexing (doesn't) happen on commit
-        # one of the 'exception while getting schema' is due to patching 
-        # CatalogTool.indexes
         self.assertEqual(log, ['exception while getting schema',
-            'exception while getting schema',
             'unable to fetch schema, skipping indexing of %r', self.folder,
             'exception during request %r', '<commit/>'])
 
@@ -910,10 +879,11 @@ class SolrServerTests(SolrTestCase):
     def testSearchableTopic(self):
         self.maintenance.reindex()
         self.setRoles(['Manager'])
-        self.folder.invokeFactory('Topic', id='news', title='some news')
+        self.folder.invokeFactory('Collection', id='news', title='some news')
         news = self.folder.news
-        crit = news.addCriterion('SearchableText', 'ATSimpleStringCriterion')
-        crit.setValue('News')
+        news.setQuery([{'i': 'SearchableText',
+                        'o': 'plone.app.querystring.operation.string.contains',
+                        'v': 'News'}])
         results = news.queryCatalog()
         self.assertEqual(sorted([(r.Title, r.path_string) for r in results]),
             [('News', '/plone/news'), ('News', '/plone/news/aggregator')])
@@ -944,19 +914,19 @@ class SolrServerTests(SolrTestCase):
         # we inject the "friendly types" into the query (in `queryCatalog.py`)
         # by using a keyword parameter...
         request = dict(SearchableText='News')
-        results = solrSearchResults(request, portal_type='Topic')
+        results = solrSearchResults(request, portal_type='Collection')
         self.assertEqual([(r.Title, r.path_string) for r in results],
             [('News', '/plone/news/aggregator')])
         self.assertEqual(len(log), 1)
-        self.assertEqual(log[-1][1]['fq'], ['+portal_type:Topic'], log)
+        self.assertEqual(log[-1][1]['fq'], ['+portal_type:Collection'], log)
         # let's test again with an already existing filter query parameter
         request = dict(SearchableText='News', fq='+review_state:published')
-        results = solrSearchResults(request, portal_type='Topic')
+        results = solrSearchResults(request, portal_type='Collection')
         self.assertEqual([(r.Title, r.path_string) for r in results],
             [('News', '/plone/news/aggregator')])
         self.assertEqual(len(log), 2)
         self.assertEqual(sorted(log[-1][1]['fq']),
-            ['+portal_type:Topic', '+review_state:published'], log)
+            ['+portal_type:Collection', '+review_state:published'], log)
         Search.__call__ = original
 
     def testDefaultOperatorIsOR(self):
