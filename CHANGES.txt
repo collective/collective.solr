@@ -4,7 +4,8 @@ Changelog
 3.1.1 - unreleased
 ------------------
 
-- 
+- Plone 4.3 compatibility of search view 
+  [tom_gross]
 
 
 3.1 - 2013-02-16

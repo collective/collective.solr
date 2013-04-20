@@ -90,8 +90,9 @@
     </h1>
 
     <p class="discreet"
-       tal:define="syntool context/portal_syndication;"
-       tal:condition="syntool/isSiteSyndicationAllowed">
+       tal:define="syndication context/@@tools/syndication|context/portal_syndication"
+       tal:condition="syndication/isSiteSyndicationAllowed"
+       tal:on-error="string:">
         <a href=""
            class="link-feed"
            i18n:translate="title_rss_feed"
