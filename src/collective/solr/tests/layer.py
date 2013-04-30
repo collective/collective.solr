@@ -17,6 +17,9 @@ class SolrLayer(BasePTCLayer):
         self.addProfile('collective.solr:search')
         # account for difference in default content in Plone 4.0 / 4.1
         _createObjectByType('Document', self.portal.events, 'previous')
+        self.portal.events.previous.setTitle('Previous')
+        self.portal.events.setTitle('EventsFolder')
+        self.portal.news.setTitle('NewsFolder')
 
 layer = solr = SolrLayer(bases=[ptc_layer])
 
