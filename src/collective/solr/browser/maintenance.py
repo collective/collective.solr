@@ -6,20 +6,25 @@ from Products.CMFCore.utils import getToolByName
 from Products.Five.browser import BrowserView
 from plone.uuid.interfaces import IUUID, IUUIDAware
 from zope.interface import implements
-from zope.component import queryUtility
+from zope.component import queryUtility, queryAdapter
+from Products.Five.browser import BrowserView
+from Products.CMFCore.utils import getToolByName
 
 from collective.indexing.indexer import getOwnIndexMethod
+from collective.solr.indexer import DefaultAdder
 from collective.solr.flare import PloneFlare
 from collective.solr.interfaces import ISolrConnectionManager
 from collective.solr.interfaces import ISolrMaintenanceView
-from collective.solr.indexer import indexable, SolrIndexProcessor
+from collective.solr.interfaces import ISolrAddHandler
+from collective.solr.interfaces import ISearch
+from collective.solr.interfaces import ICheckIndexable
+from collective.solr.indexer import handlers, SolrIndexProcessor
 from collective.solr.indexer import boost_values
 from collective.solr.parser import parse_date_as_datetime
 from collective.solr.parser import SolrResponse
 from collective.solr.parser import unmarshallers
 from collective.solr.utils import findObjects
 from collective.solr.utils import prepareData
-
 
 logger = getLogger('collective.solr.maintenance')
 MAX_ROWS = 1000000000
@@ -113,7 +118,8 @@ class SolrMaintenanceView(BrowserView):
         flush = notimeout(flush)
         def checkPoint():
             for boost_values, data in updates.values():
-                conn.add(boost_values=boost_values, **data)
+                adder = data.pop('_solr_adder')
+                adder(conn, boost_values=boost_values, **data)
             updates.clear()
             msg = 'intermediate commit (%d items processed, ' \
                   'last batch in %s)...\n' % (processed, lap.next())
@@ -124,10 +130,7 @@ class SolrMaintenanceView(BrowserView):
         cpi = checkpointIterator(checkPoint, batch)
         count = 0
         for path, obj in findObjects(self.context):
-            if indexable(obj):
-                if getOwnIndexMethod(obj, 'indexObject') is not None:
-                    log('skipping indexing of %r via private method.\n' % obj)
-                    continue
+            if ICheckIndexable(obj)():
                 count += 1
                 if count <= skip:
                     continue
@@ -136,6 +139,12 @@ class SolrMaintenanceView(BrowserView):
                 if not missing:
                     value = data.get(key, None)
                     if value is not None:
+                        log('indexing %r\n' % obj)
+                        pt = data.get('portal_type', 'default')
+                        adder = queryAdapter(obj, ISolrAddHandler, name=pt)
+                        if adder is None:
+                            adder = DefaultAdder(obj)
+                        data['_solr_adder'] = adder
                         updates[value] = (boost_values(obj, data), data)
                         processed += 1
                         cpi.next()
@@ -149,7 +158,7 @@ class SolrMaintenanceView(BrowserView):
         log(msg)
         logger.info(msg)
 
-    def sync(self, batch=1000):
+    def sync(self, batch=1000, preImportDeleteQuery='*:*'):
         """Sync the Solr index with the portal catalog. Records contained
         in the catalog but not in Solr will be indexed and records not
         contained in the catalog will be removed.
@@ -168,8 +177,7 @@ class SolrMaintenanceView(BrowserView):
         lap = timer()           # real lap time (for intermediate commits)
         cpu = timer(clock)      # cpu time
         # get Solr status
-        query = '+%s:[* TO *]' % key
-        response = conn.search(q=query, rows=MAX_ROWS, fl='%s modified' % key)
+        response = conn.search(q=preImportDeleteQuery, rows=MAX_ROWS, fl='%s modified' % key)
         # avoid creating DateTime instances
         simple_unmarshallers = unmarshallers.copy()
         simple_unmarshallers['date'] = parse_date_as_datetime
@@ -240,7 +248,7 @@ class SolrMaintenanceView(BrowserView):
         op = notimeout(lambda obj: proc.index(obj))
         for uid in index:
             obj = lookup(uid)
-            if indexable(obj):
+            if ICheckIndexable(obj)():
                 op(obj)
                 processed += 1
                 cpi.next()
@@ -260,7 +268,7 @@ class SolrMaintenanceView(BrowserView):
                 rid = rid.keys()[0]
             if cat_mod_get(rid) != solr_mod_get(uid):
                 obj = lookup(uid, rid=rid)
-                if indexable(obj):
+                if ICheckIndexable(obj)():
                     op(obj)
                     processed += 1
                     cpi.next()

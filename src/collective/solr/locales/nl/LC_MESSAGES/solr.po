@@ -4,7 +4,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: collective.solr\n"
-"POT-Creation-Date: 2010-02-14 13:36+0000\n"
+"POT-Creation-Date: 2012-06-05 11:46+0000\n"
 "PO-Revision-Date: 2010-02-14 13:35+0000\n"
 "Last-Translator: UGent Portaalteam <portaal@ugent.be>\n"
 "Language-Team: UGent Portaalteam <portaal@ugent.be>\n"
@@ -17,11 +17,261 @@ msgstr ""
 "Preferred-Encodings: utf-8 latin1\n"
 "Domain: collective.solr\n"
 
+#: ./browser/facets.pt:15
+msgid "Remove this search limit..."
+msgstr ""
+
+#. Default: "The request to the Solr server has timed out. No search results could be found."
+#: ./browser/errors.pt:36
+msgid "description_solr_timeout"
+msgstr ""
+
+#. Default: "Unknown error while trying to search using Solr."
+#: ./browser/errors.pt:47
+msgid "description_solr_unknown error"
+msgstr ""
+
+#. Default: "Please contact your system administration."
+#: ./browser/errors.pt:50
+msgid "description_solr_unknown_error_hint"
+msgstr ""
+
+#. Default: "The Solr server is currently unreachable, so no results could be found."
+#: ./browser/errors.pt:24
+msgid "description_solr_unreachable"
+msgstr ""
+
+#. Default: "Please try again later or contact your system administration."
+#: ./browser/errors.pt:27
+msgid "description_solr_unreachable_hint"
+msgstr ""
+
+#. Default: "Limit search results..."
+#: ./browser/facets.pt:6
+msgid "heading_search_facets"
+msgstr ""
+
+#. Default: "Solr Error"
+#: ./browser/errors.pt:16
+msgid "heading_solr_error"
+msgstr ""
+
+#. Default: "Check this to enable the Solr integration, i.e. indexing and searching using the below settings."
+#: ./interfaces.py:12
+msgid "help_active"
+msgstr ""
+
+#. Default: "Check to enable asynchronous indexing operations, which will improve Zope response times in return for not having the Solr index updated immediately."
+#: ./interfaces.py:29
+msgid "help_async"
+msgstr ""
+
+#. Default: "If enabled each index operation will cause a commit to be sent to Solr, which causes it to update its index. If you disable this, you need to configure commit policies on the Solr server side."
+#: ./interfaces.py:34
+msgid "help_auto_commit"
+msgstr ""
+
+#. Default: "The base prefix of the Solr instance to be used."
+#: ./interfaces.py:25
+msgid "help_base"
+msgstr ""
+
+#. Default: "Maximum number of milliseconds after which adds should be processed by Solr. Defaults to 0, meaning immediate commits. Enabling this feature implicitly disables automatic commit and you should configure commit policies on the Solr server side. Otherwise large numbers of deletes without adds will not be processed. This feature requires a Solr 1.4 server."
+#: ./interfaces.py:41
+msgid "help_commit_within"
+msgstr ""
+
+#. Default: "Specify the effective date steps in seconds. Using 900 seconds (15 minutes) means the effective date sent to Solr changes every 15 minutes."
+#: ./interfaces.py:112
+msgid "help_effective_steps"
+msgstr ""
+
+#. Default: "Specify whether the user:userid should be excluded from allowedRolesAndUsers to improve cacheability on the expense of finding content with local rolesgiven to specific users."
+#: ./interfaces.py:119
+msgid "help_exclude_user"
+msgstr ""
+
+#. Default: "Specify catalog indexes that should be queried for facet information, one per line."
+#: ./interfaces.py:88
+msgid "help_facets"
+msgstr ""
+
+#. Default: "Specify query parameters for which filter queries should be used, one per line.  You can use several indices in one filter query separated by space. Typical examples are \"effective expires allowedRolesAndUsers\" or \"review_state portal_type\"."
+#: ./interfaces.py:94
+msgid "help_filter_queries"
+msgstr ""
+
+#. Default: "The host name of the Solr instance to be used."
+#: ./interfaces.py:17
+msgid "help_host"
+msgstr ""
+
+#. Default: "Number of seconds after which an index request will time out. Set to \"0\" to disable timeouts."
+#: ./interfaces.py:52
+msgid "help_index_timeout"
+msgstr ""
+
+#. Default: "Specify the maximum number of matches to be returned when searching. Set to \"0\" to always return all results."
+#: ./interfaces.py:64
+msgid "help_max_results"
+msgstr ""
+
+#. Default: "The port of the Solr instance to be used."
+#: ./interfaces.py:21
+msgid "help_port"
+msgstr ""
+
+#. Default: "Specify required query parameters, one per line. Searches will only get dispatched to Solr if any of the listed parameters is present in the query. Leave empty to dispatch all searches."
+#: ./interfaces.py:70
+msgid "help_required"
+msgstr ""
+
+#. Default: "Specify a query pattern used for simple queries consisting only of words and numbers, i.e. not using any of Solr's advanced query expressions. {value} and {base_value} are available in the pattern and will be replaced by the search word and the search word stripped of wildcard symbols."
+#: ./interfaces.py:79
+msgid "help_search_pattern"
+msgstr ""
+
+#. Default: "Number of seconds after which a search request will time out. Set to \"0\" to disable timeouts."
+#: ./interfaces.py:58
+msgid "help_search_timeout"
+msgstr ""
+
+#. Default: "Specify a threshold (in milliseconds) after which queries are considered to be slow causing them to be logged. Set to \"0\" to prevent any logging."
+#: ./interfaces.py:105
+msgid "help_slow_query_threshold"
+msgstr ""
+
+#. Default: "Settings to enable and configure Solr integration."
+#: ./configlet.py:218
+msgid "help_solr_settings"
+msgstr ""
+
+#. Default: "Active"
+#: ./interfaces.py:11
+msgid "label_active"
+msgstr ""
+
+#. Default: "Advanced Search…"
+#: ./skins/solr_site_search/livesearch_reply.py:86
+msgid "label_advanced_search"
+msgstr ""
+
+#. Default: "Asynchronous indexing"
+#: ./interfaces.py:28
+msgid "label_async"
+msgstr ""
+
+#. Default: "Automatic commit"
+#: ./interfaces.py:33
+msgid "label_auto_commit"
+msgstr ""
+
+#. Default: "Base"
+#: ./interfaces.py:24
+msgid "label_base"
+msgstr ""
+
+#. Default: "Commit within"
+#: ./interfaces.py:40
+msgid "label_commit_within"
+msgstr ""
+
+#. Default: "Effective date steps"
+#: ./interfaces.py:110
+msgid "label_effective_steps"
+msgstr ""
+
+#. Default: "Exclude user from allowedRolesAndUsers"
+#: ./interfaces.py:117
+msgid "label_exclude_user"
+msgstr ""
+
+#. Default: "Default search facets"
+#: ./interfaces.py:87
+msgid "label_facets"
+msgstr ""
+
+#. Default: "Filter query parameters"
+#: ./interfaces.py:93
+msgid "label_filter_queries"
+msgstr ""
+
+#. Default: "Host"
+#: ./interfaces.py:16
+msgid "label_host"
+msgstr ""
+
+#. Default: "Index timeout"
+#: ./interfaces.py:50
+msgid "label_index_timeout"
+msgstr ""
+
+#. Default: "Maximum search results"
+#: ./interfaces.py:62
+msgid "label_max_results"
+msgstr ""
+
+#. Default: "No matching results found."
+#: ./skins/solr_site_search/livesearch_reply.py:85
+msgid "label_no_results_found"
+msgstr ""
+
+#. Default: "Port"
+#: ./interfaces.py:20
+msgid "label_port"
+msgstr ""
+
+#. Default: "Required query parameters"
+#: ./interfaces.py:69
+msgid "label_required"
+msgstr ""
+
+#. Default: "Pattern for simple search queries"
+#: ./interfaces.py:77
+msgid "label_search_pattern"
+msgstr ""
+
+#. Default: "Search timeout"
+#: ./interfaces.py:56
+msgid "label_search_timeout"
+msgstr ""
+
+#. Default: "Search words"
+#: ./extender.py:75
+msgid "label_searchwords"
+msgstr ""
+
+#. Default: "Show all items"
+#: ./skins/solr_site_search/livesearch_reply.py:87
+msgid "label_show_all"
+msgstr ""
+
+#. Default: "Show in search"
+#: ./extender.py:64
+msgid "label_showinsearch"
+msgstr ""
+
+#. Default: "Slow query threshold"
+#: ./interfaces.py:103
+msgid "label_slow_query_threshold"
+msgstr ""
+
+#. Default: "Solr settings"
+#: ./configlet.py:217
+msgid "label_solr_settings"
+msgstr ""
+
+#. Default: "LiveSearch &#8595;"
+#: ./skins/solr_site_search/livesearch_reply.py:84
+msgid "legend_livesearch"
+msgstr ""
 
 # english default values for facet titles
-
+#: ./__init__.py:7
 msgid "portal_type"
 msgstr "Content type"
 
+#: ./__init__.py:8
 msgid "review_state"
 msgstr "Revisiestatus"
+

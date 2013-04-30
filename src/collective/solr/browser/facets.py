@@ -22,14 +22,16 @@ def param(view, name):
     return value
 
 
-def facetParameters(context, request):
+def facetParameters(view):
     """ determine facet fields to be queried for """
     marker = []
-    fields = request.get('facet.field', request.get('facet_field', marker))
+    fields = view.request.get('facet.field', view.request.get('facet_field', marker))
     if isinstance(fields, basestring):
         fields = [fields]
     if fields is marker:
-        fields = getattr(context, 'facet_fields', marker)
+        fields = getattr(view, 'facet_fields', marker)
+    if fields is marker:
+        fields = getattr(view.context, 'facet_fields', marker)
     if fields is marker:
         config = queryUtility(ISolrConnectionConfig)
         if config is not None:
@@ -42,13 +44,13 @@ def facetParameters(context, request):
     return fields, dependencies
 
 
-def convertFacets(fields, context=None, request={}, filter=None):
+def convertFacets(fields, view, filter=None):
     """ convert facet info to a form easy to process in templates """
     info = []
-    params = request.form.copy()
+    params = view.request.form.copy()
     if 'b_start' in params:
         del params['b_start'] # Clear the batch when limiting a result set
-    facets, dependencies = list(facetParameters(context, request))
+    facets, dependencies = list(facetParameters(view))
     params['facet.field'] = facets = list(facets)
     fq = params.get('fq', [])
     if isinstance(fq, basestring):
@@ -60,7 +62,7 @@ def convertFacets(fields, context=None, request={}, filter=None):
         if vfactory is None:
             # Use the default fallback
             vfactory = getUtility(IFacetTitleVocabularyFactory)
-        vocabulary = vfactory(context)
+        vocabulary = vfactory(view.context)
 
         for name, count in sorted(values.items(), key=itemgetter(1), reverse=True):
             p = deepcopy(params)
@@ -72,13 +74,13 @@ def convertFacets(fields, context=None, request={}, filter=None):
                 if name in vocabulary:
                     title = vocabulary.getTerm(name).title
                 if isinstance(title, Message):
-                    title = translate(title, context=request)
+                    title = translate(title, context=view.request)
                 counts.append(dict(name=name, count=count, title=title,
                     query=urlencode(p, doseq=True)))
         deps = dependencies.get(field, None)
         visible = deps is None or selected.intersection(deps)
         if counts and visible:
-            info.append(dict(title=field, counts=counts))
+            info.append(dict(title=field, counts=counts, name=name))
     if facets:          # sort according to given facets (if available)
         def pos(item):
             try:
@@ -98,7 +100,7 @@ class FacetMixin:
 
     def hiddenfields(self):
         """ render hidden fields suitable for inclusion in search forms """
-        facets, dependencies = facetParameters(self.context, self.request)
+        facets, dependencies = facetParameters(self)
         queries = param(self, 'fq')
         return self.hidden(facets=facets, queries=queries)
 
@@ -122,8 +124,7 @@ class SearchFacetsView(BrowserView, FacetMixin):
         fcs = getattr(results, 'facet_counts', None)
         if results is not None and fcs is not None:
             filter = lambda name, count: name and count > 0
-            return convertFacets(fcs.get('facet_fields', {}),
-                self.context, self.request, filter)
+            return convertFacets(fcs.get('facet_fields', {}), self, filter)
         else:
             return None
 

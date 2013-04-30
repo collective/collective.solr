@@ -63,7 +63,7 @@ class SolrFacettingTests(SolrTestCase):
     def testFacettedSearchWithFilterQuery(self):
         request = self.app.REQUEST
         request.form['SearchableText'] = 'News'
-        request.form['fq'] = 'portal_type:Topic'
+        request.form['fq'] = 'portal_type:Collection'
         request.form['facet'] = 'true'
         request.form['facet_field'] = 'review_state'
         results = solrSearchResults(request)
@@ -84,7 +84,7 @@ class SolrFacettingTests(SolrTestCase):
         facets = [facet['title'] for facet in view.facets()]
         self.assertEqual(facets, ['portal_type'])
         # now again with the required facet selected
-        request.form['fq'] = 'portal_type:Topic'
+        request.form['fq'] = 'portal_type:Collection'
         view.kw = dict(results=solrSearchResults(request))
         facets = [facet['title'] for facet in view.facets()]
         self.assertEqual(facets, ['portal_type', 'review_state'])

@@ -1,18 +1,21 @@
+# --- PLEASE EDIT THE LINES BELOW CORRECTLY ---
+# SOME DESCRIPTIVE TITLE.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 msgid ""
 msgstr ""
-"Project-Id-Version: collective.solr\n"
+"Project-Id-Version: PACKAGE VERSION\n"
 "POT-Creation-Date: 2012-06-05 11:46+0000\n"
-"PO-Revision-Date: 2009-03-25 17:00+0100\n"
-"Last-Translator: Andreas Zeidler <az@zitc.de>\n"
-"Language-Team: Plone i18n <plone-i18n@lists.sourceforge.net>\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI +ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
+"Plural-Forms: nplurals=1; plural=0\n"
 "Language-Code: en\n"
 "Language-Name: English\n"
 "Preferred-Encodings: utf-8 latin1\n"
-"Domain: DOMAIN\n"
+"Domain: solr\n"
 
 #: ./browser/facets.pt:15
 msgid "Remove this search limit..."
@@ -263,12 +266,11 @@ msgstr ""
 msgid "legend_livesearch"
 msgstr ""
 
-# english default values for facet titles
 #: ./__init__.py:7
 msgid "portal_type"
-msgstr "Content type"
+msgstr ""
 
 #: ./__init__.py:8
 msgid "review_state"
-msgstr "Review state"
+msgstr ""
 

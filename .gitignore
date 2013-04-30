@@ -11,7 +11,5 @@ parts
 htmlcov
 var
 *.egg-info
-*.pyc
-.installed.cfg
-.mr.developer.cfg
-
+*.py[co]
+.*.cfg

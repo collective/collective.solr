@@ -20,7 +20,7 @@ def searchwords(obj):
         raise AttributeError
     words = field.get(obj)
     words = [w.strip('\r ').decode('utf-8') for w in words.split('\n')]
-    return tuple([w.lower() for w in words if w])
+    return tuple([w for w in words if w])
 
 
 @indexer(Interface)
@@ -61,7 +61,7 @@ class SearchExtender(object):
             schemata='settings',
             default=True,
             widget=BooleanWidget(
-                label=_(u"Show in search"),
+                label=_('label_showinsearch', default=u"Show in search"),
                 visible={"edit": "visible", "view": "invisible"},
                 description="",
             )),
@@ -72,7 +72,7 @@ class SearchExtender(object):
             schemata='settings',
             languageIndependent=False,
             widget=TextAreaWidget(
-                label=_(u"Search words"),
+                label=_('label_searchwords', default=u"Search words"),
                 description="Specify words for which this item will show up "
                     "as the first search result. Multiple words can be "
                     "specified on new lines.",

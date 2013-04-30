@@ -54,9 +54,15 @@ def prepareData(data):
             data['Language'] = [lang or 'any' for lang in language]
     searchable = data.get('SearchableText', None)
     if searchable is not None:
+        if isinstance(searchable, dict):
+            searchable = searchable['query']
         if isinstance(searchable, unicode):
             searchable = searchable.encode('utf-8')
         data['SearchableText'] = searchable.translate(translation_map)
+    # mangle path query from plone.app.collection
+    path = data.get('path')
+    if isinstance(path, dict) and not path.get('query'):
+        data.pop('path')
 
 
 simpleTerm = compile(r'^[\w\d]+$', UNICODE)
