@@ -5,9 +5,11 @@ from DateTime import DateTime
 from datetime import datetime
 from datetime import date
 from zope.component import provideUtility
+from zope.interface import implements
 from Products.CMFCore.CMFCatalogAware import CMFCatalogAware
 
 from collective.solr.interfaces import ISolrConnectionConfig
+from collective.solr.interfaces import ICheckIndexable
 from collective.solr.manager import SolrConnectionConfig
 from collective.solr.manager import SolrConnectionManager
 from collective.solr.indexer import SolrIndexProcessor
@@ -20,10 +22,14 @@ from collective.solr.utils import prepareData
 class Foo(CMFCatalogAware):
     """ dummy test object """
 
+    implements(ICheckIndexable)
+
     def __init__(self, **kw):
         for key, value in kw.items():
             setattr(self, key, value)
 
+    def __call__(self):
+        return True
 
 def sortFields(output):
     """ helper to sort `<field>` tags in output for testing """

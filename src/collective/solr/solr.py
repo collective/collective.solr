@@ -27,9 +27,10 @@
 # c.delete('123')
 # c.commit()
 
+import sys
 import httplib
 import socket
-from elementtree.ElementTree import fromstring
+from xml.etree.cElementTree import fromstring
 from xml.sax.saxutils import escape
 import codecs
 import urllib

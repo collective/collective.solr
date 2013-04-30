@@ -269,6 +269,7 @@ class SolrControlPanel(ControlPanelForm):
 
     form_fields = FormFields(ISolrSchema)
 
-    label = _('Solr settings')
-    description = _('Settings to enable and configure Solr integration.')
-    form_name = _('Solr settings')
+    label = _('label_solr_settings', default='Solr settings')
+    description = _('help_solr_settings',
+                    default='Settings to enable and configure Solr integration.')
+    form_name = _('label_solr_settings', default='Solr settings')

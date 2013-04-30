@@ -3,7 +3,7 @@
      tal:condition="python: facets or selected"
      i18n:domain="plone">
 
-  <h4 i18n:translate="heading_search_facets">
+  <h4 i18n:domain="solr" i18n:translate="heading_search_facets">
     Limit search results...
   </h4>
 
@@ -13,7 +13,8 @@
       <span tal:content="item/value"
             tal:attributes="title item/title" i18n:attributes="title" />
       <a tal:attributes="href string:${request/ACTUAL_URL}?${item/query}"
-         title="Remove this search limit..." i18n:attributes="title" >
+        title="Remove this search limit..." i18n:attributes="title"
+        i18n:domain="solr">
         &otimes;
       </a>
     </div>

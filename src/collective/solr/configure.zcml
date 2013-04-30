@@ -32,10 +32,29 @@
 
   <include package=".browser" />
 
-  <adapter
-      for=".interfaces.ICatalogTool"
-      provides=".interfaces.ISearchDispatcher"
-      factory=".dispatcher.SearchDispatcher" />
+    <adapter
+        for=".interfaces.ICatalogTool"
+        provides=".interfaces.ISearchDispatcher"
+        factory=".dispatcher.SearchDispatcher" />
+
+
+    <adapter
+        factory=".indexer.DefaultAdder"
+        name="default"
+        />
+
+    <adapter
+        factory=".indexer.BinaryAdder"
+        name="File"
+        />
+
+    <adapter
+        factory=".indexer.BinaryAdder"
+        name="Image"
+        />
+
+    <adapter
+        factory=".indexer.BaseIndexable" />
 
   <adapter
       factory=".flare.PloneFlare" />

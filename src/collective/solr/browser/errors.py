@@ -1,4 +1,5 @@
 from Products.Five import BrowserView
+from zope.component.hooks import getSite
 
 
 class ErrorView(BrowserView):
@@ -9,9 +10,9 @@ class ErrorView(BrowserView):
         # was passed as the context;  therefore we need to construct a
         # proper context in order to render the template in a sane manner;
         # normally we could use `getUtility(ISiteRoot)` for that, but then
-        # `REQUEST` is missing, we'll employ the portal state view...
+        # `REQUEST` is missing, we'll employ the getSite hook ...
         self.exception = context
-        self.context = request.traverse('@@plone_portal_state').portal()
+        self.context = getSite()
         self.request = request
 
     def errorInfo(self):
