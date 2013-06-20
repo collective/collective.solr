@@ -4,6 +4,11 @@ Changelog
 4.0 - unreleased
 ------------------
 
+- Make sure slashes are properly escaped in the search query. Solr 4.0 added
+  regular expression support, which means that '/' is now a special character
+  and must be escaped if searching for literal forward slash.
+  [timo]
+
 - Implement the getDataOrigin method for the FlareContentListingObject that
   plone.app.contentlisting defines and that plone.app.search expects to exist.
   [timo]
