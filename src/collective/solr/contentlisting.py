@@ -19,6 +19,9 @@ class FlareContentListingObject(object):
     def getObject(self):
         return self.flare.getObject()
 
+    def getDataOrigin(self):
+        return self.flare.getObject()
+
     def getPath(self):
         return self.flare.getPath()
 

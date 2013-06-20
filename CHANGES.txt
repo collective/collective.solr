@@ -4,10 +4,14 @@ Changelog
 4.0 - unreleased
 ------------------
 
+- Implement the getDataOrigin method for the FlareContentListingObject that
+  plone.app.contentlisting defines and that plone.app.search expects to exist.
+  [timo]
+
 - Use tika for extracting binary content.
   [tom_gross]
 
-- Plone 4.3 compatibility of search view 
+- Plone 4.3 compatibility of search view
   [tom_gross]
 
 - Introduce ICheckIndexable-adapter for checking if an object is indexable.
@@ -19,9 +23,10 @@ Changelog
 - Drop dependency on elementree (in favour of lxml).
   [tom_gross]
 
+
 3.1 - 2013-02-16
 ----------------
-    
+
 - Add datehandler support for python date objects.
   [jcbrand]
 
@@ -34,12 +39,14 @@ Changelog
 - Add inthandler support for not indexing Integers that are None.
   [do3cc]
 
+
 3.0 - 2012-02-06
 ----------------
 
 - Ignore a batch start parameter when selecting a facet to filter on.
   https://github.com/Jarn/collective.solr/issues/12
   [mj]
+
 
 3.0b5 - 2011-12-07
 ------------------
@@ -60,12 +67,14 @@ Changelog
 - Fix control panel adapter to save the search_pattern as utf-8.
   [ggozad]
 
+
 3.0b4 - 2011-11-10
 ------------------
 
 - Revert `unrestrictedSearchResults` change, as it breaks additional catalogs,
   like the membrane catalogs.
   [hannosch]
+
 
 3.0b3 - 2011-11-09
 ------------------
@@ -80,6 +89,7 @@ Changelog
 - Tweak search form to better match sunburst proportions.
   [elro]
 
+
 3.0b2 - 2011-10-05
 ------------------
 
@@ -88,12 +98,14 @@ Changelog
   for the facet field with the same name.
   [mj]
 
+
 3.0b1 - 2011-09-27
 ------------------
 
 - Extend the wildcard search term manipulation to do Unicode to ascii folding,
   to keep up with the default field settings of the text field.
   [hannosch, mj]
+
 
 3.0a5 - 2011-09-26
 ------------------
@@ -105,12 +117,14 @@ Changelog
 - Include CMFCore's `permissions.zcml`.
   [witekdev, hannosch]
 
+
 3.0a4 - 2011-08-22
 ------------------
 
 * Fixed bug in `extender.searchwords` indexer - terms need to be lowercased
   explicitly.
   [hannosch]
+
 
 3.0a3 - 2011-08-22
 ------------------
@@ -134,6 +148,7 @@ Changelog
 
 * Standardize on `solr` as the i18n domain.
   [hannosch]
+
 
 3.0a2 - 2011-07-10
 ------------------
@@ -163,6 +178,7 @@ Changelog
 * Adjust tests to work with latest `collective.recipe.solrinstance = 3.3` and
   its new ICU-based text field.
   [hannosch]
+
 
 3.0a1 - 2011-06-23
 ------------------
@@ -211,12 +227,14 @@ Changes
 * Updated example config to collective.recipe.solrinstance 3.1 and Solr 3.2.
   [hannosch]
 
+
 2.0 - 2011-06-04
 ----------------
 
 * Updated readme and project description, adding detailed information about how
   Solr works and how we integrate with it.
   [hannosch]
+
 
 2.0b2 - 2011-05-18
 ------------------
@@ -234,6 +252,7 @@ Changes
 
 * Avoid using the deprecated `five:implements` directive.
   [hannosch]
+
 
 2.0b1 - 2011-04-06
 ------------------
