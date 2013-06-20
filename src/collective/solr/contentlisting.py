@@ -32,7 +32,8 @@ class FlareContentListingObject(object):
             return IUUID(self.getObject())
 
     def getIcon(self):
-        return getMultiAdapter((self.getObject(), getRequest(), self.flare),
+        return getMultiAdapter(
+            (self.getObject(), getRequest(), self.flare),
             interface=IContentIcon)()
 
     def getSize(self):
@@ -98,7 +99,8 @@ class FlareContentListingObject(object):
         return self.flare.Type
 
     def ContentTypeClass(self):
-        return "contenttype-" + getUtility(IIDNormalizer).normalize(self.PortalType())
+        return "contenttype-" + getUtility(IIDNormalizer).normalize(
+            self.PortalType())
 
     def PortalType(self):
         return self.flare.portal_type
