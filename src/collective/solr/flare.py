@@ -1,3 +1,4 @@
+import sys
 from zope.interface import implements
 from zope.component import adapts
 from zope.component.hooks import getSite
@@ -36,7 +37,7 @@ class PloneFlare(AttrDict):
 
     def getRID(self):
         """Return a record id"""
-        return self['UID']
+        return int(int(self['UID'], 16) % sys.maxint)
 
     def getObject(self, REQUEST=None, restricted=True):
         """ return the actual object corresponding to this flare while

@@ -19,6 +19,9 @@ Changelog
 - Drop dependency on elementree (in favour of lxml).
   [tom_gross]
 
+- Let getRID return a real integer (like ZCatalog)
+  [tom_gross]
+
 3.1 - 2013-02-16
 ----------------
     
