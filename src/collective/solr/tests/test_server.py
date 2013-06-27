@@ -768,7 +768,7 @@ class SolrServerTests(SolrTestCase):
         self.assertEqual(search('Title', sort_on='Title',
             sort_order='reverse'),
                          sorted([i['Title'] for i in first_level_objs], reverse=True))
-        required = [i['getId'] for i in sorted(first_level_objs, 
+        required = [i['getId'] for i in sorted(first_level_objs,
                                key=itemgetter('Title'), reverse=True)]
         self.assertEqual(search('getId', sort_on='Title',
             sort_order='descending'), required)
@@ -776,7 +776,7 @@ class SolrServerTests(SolrTestCase):
             sorted([i['Title'] for i in first_level_objs])[:4] + ['?' for i in range(len(first_level_objs)-4)])
         self.assertEqual(search('Title', sort_on='Title', sort_order='reverse',
             sort_limit='3'),
-            sorted([i['Title'] for i in first_level_objs], reverse=True)[:3] + 
+            sorted([i['Title'] for i in first_level_objs], reverse=True)[:3] +
                    ['?' for i in range(len(first_level_objs)-3)])
         # test sort index aliases
         schema = self.search.getManager().getSchema()

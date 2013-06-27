@@ -80,7 +80,7 @@ def mangleQuery(keywords, config, schema):
             simple_term = isSimpleTerm(value)
             if pattern and isSimpleSearch(value):
                 base_value = value
-                if simple_term: # use prefix/wildcard search
+                if simple_term:  # use prefix/wildcard search
                     value = '(%s* OR %s)' % (prepare_wildcard(value), value)
                 elif isWildCard(value):
                     value = prepare_wildcard(value)
@@ -90,7 +90,7 @@ def mangleQuery(keywords, config, schema):
                     base_value=base_value)
                 keywords[key] = set([value])    # add literal query parameter
                 continue
-            elif simple_term: # use prefix/wildcard search
+            elif simple_term:  # use prefix/wildcard search
                 keywords[key] = '(%s* OR %s)' % (
                     prepare_wildcard(value), value)
                 continue
@@ -106,7 +106,15 @@ def mangleQuery(keywords, config, schema):
                     params = keywords['%s_parents' % key] = set()
                     for p in path:
                         base = len(p.split('/'))
-                        params.add(tmpl % (key, base + (depth and 1), base + depth, key, p))
+                        params.add(
+                            tmpl % (
+                                key,
+                                base + (depth and 1),
+                                base + depth,
+                                key,
+                                p
+                            )
+                        )
                 del args['depth']
         elif key == 'effectiveRange':
             if isinstance(value, DateTime):
