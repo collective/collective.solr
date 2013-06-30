@@ -80,7 +80,7 @@
 
   <utility 
       factory=".vocabularies.I18NFacetTitlesVocabularyFactory"
-      name="I18NFacetTitlesVocabularyFactory" />
+      name="" />
 
   <!-- Use the proper portal_types tool for type titles -->
   <utility
