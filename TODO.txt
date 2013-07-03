@@ -1,8 +1,12 @@
 TODOs:
+
+* Fix failing tests on travis-ci (or move to jenkins.plone.org if solr can
+  not be run there)
+* Migrate tests to use plone.app.testing
+* Migrate control panel to use plone.autoform and plone.app.registry
 * support for date facets
 * result iterator (with __len__ on results object)
 * support for "navtree" and "level" arguments for path queries
-
 * provide decorator for solr exceptions
 * add signal handlers (see store.py)
 * add a configurable queue limit for large transactions
@@ -10,3 +14,4 @@ TODOs:
   preferably via <copyField> tags in the solr schema
 * evaluate http://www.gnuenterprise.org/~jcater/solr.py as a replacement
   (also see http://tinyurl.com/2zcogf)
+* evaluate sunburnet as a replacement https://pypi.python.org/pypi/sunburnt
