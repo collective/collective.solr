@@ -3,6 +3,7 @@ python:
   - "2.6"
   - "2.7"
 install:
-  - python bootstrap.py
-  - bin/buildout -N
-script: bin/alltests
+  - python bootstrap.py -c travis.cfg
+  - bin/buildout -N -c travis.cfg
+before_script: curl https://raw.github.com/moliware/travis-solr/master/travis-solr.sh | SOLR_VERSION=3.6.2 SOLR_CONFS="testing-conf/schema.xml testing-conf/solrconfig.xml" SOLR_DOCS= bash
+script: bin/test
