@@ -7,7 +7,9 @@ from re import compile
 # 2) Any non reserved characters (normal text) ([^(){}\[\]+\-!^\"~*?:\\\\\s]+)
 # 3) Any grouping characters ([(){}[\]\"])
 # 4) Any special operators ([+\-!^~*?:\\\]))
-query_tokenizer = compile("(?:(\s+)|([^(){}[\]+\-!^\"~*?:\\\\\s]+)|([(){}\[\]\"])|([+\-!^~*?:\\\]))")
+query_tokenizer = compile(
+    "(?:(\s+)|([^(){}[\]+\-!^\"~*?:\\\\\s]+)|([(){}\[\]\"])|([+\-!^~*?:\\\]))"
+)
 
 
 class Whitespace(object):
@@ -24,7 +26,7 @@ class Group(list):
     def __init__(self, start=None, end=None):
         self.start = start
         self.end = end
-        self.isgroup = False # Set on pop
+        self.isgroup = False  # Set on pop
 
     def __str__(self):
         res = [x for x in self if x]
@@ -34,36 +36,50 @@ class Group(list):
         elif lenres == 1:
             return str(res[0])
         # Otherwise, also print whitespace
-        return '%s%s%s' % (self.start, ''.join([str(x) for x in self]), self.end)
+        return '%s%s%s' % (
+            self.start,
+            ''.join([str(x) for x in self]),
+            self.end)
 
 
 class Quote(Group):
 
     def __str__(self):
         if not self.end:
-            # No finishing quote, we have to add new group if there is whitespace
+            # No finishing quote, we have to add new group if there is
+            # whitespace
             if [x for x in self if isinstance(x, Whitespace)]:
-                self.start = '(%s'%self.start
+                self.start = '(%s' % self.start
                 self.end = ')'
-        return '%s%s%s' % (self.start, ''.join([str(x) for x in self]), self.end)
+        return '%s%s%s' % (
+            self.start,
+            ''.join([str(x) for x in self]),
+            self.end)
 
 
 class Range(Group):
 
     def __str__(self):
-        first=last='*'
+        first = last = '*'
         if len(self) == 0:
             return ''
         if not 'TO' in self:
             # Not valid range, quote
-            return '\\%s%s\\%s' % (self.start, ''.join([str(x) for x in self]), self.end)
+            return '\\%s%s\\%s' % (
+                self.start,
+                ''.join([str(x) for x in self]),
+                self.end)
         else:
             # split on 'TO'
             split = self.index('TO')
             if split > 0:
-                first = ''.join([str(x) for x in self[:split] if not isinstance(x, Whitespace)])
-            if split < (len(self)-1):
-                last = ''.join([str(x) for x in self[split+1:] if not isinstance(x, Whitespace)])
+                first = ''.join([
+                    str(x) for x in self[:split]
+                    if not isinstance(x, Whitespace)])
+            if split < (len(self) - 1):
+                last = ''.join([
+                    str(x) for x in self[split + 1:]
+                    if not isinstance(x, Whitespace)])
         return '%s%s TO %s%s' % (self.start, first, last, self.end)
 
 
@@ -92,7 +108,7 @@ def quote(term, textfield=False):
     # Counter enables lookahead
     i = 0
     stop = len(tokens)
-    while i<stop:
+    while i < stop:
         whitespace, text, grouping, special = tokens[i]
 
         if whitespace:
@@ -108,7 +124,7 @@ def quote(term, textfield=False):
                 stack.add(new)
 
         elif grouping:
-            # [] (inclusive range), {} (exclusive range), always with TO inside,
+            # [] (inclusive range), {} (exclusive range), always with TO inside
             # () group
             # "" for quotes
             if grouping == '"':
@@ -127,7 +143,7 @@ def quote(term, textfield=False):
                     stack.add(new)
             elif isinstance(stack.current, Quote):
                 # If we're in a quote, escape and print
-                stack.current.append('\\%s'%grouping)
+                stack.current.append('\\%s' % grouping)
             elif grouping in '[{':
                 new = Range(start=grouping, end={'[': ']', '{': '}'}[grouping])
                 stack.add(new)
@@ -139,7 +155,7 @@ def quote(term, textfield=False):
                     stack.current.isgroup = True
                     stack.pop()
                 else:
-                    stack.current.append('\\%s'%grouping)
+                    stack.current.append('\\%s' % grouping)
 
         elif text:
             stack.current.append(text)
@@ -147,16 +163,16 @@ def quote(term, textfield=False):
         elif special:
             if special == '\\':
                 # Inspect next to see if it's quoted special or quoted group
-                if (i+1)<stop:
-                    _, _, g2, s2 = tokens[i+1]
+                if (i + 1) < stop:
+                    _, _, g2, s2 = tokens[i + 1]
                     if s2:
                         stack.current.append('%s%s' % (special, s2))
                         # Jump ahead
-                        i+=1
+                        i += 1
                     elif g2:
                         stack.current.append('%s%s' % (special, g2))
                         # Jump ahead
-                        i+=1
+                        i += 1
                     else:
                         # Quote it
                         stack.current.append('\\%s' % special)
@@ -164,13 +180,13 @@ def quote(term, textfield=False):
                     # Quote it
                     stack.current.append('\\\\')
             elif isinstance(stack.current, Quote):
-                stack.current.append('\\%s'%special)
+                stack.current.append('\\%s' % special)
             elif special in '+-':
-                if (i+1)<stop:
-                    _, t2, g2, _ = tokens[i+1]
+                if (i + 1) < stop:
+                    _, t2, g2, _ = tokens[i + 1]
                     # We allow + and - in front of phrase and text
                     if t2 or g2 == '"':
-                        if textfield and i > 0 and tokens[i-1][1]:
+                        if textfield and i > 0 and tokens[i - 1][1]:
                             # Quote intra-word hyphens, so they are normal text
                             # and not syntax
                             stack.current.append('\\%s' % special)
@@ -180,30 +196,31 @@ def quote(term, textfield=False):
                         # Quote it
                         stack.current.append('\\%s' % special)
             elif special in '~^':
-                # Fuzzy or proximity is always after a term or phrase, and sometimes before int or float
-                # like roam~0.8 or "jakarta apache"~10
-                if i>0:
-                    _, t0, g0, _ = tokens[i-1]
+                # Fuzzy or proximity is always after a term or phrase, and
+                # sometimes before int or float like roam~0.8 or
+                # "jakarta apache"~10
+                if i > 0:
+                    _, t0, g0, _ = tokens[i - 1]
                     if t0 or g0 == '"':
                         # Look ahead to check for integer or float
 
-                        if (i+1)<stop:
-                            _, t2, _, _ = tokens[i+1]
+                        if (i + 1)<stop:
+                            _, t2, _, _ = tokens[i + 1]
                             try: # float(t2) might fail
                                 if t2 and float(t2):
                                     stack.current.append('%s%s' % (special, t2))
                                     # Jump ahead
-                                    i+=1
+                                    i += 1
                                 else:
                                     stack.current.append(special)
                             except ValueError:
                                 stack.current.append(special)
-                        else:# (i+1)<stop
+                        else:  # (i+1)<stop
                             stack.current.append(special)
-                    else:# t0 or g0 == '"'
-                        stack.current.append('\\%s'%special)
-                else:# i>0
-                    stack.current.append('\\%s'%special)
+                    else:  # t0 or g0 == '"'
+                        stack.current.append('\\%s' % special)
+                else:  # i>0
+                    stack.current.append('\\%s' % special)
             elif special in '?*':
                 # ? and * can not be the first characters of a search
                 if (stack.current \
@@ -215,8 +232,8 @@ def quote(term, textfield=False):
             elif isinstance(stack.current, Range):
                 stack.current.append(special)
             elif isinstance(stack.current, Group):
-                stack.current.append('\\%s'%special)
+                stack.current.append('\\%s' % special)
             elif isinstance(stack.current, list):
-                stack.current.append('\\%s'%special)
+                stack.current.append('\\%s' % special)
         i += 1
     return str(stack)
