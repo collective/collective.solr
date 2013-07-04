@@ -13,4 +13,3 @@ var
 *.egg-info
 *.py[co]
 .*.cfg
-/apache-solr-*
