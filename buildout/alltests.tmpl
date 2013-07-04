@@ -12,7 +12,7 @@ wait_for_solr(){
 }
 
 ${buildout:directory}/bin/solr-instance start
-wait_for_solr()
+wait_for_solr
 echo 'Solr is up. Running tests ...'
 ${buildout:directory}/bin/test $*
 status=$?
