@@ -78,7 +78,7 @@
       factory=".vocabularies.SolrIndexes"
       name="collective.solr.indexes" />
 
-  <utility 
+  <utility
       factory=".vocabularies.I18NFacetTitlesVocabularyFactory"
       name="" />
 
