@@ -726,7 +726,7 @@ class SolrServerTests(SolrTestCase):
         self.folder.processForm(values={'title': 'Foo'})
         commit()
         # no indexing happens, make sure we give the server some time
-        sleep(2)
+        sleep(4)
         result = connection.search(q='+Title:Foo').read()
         self.assertEqual(numFound(result), 0)
 
