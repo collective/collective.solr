@@ -737,7 +737,7 @@ class SolrServerTests(SolrTestCase):
         result = connection.search(q='+Title:Foo').read()
         self.assertEqual(numFound(result), 0)
         # but after some time, results are there
-        sleep(2.0)
+        sleep(4.0)
         result = connection.search(q='+Title:Foo').read()
         self.assertEqual(numFound(result), 1)
 
