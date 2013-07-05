@@ -9,12 +9,13 @@ from collective.solr import SolrMessageFactory as _
 class ISolrSchema(Interface):
 
     active = Bool(
-        title=_('label_active', default=u'Active'), default=False,
+        title=_('label_active', default=u'Active'),
         description=_(
             'help_active',
             default=u'Check this to enable the Solr integration, i.e. '
                     u'indexing and searching using the below settings.'
-        )
+        ),
+        default=False,
     )
 
     host = TextLine(
@@ -22,7 +23,8 @@ class ISolrSchema(Interface):
         description=_(
             'help_host',
             default=u'The host name of the Solr instance to be used.'
-        )
+        ),
+        default=u"127.0.0.1",
     )
 
     port = Int(
@@ -30,7 +32,8 @@ class ISolrSchema(Interface):
         description=_(
             'help_port',
             default=u'The port of the Solr instance to be used.'
-        )
+        ),
+        default=8983,
     )
 
     base = TextLine(
@@ -38,35 +41,35 @@ class ISolrSchema(Interface):
         description=_(
             'help_base',
             default=u'The base prefix of the Solr instance to be used.'
-        )
+        ),
+        default=u"/solr",
     )
 
     async = Bool(
         title=_('label_async', default=u'Asynchronous indexing'),
-        default=False,
         description=_(
             'help_async',
             default=u'Check to enable asynchronous indexing operations, '
                     u'which will improve Zope response times in return for '
                     u'not having the Solr index updated immediately.'
-        )
+        ),
+        default=False,
     )
 
     auto_commit = Bool(
         title=_('label_auto_commit', default=u'Automatic commit'),
-        default=True,
         description=_(
             'help_auto_commit',
             default=u'If enabled each index operation will cause a commit '
                     u'to be sent to Solr, which causes it to update its '
                     u'index. If you disable this, you need to configure '
                     u'commit policies on the Solr server side.'
-        )
+        ),
+        default=True,
     )
 
     commit_within = Int(
         title=_('label_commit_within', default=u'Commit within'),
-        default=0,
         description=_(
             'help_commit_within',
             default=u'Maximum number of milliseconds after which adds '
@@ -76,7 +79,8 @@ class ISolrSchema(Interface):
                     u'commit policies on the Solr server side. Otherwise '
                     u'large numbers of deletes without adds will not be '
                     u'processed. This feature requires a Solr 1.4 server.'
-        )
+        ),
+        default=0,
     )
 
     index_timeout = Float(
@@ -86,7 +90,8 @@ class ISolrSchema(Interface):
             'help_index_timeout',
             default=u'Number of seconds after which an index request will '
                     u'time out. Set to "0" to disable timeouts.'
-        )
+        ),
+        default=0.0,
     )
 
     search_timeout = Float(
@@ -96,18 +101,19 @@ class ISolrSchema(Interface):
             'help_search_timeout',
             default=u'Number of seconds after which a search request will '
                     u'time out. Set to "0" to disable timeouts.'
-        )
+        ),
+        default=0.0,
     )
 
     max_results = Int(
-        title=_('label_max_results',
-                default=u'Maximum search results'),
+        title=_('label_max_results', default=u'Maximum search results'),
         description=_(
             'help_max_results',
             default=u'Specify the maximum number of matches to be returned '
                     u'when searching. Set to "0" to always return all '
                     u'results.'
-        )
+        ),
+        default=0,
     )
 
     required = List(
@@ -120,7 +126,7 @@ class ISolrSchema(Interface):
                     u'Leave empty to dispatch all searches.'
         ),
         value_type=TextLine(),
-        default=[],
+        default=[u'SearchableText'],
         required=False
     )
 
@@ -135,7 +141,10 @@ class ISolrSchema(Interface):
                     u'{value} and {base_value} are available in the '
                     u'pattern and will be replaced by the search word '
                     u'and the search word stripped of wildcard symbols.'
-        )
+        ),
+        default=u"(Title:{value}^5 OR Description:{value}^2 OR "
+                u"SearchableText:{value} OR SearchableText:({base_value}) OR "
+                u"searchwords:({base_value})^1000) showinsearch:True'",
     )
 
     facets = List(
@@ -145,7 +154,7 @@ class ISolrSchema(Interface):
             default=u'Specify catalog indexes that should be queried for '
                     u'facet information, one per line.'),
         value_type=TextLine(),
-        default=[],
+        default=[u'portal_type', u'review_state'],
         required=False
     )
 
@@ -161,7 +170,7 @@ class ISolrSchema(Interface):
                     u'"review_state portal_type".'
         ),
         value_type=TextLine(),
-        default=[],
+        default=[u'portal_type'],
         required=False
     )
 
@@ -173,18 +182,21 @@ class ISolrSchema(Interface):
             default=u'Specify a threshold (in milliseconds) after which '
                     u'queries are considered to be slow causing them to '
                     u'be logged. Set to "0" to prevent any logging.'
-        )
+        ),
+        default=0,
     )
 
     effective_steps = Int(
         title=_('label_effective_steps',
                 default=u'Effective date steps'),
-        default=1,
         description=_(
             'help_effective_steps',
             default=u'Specify the effective date steps in seconds. '
                     u'Using 900 seconds (15 minutes) means the effective '
-                    u'date sent to Solr changes every 15 minutes.'))
+                    u'date sent to Solr changes every 15 minutes.'
+            ),
+            default=1,
+        )
 
     exclude_user = Bool(
         title=_('label_exclude_user',
@@ -214,7 +226,8 @@ class ISolrSchema(Interface):
     highlight_formatter_pre = TextLine(
         title=_(u'Highlight formatter: pre'),
         description=_(u'The text to insert before the highlighted keyword.'),
-        default=u'[', required=False
+        default=u'[',
+        required=False
     )
 
     highlight_formatter_post = TextLine(
@@ -225,11 +238,12 @@ class ISolrSchema(Interface):
     )
 
     highlight_fragsize = Int(
-        title=_(u'Highlight Fragment Size'), default=100,
+        title=_(u'Highlight Fragment Size'),
         description=_(
             u'The size, in characters, of the snippets (aka '
             U'fragments) created by the highlighter.'
-        )
+        ),
+        default=100,
     )
 
     field_list = List(

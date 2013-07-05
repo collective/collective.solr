@@ -61,14 +61,14 @@ class SolrControlpanelIntegrationTest(unittest.TestCase):
         self.assertEqual(
             self.registry['collective.solr.interfaces.' +
                           'ISolrSchema.host'],
-            None)
+            u"127.0.0.1")
 
     def test_port_setting(self):
         self.assertTrue('port' in ISolrSchema.names())
         self.assertEqual(
             self.registry['collective.solr.interfaces.' +
                           'ISolrSchema.port'],
-            None)
+            8983)
 
 
 class SolrControlPanelFunctionalTest(unittest.TestCase):
