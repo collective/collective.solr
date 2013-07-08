@@ -6,7 +6,7 @@ from Testing import ZopeTestCase as ztc
 from collective.solr.tests.utils import getData
 from collective.solr.parser import SolrResponse
 from collective.solr.utils import findObjects, isSimpleTerm, isSimpleSearch
-from collective.solr.utils import isWildCard
+from collective.solr.utils import isWildCard, splitSimpleSearch
 from collective.solr.utils import setupTranslationMap, prepareData
 from collective.solr.utils import padResults
 
@@ -92,6 +92,13 @@ class UtilsTests(ztc.ZopeTestCase):
         self.failIf(isSimpleSearch('foo 1/2000'))
         self.failIf(isSimpleSearch('foo 42 bar11'))
         self.failUnless(isSimpleSearch('2000 foo'))
+
+    def testSplitSimpleSearch(self):
+        self.assertEqual(splitSimpleSearch('foo bar'), ['foo', 'bar'])
+        self.assertEqual(splitSimpleSearch('foo "bar foobar" baz'),
+                         ['foo', '"bar foobar"', 'baz'])
+        self.assertRaises(AssertionError, splitSimpleSearch, 'foo AND bar')
+        self.assertRaises(AssertionError, splitSimpleSearch, 'foo42')
 
     def testIsWildCard(self):
         self.failUnless(isWildCard('foo*'))

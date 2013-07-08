@@ -7,6 +7,7 @@ from collective.solr.queryparser import quote
 from collective.solr.utils import isSimpleTerm
 from collective.solr.utils import isSimpleSearch
 from collective.solr.utils import isWildCard
+from collective.solr.utils import splitSimpleSearch
 from collective.solr.utils import prepare_wildcard
 
 
@@ -34,6 +35,53 @@ def iso8601date(value):
         v = value.toZone('UTC')
         value = '%04d-%02d-%02dT%02d:%02d:%06.3fZ' % (v.year(),
             v.month(), v.day(), v.hour(), v.minute(), v.second())
+    return value
+
+
+def makeSimpleExpressions(term, levenstein_distance):
+    '''Return a search expression for part of the query that
+    includes the levenstein distance and wildcards where appropriate.
+    Returns both an expression for "value" and "base_value"'''
+
+    base_value = term
+    if levenstein_distance:
+        levenstein_expr = '~%s' % levenstein_distance
+    else:
+        levenstein_expr = ''
+    if '"' in term:  # quoted literals
+        value = '%s%s' % (term, levenstein_expr)
+        base_value = value
+    elif isWildCard(term):
+        value = prepare_wildcard(term)
+        base_value = quote(term.replace('*', '').replace('?', ''))
+    else:
+        value = '%s* OR %s%s' % (prepare_wildcard(term), term,
+                                 levenstein_expr)
+    return '(%s)' % value, '(%s)' % base_value
+
+
+def mangleSearchableText(value, config):
+    pattern = getattr(config, 'search_pattern', '')
+    levenstein_distance = getattr(config, 'levenstein_distance', 0)
+    value_parts = []
+    base_value_parts = []
+
+    if not isSimpleSearch(value):
+        return value
+
+    for term in splitSimpleSearch(value):
+        (term_value,
+         term_base_value) = makeSimpleExpressions(term,
+                                                  levenstein_distance)
+        value_parts.append(term_value)
+        base_value_parts.append(term_base_value)
+
+    base_value = ' '.join(base_value_parts)
+    value = ' '.join(value_parts)
+    if pattern:
+        value = pattern.format(value=quote(value),
+                               base_value=base_value)
+        return set([value])    # add literal query parameter
     return value
 
 
@@ -76,24 +124,8 @@ def mangleQuery(keywords, config, schema):
     for key, value in keywords.items():
         args = extras.get(key, {})
         if key == 'SearchableText':
-            pattern = getattr(config, 'search_pattern', '')
-            simple_term = isSimpleTerm(value)
-            if pattern and isSimpleSearch(value):
-                base_value = value
-                if simple_term:  # use prefix/wildcard search
-                    value = '(%s* OR %s)' % (prepare_wildcard(value), value)
-                elif isWildCard(value):
-                    value = prepare_wildcard(value)
-                    base_value = quote(value.replace('*', '').replace('?', ''))
-                # simple queries use custom search pattern
-                value = pattern.format(value=quote(value),
-                    base_value=base_value)
-                keywords[key] = set([value])    # add literal query parameter
-                continue
-            elif simple_term:  # use prefix/wildcard search
-                keywords[key] = '(%s* OR %s)' % (
-                    prepare_wildcard(value), value)
-                continue
+            keywords[key] = mangleSearchableText(value, config)
+            continue
         if key in epi_indexes:
             path = keywords['%s_parents' % key] = value
             del keywords[key]
