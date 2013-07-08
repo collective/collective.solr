@@ -14,11 +14,6 @@ def test_suite():
     if pingSolr():
         suite.addTest(
             ztc.FunctionalDocFileSuite(
-               'configlet.txt', package='collective.solr.tests',
-               test_class=SolrControlPanelTestCase, optionflags=optionflags),
-        )
-        suite.addTest(
-            ztc.FunctionalDocFileSuite(
                'errors.txt', package='collective.solr.tests',
                test_class=SolrFunctionalTestCase, optionflags=optionflags),
         )
