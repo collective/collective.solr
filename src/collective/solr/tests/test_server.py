@@ -470,7 +470,9 @@ class SolrServerTests(SolrTestCase):
         # the pattern is applied for multi-word searches
         response = solrSearchResults(SearchableText='foo bar', Language='all')
         query = response.responseHeader['params']['q']
-        self.assertEqual(query, '(Title:(foo bar)^5 OR getId:(foo bar))')
+        self.assertEqual(query,
+                         '(Title:((foo* OR foo) (bar* OR bar))^5 OR '
+                         'getId:((foo* OR foo) (bar* OR bar)))')
         # extra parameters should be unaffected
         response = solrSearchResults(SearchableText='"news"', Type='xy', Language='all')
         query = response.responseHeader['params']['q']
@@ -479,14 +481,14 @@ class SolrServerTests(SolrTestCase):
         self.config.search_pattern = '(Title:{value} OR getId:{base_value})'
         response = solrSearchResults(SearchableText='news', Language='all')
         query = response.responseHeader['params']['q']
-        self.assertEqual(query, '(Title:(news* OR news) OR getId:news)')
+        self.assertEqual(query, '(Title:(news* OR news) OR getId:(news))')
         # and they handle wildcards as advertised
         response = solrSearchResults(SearchableText='news*', Language='all')
         query = response.responseHeader['params']['q']
-        self.assertEqual(query, '(Title:news* OR getId:news)')
+        self.assertEqual(query, '(Title:(news*) OR getId:(news))')
         response = solrSearchResults(SearchableText='*news*', Language='all')
         query = response.responseHeader['params']['q']
-        self.assertEqual(query, '(Title:news* OR getId:news)')
+        self.assertEqual(query, '(Title:(news*) OR getId:(news))')
 
     def testSolrSearchResultsWithDictRequest(self):
         self.maintenance.reindex()
@@ -724,7 +726,7 @@ class SolrServerTests(SolrTestCase):
         self.folder.processForm(values={'title': 'Foo'})
         commit()
         # no indexing happens, make sure we give the server some time
-        sleep(2)
+        sleep(4)
         result = connection.search(q='+Title:Foo').read()
         self.assertEqual(numFound(result), 0)
 

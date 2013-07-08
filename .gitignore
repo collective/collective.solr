@@ -7,9 +7,11 @@ eggs
 extras/*
 include
 lib
+lib64
 parts
 htmlcov
 var
 *.egg-info
 *.py[co]
+*.*~
 .*.cfg
