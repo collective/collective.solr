@@ -42,3 +42,8 @@ class SolrConnectionConfigIntegrationTest(unittest.TestCase):
         self.assertEqual(config.slow_query_threshold, 0)
         self.assertEqual(config.effective_steps, 1)
         self.assertEqual(config.exclude_user, False)
+        self.assertEqual(config.highlight_fields, ())
+        self.assertEqual(config.highlight_formatter_pre, '[')
+        self.assertEqual(config.highlight_formatter_post, ']')
+        self.assertEqual(config.highlight_fragsize, 100)
+        self.assertEqual(config.field_list, [])
