@@ -111,6 +111,24 @@ def isSimpleSearch(term):
     return False
 
 
+def splitSimpleSearch(term):
+    '''Split a simple search term into tokens (words and phrases)'''
+    if not isSimpleSearch(term):
+        raise AssertionError('term is not a simple search')
+    parts = term.split('"')
+    tokens = []
+    for i in range(0, len(parts)):
+        if i % 2 == 0:
+            # unquoted text
+            words = [word for word in parts[i].split() if word]
+            tokens.extend(words)
+        else:
+            # The uneven parts are those inside quotes.
+            if parts[i]:
+                tokens.append('"%s"' % parts[i])
+    return tokens
+
+
 wildCard = compile(r'^[\w\d\s*?]*[*?]+[\w\d\s*?]*$', UNICODE)
 def isWildCard(term):
     if isinstance(term, str):
