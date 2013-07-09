@@ -155,7 +155,8 @@ def quote(term, textfield=False):
                 new = Group(start='(', end=')')
                 stack.add(new)
             elif grouping in ']})':
-                if isinstance(stack.current, Group) and stack.current.end == grouping:
+                if (isinstance(stack.current, Group) and
+                    stack.current.end == grouping):
                     stack.current.isgroup = True
                     stack.pop()
                 else:
@@ -208,11 +209,12 @@ def quote(term, textfield=False):
                     if t0 or g0 == '"':
                         # Look ahead to check for integer or float
 
-                        if (i + 1)<stop:
+                        if (i + 1) < stop:
                             _, t2, _, _ = tokens[i + 1]
-                            try: # float(t2) might fail
+                            try:  # float(t2) might fail
                                 if t2 and float(t2):
-                                    stack.current.append('%s%s' % (special, t2))
+                                    stack.current.append(
+                                        '%s%s' % (special, t2))
                                     # Jump ahead
                                     i += 1
                                 else:
