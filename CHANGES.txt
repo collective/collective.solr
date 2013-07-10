@@ -4,6 +4,9 @@ Changelog
 4.0 - unreleased
 ------------------
 
+- Integrate 'suggest-terms' view from ftw.solr. No UI yet!
+  [timo, 4teamworks]
+
 - Add plone.app.testing setup.
   [timo]
 
