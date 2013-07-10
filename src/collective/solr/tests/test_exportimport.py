@@ -28,6 +28,7 @@ class SetupToolTests(SolrTestCase, TarballTester):
         config.slow_query_threshold = 2342
         config.effective_steps = 900
         config.exclude_user = True
+        config.levenshtein_distance = 0.2
 
     def testImportStep(self):
         profile = 'profile-collective.solr:default'
@@ -53,6 +54,7 @@ class SetupToolTests(SolrTestCase, TarballTester):
         self.assertEqual(config.slow_query_threshold, 0)
         self.assertEqual(config.effective_steps, 1)
         self.assertEqual(config.exclude_user, False)
+        self.assertEqual(config.levenshtein_distance, 0.2)
 
     def testExportStep(self):
         tool = self.portal.portal_setup
@@ -121,6 +123,7 @@ SOLR_XML = """\
     <highlight_formatter_post value="]"/>
     <highlight_fragsize value="100"/>
     <field-list/>
+    <levenshtein_distance value="0.2"/>
   </settings>
 </object>
 """
