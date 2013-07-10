@@ -56,7 +56,7 @@ active without *having* it active.
     >>> config.field_list
     []
     >>> config.levenshtein_distance
-    0
+    0.0
 
 
 Viewing the site control panel
@@ -114,7 +114,7 @@ Make some changes
     >>> self.browser.getControl(name='form.field_list.0.').value = 'Title'
     >>> self.browser.getControl(name='form.field_list.add').click()
     >>> self.browser.getControl(name='form.field_list.1.').value = 'effective'
-    >>> self.browser.getControl(name='form.levenshtein_distance').value = 0.9
+    >>> self.browser.getControl(name='form.levenshtein_distance').value = '0.1'
 
 Click the save button:
 
@@ -172,7 +172,7 @@ Make sure the changes have been applied correctly to the tool:
     >>> config.field_list
     [u'Title', u'effective']
     >>> config.levenshtein_distance
-    0.9
+    0.1
 
 Now that the connection is active we can also select more filter query
 parameters from the complete list of Solr indexes, provided that we use the
