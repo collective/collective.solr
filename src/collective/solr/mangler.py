@@ -4,7 +4,6 @@ from DateTime import DateTime
 
 from collective.solr.interfaces import ISolrConnectionConfig
 from collective.solr.queryparser import quote
-from collective.solr.utils import isSimpleTerm
 from collective.solr.utils import isSimpleSearch
 from collective.solr.utils import isWildCard
 from collective.solr.utils import splitSimpleSearch
@@ -21,9 +20,10 @@ sort_aliases = {
     'sortable_title': 'Title',
 }
 
-query_args = ('range',
-              'operator',
-              'depth',
+query_args = (
+    'range',
+    'operator',
+    'depth',
 )
 
 ignored = 'use_solr', '-C'
@@ -33,8 +33,8 @@ def iso8601date(value):
     """ convert `DateTime` to iso 8601 date format """
     if isinstance(value, DateTime):
         v = value.toZone('UTC')
-        value = '%04d-%02d-%02dT%02d:%02d:%06.3fZ' % (v.year(),
-            v.month(), v.day(), v.hour(), v.minute(), v.second())
+        value = '%04d-%02d-%02dT%02d:%02d:%06.3fZ' % (
+            v.year(), v.month(), v.day(), v.hour(), v.minute(), v.second())
     return value
 
 
@@ -62,7 +62,7 @@ def makeSimpleExpressions(term, levenstein_distance):
 
 def mangleSearchableText(value, config):
     pattern = getattr(config, 'search_pattern', '')
-    levenstein_distance = getattr(config, 'levenstein_distance', 0)
+    levenstein_distance = getattr(config, 'levenshtein_distance', 0)
     value_parts = []
     base_value_parts = []
 

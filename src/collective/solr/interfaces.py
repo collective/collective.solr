@@ -242,6 +242,16 @@ class ISolrSchema(Interface):
         required=False
     )
 
+    levenshtein_distance = Float(
+        title=_('label_levenshtein_distance',
+                default=u'Levenshtein distance'),
+        description=_(
+            'help_levenshtein_distance',
+            default=u'Specify a value between 0 and 1.'
+        ),
+        required=False,
+    )
+
 
 class ISolrConnectionConfig(ISolrSchema):
     """ utility to hold the connection configuration for the solr server """

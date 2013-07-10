@@ -33,5 +33,6 @@
         value="]" />
     <highlight_fragsize
         value="100" />
+    <levenshtein_distance value="0" />
   </settings>
 </object>
