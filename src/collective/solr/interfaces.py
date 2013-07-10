@@ -247,7 +247,10 @@ class ISolrSchema(Interface):
                 default=u'Levenshtein distance'),
         description=_(
             'help_levenshtein_distance',
-            default=u'Specify a value between 0 and 1.'
+            default=u'The Levenshtein distance is a string metric for '
+                    u'measuring the difference between two strings. It allows'
+                    u'you to perform fuzzy searches by specifying a value '
+                    u'between 0 and 1.'
         ),
         required=False,
     )
