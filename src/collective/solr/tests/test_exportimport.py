@@ -54,7 +54,7 @@ class SetupToolTests(SolrTestCase, TarballTester):
         self.assertEqual(config.slow_query_threshold, 0)
         self.assertEqual(config.effective_steps, 1)
         self.assertEqual(config.exclude_user, False)
-        self.assertEqual(config.levenshtein_distance, 0.2)
+        self.assertEqual(config.levenshtein_distance, 0.0)
 
     def testExportStep(self):
         tool = self.portal.portal_setup
