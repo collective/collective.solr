@@ -4,6 +4,9 @@ Changelog
 4.0 - unreleased
 ------------------
 
+- Add plone.app.testing setup.
+  [timo]
+
 - Support fuzzy search for SearchableText.
   [csenger,timo]
 
@@ -33,6 +36,7 @@ Changelog
 
 - Let getRID return a real integer (like ZCatalog)
   [tom_gross]
+
 
 3.1 - 2013-02-16
 ----------------
