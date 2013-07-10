@@ -134,7 +134,7 @@ class SolrConfigXMLAdapter(XMLAdapterBase):
                         value.append(elem.getAttribute('name'))
                     self.context.field_list = tuple(map(str, value))
                 elif child.nodeName == 'levenshtein_distance':
-                    value = int(str(child.getAttribute('value')))
+                    value = float(str(child.getAttribute('value')))
                     self.context.levenshtein_distance = value
 
     def _createNode(self, name, value):
