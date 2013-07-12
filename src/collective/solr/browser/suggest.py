@@ -28,14 +28,22 @@ class SuggestView(BrowserView):
         response = connection.doPost(
             connection.solrBase + '/suggest?' + params, '', {})
         results = json.loads(response.read())
+
+        # Check for spellcheck
         spellcheck = results.get('spellcheck', None)
         if not spellcheck:
             return json.dumps(suggestions)
+
+        # Check for existing spellcheck suggestions
         spellcheck_suggestions = spellcheck.get('suggestions', None)
-        if not spellcheck_suggestions:
+        correctly_spelled = \
+            spellcheck_suggestions == [u'correctlySpelled', True]
+        if not spellcheck_suggestions or correctly_spelled:
             return json.dumps(suggestions)
 
-        for suggestion in spellcheck_suggestions[1]['suggestion']:
-            suggestions.append(dict(label=suggestion, value=suggestion))
+        # Collect suggestions
+        if spellcheck_suggestions[1]:
+            for suggestion in spellcheck_suggestions[1]['suggestion']:
+                suggestions.append(dict(label=suggestion, value=suggestion))
 
         return json.dumps(suggestions)
