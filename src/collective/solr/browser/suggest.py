@@ -26,7 +26,7 @@ class SuggestView(BrowserView):
 
         params = urllib.urlencode(params, doseq=True)
         response = connection.doPost(
-            connection.solrBase + '/spell?' + params, '', {})
+            connection.solrBase + '/suggest?' + params, '', {})
         results = json.loads(response.read())
 
         # Check for spellcheck
@@ -38,14 +38,13 @@ class SuggestView(BrowserView):
         spellcheck_suggestions = spellcheck.get('suggestions', None)
         correctly_spelled = \
             spellcheck_suggestions == [u'correctlySpelled', True]
-        numbers_found = results['response']['numFound']
 
         # Autocomplete
-        if correctly_spelled and numbers_found > 0:
+        if correctly_spelled:
             return json.dumps(
                 [x['Title'] for x in results['response']['docs']])
 
-        if not spellcheck_suggestions or correctly_spelled:
+        if not spellcheck_suggestions:
             return json.dumps(suggestions)
 
         # Collect suggestions
