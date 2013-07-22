@@ -5,14 +5,14 @@ from re import compile
 # (see http://wiki.apache.org/solr/SolrQuerySyntax)
 # Four groups for tokenizer:
 # 1) Whitespace (\s+)
-# 2) Any non reserved characters (normal text) ([^(){}\[\]+\-!^\"~*?:\\\\\s]+)
+# 2) Any non reserved characters (normal text) ([^(){}\[\]+\-!^/\"~*?:\\\\\s]+)
 # 3) Any grouping characters ([(){}[\]\"])
-# 4) Any special operators ([+\/-!^~*?:\\\]))
+# 4) Any special operators ([+\-!^/~*?:\\\]))
 query_tokenizer = compile(
     "(?:(\s+)|"
-    "([^(){}[\]+\-!^\"~*?:\\\\\s]+)|"
+    "([^(){}[\]+\-!^/\"~*?:\\\\\s]+)|"
     "([(){}\[\]\"])|"
-    "([+\-!^~*?:\\\]))"
+    "([+\-!^/~*?:\\\]))"
 )
 
 
@@ -235,6 +235,8 @@ def quote(term, textfield=False):
                          not stack.current[-1] in special)) \
                    or isinstance(stack.current, Range):
                     stack.current.append(special)
+            elif special in '/':
+                stack.current.append('\\%s' % special)
             elif isinstance(stack.current, Range):
                 stack.current.append(special)
             elif isinstance(stack.current, Group):

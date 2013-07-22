@@ -42,7 +42,7 @@ class QuoteTests(TestCase):
         self.assertEqual(quote('\?'), '\?')
         self.assertEqual(quote('john@foo.com'), 'john@foo.com')
         self.assertEqual(quote('http://machine/folder and item and some/path and and amilli3*'),
-                               '(http\://machine/folder and item and some/path and and amilli3*)')
+                               '(http\:\\/\\/machine\\/folder and item and some\\/path and and amilli3*)')
         self.assertEqual(quote('"[]"'), '"\[\]"')
         self.assertEqual(quote('"{}"'), '"\{\}"')
         self.assertEqual(quote('"()"'), '"\(\)"')
@@ -133,11 +133,12 @@ class QuoteTests(TestCase):
         self.assertEqual(quote('[1995-12-31T23:59:59.999Z TO 2007-03-06T00:00:00Z]'),
                                '[1995-12-31T23:59:59.999Z TO 2007-03-06T00:00:00Z]')
         self.assertEqual(quote('[NOW-1YEAR/DAY TO NOW/DAY+1DAY]'),
-                               '[NOW-1YEAR/DAY TO NOW/DAY+1DAY]')
+                               '[NOW-1YEAR\\/DAY TO NOW\\/DAY+1DAY]')
         self.assertEqual(quote('[1976-03-06T23:59:59.999Z TO 1976-03-06T23:59:59.999Z+1YEAR]'),
                                '[1976-03-06T23:59:59.999Z TO 1976-03-06T23:59:59.999Z+1YEAR]')
+        # quoting date operators seems to be ok too
         self.assertEqual(quote('[1976-03-06T23:59:59.999Z/YEAR TO 1976-03-06T23:59:59.999Z]'),
-                               '[1976-03-06T23:59:59.999Z/YEAR TO 1976-03-06T23:59:59.999Z]')
+                               '[1976-03-06T23:59:59.999Z\\/YEAR TO 1976-03-06T23:59:59.999Z]')
 
 
 class QueryTests(TestCase):
