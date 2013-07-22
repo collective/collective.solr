@@ -1,14 +1,18 @@
 from re import compile
 
-# Solr/lucene reserved characters/terms: + - && || ! ( ) { } [ ] ^ " ~ * ? : \
+# Solr/lucene reserved characters/terms:
+# + - && || ! ( ) { } [ ] ^ " ~ * ? : \ /
 # (see http://wiki.apache.org/solr/SolrQuerySyntax)
 # Four groups for tokenizer:
 # 1) Whitespace (\s+)
-# 2) Any non reserved characters (normal text) ([^(){}\[\]+\-!^\"~*?:\\\\\s]+)
+# 2) Any non reserved characters (normal text) ([^(){}\[\]+\-!^/\"~*?:\\\\\s]+)
 # 3) Any grouping characters ([(){}[\]\"])
-# 4) Any special operators ([+\-!^~*?:\\\]))
+# 4) Any special operators ([+\-!^/~*?:\\\]))
 query_tokenizer = compile(
-    "(?:(\s+)|([^(){}[\]+\-!^\"~*?:\\\\\s]+)|([(){}\[\]\"])|([+\-!^~*?:\\\]))"
+    "(?:(\s+)|"
+    "([^(){}[\]+\-!^/\"~*?:\\\\\s]+)|"
+    "([(){}\[\]\"])|"
+    "([+\-!^/~*?:\\\]))"
 )
 
 
@@ -151,7 +155,8 @@ def quote(term, textfield=False):
                 new = Group(start='(', end=')')
                 stack.add(new)
             elif grouping in ']})':
-                if isinstance(stack.current, Group) and stack.current.end == grouping:
+                if (isinstance(stack.current, Group) and
+                    stack.current.end == grouping):
                     stack.current.isgroup = True
                     stack.pop()
                 else:
@@ -204,11 +209,12 @@ def quote(term, textfield=False):
                     if t0 or g0 == '"':
                         # Look ahead to check for integer or float
 
-                        if (i + 1)<stop:
+                        if (i + 1) < stop:
                             _, t2, _, _ = tokens[i + 1]
-                            try: # float(t2) might fail
+                            try:  # float(t2) might fail
                                 if t2 and float(t2):
-                                    stack.current.append('%s%s' % (special, t2))
+                                    stack.current.append(
+                                        '%s%s' % (special, t2))
                                     # Jump ahead
                                     i += 1
                                 else:
@@ -229,6 +235,8 @@ def quote(term, textfield=False):
                          not stack.current[-1] in special)) \
                    or isinstance(stack.current, Range):
                     stack.current.append(special)
+            elif special in '/':
+                stack.current.append('\\%s' % special)
             elif isinstance(stack.current, Range):
                 stack.current.append(special)
             elif isinstance(stack.current, Group):
