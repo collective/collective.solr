@@ -4,6 +4,15 @@ Changelog
 4.0 - unreleased
 ------------------
 
+- Integrate 'suggest-terms' view from ftw.solr. No UI yet!
+  [timo, 4teamworks]
+
+- Add plone.app.testing setup.
+  [timo]
+
+- Support fuzzy search for SearchableText.
+  [csenger,timo]
+
 - Make sure slashes are properly escaped in the search query. Solr 4.0 added
   regular expression support, which means that '/' is now a special character
   and must be escaped if searching for literal forward slash.
@@ -33,6 +42,7 @@ Changelog
   
 - ``solrBase`` should be a string, fixes #8
   [saily]
+
 
 
 3.1 - 2013-02-16

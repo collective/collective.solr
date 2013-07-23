@@ -46,6 +46,7 @@ class SolrConfigXMLAdapter(XMLAdapterBase):
         self.context.highlight_formatter_pre = ''
         self.context.highlight_formatter_post = ''
         self.context.highlight_fragsize = 0
+        self.context.levenshtein_distance = 0
 
     def _initProperties(self, node):
         elems = node.getElementsByTagName('connection')
@@ -132,6 +133,9 @@ class SolrConfigXMLAdapter(XMLAdapterBase):
                     for elem in child.getElementsByTagName('parameter'):
                         value.append(elem.getAttribute('name'))
                     self.context.field_list = tuple(map(str, value))
+                elif child.nodeName == 'levenshtein_distance':
+                    value = float(str(child.getAttribute('value')))
+                    self.context.levenshtein_distance = value
 
     def _createNode(self, name, value):
         node = self._doc.createElement(name)
@@ -191,6 +195,8 @@ class SolrConfigXMLAdapter(XMLAdapterBase):
         append(create('highlight_fragsize', str(self.context.highlight_fragsize)))
         field_list = self._doc.createElement('field-list')
         append(field_list)
+        append(create('levenshtein_distance',
+            str(self.context.levenshtein_distance)))
         for name in self.context.field_list:
             param = self._doc.createElement('parameter')
             param.setAttribute('name', name)

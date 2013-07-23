@@ -8,143 +8,252 @@ from collective.solr import SolrMessageFactory as _
 
 class ISolrSchema(Interface):
 
-    active = Bool(title=_('label_active', default=u'Active'), default=False,
-        description=_('help_active',
-                      default=u'Check this to enable the Solr integration, i.e. '
-                       'indexing and searching using the below settings.'))
+    active = Bool(
+        title=_('label_active', default=u'Active'), default=False,
+        description=_(
+            'help_active',
+            default=u'Check this to enable the Solr integration, i.e. '
+                    u'indexing and searching using the below settings.'
+        )
+    )
 
-    host = TextLine(title=_('label_host', default=u'Host'),
-        description=_('help_host',
-                      default=u'The host name of the Solr instance to be used.'))
+    host = TextLine(
+        title=_('label_host', default=u'Host'),
+        description=_(
+            'help_host',
+            default=u'The host name of the Solr instance to be used.'
+        )
+    )
 
-    port = Int(title=_('label_port', default=u'Port'),
-        description=_('help_port',
-                      default=u'The port of the Solr instance to be used.'))
+    port = Int(
+        title=_('label_port', default=u'Port'),
+        description=_(
+            'help_port',
+            default=u'The port of the Solr instance to be used.'
+        )
+    )
 
-    base = TextLine(title=_('label_base', default=u'Base'),
-        description=_('help_base',
-                      default=u'The base prefix of the Solr instance to be used.'))
+    base = TextLine(
+        title=_('label_base', default=u'Base'),
+        description=_(
+            'help_base',
+            default=u'The base prefix of the Solr instance to be used.'
+        )
+    )
 
-    async = Bool(title=_('label_async', default=u'Asynchronous indexing'), default=False,
-        description=_('help_async', default=u'Check to enable asynchronous indexing operations, '
-                       'which will improve Zope response times in return for '
-                       'not having the Solr index updated immediately.'))
+    async = Bool(
+        title=_('label_async', default=u'Asynchronous indexing'),
+        default=False,
+        description=_(
+            'help_async',
+            default=u'Check to enable asynchronous indexing operations, '
+                    u'which will improve Zope response times in return for '
+                    u'not having the Solr index updated immediately.'
+        )
+    )
 
-    auto_commit = Bool(title=_('label_auto_commit', default=u'Automatic commit'), default=True,
-        description=_('help_auto_commit',
-                      default=u'If enabled each index operation will cause a commit '
-                       'to be sent to Solr, which causes it to update its '
-                       'index. If you disable this, you need to configure '
-                       'commit policies on the Solr server side.'))
+    auto_commit = Bool(
+        title=_('label_auto_commit', default=u'Automatic commit'),
+        default=True,
+        description=_(
+            'help_auto_commit',
+            default=u'If enabled each index operation will cause a commit '
+                    u'to be sent to Solr, which causes it to update its '
+                    u'index. If you disable this, you need to configure '
+                    u'commit policies on the Solr server side.'
+        )
+    )
 
-    commit_within = Int(title=_('label_commit_within', default=u'Commit within'), default=0,
-        description=_('help_commit_within',
-                      default=u'Maximum number of milliseconds after which adds '
-                       'should be processed by Solr. Defaults to 0, meaning '
-                       'immediate commits. Enabling this feature implicitly '
-                       'disables automatic commit and you should configure '
-                       'commit policies on the Solr server side. Otherwise '
-                       'large numbers of deletes without adds will not be '
-                       'processed. This feature requires a Solr 1.4 server.'))
+    commit_within = Int(
+        title=_('label_commit_within', default=u'Commit within'),
+        default=0,
+        description=_(
+            'help_commit_within',
+            default=u'Maximum number of milliseconds after which adds '
+                    u'should be processed by Solr. Defaults to 0, meaning '
+                    u'immediate commits. Enabling this feature implicitly '
+                    u'disables automatic commit and you should configure '
+                    u'commit policies on the Solr server side. Otherwise '
+                    u'large numbers of deletes without adds will not be '
+                    u'processed. This feature requires a Solr 1.4 server.'
+        )
+    )
 
-    index_timeout = Float(title=_('label_index_timeout',
-                                  default=u'Index timeout'),
-        description=_('help_index_timeout',
-                      default=u'Number of seconds after which an index request will '
-                       'time out. Set to "0" to disable timeouts.'))
+    index_timeout = Float(
+        title=_('label_index_timeout',
+                default=u'Index timeout'),
+        description=_(
+            'help_index_timeout',
+            default=u'Number of seconds after which an index request will '
+                    u'time out. Set to "0" to disable timeouts.'
+        )
+    )
 
-    search_timeout = Float(title=_('label_search_timeout',
-                                   default=u'Search timeout'),
-        description=_('help_search_timeout',
-                      default=u'Number of seconds after which a search request will '
-                       'time out. Set to "0" to disable timeouts.'))
+    search_timeout = Float(
+        title=_('label_search_timeout',
+                default=u'Search timeout'),
+        description=_(
+            'help_search_timeout',
+            default=u'Number of seconds after which a search request will '
+                    u'time out. Set to "0" to disable timeouts.'
+        )
+    )
 
-    max_results = Int(title=_('label_max_results',
-                              default=u'Maximum search results'),
-        description=_('help_max_results',
-                      default=u'Specify the maximum number of matches to be returned '
-                       'when searching. Set to "0" to always return all '
-                       'results.'))
+    max_results = Int(
+        title=_('label_max_results',
+                default=u'Maximum search results'),
+        description=_(
+            'help_max_results',
+            default=u'Specify the maximum number of matches to be returned '
+                    u'when searching. Set to "0" to always return all '
+                    u'results.'
+        )
+    )
 
-    required = List(title=_('label_required', default=u'Required query parameters'),
-        description = _('help_required',
-                        default=u'Specify required query parameters, one per line. '
-                         'Searches will only get dispatched to Solr if any '
-                         'of the listed parameters is present in the query. '
-                         'Leave empty to dispatch all searches.'),
-        value_type = TextLine(), default = [], required = False)
+    required = List(
+        title=_('label_required', default=u'Required query parameters'),
+        description=_(
+            'help_required',
+            default=u'Specify required query parameters, one per line. '
+                    u'Searches will only get dispatched to Solr if any '
+                    u'of the listed parameters is present in the query. '
+                    u'Leave empty to dispatch all searches.'
+        ),
+        value_type=TextLine(),
+        default=[],
+        required=False
+    )
 
-    search_pattern = Text(title=_('label_search_pattern',
-                                  default=u'Pattern for simple search queries'),
-        description = _('help_search_pattern',
-                                default=u'Specify a query pattern used for simple queries '
-                         'consisting only of words and numbers, i.e. not '
-                         'using any of Solr\'s advanced query expressions. '
-                         '{value} and {base_value} are available in the '
-                         'pattern and will be replaced by the search word '
-                         'and the search word stripped of wildcard symbols.'))
+    search_pattern = Text(
+        title=_('label_search_pattern',
+                default=u'Pattern for simple search queries'),
+        description=_(
+            'help_search_pattern',
+            default=u'Specify a query pattern used for simple queries '
+                    u'consisting only of words and numbers, i.e. not '
+                    u'using any of Solr\'s advanced query expressions. '
+                    u'{value} and {base_value} are available in the '
+                    u'pattern and will be replaced by the search word '
+                    u'and the search word stripped of wildcard symbols.'
+        )
+    )
 
-    facets = List(title=_('label_facets', default=u'Default search facets'),
-        description = _('help_facets',
-                        default=u'Specify catalog indexes that should be queried for '
-                         'facet information, one per line.'),
-        value_type = TextLine(), default = [], required = False)
+    facets = List(
+        title=_('label_facets', default=u'Default search facets'),
+        description=_(
+            'help_facets',
+            default=u'Specify catalog indexes that should be queried for '
+                    u'facet information, one per line.'),
+        value_type=TextLine(),
+        default=[],
+        required=False
+    )
 
-    filter_queries = List(title=_('label_filter_queries', default=u'Filter query parameters'),
-        description = _('help_filter_queries',
-                        default=u'Specify query parameters for which filter queries '
-                         'should be used, one per line.  You can use several '
-                         'indices in one filter query separated by space. '
-                         'Typical examples are '
-                         '"effective expires allowedRolesAndUsers" or '
-                         '"review_state portal_type".'),
-        value_type = TextLine(), default = [], required = False)
+    filter_queries = List(
+        title=_('label_filter_queries', default=u'Filter query parameters'),
+        description=_(
+            'help_filter_queries',
+            default=u'Specify query parameters for which filter queries '
+                    u'should be used, one per line.  You can use several '
+                    u'indices in one filter query separated by space. '
+                    u'Typical examples are '
+                    u'"effective expires allowedRolesAndUsers" or '
+                    u'"review_state portal_type".'
+        ),
+        value_type=TextLine(),
+        default=[],
+        required=False
+    )
 
-    slow_query_threshold = Int(title=_('label_slow_query_threshold',
-                                       default=u'Slow query threshold'),
-        description=_('help_slow_query_threshold',
-                      default=u'Specify a threshold (in milliseconds) after which '
-                       'queries are considered to be slow causing them to '
-                       'be logged. Set to "0" to prevent any logging.'))
+    slow_query_threshold = Int(
+        title=_('label_slow_query_threshold',
+                default=u'Slow query threshold'),
+        description=_(
+            'help_slow_query_threshold',
+            default=u'Specify a threshold (in milliseconds) after which '
+                    u'queries are considered to be slow causing them to '
+                    u'be logged. Set to "0" to prevent any logging.'
+        )
+    )
 
-    effective_steps = Int(title=_('label_effective_steps',
-                                  default=u'Effective date steps'), default=1,
-        description=_('help_effective_steps',
-                      default=u'Specify the effective date steps in seconds. '
-                       'Using 900 seconds (15 minutes) means the effective '
-                       'date sent to Solr changes every 15 minutes.'))
+    effective_steps = Int(
+        title=_('label_effective_steps',
+                default=u'Effective date steps'),
+        default=1,
+        description=_(
+            'help_effective_steps',
+            default=u'Specify the effective date steps in seconds. '
+                    u'Using 900 seconds (15 minutes) means the effective '
+                    u'date sent to Solr changes every 15 minutes.'))
 
-    exclude_user = Bool(title=_('label_exclude_user',
-                                default=u'Exclude user from allowedRolesAndUsers'),
-        description=_('help_exclude_user',
-                      default=u'Specify whether the user:userid should be excluded '
-                       'from allowedRolesAndUsers to improve cacheability '
-                       'on the expense of finding content with local roles'
-                       'given to specific users.'), default=False)
+    exclude_user = Bool(
+        title=_('label_exclude_user',
+                default=u'Exclude user from allowedRolesAndUsers'),
+        description=_(
+            'help_exclude_user',
+            default=u'Specify whether the user:userid should be excluded '
+                    u'from allowedRolesAndUsers to improve cacheability '
+                    u'on the expense of finding content with local roles'
+                    u'given to specific users.'),
+        default=False
+    )
 
-    highlight_fields = List(title=_(u'Highlighting fields'),
-        description = _(u'Fields that should be used for highlighting. '
-                         'Snippets of text will be generated from the contents '
-                         ' of these fields, with the search keywords that'
-                         'matched highlighted inside the text.'),
-        value_type = TextLine(), default = [], required = False)
+    highlight_fields = List(
+        title=_(u'Highlighting fields'),
+        description=_(
+            u'Fields that should be used for highlighting. '
+            u'Snippets of text will be generated from the contents '
+            u' of these fields, with the search keywords that'
+            u'matched highlighted inside the text.'
+        ),
+        value_type=TextLine(),
+        default=[],
+        required=False
+    )
 
-    highlight_formatter_pre = TextLine(title=_(u'Highlight formatter: pre'),
+    highlight_formatter_pre = TextLine(
+        title=_(u'Highlight formatter: pre'),
         description=_(u'The text to insert before the highlighted keyword.'),
-        default=u'[', required=False)
+        default=u'[', required=False
+    )
 
-    highlight_formatter_post = TextLine(title=_(u'Highlight formatter: post'),
+    highlight_formatter_post = TextLine(
+        title=_(u'Highlight formatter: post'),
         description=_(u'The text to insert after the highlighted keyword.'),
-        default=u']', required=False)
+        default=u']',
+        required=False
+    )
 
-    highlight_fragsize = Int(title=_(u'Highlight Fragment Size'), default=100,
-        description=_(u'The size, in characters, of the snippets (aka '
-                       'fragments) created by the highlighter.'))
-    field_list = List(title=_(u'Default fields to be returned'),
-        description = _(u'Specify metadata fields that should be returned for '
-                         'items in the result set, one per line. Defaults to '
-                         'all available plus ranking score.'),
-        value_type = TextLine(), default = [], required = False)
+    highlight_fragsize = Int(
+        title=_(u'Highlight Fragment Size'), default=100,
+        description=_(
+            u'The size, in characters, of the snippets (aka '
+            U'fragments) created by the highlighter.'
+        )
+    )
+
+    field_list = List(
+        title=_(u'Default fields to be returned'),
+        description=_(u'Specify metadata fields that should be returned for '
+                      u'items in the result set, one per line. Defaults to '
+                      u'all available plus ranking score.'),
+        value_type=TextLine(),
+        default=[],
+        required=False
+    )
+
+    levenshtein_distance = Float(
+        title=_('label_levenshtein_distance',
+                default=u'Levenshtein distance'),
+        description=_(
+            'help_levenshtein_distance',
+            default=u'The Levenshtein distance is a string metric for '
+                    u'measuring the difference between two strings. It allows'
+                    u'you to perform fuzzy searches by specifying a value '
+                    u'between 0 and 1.'
+        ),
+        required=False,
+    )
 
 
 class ISolrConnectionConfig(ISolrSchema):
@@ -245,11 +354,13 @@ class ISolrMaintenanceView(Interface):
             solr server has been unavailable etc """
 
     def cleanup(batch=1000):
-        """ remove entries from solr that don't have a corresponding Zope 
+        """ remove entries from solr that don't have a corresponding Zope
             object  or have a different UID than the real object"""
+
 
 class ISolrAddHandler(Interface):
     """ An adder for solr documents """
+
 
 class IFacetTitleVocabularyFactory(IVocabularyFactory):
     """A vocabulary factory used to create a vocabulary that provides titles
@@ -262,6 +373,7 @@ class IFacetTitleVocabularyFactory(IVocabularyFactory):
     vocabulary should return zope.schema.ITitledTokenizedTerm items, their
     title attribute is what is displayed in the UI.
     """
+
 
 class ICheckIndexable(Interface):
     """ Check if an object is indexable """

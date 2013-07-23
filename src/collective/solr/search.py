@@ -95,12 +95,7 @@ class Search(object):
             elif not value:     # solr doesn't like empty fields (+foo:"")
                 if not name:
                     continue
-                logger.info(
-                    'empty search term form "%s:%s", aborting buildQuery' % (
-                        name,
-                        value
-                    )
-                )
+                logger.info('empty search term form "%s:%s", aborting buildQuery' % (name,value))
                 return {}
             elif field.class_ == 'solr.BoolField':
                 if not isinstance(value, (tuple, list)):
@@ -140,11 +135,6 @@ class Search(object):
                             value = '"%s"' % value
                 else:
                     value = quote(value)
-                    # Solr 4.0 added regular expression support, which means
-                    # that '/' is now a special character and must be escaped
-                    # if searching for literal forward slash.
-                    if '/' in value:
-                        value = value.replace('/', '\/')
                 if not value:   # don't search for empty strings, even quoted
                     continue
             else:

@@ -1,6 +1,19 @@
-#!/bin/bash
+#!/usr/bin/env bash
+
+is_solr_up(){
+    http_code=`echo $(curl -s -o /dev/null -w "%{http_code}" "http://localhost:8983/solr/admin/ping")`
+    return `test $http_code = "200"`
+}
+
+wait_for_solr(){
+    while ! is_solr_up; do
+        sleep 3
+    done
+}
 
 ${buildout:directory}/bin/solr-instance start
+wait_for_solr
+echo 'Solr is up. Running tests ...'
 ${buildout:directory}/bin/test $*
 status=$?
 ${buildout:directory}/bin/solr-instance stop
