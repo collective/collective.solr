@@ -63,7 +63,7 @@ class SolrConnection:
     def __init__(self, host='localhost:8983', solrBase='/solr',
                  persistent=True, postHeaders={}, timeout=None):
         self.host = host
-        self.solrBase = solrBase
+        self.solrBase = str(solrBase)
         self.persistent = persistent
         self.reconnects = 0
         self.encoder = codecs.getencoder('utf-8')

@@ -30,6 +30,10 @@ Changelog
 
 - Let getRID return a real integer (like ZCatalog)
   [tom_gross]
+  
+- ``solrBase`` should be a string, fixes #8
+  [saily]
+
 
 3.1 - 2013-02-16
 ----------------
