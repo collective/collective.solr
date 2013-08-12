@@ -105,8 +105,9 @@ class ISolrSchema(Interface):
         description=_(
             'help_max_results',
             default=u'Specify the maximum number of matches to be returned '
-                    u'when searching. Set to "0" to always return all '
-                    u'results.'
+                    u'when searching. Set to "10000000" or some other '
+                    u'ridiculously large value that is higher than the '
+                    u'possible number of rows that are expected.'
         )
     )
 

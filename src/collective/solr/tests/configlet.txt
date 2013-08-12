@@ -32,7 +32,7 @@ active without *having* it active.
     >>> config.search_timeout
     0.0
     >>> config.max_results
-    0
+    10000000
     >>> config.required
     ('SearchableText',)
     >>> config.facets

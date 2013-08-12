@@ -34,7 +34,7 @@ class SolrConfigXMLAdapter(XMLAdapterBase):
         self.context.commit_within = 0
         self.context.index_timeout = 0
         self.context.search_timeout = 0
-        self.context.max_results = 0
+        self.context.max_results = 10000000
         self.context.required = []
         self.context.search_pattern = ''
         self.context.facets = []

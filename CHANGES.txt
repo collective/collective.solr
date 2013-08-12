@@ -2,7 +2,12 @@ Changelog
 =========
 
 4.0 - unreleased
-------------------
+----------------
+
+- Set max_results param to '10000000' as default value as described in
+  http://wiki.apache.org/solr/CommonQueryParameters#rows. It seems this has
+  changed in Solr 4.
+  [timo]
 
 - Integrate 'suggest-terms' view from ftw.solr. No UI yet!
   [timo, 4teamworks]
@@ -39,10 +44,9 @@ Changelog
 
 - Let getRID return a real integer (like ZCatalog)
   [tom_gross]
-  
+
 - ``solrBase`` should be a string, fixes #8
   [saily]
-
 
 
 3.1 - 2013-02-16

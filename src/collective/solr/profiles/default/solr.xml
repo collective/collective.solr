@@ -9,7 +9,7 @@
     <async value="False" />
     <index-timeout value="0" />
     <search-timeout value="0" />
-    <max-results value="0" />
+    <max-results value="10000000" />
     <required-query-parameters>
       <parameter name="SearchableText" />
     </required-query-parameters>
