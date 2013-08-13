@@ -39,7 +39,13 @@ class Search(object):
         if connection is None:
             raise SolrInactiveException
         if not 'rows' in parameters:
-            parameters['rows'] = config.max_results or ''
+            parameters['rows'] = config.max_results or 10000000
+            # Check if rows param is 0 for backwards compatibility. Before
+            # Solr 4 'rows = 0' meant that there is no limitation. Solr 4
+            # always expects a rows param > 0 though:
+            # http://wiki.apache.org/solr/CommonQueryParameters#rows
+            if parameters['rows'] == 0:
+                parameters['rows'] = 10000000
             logger.info('falling back to "max_results" (%d) without a "rows" '
                 'parameter: %r (%r)', config.max_results, query, parameters)
         if getattr(config, 'highlight_fields', None):
