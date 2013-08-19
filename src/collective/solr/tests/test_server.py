@@ -973,6 +973,13 @@ class SolrServerTests(SolrTestCase):
         request = dict(SearchableText='Bar AND Foo')
         results = solrSearchResults(request)
         self.assertEqual(len(results), 1)
+        # test again with `&&` and `||` aliases
+        request = dict(SearchableText='Bar || Foo')
+        results = solrSearchResults(request)
+        self.assertEqual(len(results), 3)
+        request = dict(SearchableText='Bar && Foo')
+        results = solrSearchResults(request)
+        self.assertEqual(len(results), 1)
 
     def testMultiValueSearch(self):
         self.setRoles(('Manager',))
