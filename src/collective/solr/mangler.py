@@ -85,6 +85,14 @@ def mangleSearchableText(value, config):
     return value
 
 
+def quotePath(path):
+    """ quote overlap of solr reserved characters and those allowed
+        in zope ids (see OFS.ObjectManager.bad_id) """
+    for reserved in '/-~()':
+        path = path.replace(reserved, '\\%s' % reserved)
+    return '"%s"' % path
+
+
 def mangleQuery(keywords, config, schema):
     """ translate / mangle query parameters to replace zope specifics
         with equivalent constructs for solr """
@@ -127,6 +135,10 @@ def mangleQuery(keywords, config, schema):
             keywords[key] = mangleSearchableText(value, config)
             continue
         if key in epi_indexes:
+            if isinstance(value, (list, tuple)):
+                value = map(quotePath, value)
+            else:
+                value = quotePath(value)
             path = keywords['%s_parents' % key] = value
             del keywords[key]
             if 'depth' in args:
