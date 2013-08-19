@@ -344,5 +344,5 @@ class SearchTests(TestCase):
         self.assertEqual(match.name, 'python test doc')
         self.assertEqual(match.popularity, 0)
         self.assertEqual(match.sku, '500')
-        self.assertEqual(match.timestamp,
-            DateTime('2008-02-29 16:11:46.998 GMT'))
+        self.assertEqual(match.timestamp.ISO8601(),
+            DateTime('2008-02-29 16:11:46.998 GMT').ISO8601())
