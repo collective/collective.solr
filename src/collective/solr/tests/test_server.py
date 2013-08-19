@@ -323,14 +323,14 @@ class SolrServerTests(SolrTestCase):
         proc.reindex(self.folder)
         proc.commit()
         self.assertEqual(search('+Title:Foo'), 0)
-        self.assertEqual(search('+path_parents:/plone'), 1)
+        self.assertEqual(search('+path_parents:\/plone'), 1)
         self.assertEqual(search('+portal_type:Folder'), 1)
         # now let's only update one index, which shouldn't change anything...
         self.folder.setTitle('Foo')
         proc.reindex(self.folder, ['UID', 'Title'])
         proc.commit()
         self.assertEqual(search('+Title:Foo'), 1)
-        self.assertEqual(search('+path_parents:/plone'), 1)
+        self.assertEqual(search('+path_parents:\/plone'), 1)
         self.assertEqual(search('+portal_type:Folder'), 1)
 
     def testReindexObjectWithEmptyDate(self):
@@ -745,17 +745,17 @@ class SolrServerTests(SolrTestCase):
 
     def testLimitSearchResults(self):
         self.maintenance.reindex()
-        results = self.search('+path_parents:/plone').results()
+        results = self.search('+path_parents:\/plone').results()
         self.assertEqual(results.numFound, '8')
         self.assertEqual(len(results), 8)
         # now let's limit the returned results
         config = getUtility(ISolrConnectionConfig)
         config.max_results = 2
-        results = self.search('+path_parents:/plone').results()
+        results = self.search('+path_parents:\/plone').results()
         self.assertEqual(results.numFound, '8')
         self.assertEqual(len(results), 2)
         # an explicit value should still override things
-        results = self.search('+path_parents:/plone', rows=5).results()
+        results = self.search('+path_parents:\/plone', rows=5).results()
         self.assertEqual(results.numFound, '8')
         self.assertEqual(len(results), 5)
 
