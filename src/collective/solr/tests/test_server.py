@@ -1059,6 +1059,24 @@ class SolrServerTests(SolrTestCase):
         results = solrSearchResults(SearchableText=u'andern')
         self.assertEqual(sorted([r.Title for r in results]), [u'2010:ändern'])
 
+    def testSearchForTermWithForwardSlash(self):
+        self.folder.processForm(values={'title': 'foo/bar'})
+        commit()
+        results = solrSearchResults(SearchableText='foo')
+        self.assertEqual(sorted([r.Title for r in results]), ['foo/bar'])
+        results = solrSearchResults(SearchableText='foo/')
+        self.assertEqual(sorted([r.Title for r in results]), ['foo/bar'])
+        results = solrSearchResults(SearchableText='foo/bar')
+        self.assertEqual(sorted([r.Title for r in results]), ['foo/bar'])
+        results = solrSearchResults(SearchableText='/bar')
+        self.assertEqual(sorted([r.Title for r in results]), ['foo/bar'])
+        results = solrSearchResults(SearchableText='bar')
+        self.assertEqual(sorted([r.Title for r in results]), ['foo/bar'])
+        results = solrSearchResults(SearchableText='(foo/ AND bar)')
+        self.assertEqual(sorted([r.Title for r in results]), ['foo/bar'])
+        results = solrSearchResults(SearchableText='(foo/ OR boo)')
+        self.assertEqual(sorted([r.Title for r in results]), ['foo/bar'])
+
     def testBatchedSearchResults(self):
         self.maintenance.reindex()
         search = lambda **kw: [getattr(i, 'Title', None) for i in
