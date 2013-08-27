@@ -82,6 +82,18 @@ Note that the example solr.cfg is bound to change. Always copy the file to your
 local buildout. In general you should never rely on extending buildout config
 files from servers that aren't under your control.
 
+Solr connection configuration in ZCML
+-------------------------------------
+
+The connections settings for Solr can be configured in ZCML and thus in
+buildout. This makes it easier when copying databases between multiple Zope
+instances with different Solr servers. Example::
+
+    zcml-additional =
+        <configure xmlns:solr="http://namespaces.plone.org/solr">
+            <solr:connection host="localhost" port="8983" base="/solr"/>
+       </configure>
+
 
 Features
 ========

@@ -261,6 +261,11 @@ class ISolrConnectionConfig(ISolrSchema):
     """ utility to hold the connection configuration for the solr server """
 
 
+class IZCMLSolrConnectionConfig(Interface):
+    """Solr connection settings configured through ZCML.
+    """
+
+
 class ISolrConnectionManager(Interface):
     """ a thread-local connection manager for solr """
 

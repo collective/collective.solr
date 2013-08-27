@@ -1,9 +1,10 @@
 from logging import getLogger
 from persistent import Persistent
 from zope.interface import implements
-from zope.component import getUtility
+from zope.component import getUtility, queryUtility
 from collective.solr.interfaces import ISolrConnectionConfig
 from collective.solr.interfaces import ISolrConnectionManager
+from collective.solr.interfaces import IZCMLSolrConnectionConfig
 from collective.solr.solr import SolrConnection
 from collective.solr.local import getLocal, setLocal
 from httplib import CannotSendRequest, ResponseNotReady
@@ -57,6 +58,15 @@ class SolrConnectionConfig(BaseSolrConnectionConfig, Persistent):
         return 'solr'
 
 
+class ZCMLSolrConnectionConfig(object):
+    '''Connection values that can be configured through zcml'''
+    implements(IZCMLSolrConnectionConfig)
+
+    def __init__(self, host, port, base):
+        self.host = '%s:%d' % (host, port)
+        self.base = base
+
+
 class SolrConnectionManager(object):
     """ a thread-local connection manager for solr """
     implements(ISolrConnectionManager)
@@ -92,7 +102,19 @@ class SolrConnectionManager(object):
         if not config.active:
             return None
         conn = getLocal('connection')
-        if conn is None and config.host is not None:
+        if conn is not None:
+            return conn
+
+        zcmlconfig = queryUtility(IZCMLSolrConnectionConfig)
+        if zcmlconfig is not None:
+            # use connection parameters defined in zcml...
+            logger.debug('opening connection to %s', zcmlconfig.host)
+            conn = SolrConnection(host=zcmlconfig.host,
+                                  solrBase=zcmlconfig.base,
+                                  persistent=True)
+            setLocal('connection', conn)
+        elif config.host is not None:
+            # otherwise use connection parameters defined in control panel...
             host = '%s:%d' % (config.host, config.port)
             logger.debug('opening connection to %s', host)
             conn = SolrConnection(host=host, solrBase=config.base,

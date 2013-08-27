@@ -2,16 +2,18 @@ from unittest import defaultTestLoader
 from collective.solr.tests.base import SolrTestCase
 
 # test-specific imports go here...
-from zope.component import queryUtility, getUtilitiesFor
+from zope.component import queryUtility, getUtilitiesFor, getGlobalSiteManager
 from Products.CMFCore.utils import getToolByName
 from collective.indexing.interfaces import IIndexQueueProcessor
 from collective.solr.interfaces import ISolrConnectionConfig
 from collective.solr.interfaces import ISolrConnectionManager
 from collective.solr.interfaces import ISolrIndexQueueProcessor
 from collective.solr.interfaces import ISearch
+from collective.solr.interfaces import IZCMLSolrConnectionConfig
 from collective.solr.mangler import mangleQuery
 from collective.solr.exceptions import SolrInactiveException
 from collective.solr.tests.utils import getData, fakehttp, fakeServer
+from collective.solr.tests.utils import loadZCMLString
 from transaction import commit
 from socket import error, timeout
 from time import sleep
@@ -185,6 +187,28 @@ class SiteSearchTests(SolrTestCase):
         thread.join()               # the server thread must always be joined
         self.assertEqual(responses, [])
         self.assertEqual(len(schema), 21)   # 21 items defined in schema.xml
+
+
+class ZCMLSetupTests(SolrTestCase):
+
+    def beforeTearDown(self):
+        manager = queryUtility(ISolrConnectionManager)
+        manager.setHost(active=False)
+        zcmlconfig = queryUtility(IZCMLSolrConnectionConfig)
+        gsm = getGlobalSiteManager()
+        gsm.unregisterUtility(zcmlconfig, IZCMLSolrConnectionConfig)
+
+    def testConnectionConfigurationViaZCML(self):
+        loadZCMLString('''
+            <configure xmlns:solr="http://namespaces.plone.org/solr">
+                <solr:connection host="127.0.0.23" port="3898" base="/foo" />
+            </configure>
+        ''')
+        manager = queryUtility(ISolrConnectionManager)
+        manager.setHost(active=True)        # also clears connection cache
+        connection = manager.getConnection()
+        self.assertEqual(connection.host, '127.0.0.23:3898')
+        self.assertEqual(connection.solrBase, '/foo')
 
 
 class SiteSetupTests(SolrTestCase):
