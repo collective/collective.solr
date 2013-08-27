@@ -102,19 +102,19 @@ class SolrConnectionManager(object):
         if not config.active:
             return None
         conn = getLocal('connection')
+        if conn is not None:
+            return conn
 
-        # Try to open connection defined in zcml.
-        if conn is None:
-            zcmlconfig = queryUtility(IZCMLSolrConnectionConfig)
-            if zcmlconfig is not None:
-                logger.debug('opening connection to %s', zcmlconfig.host)
-                conn = SolrConnection(host=zcmlconfig.host,
-                                      solrBase=zcmlconfig.base,
-                                      persistent=True)
-                setLocal('connection', conn)
-
-        # Open the connection defined in control panel if we don't have one yet.
-        if conn is None and config.host is not None:
+        zcmlconfig = queryUtility(IZCMLSolrConnectionConfig)
+        if zcmlconfig is not None:
+            # use connection parameters defined in zcml...
+            logger.debug('opening connection to %s', zcmlconfig.host)
+            conn = SolrConnection(host=zcmlconfig.host,
+                                  solrBase=zcmlconfig.base,
+                                  persistent=True)
+            setLocal('connection', conn)
+        elif config.host is not None:
+            # otherwise use connection parameters defined in control panel...
             host = '%s:%d' % (config.host, config.port)
             logger.debug('opening connection to %s', host)
             conn = SolrConnection(host=host, solrBase=config.base,
