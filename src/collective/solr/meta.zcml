@@ -1,0 +1,16 @@
+<configure xmlns="http://namespaces.zope.org/zope"
+           xmlns:meta="http://namespaces.zope.org/meta">
+
+  <include package="zope.component" file="meta.zcml" />
+  
+  <meta:directives namespace="http://namespaces.plone.org/solr">
+
+    <meta:directive
+       name="connection"
+       schema=".zcml.ISolrConnectionConfigDirective"
+       handler=".zcml.solrConnectionConfigDirective"
+       />
+
+  </meta:directives>
+
+</configure>
