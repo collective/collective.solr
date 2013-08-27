@@ -1,18 +1,20 @@
 from re import compile
 
 # Solr/lucene reserved characters/terms:
-# + - && || ! ( ) { } [ ] ^ " ~ * ? : \ /
-# (see http://wiki.apache.org/solr/SolrQuerySyntax)
+#   + - && || ! ( ) { } [ ] ^ " ~ * ? : \ /
+#   (see http://wiki.apache.org/solr/SolrQuerySyntax)
 # Four groups for tokenizer:
 # 1) Whitespace (\s+)
-# 2) Any non reserved characters (normal text) ([^(){}\[\]+\-!^/\"~*?:\\\\\s]+)
-# 3) Any grouping characters ([(){}[\]\"])
-# 4) Any special operators ([+\-!^/~*?:\\\]))
+# 2) Boolean operators, ampersand and pipe literals ([\&\|])
+# 2) Any non reserved characters (normal text) ([^-(){}\[\]+!^\"~*?:\\/\s]+)
+# 3) Any grouping characters ([(){}\[\]"])
+# 4) Any special operators ([-+!^~*?:\\/])
 query_tokenizer = compile(
-    "(?:(\s+)|"
-    "([^(){}[\]+\-!^/\"~*?:\\\\\s]+)|"
-    "([(){}\[\]\"])|"
-    "([+\-!^/~*?:\\\]))"
+    r'(?:(\s+)|'
+    r'([\&\|])|'
+    r'([^-(){}\[\]+!^\"~*?:\\/\&\|\s]+)|'
+    r'([(){}\[\]"])|'
+    r'([-+!^~*?:\\/]))'
 )
 
 
@@ -113,7 +115,7 @@ def quote(term, textfield=False):
     i = 0
     stop = len(tokens)
     while i < stop:
-        whitespace, text, grouping, special = tokens[i]
+        whitespace, boolean, text, grouping, special = tokens[i]
 
         if whitespace:
             # Add whitespace if group text, range and group filter on display
@@ -126,6 +128,22 @@ def quote(term, textfield=False):
                 new.append(Whitespace())
                 stack.current[:] = []
                 stack.add(new)
+
+        elif boolean:
+            # It's an operator if the following token is the same...
+            if i < stop - 1 and boolean == tokens[i + 1][1]:
+                # Add operator if we're inside a group
+                if isinstance(stack.current, Group):
+                    stack.current.append(boolean)
+                elif isinstance(stack.current, list):
+                    # We have an operator with no grouping, insert group
+                    new = Group('(', ')')
+                    new.extend(stack.current)
+                    new.append(boolean)
+                    stack.current[:] = []
+                    stack.add(new)
+            else:
+                stack.current.append(boolean)
 
         elif grouping:
             # [] (inclusive range), {} (exclusive range), always with TO inside
@@ -169,7 +187,7 @@ def quote(term, textfield=False):
             if special == '\\':
                 # Inspect next to see if it's quoted special or quoted group
                 if (i + 1) < stop:
-                    _, _, g2, s2 = tokens[i + 1]
+                    _, _, _, g2, s2 = tokens[i + 1]
                     if s2:
                         stack.current.append('%s%s' % (special, s2))
                         # Jump ahead
@@ -188,10 +206,10 @@ def quote(term, textfield=False):
                 stack.current.append('\\%s' % special)
             elif special in '+-':
                 if (i + 1) < stop:
-                    _, t2, g2, _ = tokens[i + 1]
+                    _, _, t2, g2, _ = tokens[i + 1]
                     # We allow + and - in front of phrase and text
                     if t2 or g2 == '"':
-                        if textfield and i > 0 and tokens[i - 1][1]:
+                        if textfield and i > 0 and tokens[i - 1][2]:
                             # Quote intra-word hyphens, so they are normal text
                             # and not syntax
                             stack.current.append('\\%s' % special)
@@ -205,12 +223,12 @@ def quote(term, textfield=False):
                 # sometimes before int or float like roam~0.8 or
                 # "jakarta apache"~10
                 if i > 0:
-                    _, t0, g0, _ = tokens[i - 1]
+                    _, _, t0, g0, _ = tokens[i - 1]
                     if t0 or g0 == '"':
                         # Look ahead to check for integer or float
 
                         if (i + 1) < stop:
-                            _, t2, _, _ = tokens[i + 1]
+                            _, _, t2, _, _ = tokens[i + 1]
                             try:  # float(t2) might fail
                                 if t2 and float(t2):
                                     stack.current.append(

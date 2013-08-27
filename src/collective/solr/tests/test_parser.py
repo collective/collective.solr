@@ -21,8 +21,8 @@ class ParserTests(TestCase):
         self.assertEqual(match.name, 'python test doc')
         self.assertEqual(match.popularity, 0)
         self.assertEqual(match.sku, '500')
-        self.assertEqual(match.timestamp,
-            DateTime('2008-02-29 16:11:46.998 GMT'))
+        self.assertEqual(match.timestamp.ISO8601(),
+            DateTime('2008-02-29 16:11:46.998 GMT').ISO8601())
         headers = response.responseHeader
         self.assertEqual(headers['status'], 0)
         self.assertEqual(headers['QTime'], 0)
@@ -45,7 +45,8 @@ class ParserTests(TestCase):
             ['str'] * 6 + ['unicode'])
         self.assertEqual(first.id, 'SOLR1000')
         self.assertEqual(first.inStock, True)
-        self.assertEqual(first.incubationdate_dt, DateTime('2006/01/17 GMT'))
+        self.assertEqual(first.incubationdate_dt.ISO8601(),
+            DateTime('2006/01/17 GMT').ISO8601())
         self.assertEqual(first.manu, 'Apache Software Foundation')
         self.assertEqual(first.popularity, 10)
         self.assertEqual(first.price, 0.0)
@@ -116,7 +117,8 @@ class ParserTests(TestCase):
         self.assertEqual(timestamps['2007-08-15T00:00:00.000Z'], 2)
         self.assertEqual(timestamps['2007-08-16T00:00:00.000Z'], 16)
         self.assertEqual(timestamps['gap'], '+1DAY')
-        self.assertEqual(timestamps['end'], DateTime('2007-08-17 GMT'))
+        self.assertEqual(timestamps['end'].ISO8601(),
+            DateTime('2007-08-17 GMT').ISO8601())
 
     def testParseConfig(self):
         schema_xml = getData('schema.xml')
@@ -162,11 +164,11 @@ class ParserTests(TestCase):
 class ParseDateHelperTests(TestCase):
 
     def testParseDateHelper(self):
-        self.assertEqual(parseDate('2007-08-11T00:00:00.000Z'),
-            DateTime(2007, 8, 11, 0, 0, 0, 'GMT'))
-        self.assertEqual(parseDate('1900-01-01T00:00:00.000Z'),
-            DateTime(1900, 1, 1, 0, 0, 0, 'GMT'))
-        self.assertEqual(parseDate('999-12-31T00:00:00.000Z'),
-            DateTime(999, 12, 31, 0, 0, 0, 'GMT'))
-        self.assertEqual(parseDate('99-12-31T00:00:00.000Z'),
-            DateTime('0099-12-31T00:00:00.000Z'))
+        self.assertEqual(parseDate('2007-08-11T00:00:00.000Z').ISO8601(),
+            DateTime(2007, 8, 11, 0, 0, 0, 'GMT').ISO8601())
+        self.assertEqual(parseDate('1900-01-01T00:00:00.000Z').ISO8601(),
+            DateTime(1900, 1, 1, 0, 0, 0, 'GMT').ISO8601())
+        self.assertEqual(parseDate('999-12-31T00:00:00.000Z').ISO8601(),
+            DateTime(999, 12, 31, 0, 0, 0, 'GMT').ISO8601())
+        self.assertEqual(parseDate('99-12-31T00:00:00.000Z').ISO8601(),
+            DateTime('0099-12-31T00:00:00.000Z').ISO8601())
