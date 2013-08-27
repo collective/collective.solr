@@ -1,3 +1,0 @@
-<configure xmlns:solr="http://namespaces.plone.org/solr">
-  <solr:connection host="127.0.0.23" port="3898" base="/foo" />
-</configure>
