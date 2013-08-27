@@ -4,6 +4,9 @@ Changelog
 4.0 - unreleased
 ----------------
 
+- Add configuration for solr host, port and base throught zcml. This is
+  ported from ftw.solr. [csenger, buchi]
+
 - Set max_results param to '10000000' as default value as described in
   http://wiki.apache.org/solr/CommonQueryParameters#rows. It seems this has
   changed in Solr 4.
