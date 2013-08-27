@@ -186,6 +186,15 @@ class SiteSearchTests(SolrTestCase):
         self.assertEqual(responses, [])
         self.assertEqual(len(schema), 21)   # 21 items defined in schema.xml
 
+    def testConnectionConfigurationViaZCML(self):
+        from collective.solr import tests
+        self.layer.loadZCML('data/solr.zcml', package=tests)
+        manager = queryUtility(ISolrConnectionManager)
+        manager.setHost(active=True)        # also clears connection cache
+        connection = manager.getConnection()
+        self.assertEqual(connection.host, '127.0.0.23:3898')
+        self.assertEqual(connection.solrBase, '/foo')
+
 
 class SiteSetupTests(SolrTestCase):
 
