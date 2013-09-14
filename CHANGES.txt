@@ -1,6 +1,12 @@
 Changelog
 =========
 
+3.0.1 - Unreleased
+------------------
+
+- Add `limit` option to `reindex` method of the maintenance view.
+  [fschulze]
+
 3.0 - 2012-02-06
 ----------------
 
