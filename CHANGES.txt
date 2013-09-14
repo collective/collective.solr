@@ -1,7 +1,7 @@
 Changelog
 =========
 
-3.0.1 - Unreleased
+3.0.1 - 2013-09-14
 ------------------
 
 - Add `limit` option to `reindex` method of the maintenance view.
