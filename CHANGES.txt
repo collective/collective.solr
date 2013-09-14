@@ -59,9 +59,6 @@ Changelog
 3.1 - 2013-02-16
 ----------------
 
-- Add datehandler support for python date objects.
-  [jcbrand]
-
 - Add optional plone.app.contentlisting/plone.app.search support
   [do3cc][csenger]
 
