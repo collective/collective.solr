@@ -92,7 +92,7 @@ class SolrMaintenanceView(BrowserView):
         conn.commit()
         return 'solr index cleared.'
 
-    def reindex(self, batch=1000, skip=0):
+    def reindex(self, batch=1000, skip=0, limit=0):
         """ find all contentish objects (meaning all objects derived from one
             of the catalog mixin classes) and (re)indexes them """
         manager = queryUtility(ISolrConnectionManager)
@@ -103,6 +103,8 @@ class SolrMaintenanceView(BrowserView):
         log('reindexing solr catalog...\n')
         if skip:
             log('skipping indexing of %d object(s)...\n' % skip)
+        if limit:
+            log('limiting indexing to %d object(s)...\n' % limit)
         real = timer()          # real time
         lap = timer()           # real lap time (for intermediate commits)
         cpu = timer(clock)      # cpu time
@@ -147,6 +149,8 @@ class SolrMaintenanceView(BrowserView):
                         cpi.next()
                 else:
                     log('missing data, skipping indexing of %r.\n' % obj)
+                if limit and count >= (skip + limit):
+                    break
         checkPoint()
         conn.commit()
         log('solr index rebuilt.\n')

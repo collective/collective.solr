@@ -87,10 +87,18 @@ class SolrMaintenanceTests(SolrTestCase):
 
     def testReindexParameters(self):
         maintenance = self.portal.unrestrictedTraverse('solr-maintenance')
-        # the view allos to skip the first n items...
+        # the view allows to skip the first n items...
         maintenance.clear()
         maintenance.reindex(skip=2)
         self.assertEqual(numFound(self.search()), 6)
+        # or to limit to n items...
+        maintenance.clear()
+        maintenance.reindex(limit=2)
+        self.assertEqual(numFound(self.search()), 2)
+        # or both
+        maintenance.clear()
+        maintenance.reindex(skip=2, limit=2)
+        self.assertEqual(numFound(self.search()), 2)
         # and also specify the batch size
         log = []
         def write(msg):

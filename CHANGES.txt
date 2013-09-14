@@ -4,6 +4,10 @@ Changelog
 4.0 - unreleased
 ----------------
 
+- Add `limit` option to `reindex` method of the maintenance view.
+  (from 3.0.1 release, was not in 3.1)
+  [fschulze]
+
 - Add configuration for solr host, port and base throught zcml. This is
   ported from ftw.solr. [csenger, buchi]
 
