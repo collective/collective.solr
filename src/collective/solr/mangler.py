@@ -146,7 +146,7 @@ def mangleQuery(keywords, config, schema):
                 if depth >= 0:
                     if not isinstance(value, (list, tuple)):
                         path = [path]
-                    tmpl = '(+%s_depth:[%d TO %d] AND +%s_parents:%s)'
+                    tmpl = '+(+%s_depth:[%d TO %d] AND +%s_parents:%s)'
                     params = keywords['%s_parents' % key] = set()
                     for p in path:
                         base = len(p.split('/'))
