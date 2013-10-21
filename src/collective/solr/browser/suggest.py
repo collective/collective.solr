@@ -73,7 +73,7 @@ class AutocompleteView(BrowserView):
 
         params = urllib.urlencode(params, doseq=True)
         response = connection.doPost(
-            connection.solrBase + '/suggest?' + params, '', {})
+            connection.solrBase + '/autocomplete?' + params, '', {})
         results = json.loads(response.read())
 
         # Check for spellcheck
