@@ -3,7 +3,11 @@ python:
   - "2.6"
   - "2.7"
 install:
+  - mkdir -p buildout-cache/eggs
   - mkdir -p buildout-cache/downloads
+  - pip install -U setuptools==1.1.6
+  - pip uninstall -y distribute
   - python bootstrap.py -c travis.cfg
   - bin/buildout -N -t 20 -c travis.cfg
-script: bin/alltests
+script:
+  - bin/alltests
