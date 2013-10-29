@@ -57,15 +57,14 @@ class SuggestView(BrowserView):
 class AutocompleteView(BrowserView):
 
     def __call__(self):
-        suggestions = []
         term = self.request.get('term', '')
         if not term:
-            return json.dumps(suggestions)
+            return json.dumps([])
         manager = getUtility(ISolrConnectionManager)
         connection = manager.getConnection()
 
         if connection is None:
-            return json.dumps(suggestions)
+            return json.dumps([])
 
         params = {}
         params['q'] = term
@@ -76,27 +75,15 @@ class AutocompleteView(BrowserView):
             connection.solrBase + '/autocomplete?' + params, '', {})
         results = json.loads(response.read())
 
-        # Check for spellcheck
-        spellcheck = results.get('spellcheck', None)
-        if not spellcheck:
-            return json.dumps(suggestions)
+        if not 'grouped' in results:
+            return json.dumps([])
 
-        # Check for existing spellcheck suggestions
-        spellcheck_suggestions = spellcheck.get('suggestions', None)
-        correctly_spelled = \
-            spellcheck_suggestions == [u'correctlySpelled', True]
+        groups = results.get('grouped')['title_autocomplete']['groups']
 
-        # Autocomplete
-        if correctly_spelled:
-            return json.dumps(
-                [x['Title'] for x in results['response']['docs']])
+        suggestions = [x['doclist']['docs'][0]['title_autocomplete'] for x in groups]
 
-        if not spellcheck_suggestions:
-            return json.dumps(suggestions)
+        result = []
+        for suggestion in suggestions:
+            result.append(dict(label=suggestion, value=suggestion))
 
-        # Collect suggestions
-        if spellcheck_suggestions[1]:
-            for suggestion in spellcheck_suggestions[1]['suggestion']:
-                suggestions.append(dict(label=suggestion, value=suggestion))
-
-        return json.dumps(suggestions)
+        return json.dumps(result)
