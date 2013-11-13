@@ -84,6 +84,12 @@ Changelog
 - ``solrBase`` should be a string, fixes #8
   [saily]
 
+- ``ranges`` dict inside ``mangler`` module now contain also "minmax"
+  [keul, cekk]
+
+- If ``iso8601date`` receive a string, try to convert to DateTime
+  (for new collection compatibility)
+  [keul, cekk]
 
 3.1 - 2013-02-16
 ----------------
