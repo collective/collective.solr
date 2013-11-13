@@ -1,6 +1,7 @@
 from zope.component import queryUtility
 from AccessControl import getSecurityManager
 from DateTime import DateTime
+from DateTime.interfaces import DateError, SyntaxError
 
 from collective.solr.interfaces import ISolrConnectionConfig
 from collective.solr.queryparser import quote
@@ -13,7 +14,8 @@ from collective.solr.utils import prepare_wildcard
 ranges = {
     'min': '[%s TO *]',
     'max': '[* TO %s]',
-    'min:max': '[%s TO %s]',
+    'min:max': '[%s TO %s]', # BBB: probably to be removed
+    'minmax': '[%s TO %s]',
 }
 
 sort_aliases = {
@@ -30,7 +32,30 @@ ignored = 'use_solr', '-C'
 
 
 def iso8601date(value):
-    """ convert `DateTime` to iso 8601 date format """
+    """Convert `DateTime` to iso 8601 date format
+    
+    If value is a DateTime instance, the proper ISO format is returned
+    
+    >>> iso8601date(DateTime('2013-11-13'))
+    '2013-11-13T00:00:00.000Z'
+    
+    value can be also a valid string, to be converted to a DateTime object
+    
+    >>> iso8601date('2013-11-13')
+    '2013-11-13T00:00:00.000Z'
+
+    Invalid strings date are ignored
+    >>> iso8601date('99-99-9999')
+    '99-99-9999'
+    >>> iso8601date('Tonight')
+    'Tonight'
+    
+    """
+    if isinstance(value, basestring):
+        try:
+            value = DateTime(value)
+        except (SyntaxError, DateError) as e:
+            pass
     if isinstance(value, DateTime):
         v = value.toZone('UTC')
         value = '%04d-%02d-%02dT%02d:%02d:%06.3fZ' % (

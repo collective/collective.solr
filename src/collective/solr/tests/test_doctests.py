@@ -47,4 +47,8 @@ def test_suite():
                'collections.txt', package='collective.solr.tests',
                test_class=SolrFunctionalTestCase, optionflags=optionflags),
         )
+        suite.addTest(
+            doctest.DocTestSuite(
+               'collective.solr.mangler'),
+        )
     return suite
