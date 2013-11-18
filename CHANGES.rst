@@ -91,6 +91,10 @@ Changelog
   (for new collection compatibility)
   [keul, cekk]
 
+- Changes to ``FlareContentListingObject``. Unknow attribute are called
+  onto the inner ``PloneFlare`` object
+  [keul, cekk]
+
 3.1 - 2013-02-16
 ----------------
 
