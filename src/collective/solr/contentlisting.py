@@ -13,6 +13,9 @@ class FlareContentListingObject(object):
     def __init__(self, flare):
         self.flare = flare
 
+    def __getattr__(self, name):
+        return self.flare.__getattr__(name)
+
     def getId(self):
         return self.flare.getId
 
