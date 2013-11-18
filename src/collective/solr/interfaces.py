@@ -204,7 +204,7 @@ class ISolrSchema(Interface):
         description=_(
             u'Fields that should be used for highlighting. '
             u'Snippets of text will be generated from the contents '
-            u' of these fields, with the search keywords that'
+            u'of these fields, with the search keywords that'
             u'matched highlighted inside the text.'
         ),
         value_type=TextLine(),

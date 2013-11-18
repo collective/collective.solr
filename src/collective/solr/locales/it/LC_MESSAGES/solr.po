@@ -6,20 +6,21 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "POT-Creation-Date: 2013-11-18 13:05+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI +ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Last-Translator: Luca Fabbri <keul@redturtle.it>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0\n"
-"Language-Code: en\n"
-"Language-Name: English\n"
+"Language-Code: it\n"
+"Language-Name: Italian\n"
 "Preferred-Encodings: utf-8 latin1\n"
 "Domain: solr\n"
+"X-Is-Fallback-For: it-ch it-it\n"
 
 #: ../interfaces.py:237
 msgid "Default fields to be returned"
-msgstr ""
+msgstr "Campi predefiniti da restituire"
 
 #: ../interfaces.py:204
 msgid "Fields that should be used for highlighting. Snippets of text will be generated from the contents of these fields, with the search keywords thatmatched highlighted inside the text."
@@ -185,6 +186,8 @@ msgstr ""
 #: ../extender.py:76
 msgid "help_searchwords"
 msgstr ""
+"Specifica delle parole per le quali questo elemento verrà mostrato come primo risultato della ricerca.\n"
+"Possono essere indicate più parole usando righe separate."
 
 #. Default: "Specify a threshold (in milliseconds) after which queries are considered to be slow causing them to be logged. Set to \"0\" to prevent any logging."
 #: ../interfaces.py:172
@@ -294,7 +297,7 @@ msgstr ""
 #. Default: "Search words"
 #: ../extender.py:75
 msgid "label_searchwords"
-msgstr ""
+msgstr "Parole di ricerca"
 
 #. Default: "Show all items"
 #: ../skins/solr_site_search/livesearch_reply.py:87
@@ -304,7 +307,7 @@ msgstr ""
 #. Default: "Show in search"
 #: ../extender.py:64
 msgid "label_showinsearch"
-msgstr ""
+msgstr "Mostra nella ricerca"
 
 #. Default: "Slow query threshold"
 #: ../interfaces.py:170
