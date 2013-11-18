@@ -95,6 +95,9 @@ Changelog
   onto the inner ``PloneFlare`` object
   [keul, cekk]
 
+- Added .po compilation script
+  [keul]
+
 3.1 - 2013-02-16
 ----------------
 
