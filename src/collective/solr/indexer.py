@@ -51,7 +51,10 @@ def datehandler(value):
     if value is None or value is '':
         raise AttributeError
     if isinstance(value, str) and not value.endswith('Z'):
-        value = DateTime(value)
+        try:
+            value = DateTime(value)
+        except SyntaxError:
+            raise AttributeError
 
     if isinstance(value, DateTime):
         v = value.toZone('UTC')
