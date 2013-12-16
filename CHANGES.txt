@@ -4,12 +4,6 @@ Changelog
 4.0 (unreleased)
 ----------------
 
-- Nothing changed yet.
-
-
-3.1-FHNW2 (2013-12-16)
-----------------------
-
 - Make it work with 'OR' as the default operator in solr. 
   [csenger]
 
