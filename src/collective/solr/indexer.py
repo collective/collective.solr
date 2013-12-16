@@ -46,7 +46,9 @@ class BaseIndexable(object):
 
 
 def datehandler(value):
-    if value is None:
+    # TODO: we might want to handle datetime and time as well;
+    # check the enfold.solr implementation
+    if value is None or value is '':
         raise AttributeError
     if isinstance(value, str) and not value.endswith('Z'):
         value = DateTime(value)
