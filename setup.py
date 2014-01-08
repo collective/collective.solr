@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 version = '4.0.dev0'
 long_description = \
-    open("README.rst").read() + '\n' + open('CHANGES.txt').read()
+    open("README.rst").read() + '\n' + open('CHANGES.rst').read()
 
 setup(
     name='collective.solr',
