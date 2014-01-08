@@ -1,8 +1,11 @@
 Changelog
 =========
 
-4.0 (unreleased)
+4.0 (2014-01-08)
 ----------------
+
+- Solr 4.x compatibility.
+  [timo]
 
 - Don't fail on incorrect date string.
   [tom_gross]
