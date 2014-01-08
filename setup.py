@@ -1,14 +1,14 @@
 from setuptools import setup, find_packages
 
-version='4.0.dev0'
-
+version = '4.0.dev0'
+long_description = \
+    open("README.rst").read() + '\n' + open('CHANGES.txt').read()
 
 setup(
     name='collective.solr',
     version=version,
     description='Solr integration for external indexing and searching.',
-    long_description=open("README.rst").read() + '\n' +
-                     open('CHANGES.txt').read(),
+    long_description=long_description,
     classifiers=[
         'Development Status :: 5 - Production/Stable',
         'Environment :: Web Environment',
@@ -69,8 +69,8 @@ setup(
             'collective.testcaselayer',
             'Products.LinguaPlone >=3.1a1',
             'Products.PloneTestCase',
-            'plone.app.contentlisting', # Comes with Plone 4.2,
-                                        # only a test req for 4.1 compatibility
+            'plone.app.contentlisting',  # Comes with Plone 4.2,
+                                         # only a test req for 4.1 compat
         ]
     },
     entry_points='''
