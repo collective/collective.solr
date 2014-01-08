@@ -4,7 +4,13 @@ Changelog
 4.0 (unreleased)
 ----------------
 
-- Make it work with 'OR' as the default operator in solr. 
+- Don't fail on incorrect date string.
+  [tom_gross]
+
+- Fixed index for to datetime and time.
+  [Rodrigo]
+
+- Make it work with 'OR' as the default operator in solr.
   [csenger]
 
 - Add `limit` option to `reindex` method of the maintenance view.
@@ -12,7 +18,8 @@ Changelog
   [fschulze]
 
 - Add configuration for solr host, port and base throught zcml. This is
-  ported from ftw.solr. [csenger, buchi]
+  ported from ftw.solr.
+  [csenger, buchi]
 
 - Set max_results param to '10000000' as default value as described in
   http://wiki.apache.org/solr/CommonQueryParameters#rows. It seems this has
