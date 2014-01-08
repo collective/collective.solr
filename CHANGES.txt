@@ -72,6 +72,9 @@ Changelog
 - Added .po compilation script
   [keul]
 
+- Added ``_brain`` and ``pretty_title_or_id `` methods to ``FlareContentListingObject``
+  for plone.app.collection thumbnail_view compatibility [cekk]
+
 3.1 - 2013-02-16
 ----------------
 
