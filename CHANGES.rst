@@ -4,7 +4,9 @@ Changelog
 4.0.1 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Move icon_expr from actionicons.xml to controlpanel.xml to avoid deprecation
+  warnings.
+  [timo]
 
 
 4.0 (2014-01-08)
