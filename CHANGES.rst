@@ -4,6 +4,9 @@ Changelog
 4.0.1 (unreleased)
 ------------------
 
+- Add support for solr.FloatField.
+  [timo]
+
 - Move icon_expr from actionicons.xml to controlpanel.xml to avoid deprecation
   warnings.
   [timo]

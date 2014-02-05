@@ -79,6 +79,7 @@ def inthandler(value):
 
 handlers = {
     'solr.DateField': datehandler,
+    'solr.FloatField': inthandler,
     'solr.TrieDateField': datehandler,
     'solr.TrieIntField': inthandler,
     'solr.IntField': inthandler,
@@ -183,7 +184,7 @@ class SolrIndexProcessor(object):
                     logger.debug('indexing %r with %r adder (%r)', obj, pt, data)
 
                     adder = queryAdapter(obj, ISolrAddHandler, name=pt)
-                    
+
                     if adder is None:
                         adder = DefaultAdder(obj)
                     adder(conn, boost_values=boost_values(obj, data), **data)
@@ -208,7 +209,7 @@ class SolrIndexProcessor(object):
                 return
 
             # remove the PathWrapper, otherwise IndexableObjectWrapper fails
-            # to get the UID indexer (for dexterity objects) and the parent 
+            # to get the UID indexer (for dexterity objects) and the parent
             # UID is acquired
             if hasattr(obj, 'context'):
                 obj = obj.context
