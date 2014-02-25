@@ -11,6 +11,6 @@ install:
 script:
   - bin/alltests
 after_success:
-  - bin/createcoverage run bin/test
+  - bin/createcoverage run bin/alltests
   - pip install -q coveralls
   - coveralls
