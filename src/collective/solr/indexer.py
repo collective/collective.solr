@@ -41,8 +41,8 @@ class BaseIndexable(object):
         self.context = context
 
     def __call__(self):
-        return isinstance(self.context, CatalogMultiplex) or \
-            isinstance(self.context, CMFCatalogAware)
+        return  isinstance(self.context, CatalogMultiplex) or \
+                isinstance(self.context, CMFCatalogAware)
 
 
 def datehandler(value):
@@ -58,14 +58,8 @@ def datehandler(value):
 
     if isinstance(value, DateTime):
         v = value.toZone('UTC')
-        value = '%04d-%02d-%02dT%02d:%02d:%06.3fZ' % (
-            v.year(),
-            v.month(),
-            v.day(),
-            v.hour(),
-            v.minute(),
-            v.second()
-        )
+        value = '%04d-%02d-%02dT%02d:%02d:%06.3fZ' % (v.year(),
+            v.month(), v.day(), v.hour(), v.minute(), v.second())
     elif isinstance(value, datetime):
         # Convert a timezone aware timetuple to a non timezone aware time
         # tuple representing utc time. Does nothing if object is not
@@ -76,11 +70,12 @@ def datehandler(value):
         value = '%s.000Z' % value.strftime('%Y-%m-%dT%H:%M:%S')
     return value
 
-
 def inthandler(value):
     if value is None or value is "":
         raise AttributeError("Solr cant handle none strings or empty values")
+    else:
 	return value
+
 
 handlers = {
     'solr.DateField': datehandler,
@@ -89,7 +84,6 @@ handlers = {
     'solr.TrieIntField': inthandler,
     'solr.IntField': inthandler,
 }
-
 
 class DefaultAdder(object):
     """
@@ -107,7 +101,6 @@ class DefaultAdder(object):
         data.pop('links', '')
         conn.add(**data)
 
-
 class BinaryAdder(DefaultAdder):
     """
     """
@@ -122,10 +115,8 @@ class BinaryAdder(DefaultAdder):
             return super(BinaryAdder, self).__call__(conn, **data)
         ignore = ('SearchableText', 'created', 'Type', 'links',
                   'description', 'Date')
-        postdata = dict([
-            ('literal.%s' % key, val) for key, val in data.iteritems()
-            if key not in ignore
-        ])
+        postdata = dict([('literal.%s' % key, val) for key, val in data.iteritems()
+                     if key not in ignore])
         portal_state = self.context.restrictedTraverse('@@plone_portal_state')
         postdata['stream.file'] = self.getpath()
         postdata['stream.contentTyp'] = data.get('content_type',
@@ -141,7 +132,6 @@ class BinaryAdder(DefaultAdder):
         except SolrException, e:
             logger.warn('Error %s @ %s', e, data['path_string'])
             conn.reset()
-
 
 def boost_values(obj, data):
     """ calculate boost values using a method or skin script;  returns
@@ -191,8 +181,7 @@ class SolrIndexProcessor(object):
                 try:
                     logger.debug('indexing %r (%r)', obj, data)
                     pt = data.get('portal_type', 'default')
-                    logger.debug(
-                        'indexing %r with %r adder (%r)', obj, pt, data)
+                    logger.debug('indexing %r with %r adder (%r)', obj, pt, data)
 
                     adder = queryAdapter(obj, ISolrAddHandler, name=pt)
 
@@ -321,9 +310,8 @@ class SolrIndexProcessor(object):
             except AttributeError:
                 continue
             except Exception:
-                logger.exception(
-                    'Error occured while getting data for indexing!'
-                )
+                logger.exception('Error occured while getting data for '
+                    'indexing!')
                 continue
             field = schema[name]
             handler = handlers.get(field.class_, None)
