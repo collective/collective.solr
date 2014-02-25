@@ -31,7 +31,6 @@ class Foo(CMFCatalogAware):
     def __call__(self):
         return True
 
-
 def sortFields(output):
     """ helper to sort `<field>` tags in output for testing """
     pattern = r'^(.*<doc>)(<field .*</field>)(</doc>.*)'
@@ -56,16 +55,9 @@ class QueueIndexerTests(TestCase):
         self.mngr.setHost(active=False)
 
     def testPrepareData(self):
-        data = {
-            'allowedRolesAndUsers': ['user:test_user_1_', 'user:portal_owner']
-        }
+        data = {'allowedRolesAndUsers': ['user:test_user_1_', 'user:portal_owner']}
         prepareData(data)
-        self.assertEqual(
-            data,
-            {'allowedRolesAndUsers': [
-                'user$test_user_1_', 'user$portal_owner'
-            ]}
-        )
+        self.assertEqual(data, {'allowedRolesAndUsers': ['user$test_user_1_', 'user$portal_owner']})
 
     def testLanguageParameterHandling(self):
         # empty strings are replaced...
@@ -82,20 +74,15 @@ class QueueIndexerTests(TestCase):
 
     def testIndexObject(self):
         response = getData('add_response.txt')
-        # fake add response
-        output = fakehttp(self.mngr.getConnection(), response)
-        # indexing sends data
-        self.proc.index(Foo(id='500', name='python test doc'))
+        output = fakehttp(self.mngr.getConnection(), response)   # fake add response
+        self.proc.index(Foo(id='500', name='python test doc'))   # indexing sends data
         self.assertEqual(sortFields(str(output)), getData('add_request.txt'))
 
     def testIndexAccessorRaises(self):
         response = getData('add_response.txt')
-        # fake add response
-        output = fakehttp(self.mngr.getConnection(), response)
-
+        output = fakehttp(self.mngr.getConnection(), response)   # fake add response
         def brokenfunc():
             raise ValueError
-
         self.proc.index(Foo(id='500', name='python test doc',
                             text=brokenfunc))   # indexing sends data
         self.assertEqual(sortFields(str(output)), getData('add_request.txt'))
@@ -106,28 +93,19 @@ class QueueIndexerTests(TestCase):
         response = getData('add_response.txt')
         output = fakehttp(self.mngr.getConnection(), response)
         self.proc.index(foo)
-        self.assert_(
-            str(output).find('<field name="price">42.0</field>') > 0,
-            '"price" data not found'
-        )
+        self.assert_(str(output).find('<field name="price">42.0</field>') > 0, '"price" data not found')
         # then only a subset...
         response = getData('add_response.txt')
         output = fakehttp(self.mngr.getConnection(), response)
         self.proc.index(foo, attributes=['id', 'name'])
         output = str(output)
-        self.assert_(
-            output.find('<field name="name">foo</field>') > 0,
-            '"name" data not found'
-        )
+        self.assert_(output.find('<field name="name">foo</field>') > 0, '"name" data not found')
         # at this point we'd normally check for a partial update:
         #   self.assertEqual(output.find('price'), -1, '"price" data found?')
         #   self.assertEqual(output.find('42'), -1, '"price" data found?')
         # however, until SOLR-139 has been implemented (re)index operations
         # always need to provide data for all attributes in the schema...
-        self.assert_(
-            output.find('<field name="price">42.0</field>') > 0,
-            '"price" data not found'
-        )
+        self.assert_(output.find('<field name="price">42.0</field>') > 0, '"price" data not found')
 
     def testDateIndexing(self):
         foo = Foo(id='zeidler', name='andi', cat='nerd', timestamp=DateTime('May 11 1972 03:45 GMT'))
