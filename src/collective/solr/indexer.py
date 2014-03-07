@@ -74,7 +74,7 @@ def inthandler(value):
     if value is None or value is "":
         raise AttributeError("Solr cant handle none strings or empty values")
     else:
-	return value
+        return value
 
 
 handlers = {
@@ -119,7 +119,7 @@ class BinaryAdder(DefaultAdder):
                      if key not in ignore])
         portal_state = self.context.restrictedTraverse('@@plone_portal_state')
         postdata['stream.file'] = self.getpath()
-        postdata['stream.contentTyp'] = data.get('content_type',
+        postdata['stream.contentType'] = data.get('content_type',
                                                  'application/octet-stream')
         postdata['fmap.content'] = 'SearchableText'
         postdata['extractFormat'] = 'text'
