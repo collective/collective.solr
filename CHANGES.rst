@@ -1,6 +1,11 @@
 Changelog
 =========
 
+4.0.2 (unreleased)
+------------------
+- Fix typo in Binary Indexer
+  [giacomos]
+
 4.0.1 (2014-02-05)
 ------------------
 
