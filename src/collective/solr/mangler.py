@@ -1,3 +1,4 @@
+import re
 from zope.component import queryUtility
 from AccessControl import getSecurityManager
 from DateTime import DateTime
@@ -90,6 +91,8 @@ def quotePath(path):
         in zope ids (see OFS.ObjectManager.bad_id) """
     for reserved in '/-~()':
         path = path.replace(reserved, '\\%s' % reserved)
+    if re.match("\".*\"", path):
+        return '%s' % path
     return '"%s"' % path
 
 
