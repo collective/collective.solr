@@ -112,8 +112,14 @@ class FlareContentListingObject(object):
         return self.flare.portal_type
 
     # Temporary to workaround a bug in current plone.app.search<=1.1.0
-    def portal_type(self):
-        return self.PortalType()
+    # def portal_type(self):
+    #     return self.PortalType()
 
     def CroppedDescription(self):
         return self.flare.Description
+
+    def _brain(self):
+        return self.flare
+
+    def pretty_title_or_id(self):
+        return self.flare.pretty_title_or_id()
