@@ -31,9 +31,9 @@ class SolrFlare(AttrDict):
 class SolrResults(list):
     """ a list of results returned from solr, i.e. sol(a)r flares """
 
-    @property
-    def actual_result_count(self):
-        return len(self)
+    # @property
+    # def actual_result_count(self):
+    #     return len(self)
 
 def parseDate(value):
     """ use `DateTime` to parse a date, but take care of solr 1.4
@@ -91,6 +91,11 @@ class SolrResponse(object):
     """ a solr search response; TODO: this should get an interface!! """
 
     __allow_access_to_unprotected_subobjects__ = True
+
+    @property
+    def actual_result_count(self):
+        if getattr(self, 'response', None):
+            return int(self.response.numFound)
 
     def __init__(self, data=None, unmarshallers=unmarshallers):
         self.unmarshallers = unmarshallers
