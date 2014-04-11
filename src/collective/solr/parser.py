@@ -31,6 +31,9 @@ class SolrFlare(AttrDict):
 class SolrResults(list):
     """ a list of results returned from solr, i.e. sol(a)r flares """
 
+    @property
+    def actual_result_count(self):
+        return len(self)
 
 def parseDate(value):
     """ use `DateTime` to parse a date, but take care of solr 1.4

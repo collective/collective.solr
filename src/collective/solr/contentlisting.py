@@ -55,7 +55,11 @@ class FlareContentListingObject(object):
         return self.flare.Creator
 
     def Subject(self):
-        return self.flare.Subject
+        try:
+            return self.flare.Subject
+        except AttributeError:
+            #BBB if the object doesn't have any keyword, solr return a result without Subject attribute
+            return ()
 
     def Publisher(self):
         return NotImplementedError

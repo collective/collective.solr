@@ -21,6 +21,11 @@ Changelog
 - Added .po compilation script
   [keul]
 
+- Added ``actual_result_count`` property to SolrResults [cekk]
+
+- Fix Subject handling in FlareContentListingObject [cekk]
+
+
 4.0.1 (2014-02-05)
 ------------------
 
