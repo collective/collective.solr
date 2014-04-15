@@ -25,6 +25,8 @@ Changelog
 
 - Fix Subject handling in FlareContentListingObject [cekk]
 
+- Add support to ``not in`` index [cekk]
+
 
 4.0.1 (2014-02-05)
 ------------------
