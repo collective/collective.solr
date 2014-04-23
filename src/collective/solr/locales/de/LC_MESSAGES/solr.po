@@ -266,9 +266,9 @@ msgstr ""
 # english default values for facet titles
 #: ./__init__.py:7
 msgid "portal_type"
-msgstr "Content type"
+msgstr "Artikeltyp"
 
 #: ./__init__.py:8
 msgid "review_state"
-msgstr "Review state"
+msgstr "Revisionsstatus"
 
