@@ -221,10 +221,8 @@ class SolrConnection:
 
     def commit(self, waitFlush=True, waitSearcher=True, optimize=False):
         data = {'committype': optimize and 'optimize' or 'commit',
-                'nowait': not waitSearcher and ' waitSearcher="false"' or '',
-                'noflush': not waitFlush and not waitSearcher and \
-                    ' waitFlush="false"' or ''}
-        xstr = '<%(committype)s%(noflush)s%(nowait)s/>' % data
+                'nowait': not waitSearcher and ' waitSearcher="false"' or ''}
+        xstr = '<%(committype)s%(nowait)s/>' % data
         self.doUpdateXML(xstr)
         return self.flush()
 
