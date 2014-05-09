@@ -91,7 +91,10 @@ class Search(object):
         args[None] = default
         query = {}
         for name, value in sorted(args.items()):
-            field = schema.get(name or defaultSearchField, None)
+            if name and name.startswith("-"):
+                field = schema.get(name[1:] or defaultSearchField, None)
+            else:
+                field = schema.get(name or defaultSearchField, None)
             if field is None or not field.indexed:
                 logger.info('dropping unknown search attribute "%s" '
                     ' (%r) for query: %r', name, value, args)
@@ -101,7 +104,7 @@ class Search(object):
             elif not value:     # solr doesn't like empty fields (+foo:"")
                 if not name:
                     continue
-                logger.info('empty search term form "%s:%s", aborting buildQuery' % (name,value))
+                logger.info('empty search term form "%s:%s", aborting buildQuery' % (name, value))
                 return {}
             elif field.class_ == 'solr.BoolField':
                 if not isinstance(value, (tuple, list)):
@@ -151,7 +154,10 @@ class Search(object):
                 if value and value[0] not in '+-':
                     value = '+%s' % value
             else:
-                value = '+%s:%s' % (name, value)
+                if name.startswith("-"):
+                    value = '%s:%s' % (name, value)
+                else:
+                    value = '+%s:%s' % (name, value)
             query[name] = value
         logger.debug('built query "%s"', query)
         return query

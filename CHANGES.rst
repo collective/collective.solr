@@ -3,8 +3,30 @@ Changelog
 
 4.0.2 (unreleased)
 ------------------
+
 - Fix typo in Binary Indexer
   [giacomos]
+
+- ``ranges`` dict inside ``mangler`` module now contain also "minmax"
+  [keul, cekk]
+
+- If ``iso8601date`` receive a string, try to convert to DateTime
+  (for new collection compatibility)
+  [keul, cekk]
+
+- Changes to ``FlareContentListingObject``. Unknow attribute are called
+  onto the inner ``PloneFlare`` object
+  [keul, cekk]
+
+- Added .po compilation script
+  [keul]
+
+- Added ``actual_result_count`` property to SolrResults [cekk]
+
+- Fix Subject handling in FlareContentListingObject [cekk]
+
+- Add support to ``not in`` index [cekk]
+
 
 4.0.1 (2014-02-05)
 ------------------
@@ -83,7 +105,6 @@ Changelog
 
 - ``solrBase`` should be a string, fixes #8
   [saily]
-
 
 3.1 - 2013-02-16
 ----------------

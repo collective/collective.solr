@@ -13,6 +13,9 @@ class FlareContentListingObject(object):
     def __init__(self, flare):
         self.flare = flare
 
+    def __getattr__(self, name):
+        return self.flare.__getattr__(name)
+
     def getId(self):
         return self.flare.getId
 
@@ -52,7 +55,11 @@ class FlareContentListingObject(object):
         return self.flare.Creator
 
     def Subject(self):
-        return self.flare.Subject
+        try:
+            return self.flare.Subject
+        except AttributeError:
+            #BBB if the object doesn't have any keyword, solr return a result without Subject attribute
+            return ()
 
     def Publisher(self):
         return NotImplementedError
@@ -109,8 +116,14 @@ class FlareContentListingObject(object):
         return self.flare.portal_type
 
     # Temporary to workaround a bug in current plone.app.search<=1.1.0
-    def portal_type(self):
-        return self.PortalType()
+    # def portal_type(self):
+    #     return self.PortalType()
 
     def CroppedDescription(self):
         return self.flare.Description
+
+    def _brain(self):
+        return self.flare
+
+    def pretty_title_or_id(self):
+        return self.flare.pretty_title_or_id()
