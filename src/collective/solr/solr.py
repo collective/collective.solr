@@ -105,6 +105,9 @@ class SolrConnection:
             except:
                 pass
             raise ex
+        else:
+            # BBB: http://stackoverflow.com/a/10876180/2470118
+            rsp.read()
         return rsp
 
     def setTimeout(self, timeout):
