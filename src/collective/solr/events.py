@@ -4,6 +4,7 @@ from Products.CMFDefault.permissions import ModifyPortalContent
 from Products.CMFCore.CMFCatalogAware import CMFCatalogAware
 from Products.Archetypes.CatalogMultiplex import CatalogMultiplex
 
+
 def reorderedEvent(event):
     parent = event.object
     mtool = getToolByName(parent, 'portal_membership')
