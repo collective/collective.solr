@@ -25,6 +25,9 @@ def searchwords(obj):
 
 @indexer(Interface)
 def showinsearch(obj):
+    # if the object is a dexterity object, check for the showinsearch attribute
+    if getattr(aq_base(obj), 'showinsearch', True) is False:
+        return obj.showinsearch
     # if the object isn't an Archetype, it should be included
     getField = getattr(aq_base(obj), 'getField', None)
     if getField is None:
@@ -74,8 +77,8 @@ class SearchExtender(object):
             widget=TextAreaWidget(
                 label=_('label_searchwords', default=u"Search words"),
                 description="Specify words for which this item will show up "
-                    "as the first search result. Multiple words can be "
-                    "specified on new lines.",
+                            "as the first search result. Multiple words can "
+                            "be specified on new lines.",
                 visible={"edit": "visible", "view": "invisible"},
             )),
         ]

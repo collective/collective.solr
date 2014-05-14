@@ -13,6 +13,9 @@ Changelog
 - Add facet title vocabulary factory for review_state.
   [tschorr]
 
+- Add Dexterity support for showinsearch indexer.
+  [timo]
+
 
 4.0.1 (2014-02-05)
 ------------------
