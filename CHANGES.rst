@@ -16,6 +16,9 @@ Changelog
 - Add Dexterity support for showinsearch indexer.
   [timo]
 
+- Test agains Solr 4.8.0.
+  [timo]
+
 
 4.0.1 (2014-02-05)
 ------------------
