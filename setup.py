@@ -65,7 +65,6 @@ setup(
     ],
     extras_require={
         'test': [
-            'cElementTree',
             'collective.testcaselayer',
             'Products.LinguaPlone >=3.1a1',
             'Products.PloneTestCase',
