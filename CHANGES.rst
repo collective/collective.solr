@@ -7,6 +7,12 @@ Changelog
 - Fix typo in Binary Indexer
   [giacomos]
 
+- Fix typo in facet search
+  [tschorr]
+
+- Add facet title vocabulary factory for review_state.
+  [tschorr]
+
 
 4.0.1 (2014-02-05)
 ------------------
