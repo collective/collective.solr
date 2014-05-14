@@ -26,7 +26,7 @@ Changelog
   [timo]
 
 
-4.0.1 (2014-02-05)
+4.0.1 (unreleased)
 ------------------
 
 - Add support for solr.FloatField.
