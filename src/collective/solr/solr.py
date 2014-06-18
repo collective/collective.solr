@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # http://svn.apache.org/repos/asf/lucene/solr/trunk/client/python/solr.py
 
 # Licensed to the Apache Software Foundation (ASF) under one or more

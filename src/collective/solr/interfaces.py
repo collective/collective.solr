@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from collective.indexing.interfaces import IIndexQueueProcessor
 from zope.interface import Interface
 from zope.schema import Bool, Text, TextLine, Int, Float, List

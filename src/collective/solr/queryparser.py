@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from re import compile
 
 # Solr/lucene reserved characters/terms:

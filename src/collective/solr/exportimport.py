@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from persistent.interfaces import IPersistent
 from zope.component import queryUtility
 from Products.GenericSetup.utils import exportObjects

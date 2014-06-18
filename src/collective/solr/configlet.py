@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from zope.component import adapts, queryUtility
 from zope.formlib.form import FormFields
 from zope.interface import implements

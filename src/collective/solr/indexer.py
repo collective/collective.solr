@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import os
 
 from logging import getLogger
@@ -8,7 +9,6 @@ from zope.component import getUtility, queryUtility, queryMultiAdapter
 from zope.component import queryAdapter, adapts
 from zope.interface import implements
 from zope.interface import Interface
-from zope.contenttype import guess_content_type
 from ZODB.POSException import ConflictError
 from Products.CMFCore.utils import getToolByName
 from Products.CMFCore.CMFCatalogAware import CMFCatalogAware
@@ -25,9 +25,8 @@ from collective.solr.interfaces import ISolrAddHandler
 from collective.solr.solr import SolrException
 from collective.solr.utils import prepareData
 from socket import error
-from urllib import urlencode, quote
+from urllib import urlencode
 
-from ZODB.POSException import POSKeyError
 
 logger = getLogger('collective.solr.indexer')
 
@@ -41,8 +40,8 @@ class BaseIndexable(object):
         self.context = context
 
     def __call__(self):
-        return  isinstance(self.context, CatalogMultiplex) or \
-                isinstance(self.context, CMFCatalogAware)
+        return isinstance(self.context, CatalogMultiplex) or \
+            isinstance(self.context, CMFCatalogAware)
 
 
 def datehandler(value):
@@ -70,6 +69,7 @@ def datehandler(value):
         value = '%s.000Z' % value.strftime('%Y-%m-%dT%H:%M:%S')
     return value
 
+
 def inthandler(value):
     if value is None or value is "":
         raise AttributeError("Solr cant handle none strings or empty values")
@@ -84,6 +84,7 @@ handlers = {
     'solr.TrieIntField': inthandler,
     'solr.IntField': inthandler,
 }
+
 
 class DefaultAdder(object):
     """

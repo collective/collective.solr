@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from copy import deepcopy
 from zope.interface import implements
 from zope.component import queryUtility, queryMultiAdapter
@@ -21,8 +22,8 @@ from collective.solr.lingua import languageFilter
 
 from collective.solr.monkey import patchCatalogTool, patchLazy
 from collective.solr.parser import SolrResponse
-patchCatalogTool() # patch catalog tool to use the dispatcher...
-patchLazy() # ...as well as ZCatalog's Lazy class
+patchCatalogTool()  # patch catalog tool to use the dispatcher...
+patchLazy()  # ...as well as ZCatalog's Lazy class
 
 
 class FallBackException(Exception):

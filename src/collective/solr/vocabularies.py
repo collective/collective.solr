@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from zope.component import queryUtility
 from zope.interface import implements
 from zope.schema.interfaces import IBaseVocabulary

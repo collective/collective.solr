@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from logging import getLogger
 from persistent import Persistent
 from zope.interface import implements

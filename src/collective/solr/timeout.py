@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from urllib2 import build_opener, HTTPHandler
 from httplib import HTTPConnection
 

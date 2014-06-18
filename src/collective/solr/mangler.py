@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from zope.component import queryUtility
 from AccessControl import getSecurityManager
 from DateTime import DateTime

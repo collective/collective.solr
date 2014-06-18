@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from plone.app.contentlisting.interfaces import IContentListingObject
 from plone.app.layout.icons.interfaces import IContentIcon
 from plone.i18n.normalizer.interfaces import IIDNormalizer

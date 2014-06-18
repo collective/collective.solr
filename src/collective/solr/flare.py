@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import sys
 from zope.interface import implements
 from zope.component import adapts
