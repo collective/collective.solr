@@ -1,7 +1,7 @@
 Changelog
 =========
 
-4.0.3 (unreleased)
+4.0.3 (2014-06-18)
 ------------------
 
 - Set logger level for 'failing back to "max_results" from 'info' to 'debug'.
