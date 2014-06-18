@@ -4,7 +4,8 @@ Changelog
 4.0.3 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Set logger level for 'failing back to "max_results" from 'info' to 'debug'.
+  [timo]
 
 
 4.0.2 (2014-05-14)
