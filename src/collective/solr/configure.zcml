@@ -80,7 +80,12 @@
   <utility
       component="plone.app.vocabularies.types.PortalTypesVocabularyFactory"
       provides=".interfaces.IFacetTitleVocabularyFactory"
-      name="portal_types" />
+      name="portal_type" />
+
+  <utility
+      component="plone.app.vocabularies.workflow.WorkflowStatesVocabularyFactory"
+      provides=".interfaces.IFacetTitleVocabularyFactory"
+      name="review_state" />
 
   <adapter name="path_string" factory=".attributes.path_string" />
   <adapter name="path_depth" factory=".attributes.path_depth" />

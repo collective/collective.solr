@@ -1,7 +1,28 @@
 Introduction
 ============
 
-.. image:: https://secure.travis-ci.org/collective/collective.solr.png
+.. image:: https://secure.travis-ci.org/collective/collective.solr.png?branch=master
+    :target: http://travis-ci.org/plone/collective/collective.solr
+
+.. image:: https://coveralls.io/repos/collective/collective.solr/badge.png?branch=master
+    :target: https://coveralls.io/r/collective/collective.solr
+
+.. image:: https://pypip.in/d/collective.solr/badge.png
+    :target: https://pypi.python.org/pypi/collective.solr/
+    :alt: Downloads
+
+.. image:: https://pypip.in/v/collective.solr/badge.png
+    :target: https://pypi.python.org/pypi/collective.solr/
+    :alt: Latest Version
+
+.. image:: https://pypip.in/egg/collective.solr/badge.png
+    :target: https://pypi.python.org/pypi/collective.solr/
+    :alt: Egg Status
+
+.. image:: https://pypip.in/license/collective.solr/badge.png
+    :target: https://pypi.python.org/pypi/collective.solr/
+    :alt: License
+
 
 collective.solr integrates the `Solr`_ search engine with `Plone`_.
 
@@ -45,7 +66,7 @@ The following buildout configuration may be used to get started quickly::
   [buildout]
   extends =
     buildout.cfg
-    https://github.com/Jarn/collective.solr/raw/master/buildout/solr.cfg
+    https://github.com/collective/collective.solr/raw/master/buildout/solr.cfg
 
   [instance]
   eggs += collective.solr
@@ -81,6 +102,18 @@ index structure or changing the settings of existing fields.
 Note that the example solr.cfg is bound to change. Always copy the file to your
 local buildout. In general you should never rely on extending buildout config
 files from servers that aren't under your control.
+
+Solr connection configuration in ZCML
+-------------------------------------
+
+The connections settings for Solr can be configured in ZCML and thus in
+buildout. This makes it easier when copying databases between multiple Zope
+instances with different Solr servers. Example::
+
+    zcml-additional =
+        <configure xmlns:solr="http://namespaces.plone.org/solr">
+            <solr:connection host="localhost" port="8983" base="/solr"/>
+       </configure>
 
 
 Features

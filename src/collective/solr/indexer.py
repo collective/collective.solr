@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import os
 
 from logging import getLogger
@@ -8,7 +9,6 @@ from zope.component import getUtility, queryUtility, queryMultiAdapter
 from zope.component import queryAdapter, adapts
 from zope.interface import implements
 from zope.interface import Interface
-from zope.contenttype import guess_content_type
 from ZODB.POSException import ConflictError
 from Products.CMFCore.utils import getToolByName
 from Products.CMFCore.CMFCatalogAware import CMFCatalogAware
@@ -25,9 +25,8 @@ from collective.solr.interfaces import ISolrAddHandler
 from collective.solr.solr import SolrException
 from collective.solr.utils import prepareData
 from socket import error
-from urllib import urlencode, quote
+from urllib import urlencode
 
-from ZODB.POSException import POSKeyError
 
 logger = getLogger('collective.solr.indexer')
 
@@ -41,15 +40,20 @@ class BaseIndexable(object):
         self.context = context
 
     def __call__(self):
-        return  isinstance(self.context, CatalogMultiplex) or \
-                isinstance(self.context, CMFCatalogAware)
+        return isinstance(self.context, CatalogMultiplex) or \
+            isinstance(self.context, CMFCatalogAware)
 
 
 def datehandler(value):
-    if value is None:
+    # TODO: we might want to handle datetime and time as well;
+    # check the enfold.solr implementation
+    if value is None or value is '':
         raise AttributeError
     if isinstance(value, str) and not value.endswith('Z'):
-        value = DateTime(value)
+        try:
+            value = DateTime(value)
+        except SyntaxError:
+            raise AttributeError
 
     if isinstance(value, DateTime):
         v = value.toZone('UTC')
@@ -65,19 +69,22 @@ def datehandler(value):
         value = '%s.000Z' % value.strftime('%Y-%m-%dT%H:%M:%S')
     return value
 
+
 def inthandler(value):
     if value is None or value is "":
         raise AttributeError("Solr cant handle none strings or empty values")
     else:
-	return value
+        return value
 
 
 handlers = {
     'solr.DateField': datehandler,
+    'solr.FloatField': inthandler,
     'solr.TrieDateField': datehandler,
     'solr.TrieIntField': inthandler,
     'solr.IntField': inthandler,
 }
+
 
 class DefaultAdder(object):
     """
@@ -113,7 +120,7 @@ class BinaryAdder(DefaultAdder):
                      if key not in ignore])
         portal_state = self.context.restrictedTraverse('@@plone_portal_state')
         postdata['stream.file'] = self.getpath()
-        postdata['stream.contentTyp'] = data.get('content_type',
+        postdata['stream.contentType'] = data.get('content_type',
                                                  'application/octet-stream')
         postdata['fmap.content'] = 'SearchableText'
         postdata['extractFormat'] = 'text'
@@ -178,7 +185,7 @@ class SolrIndexProcessor(object):
                     logger.debug('indexing %r with %r adder (%r)', obj, pt, data)
 
                     adder = queryAdapter(obj, ISolrAddHandler, name=pt)
-                    
+
                     if adder is None:
                         adder = DefaultAdder(obj)
                     adder(conn, boost_values=boost_values(obj, data), **data)
@@ -203,7 +210,7 @@ class SolrIndexProcessor(object):
                 return
 
             # remove the PathWrapper, otherwise IndexableObjectWrapper fails
-            # to get the UID indexer (for dexterity objects) and the parent 
+            # to get the UID indexer (for dexterity objects) and the parent
             # UID is acquired
             if hasattr(obj, 'context'):
                 obj = obj.context

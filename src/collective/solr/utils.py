@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from string import maketrans
 from re import compile, UNICODE
 

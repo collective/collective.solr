@@ -1,12 +1,85 @@
 Changelog
 =========
 
-4.0 - unreleased
+4.0.4 (unreleased)
 ------------------
 
-- Support fuzzy search for SearchableText, currently without an admin GUI
-  to set the required config value.
+- Nothing changed yet.
+
+
+4.0.3 (2014-06-18)
+------------------
+
+- Set logger level for 'failing back to "max_results" from 'info' to 'debug'.
+  [timo]
+
+
+4.0.2 (2014-05-14)
+------------------
+
+- Fix typo in Binary Indexer
+  [giacomos]
+
+- Fix typo in facet search
+  [tschorr]
+
+- Add facet title vocabulary factory for review_state.
+  [tschorr]
+
+- Add Dexterity support for showinsearch indexer.
+  [timo]
+
+- Test agains Solr 4.8.0.
+  [timo]
+
+
+4.0.1 (unreleased)
+------------------
+
+- Add support for solr.FloatField.
+  [timo]
+
+- Move icon_expr from actionicons.xml to controlpanel.xml to avoid deprecation
+  warnings.
+  [timo]
+
+
+4.0 (2014-01-08)
+----------------
+
+- Solr 4.x compatibility.
+  [timo]
+
+- Don't fail on incorrect date string.
+  [tom_gross]
+
+- Fixed index for to datetime and time.
+  [Rodrigo]
+
+- Make it work with 'OR' as the default operator in solr.
   [csenger]
+
+- Add `limit` option to `reindex` method of the maintenance view.
+  (from 3.0.1 release, was not in 3.1)
+  [fschulze]
+
+- Add configuration for solr host, port and base throught zcml. This is
+  ported from ftw.solr.
+  [csenger, buchi]
+
+- Set max_results param to '10000000' as default value as described in
+  http://wiki.apache.org/solr/CommonQueryParameters#rows. It seems this has
+  changed in Solr 4.
+  [timo]
+
+- Integrate 'suggest-terms' view from ftw.solr. No UI yet!
+  [timo, 4teamworks]
+
+- Add plone.app.testing setup.
+  [timo]
+
+- Support fuzzy search for SearchableText.
+  [csenger,timo]
 
 - Make sure slashes are properly escaped in the search query. Solr 4.0 added
   regular expression support, which means that '/' is now a special character
@@ -35,11 +108,12 @@ Changelog
 - Let getRID return a real integer (like ZCatalog)
   [tom_gross]
 
+- ``solrBase`` should be a string, fixes #8
+  [saily]
+
+
 3.1 - 2013-02-16
 ----------------
-
-- Add datehandler support for python date objects.
-  [jcbrand]
 
 - Add optional plone.app.contentlisting/plone.app.search support
   [do3cc][csenger]

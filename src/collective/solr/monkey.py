@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from zope.component import queryAdapter
 from DateTime import DateTime
 from Products.CMFCore.permissions import AccessInactivePortalContent

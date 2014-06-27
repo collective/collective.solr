@@ -15,3 +15,5 @@ var
 *.py[co]
 *.*~
 .*.cfg
+docs/doctrees/
+docs/html/

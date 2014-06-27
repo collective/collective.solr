@@ -49,4 +49,16 @@
       class=".facets.SearchFacetsView"
       permission="zope2.View" />
 
+  <browser:page
+      for="*"
+      name="suggest-terms"
+      class=".suggest.SuggestView"
+      permission="zope2.View"/>
+
+  <browser:page
+      for="*"
+      name="solr-autocomplete"
+      class=".suggest.AutocompleteView"
+      permission="zope2.View"/>
+
 </configure>

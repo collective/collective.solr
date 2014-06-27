@@ -42,7 +42,7 @@ class QuoteTests(TestCase):
         self.assertEqual(quote('\?'), '\?')
         self.assertEqual(quote('john@foo.com'), 'john@foo.com')
         self.assertEqual(quote('http://machine/folder and item and some/path and and amilli3*'),
-                               '(http\://machine/folder and item and some/path and and amilli3*)')
+                               '(http\:\\/\\/machine\\/folder and item and some\\/path and and amilli3*)')
         self.assertEqual(quote('"[]"'), '"\[\]"')
         self.assertEqual(quote('"{}"'), '"\{\}"')
         self.assertEqual(quote('"()"'), '"\(\)"')
@@ -102,6 +102,15 @@ class QuoteTests(TestCase):
                                '((jakarta OR apache) AND website)')
         self.assertEqual(quote('(a AND (b OR c))'), '(a AND (b OR c))')
         self.assertEqual(quote('((a AND b) OR c)'), '((a AND b) OR c)')
+        self.assertEqual(quote('"jakarta apache" || jakarta'),
+                               '("jakarta apache" || jakarta)')
+        self.assertEqual(quote('"jakarta apache" && "Apache Lucene"'),
+                               '("jakarta apache" && "Apache Lucene")')
+        self.assertEqual(quote('(jakarta || apache) && website'),
+                               '((jakarta || apache) && website)')
+        self.assertEqual(quote('(a && (b || c))'), '(a && (b || c))')
+        self.assertEqual(quote('((a && b) || c)'), '((a && b) || c)')
+        self.assertEqual(quote('P||This&&That'), '(P||This&&That)')
 
     def testQuotingEscapingSpecialCharacters(self):
         self.assertEqual(quote('-+!^~:'), '\\-\\+\\!\\^\\~\\:')
@@ -111,6 +120,14 @@ class QuoteTests(TestCase):
         self.assertEqual(quote(':'), '\\:')
         self.assertEqual(quote(': :'), '(\\: \\:)')
         self.assertEqual(quote('foo+ bar! nul:'), '(foo\\+ bar\\! nul\\:)')
+
+    def testQuotingForwardSlashes(self):
+        # solr 4 supports regular expressions and requires / to be escaped
+        self.assertEqual(quote('/'), '\\/')
+        self.assertEqual(quote('(/ OR x)'), '(\\/ OR x)')
+        self.assertEqual(quote('"/'), '\\"\\/')
+        self.assertEqual(quote('"/"'), '"\\/"')
+        self.assertEqual(quote('"(/ OR x)"'), '"\\(\\/ OR x\\)"')
 
     def testUnicode(self):
         self.assertEqual(quote('foø'), 'fo\xc3\xb8')
@@ -133,11 +150,12 @@ class QuoteTests(TestCase):
         self.assertEqual(quote('[1995-12-31T23:59:59.999Z TO 2007-03-06T00:00:00Z]'),
                                '[1995-12-31T23:59:59.999Z TO 2007-03-06T00:00:00Z]')
         self.assertEqual(quote('[NOW-1YEAR/DAY TO NOW/DAY+1DAY]'),
-                               '[NOW-1YEAR/DAY TO NOW/DAY+1DAY]')
+                               '[NOW-1YEAR\\/DAY TO NOW\\/DAY+1DAY]')
         self.assertEqual(quote('[1976-03-06T23:59:59.999Z TO 1976-03-06T23:59:59.999Z+1YEAR]'),
                                '[1976-03-06T23:59:59.999Z TO 1976-03-06T23:59:59.999Z+1YEAR]')
+        # quoting date operators seems to be ok too
         self.assertEqual(quote('[1976-03-06T23:59:59.999Z/YEAR TO 1976-03-06T23:59:59.999Z]'),
-                               '[1976-03-06T23:59:59.999Z/YEAR TO 1976-03-06T23:59:59.999Z]')
+                               '[1976-03-06T23:59:59.999Z\\/YEAR TO 1976-03-06T23:59:59.999Z]')
 
 
 class QueryTests(TestCase):
@@ -326,5 +344,5 @@ class SearchTests(TestCase):
         self.assertEqual(match.name, 'python test doc')
         self.assertEqual(match.popularity, 0)
         self.assertEqual(match.sku, '500')
-        self.assertEqual(match.timestamp,
-            DateTime('2008-02-29 16:11:46.998 GMT'))
+        self.assertEqual(match.timestamp.ISO8601(),
+            DateTime('2008-02-29 16:11:46.998 GMT').ISO8601())

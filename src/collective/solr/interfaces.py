@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from collective.indexing.interfaces import IIndexQueueProcessor
 from zope.interface import Interface
 from zope.schema import Bool, Text, TextLine, Int, Float, List
@@ -110,10 +111,10 @@ class ISolrSchema(Interface):
         description=_(
             'help_max_results',
             default=u'Specify the maximum number of matches to be returned '
-                    u'when searching. Set to "0" to always return all '
-                    u'results.'
-        ),
-        default=0,
+                    u'when searching. Set to "10000000" or some other '
+                    u'ridiculously large value that is higher than the '
+                    u'possible number of rows that are expected.'
+        )
     )
 
     required = List(
@@ -256,9 +257,27 @@ class ISolrSchema(Interface):
         required=False
     )
 
+    levenshtein_distance = Float(
+        title=_('label_levenshtein_distance',
+                default=u'Levenshtein distance'),
+        description=_(
+            'help_levenshtein_distance',
+            default=u'The Levenshtein distance is a string metric for '
+                    u'measuring the difference between two strings. It allows'
+                    u'you to perform fuzzy searches by specifying a value '
+                    u'between 0 and 1.'
+        ),
+        required=False,
+    )
+
 
 class ISolrConnectionConfig(ISolrSchema):
     """ utility to hold the connection configuration for the solr server """
+
+
+class IZCMLSolrConnectionConfig(Interface):
+    """Solr connection settings configured through ZCML.
+    """
 
 
 class ISolrConnectionManager(Interface):

@@ -1,10 +1,10 @@
+# -*- coding: utf-8 -*-
 from zope.component import queryUtility
 from AccessControl import getSecurityManager
 from DateTime import DateTime
 
 from collective.solr.interfaces import ISolrConnectionConfig
 from collective.solr.queryparser import quote
-from collective.solr.utils import isSimpleTerm
 from collective.solr.utils import isSimpleSearch
 from collective.solr.utils import isWildCard
 from collective.solr.utils import splitSimpleSearch
@@ -21,9 +21,10 @@ sort_aliases = {
     'sortable_title': 'Title',
 }
 
-query_args = ('range',
-              'operator',
-              'depth',
+query_args = (
+    'range',
+    'operator',
+    'depth',
 )
 
 ignored = 'use_solr', '-C'
@@ -33,8 +34,8 @@ def iso8601date(value):
     """ convert `DateTime` to iso 8601 date format """
     if isinstance(value, DateTime):
         v = value.toZone('UTC')
-        value = '%04d-%02d-%02dT%02d:%02d:%06.3fZ' % (v.year(),
-            v.month(), v.day(), v.hour(), v.minute(), v.second())
+        value = '%04d-%02d-%02dT%02d:%02d:%06.3fZ' % (
+            v.year(), v.month(), v.day(), v.hour(), v.minute(), v.second())
     return value
 
 
@@ -62,7 +63,7 @@ def makeSimpleExpressions(term, levenstein_distance):
 
 def mangleSearchableText(value, config):
     pattern = getattr(config, 'search_pattern', '')
-    levenstein_distance = getattr(config, 'levenstein_distance', 0)
+    levenstein_distance = getattr(config, 'levenshtein_distance', 0)
     value_parts = []
     base_value_parts = []
 
@@ -83,6 +84,14 @@ def mangleSearchableText(value, config):
                                base_value=base_value)
         return set([value])    # add literal query parameter
     return value
+
+
+def quotePath(path):
+    """ quote overlap of solr reserved characters and those allowed
+        in zope ids (see OFS.ObjectManager.bad_id) """
+    for reserved in '/-~()':
+        path = path.replace(reserved, '\\%s' % reserved)
+    return '"%s"' % path
 
 
 def mangleQuery(keywords, config, schema):
@@ -127,6 +136,10 @@ def mangleQuery(keywords, config, schema):
             keywords[key] = mangleSearchableText(value, config)
             continue
         if key in epi_indexes:
+            if isinstance(value, (list, tuple)):
+                value = map(quotePath, value)
+            else:
+                value = quotePath(value)
             path = keywords['%s_parents' % key] = value
             del keywords[key]
             if 'depth' in args:
@@ -134,7 +147,7 @@ def mangleQuery(keywords, config, schema):
                 if depth >= 0:
                     if not isinstance(value, (list, tuple)):
                         path = [path]
-                    tmpl = '(+%s_depth:[%d TO %d] AND +%s_parents:%s)'
+                    tmpl = '+(+%s_depth:[%d TO %d] AND +%s_parents:%s)'
                     params = keywords['%s_parents' % key] = set()
                     for p in path:
                         base = len(p.split('/'))

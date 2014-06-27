@@ -87,10 +87,18 @@ class SolrMaintenanceTests(SolrTestCase):
 
     def testReindexParameters(self):
         maintenance = self.portal.unrestrictedTraverse('solr-maintenance')
-        # the view allos to skip the first n items...
+        # the view allows to skip the first n items...
         maintenance.clear()
         maintenance.reindex(skip=2)
         self.assertEqual(numFound(self.search()), 6)
+        # or to limit to n items...
+        maintenance.clear()
+        maintenance.reindex(limit=2)
+        self.assertEqual(numFound(self.search()), 2)
+        # or both
+        maintenance.clear()
+        maintenance.reindex(skip=2, limit=2)
+        self.assertEqual(numFound(self.search()), 2)
         # and also specify the batch size
         log = []
         def write(msg):
@@ -323,14 +331,14 @@ class SolrServerTests(SolrTestCase):
         proc.reindex(self.folder)
         proc.commit()
         self.assertEqual(search('+Title:Foo'), 0)
-        self.assertEqual(search('+path_parents:/plone'), 1)
+        self.assertEqual(search('+path_parents:\/plone'), 1)
         self.assertEqual(search('+portal_type:Folder'), 1)
         # now let's only update one index, which shouldn't change anything...
         self.folder.setTitle('Foo')
         proc.reindex(self.folder, ['UID', 'Title'])
         proc.commit()
         self.assertEqual(search('+Title:Foo'), 1)
-        self.assertEqual(search('+path_parents:/plone'), 1)
+        self.assertEqual(search('+path_parents:\/plone'), 1)
         self.assertEqual(search('+portal_type:Folder'), 1)
 
     def testReindexObjectWithEmptyDate(self):
@@ -745,17 +753,17 @@ class SolrServerTests(SolrTestCase):
 
     def testLimitSearchResults(self):
         self.maintenance.reindex()
-        results = self.search('+path_parents:/plone').results()
+        results = self.search('+path_parents:\/plone').results()
         self.assertEqual(results.numFound, '8')
         self.assertEqual(len(results), 8)
         # now let's limit the returned results
         config = getUtility(ISolrConnectionConfig)
         config.max_results = 2
-        results = self.search('+path_parents:/plone').results()
+        results = self.search('+path_parents:\/plone').results()
         self.assertEqual(results.numFound, '8')
         self.assertEqual(len(results), 2)
         # an explicit value should still override things
-        results = self.search('+path_parents:/plone', rows=5).results()
+        results = self.search('+path_parents:\/plone', rows=5).results()
         self.assertEqual(results.numFound, '8')
         self.assertEqual(len(results), 5)
 
@@ -973,6 +981,13 @@ class SolrServerTests(SolrTestCase):
         request = dict(SearchableText='Bar AND Foo')
         results = solrSearchResults(request)
         self.assertEqual(len(results), 1)
+        # test again with `&&` and `||` aliases
+        request = dict(SearchableText='Bar || Foo')
+        results = solrSearchResults(request)
+        self.assertEqual(len(results), 3)
+        request = dict(SearchableText='Bar && Foo')
+        results = solrSearchResults(request)
+        self.assertEqual(len(results), 1)
 
     def testMultiValueSearch(self):
         self.setRoles(('Manager',))
@@ -1051,6 +1066,24 @@ class SolrServerTests(SolrTestCase):
         self.assertEqual(sorted([r.Title for r in results]), [u'2010:ändern'])
         results = solrSearchResults(SearchableText=u'andern')
         self.assertEqual(sorted([r.Title for r in results]), [u'2010:ändern'])
+
+    def testSearchForTermWithForwardSlash(self):
+        self.folder.processForm(values={'title': 'foo/bar'})
+        commit()
+        results = solrSearchResults(SearchableText='foo')
+        self.assertEqual(sorted([r.Title for r in results]), ['foo/bar'])
+        results = solrSearchResults(SearchableText='foo/')
+        self.assertEqual(sorted([r.Title for r in results]), ['foo/bar'])
+        results = solrSearchResults(SearchableText='foo/bar')
+        self.assertEqual(sorted([r.Title for r in results]), ['foo/bar'])
+        results = solrSearchResults(SearchableText='/bar')
+        self.assertEqual(sorted([r.Title for r in results]), ['foo/bar'])
+        results = solrSearchResults(SearchableText='bar')
+        self.assertEqual(sorted([r.Title for r in results]), ['foo/bar'])
+        results = solrSearchResults(SearchableText='(foo/ AND bar)')
+        self.assertEqual(sorted([r.Title for r in results]), ['foo/bar'])
+        results = solrSearchResults(SearchableText='(foo/ OR boo)')
+        self.assertEqual(sorted([r.Title for r in results]), ['foo/bar'])
 
     def testBatchedSearchResults(self):
         self.maintenance.reindex()

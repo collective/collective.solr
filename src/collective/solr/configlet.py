@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from zope.component import adapts, queryUtility
 from zope.formlib.form import FormFields
 from zope.interface import implements
@@ -174,7 +175,8 @@ class SolrControlPanelAdapter(SchemaAdapterBase):
         if util is not None:
             util.filter_queries = value
 
-    filter_queries = property(getFilterQueryParameters, setFilterQueryParameters)
+    filter_queries = property(
+        getFilterQueryParameters, setFilterQueryParameters)
 
     def getSlowQueryThreshold(self):
         util = queryUtility(ISolrConnectionConfig)
@@ -185,7 +187,8 @@ class SolrControlPanelAdapter(SchemaAdapterBase):
         if util is not None:
             util.slow_query_threshold = value
 
-    slow_query_threshold = property(getSlowQueryThreshold, setSlowQueryThreshold)
+    slow_query_threshold = property(
+        getSlowQueryThreshold, setSlowQueryThreshold)
 
     def getEffectiveSteps(self):
         util = queryUtility(ISolrConnectionConfig)
@@ -229,7 +232,8 @@ class SolrControlPanelAdapter(SchemaAdapterBase):
         if util is not None:
             util.highlight_formatter_pre = value
 
-    highlight_formatter_pre = property(getHighlightFormatterPre, setHighlightFormatterPre)
+    highlight_formatter_pre = property(
+        getHighlightFormatterPre, setHighlightFormatterPre)
 
     def getHighlightFormatterPost(self):
         util = queryUtility(ISolrConnectionConfig)
@@ -240,7 +244,8 @@ class SolrControlPanelAdapter(SchemaAdapterBase):
         if util is not None:
             util.highlight_formatter_post = value
 
-    highlight_formatter_post = property(getHighlightFormatterPost, setHighlightFormatterPost)
+    highlight_formatter_post = property(
+        getHighlightFormatterPost, setHighlightFormatterPost)
 
     def getHighlightFragsize(self):
         util = queryUtility(ISolrConnectionConfig)
@@ -264,12 +269,25 @@ class SolrControlPanelAdapter(SchemaAdapterBase):
 
     field_list = property(getFieldList, setFieldList)
 
+    def getLevenshteinDistance(self):
+        util = queryUtility(ISolrConnectionConfig)
+        return getattr(util, 'levenshtein_distance', '')
+
+    def setLevenshteinDistance(self, value):
+        util = queryUtility(ISolrConnectionConfig)
+        if util is not None:
+            util.levenshtein_distance = value
+
+    levenshtein_distance = property(
+        getLevenshteinDistance, setLevenshteinDistance)
+
 
 class SolrControlPanel(ControlPanelForm):
 
     form_fields = FormFields(ISolrSchema)
 
     label = _('label_solr_settings', default='Solr settings')
-    description = _('help_solr_settings',
-                    default='Settings to enable and configure Solr integration.')
+    description = _(
+        'help_solr_settings',
+        default='Settings to enable and configure Solr integration.')
     form_name = _('label_solr_settings', default='Solr settings')

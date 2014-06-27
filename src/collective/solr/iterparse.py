@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # import `iterparse` from one of the various elementtree implementations,
 # sorted according to response parsing benchmark results (on python 2.6):
 #

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from logging import getLogger
 from time import time
 from zope.interface import implements
@@ -39,9 +40,17 @@ class Search(object):
         if connection is None:
             raise SolrInactiveException
         if not 'rows' in parameters:
-            parameters['rows'] = config.max_results or ''
-            logger.info('falling back to "max_results" (%d) without a "rows" '
-                'parameter: %r (%r)', config.max_results, query, parameters)
+            parameters['rows'] = config.max_results or 10000000
+            # Check if rows param is 0 for backwards compatibility. Before
+            # Solr 4 'rows = 0' meant that there is no limitation. Solr 4
+            # always expects a rows param > 0 though:
+            # http://wiki.apache.org/solr/CommonQueryParameters#rows
+            if parameters['rows'] == 0:
+                parameters['rows'] = 10000000
+            logger.debug(
+                'falling back to "max_results" (%d) without a "rows" '
+                'parameter: %r (%r)', config.max_results, query, parameters
+            )
         if getattr(config, 'highlight_fields', None):
             if parameters.get('hl', 'false') == 'true' and not 'hl.fl' in parameters:
                 parameters['hl'] = 'true'
@@ -70,9 +79,13 @@ class Search(object):
         elapsed = (time() - start) * 1000
         slow = config.slow_query_threshold
         if slow and elapsed >= slow:
-            logger.info('slow query: %d/%d ms for %r (%r)',
-                results.responseHeader['QTime'], elapsed, query, parameters)
-        logger.debug('highlighting info: %s' % getattr(results, 'highlighting', {}))
+            logger.info(
+                'slow query: %d/%d ms for %r (%r)',
+                results.responseHeader['QTime'], elapsed, query, parameters
+            )
+        logger.debug(
+            'highlighting info: %s' % getattr(results, 'highlighting', {})
+        )
         return results
 
     __call__ = search
@@ -87,8 +100,10 @@ class Search(object):
         for name, value in sorted(args.items()):
             field = schema.get(name or defaultSearchField, None)
             if field is None or not field.indexed:
-                logger.info('dropping unknown search attribute "%s" '
-                    ' (%r) for query: %r', name, value, args)
+                logger.info(
+                    'dropping unknown search attribute "%s" '
+                    ' (%r) for query: %r', name, value, args
+                )
                 continue
             if isinstance(value, bool):
                 value = str(value).lower()
@@ -140,16 +155,12 @@ class Search(object):
                             value = '"%s"' % value
                 else:
                     value = quote(value)
-                    # Solr 4.0 added regular expression support, which means
-                    # that '/' is now a special character and must be escaped
-                    # if searching for literal forward slash.
-                    if '/' in value:
-                        value = value.replace('/', '\/')
                 if not value:   # don't search for empty strings, even quoted
                     continue
             else:
-                logger.info('skipping unsupported value "%r" (%s)',
-                    value, name)
+                logger.info(
+                    'skipping unsupported value "%r" (%s)', value, name
+                )
                 continue
             if name is None:
                 if value and value[0] not in '+-':

@@ -7,18 +7,13 @@ from Products.Five.browser import BrowserView
 from plone.uuid.interfaces import IUUID, IUUIDAware
 from zope.interface import implements
 from zope.component import queryUtility, queryAdapter
-from Products.Five.browser import BrowserView
-from Products.CMFCore.utils import getToolByName
-
-from collective.indexing.indexer import getOwnIndexMethod
 from collective.solr.indexer import DefaultAdder
 from collective.solr.flare import PloneFlare
 from collective.solr.interfaces import ISolrConnectionManager
 from collective.solr.interfaces import ISolrMaintenanceView
 from collective.solr.interfaces import ISolrAddHandler
-from collective.solr.interfaces import ISearch
 from collective.solr.interfaces import ICheckIndexable
-from collective.solr.indexer import handlers, SolrIndexProcessor
+from collective.solr.indexer import SolrIndexProcessor
 from collective.solr.indexer import boost_values
 from collective.solr.parser import parse_date_as_datetime
 from collective.solr.parser import SolrResponse
@@ -70,6 +65,7 @@ class SolrMaintenanceView(BrowserView):
     def mklog(self, use_std_log=False):
         """ helper to prepend a time stamp to the output """
         write = self.request.RESPONSE.write
+
         def log(msg, timestamp=True):
             if timestamp:
                 msg = strftime('%Y/%m/%d-%H:%M:%S ') + msg
@@ -96,7 +92,7 @@ class SolrMaintenanceView(BrowserView):
         conn.commit()
         return 'solr index cleared.'
 
-    def reindex(self, batch=1000, skip=0):
+    def reindex(self, batch=1000, skip=0, limit=0):
         """ find all contentish objects (meaning all objects derived from one
             of the catalog mixin classes) and (re)indexes them """
         manager = queryUtility(ISolrConnectionManager)
@@ -107,6 +103,8 @@ class SolrMaintenanceView(BrowserView):
         log('reindexing solr catalog...\n')
         if skip:
             log('skipping indexing of %d object(s)...\n' % skip)
+        if limit:
+            log('limiting indexing to %d object(s)...\n' % limit)
         real = timer()          # real time
         lap = timer()           # real lap time (for intermediate commits)
         cpu = timer(clock)      # cpu time
@@ -116,6 +114,7 @@ class SolrMaintenanceView(BrowserView):
         updates = {}            # list to hold data to be updated
         flush = lambda: conn.flush()
         flush = notimeout(flush)
+
         def checkPoint():
             for boost_values, data in updates.values():
                 adder = data.pop('_solr_adder')
@@ -150,6 +149,8 @@ class SolrMaintenanceView(BrowserView):
                         cpi.next()
                 else:
                     log('missing data, skipping indexing of %r.\n' % obj)
+                if limit and count >= (skip + limit):
+                    break
         checkPoint()
         conn.commit()
         log('solr index rebuilt.\n')
@@ -177,7 +178,10 @@ class SolrMaintenanceView(BrowserView):
         lap = timer()           # real lap time (for intermediate commits)
         cpu = timer(clock)      # cpu time
         # get Solr status
-        response = conn.search(q=preImportDeleteQuery, rows=MAX_ROWS, fl='%s modified' % key)
+        response = conn.search(
+            q=preImportDeleteQuery,
+            rows=MAX_ROWS,
+            fl='%s modified' % key)
         # avoid creating DateTime instances
         simple_unmarshallers = unmarshallers.copy()
         simple_unmarshallers['date'] = parse_date_as_datetime
@@ -185,10 +189,11 @@ class SolrMaintenanceView(BrowserView):
         response.close()
         solr_results = {}
         solr_uids = set()
+
         def _utc_convert(value):
             t_tup = value.utctimetuple()
             return ((((t_tup[0] * 12 + t_tup[1]) * 31 + t_tup[2])
-                      * 24 + t_tup[3]) * 60 + t_tup[4])
+                    * 24 + t_tup[3]) * 60 + t_tup[4])
         for flare in flares:
             uid = flare[key]
             solr_uids.add(uid)
@@ -205,6 +210,7 @@ class SolrMaintenanceView(BrowserView):
         unindex = solr_uids
         processed = 0
         flush = notimeout(lambda: conn.flush())
+
         def checkPoint():
             msg = 'intermediate commit (%d items processed, ' \
                   'last batch in %s)...\n' % (processed, lap.next())
@@ -217,6 +223,7 @@ class SolrMaintenanceView(BrowserView):
         uid_rid_get = cat_results.get
         rid_path_get = catalog._catalog.paths.get
         catalog_traverse = catalog.unrestrictedTraverse
+
         def lookup(uid, rid=None,
                    uid_rid_get=uid_rid_get, rid_path_get=rid_path_get,
                    catalog_traverse=catalog_traverse):
@@ -284,7 +291,7 @@ class SolrMaintenanceView(BrowserView):
         logger.info(msg)
 
     def cleanup(self, batch=1000):
-        """ remove entries from solr that don't have a corresponding Zope 
+        """ remove entries from solr that don't have a corresponding Zope
             object or have a different UID than the real object"""
         manager = queryUtility(ISolrConnectionManager)
         proc = SolrIndexProcessor(manager)
@@ -304,21 +311,22 @@ class SolrMaintenanceView(BrowserView):
                 try:
                     ob = PloneFlare(flare).getObject()
                 except Exception as err:
-                    log('Error getting object, removing: %s (%s)\n' % (flare['path_string'], err))
+                    log('Error getting object, removing: %s (%s)\n' % (
+                        flare['path_string'], err))
                     conn.delete(flare[key])
                     deleted += 1
                     continue
                 if not IUUIDAware.providedBy(ob):
-                    log('Object %s of type %s does not support uuids, skipping.\n' % \
+                    log('Object %s of type %s does not support uuids, skipping.\n' %
                         ('/'.join(ob.getPhysicalPath()), ob.meta_type))
                     continue
                 uuid = IUUID(ob)
                 if uuid != flare[key]:
-                    log('indexed under wrong UID, removing: %s\n' % \
-                                        flare['path_string'])
+                    log('indexed under wrong UID, removing: %s\n' %
+                        flare['path_string'])
                     conn.delete(flare[key])
                     deleted += 1
-                    realob_res = SolrResponse(conn.search(q='%s:%s' % \
+                    realob_res = SolrResponse(conn.search(q='%s:%s' %
                                               (key, uuid))).results()
                     if len(realob_res) == 0:
                         log('no sane entry for last object, reindexing\n')
