@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from copy import deepcopy
 from operator import itemgetter
 from string import strip
@@ -25,7 +26,10 @@ def param(view, name):
 def facetParameters(view):
     """ determine facet fields to be queried for """
     marker = []
-    fields = view.request.get('facet.field', view.request.get('facet_field', marker))
+    fields = view.request.get(
+        'facet.field',
+        view.request.get('facet_field', marker)
+    )
     if isinstance(fields, basestring):
         fields = [fields]
     if fields is marker:
@@ -49,7 +53,7 @@ def convertFacets(fields, view, filter=None):
     info = []
     params = view.request.form.copy()
     if 'b_start' in params:
-        del params['b_start'] # Clear the batch when limiting a result set
+        del params['b_start']  # Clear the batch when limiting a result set
     facets, dependencies = list(facetParameters(view))
     params['facet.field'] = facets = list(facets)
     fq = params.get('fq', [])
@@ -66,7 +70,8 @@ def convertFacets(fields, view, filter=None):
 
         for name, count in sorted(values.items(), key=itemgetter(1), reverse=True):
             p = deepcopy(params)
-            p.setdefault('fq', []).append('%s:"%s"' % (field, name.encode('utf-8')))
+            p.setdefault('fq', []).append(
+                '%s:"%s"' % (field, name.encode('utf-8')))
             if field in p.get('facet.field', []):
                 p['facet.field'].remove(field)
             if filter is None or filter(name, count):
@@ -75,13 +80,19 @@ def convertFacets(fields, view, filter=None):
                     title = vocabulary.getTerm(name).title
                 if isinstance(title, Message):
                     title = translate(title, context=view.request)
-                counts.append(dict(name=name, count=count, title=title,
-                    query=urlencode(p, doseq=True)))
+                counts.append(
+                    dict(
+                        name=name,
+                        count=count,
+                        title=title,
+                        query=urlencode(p, doseq=True)
+                    )
+                )
         deps = dependencies.get(field, None)
         visible = deps is None or selected.intersection(deps)
         if counts and visible:
             info.append(dict(title=field, counts=counts, name=name))
-    if facets:          # sort according to given facets (if available)
+    if facets:  # sort according to given facets (if available)
         def pos(item):
             try:
                 return facets.index(item)
@@ -142,7 +153,8 @@ class SearchFacetsView(BrowserView, FacetMixin):
                 params['facet.field'] = facets + [field]
             if value.startswith('"') and value.endswith('"'):
                 # Look up a vocabulary to provide a title for this facet
-                vfactory = queryUtility(IFacetTitleVocabularyFactory, name=field)
+                vfactory = queryUtility(
+                    IFacetTitleVocabularyFactory, name=field)
                 if vfactory is None:
                     # Use the default fallback
                     vfactory = getUtility(IFacetTitleVocabularyFactory)
@@ -153,6 +165,11 @@ class SearchFacetsView(BrowserView, FacetMixin):
                 if isinstance(value, Message):
                     value = translate(value, context=self.request)
 
-                info.append(dict(title=field, value=value,
-                    query=urlencode(params, doseq=True)))
+                info.append(
+                    dict(
+                        title=field,
+                        value=value,
+                        query=urlencode(params, doseq=True)
+                    )
+                )
         return info
