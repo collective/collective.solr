@@ -29,10 +29,15 @@ class SolrFacettingTests(SolrTestCase):
         self.setRoles(('Manager',))
         self.portal.invokeFactory('Event', id='event1', title='Welcome')
         self.maintenance.reindex()
-        results = solrSearchResults(SearchableText='Welcome', facet='true',
-            facet_field='portal_type')
-        self.assertEqual(sorted([r.path_string for r in results]),
-            ['/plone/event1', '/plone/front-page'])
+        results = solrSearchResults(
+            SearchableText='Welcome',
+            facet='true',
+            facet_field='portal_type'
+        )
+        self.assertEqual(
+            sorted([r.path_string for r in results]),
+            ['/plone/event1', '/plone/front-page']
+        )
         types = results.facet_counts['facet_fields']['portal_type']
         self.assertEqual(types['Document'], 1)
         self.assertEqual(types['Event'], 1)
@@ -43,8 +48,10 @@ class SolrFacettingTests(SolrTestCase):
         request.form['facet'] = 'true'
         request.form['facet_field'] = 'review_state'
         results = solrSearchResults(request)
-        self.assertEqual(sorted([r.path_string for r in results]),
-            ['/plone/news', '/plone/news/aggregator'])
+        self.assertEqual(
+            sorted([r.path_string for r in results]),
+            ['/plone/news', '/plone/news/aggregator']
+        )
         states = results.facet_counts['facet_fields']['review_state']
         self.assertEqual(states, dict(private=0, published=2))
 
@@ -52,10 +59,15 @@ class SolrFacettingTests(SolrTestCase):
         self.setRoles(('Manager',))
         self.portal.invokeFactory('Event', id='event1', title='Welcome')
         self.maintenance.reindex()
-        results = solrSearchResults(SearchableText='Welcome', facet='true',
-            facet_field=['portal_type', 'review_state'])
-        self.assertEqual(sorted([r.path_string for r in results]),
-            ['/plone/event1', '/plone/front-page'])
+        results = solrSearchResults(
+            SearchableText='Welcome',
+            facet='true',
+            facet_field=['portal_type', 'review_state']
+        )
+        self.assertEqual(
+            sorted([r.path_string for r in results]),
+            ['/plone/event1', '/plone/front-page']
+        )
         facets = results.facet_counts['facet_fields']
         self.assertEqual(facets['portal_type']['Event'], 1)
         self.assertEqual(facets['review_state']['published'], 1)
@@ -67,8 +79,10 @@ class SolrFacettingTests(SolrTestCase):
         request.form['facet'] = 'true'
         request.form['facet_field'] = 'review_state'
         results = solrSearchResults(request)
-        self.assertEqual([r.path_string for r in results],
-            ['/plone/news/aggregator'])
+        self.assertEqual(
+            [r.path_string for r in results],
+            ['/plone/news/aggregator']
+        )
         states = results.facet_counts['facet_fields']['review_state']
         self.assertEqual(states, dict(private=0, published=1))
 
@@ -77,8 +91,10 @@ class SolrFacettingTests(SolrTestCase):
         request = self.app.REQUEST
         request.form['SearchableText'] = 'News'
         request.form['facet'] = 'true'
-        request.form['facet_field'] = ['portal_type',
-            'review_state:portal_type']
+        request.form['facet_field'] = [
+            'portal_type',
+            'review_state:portal_type'
+        ]
         view = SearchFacetsView(self.portal, request)
         view.kw = dict(results=solrSearchResults(request))
         facets = [facet['title'] for facet in view.facets()]
@@ -99,14 +115,18 @@ class SolrFacettingTests(SolrTestCase):
         view = SearchFacetsView(self.portal, request)
         view.kw = dict(results=solrSearchResults(request))
         facets = view.facets()
-        self.assertEqual(sorted([c['name'] for c in facets[0]['counts']]),
-            ['Collection', u'Føø'])
+        self.assertEqual(
+            sorted([c['name'] for c in facets[0]['counts']]),
+            ['Collection', u'Føø']
+        )
 
     def checkOrder(self, html, *order):
         for item in order:
             position = html.find(item)
-            self.failUnless(position >= 0,
-                'menu item "%s" missing or out of order' % item)
+            self.failUnless(
+                position >= 0,
+                'menu item "%s" missing or out of order' % item
+            )
             html = html[position:]
 
     def testFacetsInformationView(self):
@@ -122,8 +142,15 @@ class SolrFacettingTests(SolrTestCase):
         view = view.__of__(self.portal)     # needed to traverse `view/`
         results = solrSearchResults(request)
         output = view(results=results)
-        self.checkOrder(output, 'portal-searchfacets', 'Content type',
-            'Document', '1', 'Event', '1')
+        self.checkOrder(
+            output,
+            'portal-searchfacets',
+            'Content type',
+            'Document',
+            '1',
+            'Event',
+            '1'
+        )
 
     def testFacetFieldsInSearchBox(self):
         request = self.portal.REQUEST
@@ -131,7 +158,8 @@ class SolrFacettingTests(SolrTestCase):
         viewlet = viewlet.__of__(self.portal)   # needed to get security right
         viewlet.update()
         output = viewlet.render()
-        self.checkOrder(output,
+        self.checkOrder(
+            output,
             '<input', 'name="facet" value="true"',
             '<input', 'value="portal_type"',
             '<input', 'value="review_state"',
@@ -139,7 +167,8 @@ class SolrFacettingTests(SolrTestCase):
         # try overriding the desired facets in the request
         request.form['facet.field'] = ['foo']
         output = viewlet.render()
-        self.checkOrder(output,
+        self.checkOrder(
+            output,
             '<input', 'name="facet" value="true"',
             '<input', 'value="foo"',
             '</form>')
@@ -151,7 +180,10 @@ class SolrFacettingTests(SolrTestCase):
         request.form['facet'] = 'true'
         request.form['facet_field'] = 'foo'
         alsoProvides(request, IThemeSpecific)
-        view = getMultiAdapter((self.portal, request), name='search-facets')
+        view = getMultiAdapter(
+            (self.portal, request),
+            name='search-facets'
+        )
         self.assertRaises(SolrException, solrSearchResults, request)
 
     def testNoFacetFields(self):
@@ -198,14 +230,22 @@ class SolrFacettingTests(SolrTestCase):
         results = solrSearchResults(request)
         output = view(results=results)
         # the displayed facets should match the given order...
-        self.checkOrder(output, 'portal-searchfacets',
-            'Content type', 'Review state')
+        self.checkOrder(
+            output,
+            'portal-searchfacets',
+            'Content type',
+            'Review state'
+        )
         # let's also try the other way round...
         request.form['facet_field'] = ['review_state', 'portal_type']
         results = solrSearchResults(request)
         output = view(results=results)
-        self.checkOrder(output, 'portal-searchfacets',
-            'Review state', 'Content type')
+        self.checkOrder(
+            output,
+            'portal-searchfacets',
+            'Review state',
+            'Content type'
+        )
 
 
 def test_suite():
