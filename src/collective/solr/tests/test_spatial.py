@@ -15,6 +15,8 @@ from zope.interface import Interface
 from zope.component import getUtility
 from zope import schema
 
+import unittest2 as unittest
+
 
 class ILocation(Interface):
 
@@ -109,6 +111,46 @@ class SolrSpatialSearchTests(SolrTestCase):
         self.assertEqual(
             sorted([r.path_string for r in results]),
             []
+        )
+
+    # sort='geodist() desc' allows us to sort geolocations by distance.
+    # it seems that right now collective.solr filters that param entirely.
+    @unittest.skip('Sorting is not working yet.')
+    def testGeoSpatialSearchSortByDistance(self):
+        self.portal.invokeFactory('Location', id='location1', title='Loc 1')
+        self.portal.location1.geolocation = '50,1'
+        self.portal.location1.reindexObject()
+        self.portal.invokeFactory('Location', id='location2', title='Loc 2')
+        self.portal.location2.geolocation = '60,1'
+        self.portal.location2.reindexObject()
+        self.maintenance.reindex()
+
+        # Query: 52,1 | 50,1 (locaction1) < 60,1 (location2)
+        results = solrSearchResults(
+            spatial='true',
+            fq='{!bbox}',
+            sfield='geolocation',
+            pt='52,1',
+            d=100,
+            sort='geodist() desc'
+        )
+        self.assertEqual(
+            sorted([r.path_string for r in results]),
+            ['/plone/location2', '/plone/location1']
+        )
+
+        # Query: 58,1 | 60,1 (locaction2) < 50,1 (location1)
+        results = solrSearchResults(
+            spatial='true',
+            fq='{!bbox}',
+            sfield='geolocation',
+            pt='58,1',
+            d=100,
+            sort='geodist() asc'
+        )
+        self.assertEqual(
+            sorted([r.path_string for r in results]),
+            ['/plone/location1', '/plone/location2'],
         )
 
 
