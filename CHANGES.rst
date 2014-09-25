@@ -1,10 +1,11 @@
 Changelog
 =========
 
-4.0.4 (unreleased)
+4.1.0 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Add support for geospatial search.
+  [timo]
 
 
 4.0.3 (2014-06-18)
