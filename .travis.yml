@@ -2,11 +2,15 @@ language: python
 python:
   - "2.6"
   - "2.7"
+env:
+  matrix:
+    - SOLR_VERSION=4.10.x
+    - SOLR_VERSION=4.9.x
 install:
   - mkdir -p buildout-cache/eggs
   - mkdir -p buildout-cache/downloads
   - pip install -U setuptools==1.4.2
-  - python bootstrap.py -c travis.cfg
+  - python bootstrap.py -c travis-$SOLR_VERSION.cfg
   - bin/buildout -N -t 20 -c travis.cfg
 script:
   - bin/alltests
