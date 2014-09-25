@@ -299,6 +299,9 @@ class SolrServerTests(SolrTestCase):
         fields.remove('default')
         # remove field not defined for a folder
         fields.remove('getRemoteUrl')
+        # geolocation is an optional field that we have to keep in the
+        # default solr configuration for testing
+        fields.remove('geolocation')
         proc = SolrIndexProcessor(manager)
         # without explicit attributes all data should be returned
         data, missing = proc.getData(self.folder)

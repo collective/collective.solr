@@ -217,7 +217,7 @@ def extractQueryParameters(args):
     if limit:
         params['rows'] = int(limit)
     for key, value in args.items():
-        if key in ('fq', 'fl', 'facet', 'hl'):
+        if key in ('fq', 'fl', 'facet', 'hl', 'd', 'pt', 'sfield'):
             params[key] = value
             del args[key]
         elif key.startswith('facet.') or key.startswith('facet_'):
