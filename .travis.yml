@@ -11,7 +11,7 @@ install:
   - mkdir -p buildout-cache/downloads
   - pip install -U setuptools==1.4.2
   - python bootstrap.py -c travis-solr-$SOLR_VERSION.cfg
-  - bin/buildout -N -t 20 -c travis.cfg
+  - bin/buildout -N -t 20 -c travis-solr-$SOLR_VERSION.cfg
 script:
   - bin/alltests
 after_success:
