@@ -4,7 +4,8 @@ Changelog
 4.0.4 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Support strings in a proper date/time format for range type index
+  [keul]
 
 
 4.0.3 (2014-06-18)
