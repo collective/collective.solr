@@ -130,7 +130,7 @@ class SolrResponse(object):
         """
         if getattr(self, 'response', None):
             return int(self.response.numFound)
-        return None
+        return 0
 
     def __len__(self):
         return len(self.results())
