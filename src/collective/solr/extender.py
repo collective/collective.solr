@@ -77,9 +77,10 @@ class SearchExtender(object):
             languageIndependent=False,
             widget=TextAreaWidget(
                 label=_('label_searchwords', default=u"Search words"),
-                description="Specify words for which this item will show up "
-                            "as the first search result. Multiple words can "
-                            "be specified on new lines.",
+                description=_('help_searchwords',
+                              u"Specify words for which this item will show up "
+                              u"as the first search result. Multiple words can be "
+                              u"specified on new lines."),
                 visible={"edit": "visible", "view": "invisible"},
             )),
         ]

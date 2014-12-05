@@ -1,18 +1,22 @@
+# --- PLEASE EDIT THE LINES BELOW CORRECTLY ---
+# SOME DESCRIPTIVE TITLE.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 msgid ""
 msgstr ""
-"Project-Id-Version: collective.solr\n"
+"Project-Id-Version: PACKAGE VERSION\n"
 "POT-Creation-Date: 2014-12-05 15:50+0000\n"
-"PO-Revision-Date: 2012-06-05 12:51+0100\n"
-"Last-Translator: Tom Gross <thomasmichael.gross@fhnw.ch>\n"
-"Language-Team: Plone i18n <plone-i18n@lists.sourceforge.net>\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI +ZONE\n"
+"Last-Translator: Luca Fabbri <keul@redturtle.it>\n"
+"Language-Team: RedTurtle Technology <sviluppoplone@redturtle.it>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
+"Plural-Forms: nplurals=1; plural=0\n"
 "Language-Code: en\n"
 "Language-Name: English\n"
 "Preferred-Encodings: utf-8 latin1\n"
 "Domain: solr\n"
+"X-Is-Fallback-For: it-ch it-it\n"
 
 #: ../interfaces.py:238
 msgid "Default fields to be returned"
@@ -40,7 +44,7 @@ msgstr ""
 
 #: ../browser/facets.pt:15
 msgid "Remove this search limit..."
-msgstr "Sucheinschränkung entfernen ..."
+msgstr ""
 
 #: ../interfaces.py:239
 msgid "Specify metadata fields that should be returned for items in the result set, one per line. Defaults to all available plus ranking score."
@@ -61,37 +65,37 @@ msgstr ""
 #. Default: "The request to the Solr server has timed out. No search results could be found."
 #: ../browser/errors.pt:36
 msgid "description_solr_timeout"
-msgstr "Bei der Anfrage des Suchservers ist es zu einer Zeitüberschreitung gekommen. Es konnten keine Resultate gefunden werden."
+msgstr ""
 
 #. Default: "Unknown error while trying to search using Solr."
 #: ../browser/errors.pt:47
 msgid "description_solr_unknown error"
-msgstr "Unbekannter Fehler beim Zugriff auf den Suchserver."
+msgstr ""
 
 #. Default: "Please contact your system administration."
 #: ../browser/errors.pt:50
 msgid "description_solr_unknown_error_hint"
-msgstr "Bitte kontaktieren Sie Ihren Systemadministrator"
+msgstr ""
 
 #. Default: "The Solr server is currently unreachable, so no results could be found."
 #: ../browser/errors.pt:24
 msgid "description_solr_unreachable"
-msgstr "Der Suchserver ist zur Zeit nicht erreichbar. Es konnten keine Resultate gefunden werden."
+msgstr ""
 
 #. Default: "Please try again later or contact your system administration."
 #: ../browser/errors.pt:27
 msgid "description_solr_unreachable_hint"
-msgstr "Bitte probieren Sie es später noch einmal oder kontaktieren Sie Ihren Systemadministrator."
+msgstr ""
 
 #. Default: "Limit search results..."
 #: ../browser/facets.pt:6
 msgid "heading_search_facets"
-msgstr "Suche einschränken..."
+msgstr ""
 
 #. Default: "Solr Error"
 #: ../browser/errors.pt:16
 msgid "heading_solr_error"
-msgstr "Suchserver Fehler"
+msgstr ""
 
 #. Default: "Check this to enable the Solr integration, i.e. indexing and searching using the below settings."
 #: ../interfaces.py:14
@@ -318,12 +322,11 @@ msgstr ""
 msgid "legend_livesearch"
 msgstr ""
 
-# english default values for facet titles
 #: ../__init__.py:7
 msgid "portal_type"
-msgstr "Artikeltyp"
+msgstr ""
 
 #: ../__init__.py:8
 msgid "review_state"
-msgstr "Revisionsstatus"
+msgstr ""
 
