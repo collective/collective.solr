@@ -15,6 +15,7 @@ class ParserTests(TestCase):
         results = response.response     # the result set is named 'response'
         self.assertEqual(results.numFound, '1')
         self.assertEqual(results.start, '0')
+        self.assertEqual(response.actual_result_count, 1)
         match = results[0]
         self.assertEqual(len(results), 1)
         self.assertEqual(match.id, '500')
@@ -36,6 +37,7 @@ class ParserTests(TestCase):
         response = SolrResponse(complex_xml_response)
         results = response.response     # the result set is named 'response'
         self.assertEqual(results.numFound, '2')
+        self.assertEqual(response.actual_result_count, 2)
         self.assertEqual(results.start, '0')
         self.assertEqual(len(results), 2)
         first = results[0]
