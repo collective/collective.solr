@@ -4,7 +4,9 @@ Changelog
 4.0.4 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Add "actual_result_count" attribute to SolrResponse to emulate
+  catalog attribute.
+  [cekk]
 
 
 4.0.3 (2014-06-18)
