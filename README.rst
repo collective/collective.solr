@@ -2,7 +2,7 @@ Introduction
 ============
 
 .. image:: https://secure.travis-ci.org/collective/collective.solr.png?branch=master
-    :target: http://travis-ci.org/plone/collective/collective.solr
+    :target: http://travis-ci.org/collective/collective.solr
 
 .. image:: https://coveralls.io/repos/collective/collective.solr/badge.png?branch=master
     :target: https://coveralls.io/r/collective/collective.solr
