@@ -13,6 +13,7 @@ htmlcov
 var
 *.egg-info
 *.py[co]
+*.mo
 *.*~
 .*.cfg
 docs/doctrees/
