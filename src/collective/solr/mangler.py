@@ -14,7 +14,8 @@ from collective.solr.utils import prepare_wildcard
 ranges = {
     'min': '[%s TO *]',
     'max': '[* TO %s]',
-    'min:max': '[%s TO %s]',
+    'min:max': '[%s TO %s]',    # BBB: probably to be removed
+    'minmax': '[%s TO %s]',
 }
 
 sort_aliases = {
