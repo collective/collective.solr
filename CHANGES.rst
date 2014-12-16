@@ -7,6 +7,8 @@ Changelog
 - Add "actual_result_count" attribute to SolrResponse to emulate
   catalog attribute.
   [cekk]
+- Support strings in a proper date/time format for range type index
+  [keul]
 
 
 4.0.3 (2014-06-18)
