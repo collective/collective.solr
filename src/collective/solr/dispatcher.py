@@ -56,6 +56,7 @@ def solrSearchResults(request=None, **keywords):
         parameters with portal catalog semantics """
     search = queryUtility(ISearch)
     config = queryUtility(ISolrConnectionConfig)
+
     if request is None:
         # try to get a request instance, so that flares can be adapted to
         # ploneflares and urls can be converted into absolute ones etc;
@@ -72,8 +73,10 @@ def solrSearchResults(request=None, **keywords):
         # if request is a dict, we need the real request in order to
         # be able to adapt to plone flares
         request = getattr(getSite(), 'REQUEST', args)
+
     if 'path' in args and 'navtree' in args['path']:
         raise FallBackException     # we can't handle navtree queries yet
+
     use_solr = args.get('use_solr', False)  # A special key to force Solr
     if not use_solr and config.required:
         required = set(config.required).intersection(args)
@@ -83,11 +86,14 @@ def solrSearchResults(request=None, **keywords):
                     raise FallBackException
         else:
             raise FallBackException
+
     schema = search.getManager().getSchema() or {}
+
     params = cleanupQueryParameters(extractQueryParameters(args), schema)
     languageFilter(args)
     prepareData(args)
     mangleQuery(args, config, schema)
+
     query = search.buildQuery(**args)
     if query != {}:
         optimizeQueryParameters(query, params)
@@ -95,10 +101,12 @@ def solrSearchResults(request=None, **keywords):
         response = search(query, **params)
     else:
         return SolrResponse()
+
     def wrap(flare):
         """ wrap a flare object with a helper class """
         adapter = queryMultiAdapter((flare, request), IFlare)
         return adapter is not None and adapter or flare
+
     results = response.results()
     for idx, flare in enumerate(results):
         flare = wrap(flare)
