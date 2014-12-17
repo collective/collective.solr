@@ -110,6 +110,58 @@ class SolrMaintenanceTests(SolrTestCase):
         self.assertEqual(len(log), 3)
         self.assertEqual(numFound(self.search()), 8)
 
+    def testReindexPortalTypesParameters(self):
+        maintenance = self.portal.unrestrictedTraverse('solr-maintenance')
+        # initially the solr index should be empty
+        self.assertEqual(numFound(self.search()), 0)
+
+        ## first test the only_portal_types parameter
+        maintenance.reindex(only_portal_types=[])
+        self.assertEqual(numFound(self.search()), 8)
+        maintenance.clear()
+
+        maintenance.reindex(only_portal_types=['Folder'])
+        self.assertEqual(numFound(self.search()), 4)
+        maintenance.clear()
+
+        maintenance.reindex(only_portal_types=['Folder', 'Collection'])
+        self.assertEqual(numFound(self.search()), 6)
+        maintenance.clear()
+
+        maintenance.reindex(
+            only_portal_types=['Folder', 'Collection', 'NotExistingPortalType']
+        )
+        self.assertEqual(numFound(self.search()), 6)
+        maintenance.clear()
+
+        ## then the ignore_portal_types
+        maintenance.reindex(ignore_portal_types=[])
+        self.assertEqual(numFound(self.search()), 8)
+        maintenance.clear()
+
+        maintenance.reindex(ignore_portal_types=['Folder'])
+        self.assertEqual(numFound(self.search()), 4)
+        maintenance.clear()
+
+        maintenance.reindex(ignore_portal_types=['Folder', 'Collection'])
+        self.assertEqual(numFound(self.search()), 2)
+        maintenance.clear()
+
+        maintenance.reindex(
+            ignore_portal_types=['Folder', 'Collection',
+                                 'NotExistingPortalType']
+        )
+        self.assertEqual(numFound(self.search()), 2)
+        maintenance.clear()
+
+        ## and then both, which is not supported
+        msg = maintenance.reindex(ignore_portal_types=['Collection'],
+                                  only_portal_types=['Folder'])
+        self.assertEquals(
+            msg,
+            'It is not possible to combine ignore_portal_types with ' \
+            'only_portal_types')
+
     def testPartialReindex(self):
         maintenance = self.portal.unrestrictedTraverse('news/solr-maintenance')
         # initially the solr index should be empty
