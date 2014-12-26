@@ -5,13 +5,31 @@ This tests the integration of Solr's facetted searches into Plone.  We'll
 use a testbrowser to check the correct display of facets.  First we need to
 activate Solr support and reindex the site's content:
 
-  >>> self.folder.setTitle('My folder')
-  >>> self.activateAndReindex()
+  >>> from collective.solr.testing import activateAndReindex
+  >>> from plone.app.testing import setRoles
+  >>> from plone.app.testing import TEST_USER_ID
+  >>> from plone.app.testing import TEST_USER_NAME
+  >>> from plone.app.testing import TEST_USER_PASSWORD
+  >>> from plone.testing.z2 import Browser
+  >>> from transaction import commit
+  >>> portal = layer['portal']
+  >>> setRoles(portal, TEST_USER_ID, ['Manager'])
+  >>> portal.invokeFactory('Folder', id='folder')
+  'folder'
+  >>> folder = portal.folder
+  >>> commit()
+  >>> browser = Browser(layer['app'])
+  >>> browser.open('http://nohost/plone/login_form')
+  >>> browser.getControl(name='__ac_name').value = TEST_USER_NAME
+  >>> browser.getControl(name='__ac_password').value = TEST_USER_PASSWORD
+  >>> browser.getControl(name='submit').click()
+
+  >>> folder.setTitle('My folder')
+  >>> activateAndReindex(portal)
+  >>> commit()
 
 The search form should contain default settings for facets to be shown:
 
-  >>> self.setRoles(('Manager',))
-  >>> browser = self.getBrowser()
   >>> browser.open('http://nohost/plone/')
   >>> browser.contents
   '...<input type="hidden" name="facet.field"...value="portal_type" />...'
@@ -41,7 +59,7 @@ Let's try again with some results:
    ...Content type...
    ...Folder...1...
    ...Collection...1...
-   ...Site News...'
+   ...NewsFolder...'
 
 In fact, information for multiple facets should be displayed:
 
@@ -58,7 +76,7 @@ In fact, information for multiple facets should be displayed:
    ...Collection...1...
    ...Review state...
    ...published...2...
-   ...Site News...'
+   ...NewsFolder...'
 
 Clicking on of the facets should restrict the search:
 
@@ -73,13 +91,13 @@ Clicking on of the facets should restrict the search:
    ...Content type...Collection...&otimes;...
    ...Review state...
    ...published...1...
-   ...Site News...'
+   ...News...'
 
 There should be a link to remove the selected facet, but no other details:
 
   >>> browser.getLink('⊗').url
   'http://nohost/plone/search?...&facet.field=portal_type...'
-  >>> 'Folder' in browser.contents
+  >>> '>Folder</a>' in browser.contents
   False
 
 But the other facet should still be browsable:
@@ -94,7 +112,7 @@ But the other facet should still be browsable:
    ...portal-searchfacets...
    ...Content type...Collection...&otimes;...
    ...Review state...published...&otimes;...
-   ...Site News...'
+   ...News...'
 
 Removing a previously selected facet should extend the search again:
 
@@ -112,7 +130,7 @@ Removing a previously selected facet should extend the search again:
    ...Content type...
    ...Folder...1...
    ...Collection...1...
-   ...Site News...'
+   ...News...'
 
 Using the search boxes, both the standard one as well as the other, which is
 embedded into the results page, should provide facet information and preserve
@@ -126,7 +144,7 @@ the already selected facets:
    ...Content type...
    ...Folder...1...
    ...Collection...1...
-   ...Site News...'
+   ...NewsFolder...'
 
   >>> browser.getForm(name='searchform', index=1).submit()
   >>> browser.contents
@@ -136,7 +154,7 @@ the already selected facets:
    ...Content type...
    ...Folder...1...
    ...Collection...1...
-   ...Site News...'
+   ...NewsFolder...'
 
 The already selected facets should of course be displayed in case there were
 no search results, so the filters can be removed by the user.  So while at

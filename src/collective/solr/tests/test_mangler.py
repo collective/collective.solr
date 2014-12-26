@@ -1,14 +1,17 @@
-from unittest import TestCase
-from zope.component import provideUtility, getGlobalSiteManager
-from DateTime import DateTime
+# -*- coding: utf-8 -*-
 
+from DateTime import DateTime
 from collective.solr.interfaces import ISolrConnectionConfig
 from collective.solr.manager import SolrConnectionConfig
-from collective.solr.mangler import mangleQuery
-from collective.solr.mangler import extractQueryParameters
 from collective.solr.mangler import cleanupQueryParameters
+from collective.solr.mangler import mangleQuery
 from collective.solr.mangler import optimizeQueryParameters
-from collective.solr.parser import SolrSchema, SolrField
+from collective.solr.mangler import subtractQueryParameters
+from collective.solr.parser import SolrField
+from collective.solr.parser import SolrSchema
+from unittest import TestCase
+from zope.component import getGlobalSiteManager
+from zope.component import provideUtility
 
 
 def mangle(**keywords):
@@ -208,7 +211,7 @@ class PathManglerTests(TestCase):
 class QueryParameterTests(TestCase):
 
     def testSortIndex(self):
-        extract = extractQueryParameters
+        extract = subtractQueryParameters
         params = extract({'sort_on': 'foo'})
         self.assertEqual(params, dict(sort='foo asc'))
         # again with dashed instead of underscores
@@ -216,7 +219,7 @@ class QueryParameterTests(TestCase):
         self.assertEqual(params, dict(sort='foo asc'))
 
     def testSortOrder(self):
-        extract = extractQueryParameters
+        extract = subtractQueryParameters
         params = extract({'sort_on': 'foo', 'sort_order': 'ascending'})
         self.assertEqual(params, dict(sort='foo asc'))
         params = extract({'sort_on': 'foo', 'sort_order': 'descending'})
@@ -236,7 +239,7 @@ class QueryParameterTests(TestCase):
         self.assertEqual(params, dict(sort='foo asc'))
 
     def testSortLimit(self):
-        extract = extractQueryParameters
+        extract = subtractQueryParameters
         params = extract({'sort_limit': 5})
         self.assertEqual(params, dict(rows=5))
         params = extract({'sort_limit': '10'})
@@ -248,7 +251,7 @@ class QueryParameterTests(TestCase):
         self.assertEqual(params, dict(rows=10))
 
     def testBatchParameters(self):
-        extract = extractQueryParameters
+        extract = subtractQueryParameters
         params = extract({'b_start': 5})
         self.assertEqual(params, dict(start=5))
         params = extract({'b_start': '10'})
@@ -259,7 +262,7 @@ class QueryParameterTests(TestCase):
         self.assertEqual(params, dict(rows=10))
 
     def testCombined(self):
-        extract = extractQueryParameters
+        extract = subtractQueryParameters
         params = extract({'sort_on': 'foo', 'sort_limit': 5})
         self.assertEqual(params, dict(sort='foo asc', rows=5))
         params = extract({'sort_on': 'foo', 'sort_order': 'reverse',
@@ -269,7 +272,7 @@ class QueryParameterTests(TestCase):
         self.assertEqual(params, dict(rows=5))
 
     def testAllowFacetParameters(self):
-        extract = extractQueryParameters
+        extract = subtractQueryParameters
         # 'facet' and 'facet.*' should be passed on...
         params = extract({'facet': 'true'})
         self.assertEqual(params, {'facet': 'true'})
@@ -288,7 +291,7 @@ class QueryParameterTests(TestCase):
         self.assertEqual(params, {'facet.foo': ('foo', 'bar')})
 
     def testAllowFilterQueryParameters(self):
-        extract = extractQueryParameters
+        extract = subtractQueryParameters
         # 'fq' should be passed on...
         params = extract({'fq': 'foo'})
         self.assertEqual(params, {'fq': 'foo'})
@@ -296,7 +299,7 @@ class QueryParameterTests(TestCase):
         self.assertEqual(params, {'fq': ['foo', 'bar']})
 
     def testAllowFieldListParameter(self):
-        extract = extractQueryParameters
+        extract = subtractQueryParameters
         # 'fl' should be passed on...
         params = extract({'fl': 'foo'})
         self.assertEqual(params, {'fl': 'foo'})
@@ -304,7 +307,7 @@ class QueryParameterTests(TestCase):
         self.assertEqual(params, {'fl': ['foo', 'bar']})
 
     def testAllowHighlightParameter(self):
-        extract = extractQueryParameters
+        extract = subtractQueryParameters
         # 'hl' should be passed on...
         params = extract({'hl': 'foo'})
         self.assertEqual(params, {'hl': 'foo'})
@@ -399,7 +402,7 @@ class QueryParameterTests(TestCase):
         )
 
     def testFilterFacetDependencies(self):
-        extract = extractQueryParameters
+        extract = subtractQueryParameters
         # any info about facet dependencies must not be passed on to solr
         params = extract({'facet.field': 'foo:bar', 'facet.foo': 'bar:foo'})
         self.assertEqual(params, {'facet.field': 'foo', 'facet.foo': 'bar'})

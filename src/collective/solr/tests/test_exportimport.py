@@ -1,15 +1,19 @@
-from unittest import defaultTestLoader
-from zope.component import getUtility
+# -*- coding: utf-8 -*-
 from Products.GenericSetup.tests.common import TarballTester
 from StringIO import StringIO
-
-from collective.solr.tests.base import SolrTestCase
 from collective.solr.interfaces import ISolrConnectionConfig
+from collective.solr.testing import COLLECTIVE_SOLR_INTEGRATION_TESTING
+from unittest import TestCase
+from unittest import defaultTestLoader
+from zope.component import getUtility
 
 
-class SetupToolTests(SolrTestCase, TarballTester):
+class SetupToolTests(TestCase, TarballTester):
 
-    def afterSetUp(self):
+    layer = COLLECTIVE_SOLR_INTEGRATION_TESTING
+
+    def setUp(self):
+        self.portal = self.layer['portal']
         config = getUtility(ISolrConnectionConfig)
         config.active = False
         config.host = 'foo'
@@ -36,7 +40,7 @@ class SetupToolTests(SolrTestCase, TarballTester):
         result = tool.runImportStepFromProfile(profile, 'solr')
         self.assertEqual(result['steps'], [u'componentregistry', 'solr'])
         output = 'collective.solr: settings imported.'
-        self.failUnless(result['messages']['solr'].endswith(output))
+        self.assertTrue(result['messages']['solr'].endswith(output))
         config = getUtility(ISolrConnectionConfig)
         self.assertEqual(config.active, False)
         self.assertEqual(config.host, '127.0.0.1')

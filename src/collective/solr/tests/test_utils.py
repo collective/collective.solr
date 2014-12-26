@@ -1,20 +1,24 @@
 # -*- coding: utf-8 -*-
-from unittest import TestCase
-from Testing import ZopeTestCase as ztc
-
-from collective.solr.tests.utils import getData
 from collective.solr.parser import SolrResponse
+from collective.solr.testing import COLLECTIVE_SOLR_INTEGRATION_TESTING
+from collective.solr.tests.utils import getData
 from collective.solr.utils import findObjects
-from collective.solr.utils import isSimpleTerm
 from collective.solr.utils import isSimpleSearch
-from collective.solr.utils import isWildCard, splitSimpleSearch
-from collective.solr.utils import setupTranslationMap, prepareData
+from collective.solr.utils import isSimpleTerm
+from collective.solr.utils import isWildCard
 from collective.solr.utils import padResults
+from collective.solr.utils import prepareData
+from collective.solr.utils import setupTranslationMap
+from collective.solr.utils import splitSimpleSearch
+from unittest import TestCase
 
 
-class UtilsTests(ztc.ZopeTestCase):
+class UtilsTests(TestCase):
 
-    def afterSetUp(self):
+    layer = COLLECTIVE_SOLR_INTEGRATION_TESTING
+
+    def setUp(self):
+        self.app = self.layer['app']
         self.app.manage_addFolder(id='portal', title='Portal')
         self.portal = self.app.portal
         self.portal.manage_addFolder(id='foo', title='Foo')

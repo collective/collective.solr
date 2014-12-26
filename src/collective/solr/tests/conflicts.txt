@@ -12,9 +12,23 @@ results when searching for this particular piece of content later on.
 We'll use a testbrowser test this, but first we need to activate Solr support
 and reindex the site's content:
 
-  >>> self.activateAndReindex()
-  >>> self.setRoles(('Manager',))
-  >>> browser = self.getBrowser()
+  >>> from collective.solr.testing import activateAndReindex
+  >>> from plone.app.testing import TEST_USER_ID
+  >>> from plone.app.testing import TEST_USER_NAME
+  >>> from plone.app.testing import TEST_USER_PASSWORD
+  >>> from plone.app.testing import setRoles
+  >>> from plone.testing.z2 import Browser
+  >>> from transaction import commit
+  >>> setRoles(layer['portal'], TEST_USER_ID, ['Manager'])
+  >>> commit()
+  >>> browser = Browser(layer['app'])
+  >>> browser.open('http://nohost/plone/login_form')
+  >>> browser.getControl(name='__ac_name').value = TEST_USER_NAME
+  >>> browser.getControl(name='__ac_password').value = TEST_USER_PASSWORD
+  >>> browser.getControl(name='submit').click()
+
+  >>> activateAndReindex(layer['portal'])
+  >>> commit()
   >>> browser.open('http://nohost/plone/')
   >>> browser.getLink('Page').click()
   >>> browser.getControl('Title').value = 'Foo'
@@ -52,6 +66,3 @@ In the end we need to clean up our changes to avoid having ill effects on
 other tests:
 
   >>> BaseObject.at_post_create_script = original   # remove the monkey
-  >>> from collective.solr.utils import activate
-  >>> activate(False)
-

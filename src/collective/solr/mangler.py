@@ -1,14 +1,13 @@
 # -*- coding: utf-8 -*-
-from zope.component import queryUtility
 from AccessControl import getSecurityManager
 from DateTime import DateTime
-
 from collective.solr.interfaces import ISolrConnectionConfig
 from collective.solr.queryparser import quote
 from collective.solr.utils import isSimpleSearch
 from collective.solr.utils import isWildCard
-from collective.solr.utils import splitSimpleSearch
 from collective.solr.utils import prepare_wildcard
+from collective.solr.utils import splitSimpleSearch
+from zope.component import queryUtility
 
 
 ranges = {
@@ -107,7 +106,7 @@ def mangleQuery(keywords, config, schema):
             keywords[key] = value['query']
             del value['query']
             extras[key] = value
-        elif hasattr(value, 'query'):       # unify object parameters
+        elif getattr(value, 'query', None):       # unify object parameters
             keywords[key] = value.query
             extra = dict()
             for arg in query_args:
@@ -195,9 +194,9 @@ def mangleQuery(keywords, config, schema):
             assert not args, 'unsupported usage: %r' % args
 
 
-def extractQueryParameters(args):
-    """ extract parameters related to sorting and limiting search results
-        from a given set of arguments, also removing them """
+def subtractQueryParameters(args, request_keywords=None):
+    """ subtract parameters related to sorting and limiting search results
+        from a given set of arguments, also removing them from the input """
     def get(name):
         for prefix in 'sort_', 'sort-':
             key = '%s%s' % (prefix, name)
@@ -206,6 +205,7 @@ def extractQueryParameters(args):
                 del args[key]
                 return value
         return None
+
     params = {}
     index = get('on')
     if index:
@@ -213,9 +213,11 @@ def extractQueryParameters(args):
         reverse = reverse.lower() in ('reverse', 'descending')
         order = reverse and 'desc' or 'asc'
         params['sort'] = '%s %s' % (index, order)
+
     limit = get('limit')
     if limit:
         params['rows'] = int(limit)
+
     for key, value in args.items():
         if key in ('fq', 'fl', 'facet', 'hl'):
             params[key] = value
@@ -236,6 +238,7 @@ def extractQueryParameters(args):
         elif key == 'b_size':
             params['rows'] = int(value)
             del args[key]
+
     return params
 
 
@@ -245,14 +248,14 @@ def cleanupQueryParameters(args, schema):
     sort = args.get('sort', None)
     if sort is not None:
         field, order = sort.split(' ', 1)
-        if not field in schema:
+        if field not in schema:
             field = sort_aliases.get(field, None)
         fld = schema.get(field, None)
         if fld is not None and fld.indexed:
             args['sort'] = '%s %s' % (field, order)
         else:
             del args['sort']
-    if 'facet.field' in args and not 'facet' in args:
+    if 'facet.field' in args and 'facet' not in args:
         args['facet'] = 'true'
     return args
 

@@ -1,27 +1,23 @@
 # -*- coding: utf-8 -*-
-from copy import deepcopy
-from zope.interface import implements
-from zope.component import queryUtility, queryMultiAdapter
-from zope.component.hooks import getSite
-from zope.publisher.interfaces.http import IHTTPRequest
 from Acquisition import aq_base
 from Missing import MV
 from Products.ZCatalog.ZCatalog import ZCatalog
-
-from collective.solr.interfaces import ISolrConnectionConfig
-from collective.solr.interfaces import ISearchDispatcher
-from collective.solr.interfaces import ISearch
 from collective.solr.interfaces import IFlare
-from collective.solr.utils import isActive, prepareData
-from collective.solr.utils import padResults
-from collective.solr.mangler import mangleQuery
-from collective.solr.mangler import extractQueryParameters
-from collective.solr.mangler import cleanupQueryParameters
-from collective.solr.mangler import optimizeQueryParameters
-from collective.solr.lingua import languageFilter
-
-from collective.solr.monkey import patchCatalogTool, patchLazy
+from collective.solr.interfaces import ISearch
+from collective.solr.interfaces import ISearchDispatcher
+from collective.solr.interfaces import ISolrConnectionConfig
+from collective.solr.monkey import patchCatalogTool
+from collective.solr.monkey import patchLazy
 from collective.solr.parser import SolrResponse
+from collective.solr.utils import isActive
+from collective.solr.utils import padResults
+from copy import deepcopy
+from zope.component import queryMultiAdapter
+from zope.component import queryUtility
+from zope.component.hooks import getSite
+from zope.interface import implements
+from zope.publisher.interfaces.http import IHTTPRequest
+
 patchCatalogTool()  # patch catalog tool to use the dispatcher...
 patchLazy()  # ...as well as ZCatalog's Lazy class
 
@@ -51,7 +47,7 @@ class SearchDispatcher(object):
         return ZCatalog.searchResults(self.context, request, **keywords)
 
 
-def solrSearchResults(request=None, **keywords):
+def solrSearchResults(request=None, **keywords):  # noqa
     """ perform a query using solr after translating the passed in
         parameters with portal catalog semantics """
     search = queryUtility(ISearch)
@@ -61,15 +57,15 @@ def solrSearchResults(request=None, **keywords):
         # try to get a request instance, so that flares can be adapted to
         # ploneflares and urls can be converted into absolute ones etc;
         # however, in this case any arguments from the request are ignored
-        request = getattr(getSite(), 'REQUEST', None)
         args = deepcopy(keywords)
+        request = getattr(getSite(), 'REQUEST', None)
     elif IHTTPRequest.providedBy(request):
-        args = deepcopy(request.form)  # ignore headers and other stuff
-        args.update(keywords)       # keywords take precedence
+        args = deepcopy(request.form)
+        args.update(keywords)  # keywords take precedence
     else:
         assert isinstance(request, dict), request
         args = deepcopy(request)
-        args.update(keywords)       # keywords take precedence
+        args.update(keywords)  # keywords take precedence
         # if request is a dict, we need the real request in order to
         # be able to adapt to plone flares
         request = getattr(getSite(), 'REQUEST', args)
@@ -87,16 +83,9 @@ def solrSearchResults(request=None, **keywords):
         else:
             raise FallBackException
 
-    schema = search.getManager().getSchema() or {}
+    query, params = search.buildQueryAndParameters(**args)
 
-    params = cleanupQueryParameters(extractQueryParameters(args), schema)
-    languageFilter(args)
-    prepareData(args)
-    mangleQuery(args, config, schema)
-
-    query = search.buildQuery(**args)
     if query != {}:
-        optimizeQueryParameters(query, params)
         __traceback_info__ = (query, params, args)
         response = search(query, **params)
     else:
@@ -107,6 +96,7 @@ def solrSearchResults(request=None, **keywords):
         adapter = queryMultiAdapter((flare, request), IFlare)
         return adapter is not None and adapter or flare
 
+    schema = search.getManager().getSchema() or {}
     results = response.results()
     for idx, flare in enumerate(results):
         flare = wrap(flare)
