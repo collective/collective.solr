@@ -68,7 +68,8 @@ def convertFacets(fields, view, filter=None):
             vfactory = getUtility(IFacetTitleVocabularyFactory)
         vocabulary = vfactory(view.context)
 
-        for name, count in sorted(values.items(), key=itemgetter(1), reverse=True):
+        sorted_values = sorted(values.items(), key=itemgetter(1), reverse=True)
+        for name, count in sorted_values:
             p = deepcopy(params)
             p.setdefault('fq', []).append(
                 '%s:"%s"' % (field, name.encode('utf-8')))
