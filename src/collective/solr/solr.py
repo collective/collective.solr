@@ -173,8 +173,8 @@ class SolrConnection:
         finally:
             if not self.persistent:
                 self.conn.close()
-        #detect old-style error response (HTTP response code of
-        #200 with a non-zero status.
+        # detect old-style error response (HTTP response code of
+        # 200 with a non-zero status.
         parsed = fromstring(self.decoder(data)[0])
         status = parsed.attrib.get('status', 0)
         if status != 0:

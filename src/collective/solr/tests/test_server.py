@@ -298,7 +298,7 @@ class SolrErrorHandlingTests(TestCase):
         self.folder.processForm(values={'title': 'Bar'})
         commit()                    # indexing (doesn't) happen on commit
         self.assertEqual(log, ['exception during request %r', log[1],
-                         'exception during request %r', '<commit/>'])
+                               'exception during request %r', '<commit/>'])
         self.assertTrue('test_user_1_' in log[1])
         self.assertTrue('Bar' in log[1])
 
@@ -709,8 +709,8 @@ class SolrServerTests(TestCase):
         self.maintenance.reindex()
         request = dict(SearchableText='[* TO *]')
         search = lambda subject: sorted([r.path_string for r in
-                                        solrSearchResults(request,
-                                                          Subject=subject)])
+                                         solrSearchResults(request,
+                                                           Subject=subject)])
         self.assertEqual(search(dict(operator='and',
                                      query=['News'])),
                          ['/plone/front-page', '/plone/news'])
@@ -889,7 +889,7 @@ class SolrServerTests(TestCase):
         self.assertEqual(search('Title', sort_on='Title', sort_limit=4),
                          sorted([i['Title']
                                  for i in first_level_objs])[:4]
-                         + ['?' for i in range(len(first_level_objs)-4)])
+                         + ['?' for i in range(len(first_level_objs) - 4)])
         self.assertEqual(search('Title',
                                 sort_on='Title',
                                 sort_order='reverse',
@@ -897,7 +897,7 @@ class SolrServerTests(TestCase):
                          sorted([i['Title']
                                  for i in first_level_objs],
                                 reverse=True)[:3] +
-                         ['?' for i in range(len(first_level_objs)-3)])
+                         ['?' for i in range(len(first_level_objs) - 3)])
         # test sort index aliases
         schema = self.search.getManager().getSchema()
         self.assertFalse('sortable_title' in schema)

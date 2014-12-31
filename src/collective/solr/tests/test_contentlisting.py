@@ -9,4 +9,5 @@ from collective.solr.contentlisting import FlareContentListingObject
 class ContentListingTests(TestCase):
 
     def testInterfaceComplete(self):
-        self.assertTrue(verifyClass(IContentListingObject, FlareContentListingObject))
+        self.assertTrue(
+            verifyClass(IContentListingObject, FlareContentListingObject))

@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-
 from collective.solr.browser.facets import SearchBox
 from collective.solr.browser.facets import SearchFacetsView
 from collective.solr.browser.interfaces import IThemeSpecific
