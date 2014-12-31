@@ -32,7 +32,7 @@ class MockResponse():
                         "endOffset": 5,
                         "origFreq": 0,
                         "suggestion": [
-                            {"word":"Plone", "freq":13}
+                            {"word": "Plone", "freq": 13}
                         ]
                     },
                     "correctlySpelled",

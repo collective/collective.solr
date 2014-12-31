@@ -16,10 +16,12 @@ from collective.solr.tests.utils import getData
 
 
 class Dummy(object):
+
     """ dummy class that allows setting attributes """
 
     def __init__(self, **kw):
         self.__dict__.update(kw)
+
 
 class DummyView(object):
 
@@ -33,7 +35,9 @@ class DummyView(object):
         else:
             self.request = {}
 
+
 class DummyTitleVocabulary(object):
+
     def __contains__(self, term):
         return True
 
@@ -42,11 +46,13 @@ class DummyTitleVocabulary(object):
 
 
 class DummyTitleVocabularyFactory(object):
+
     def __call__(self, context):
         return DummyTitleVocabulary()
 
 
 class DummyAllCapsVocabulary(object):
+
     def __contains__(self, term):
         return term != 'leavelowercase'
 
@@ -55,11 +61,13 @@ class DummyAllCapsVocabulary(object):
 
 
 class DummyAllCapsVocabularyFactory(object):
+
     def __call__(self, context):
         return DummyAllCapsVocabulary()
 
 
 class FacettingHelperTest(TestCase, cleanup.CleanUp):
+
     def setUp(self):
         provideUtility(
             DummyTitleVocabularyFactory(), IFacetTitleVocabularyFactory)
@@ -69,7 +77,7 @@ class FacettingHelperTest(TestCase, cleanup.CleanUp):
 
     def testConvertFacets(self):
         fields = dict(portal_type=dict(Document=10,
-            Folder=3, Event=5, Topic=2))
+                                       Folder=3, Event=5, Topic=2))
         view = DummyView(context=Dummy(), request=TestRequest())
         info = convertFacets(fields, view=view)
         # the info should consist of 1 dict with
@@ -95,7 +103,8 @@ class FacettingHelperTest(TestCase, cleanup.CleanUp):
         info = convertFacets(fields, view=view)
         # the info should consist of 2 dicts with
         # `counts`, `name` and `title` keys
-        self.assertEqual([sorted(i) for i in info], [['counts', 'name', 'title']] * 2)
+        self.assertEqual([sorted(i)
+                          for i in info], [['counts', 'name', 'title']] * 2)
         # next let's check the field names
         self.assertEqual([i['title'] for i in info], ['cat', 'inStock'])
         # and the fields contents
@@ -131,7 +140,7 @@ class FacettingHelperTest(TestCase, cleanup.CleanUp):
         # and again via the request
         request['facet.field'] = ['foo', 'bar']
         self.assertEqual(facetParameters(view),
-            (['foo', 'bar'], {}))
+                         (['foo', 'bar'], {}))
         # clean up...
         getGlobalSiteManager().unregisterUtility(cfg, ISolrConnectionConfig)
 
@@ -144,19 +153,19 @@ class FacettingHelperTest(TestCase, cleanup.CleanUp):
         request = {}
         view = DummyView(context, request)
         self.assertEqual(facetParameters(view),
-            (['foo:bar'], dict(foo=['bar'])))
+                         (['foo:bar'], dict(foo=['bar'])))
         # overridden on the context
         context.facet_fields = ['bar:foo']
         self.assertEqual(facetParameters(view),
-            (['bar:foo'], dict(bar=['foo'])))
+                         (['bar:foo'], dict(bar=['foo'])))
         # and via the request
         request['facet.field'] = ['foo:bar', 'bar:foo']
         self.assertEqual(facetParameters(view),
-            (['foo:bar', 'bar:foo'], dict(foo=['bar'], bar=['foo'])))
+                         (['foo:bar', 'bar:foo'], dict(foo=['bar'], bar=['foo'])))
         # white space shouldn't matter
         request['facet.field'] = ['foo : bar', 'bar  :foo']
         self.assertEqual(facetParameters(view),
-            (['foo : bar', 'bar  :foo'], dict(foo=['bar'], bar=['foo'])))
+                         (['foo : bar', 'bar  :foo'], dict(foo=['bar'], bar=['foo'])))
         # clean up...
         getGlobalSiteManager().unregisterUtility(cfg, ISolrConnectionConfig)
 
@@ -221,7 +230,7 @@ class FacettingHelperTest(TestCase, cleanup.CleanUp):
         context = Dummy()
         request = TestRequest(form={'facet.field': ['foo', 'bar']})
         fields = dict(foo=dict(Document=10, Folder=3, Event=5),
-            bar=dict(private=2, published=4))
+                      bar=dict(private=2, published=4))
         view = DummyView(context=context, request=request)
         info = convertFacets(fields, view)
         self.assertEqual(len(info), 2)
@@ -284,17 +293,23 @@ class FacettingHelperTest(TestCase, cleanup.CleanUp):
         # extra parameter should be left untouched
         request.form['foo'] = 'bar'
         self.assertEqual(info(), [
-            ('foo', ['facet.field=foo', 'foo=bar', 'fq=bah:"z"', 'fq=bar:"y"']),
-            ('bar', ['facet.field=bar', 'foo=bar', 'fq=bah:"z"', 'fq=foo:"x"']),
-            ('bah', ['facet.field=bah', 'foo=bar', 'fq=bar:"y"', 'fq=foo:"x"']),
+            ('foo', [
+             'facet.field=foo', 'foo=bar', 'fq=bah:"z"', 'fq=bar:"y"']),
+            ('bar', [
+             'facet.field=bar', 'foo=bar', 'fq=bah:"z"', 'fq=foo:"x"']),
+            ('bah', [
+             'facet.field=bah', 'foo=bar', 'fq=bar:"y"', 'fq=foo:"x"']),
         ])
         # an existing 'facet.field' parameter should be preserved
         del request.form['foo']
         request.form['facet.field'] = 'x'
         self.assertEqual(info(), [
-            ('foo', ['facet.field=foo', 'facet.field=x', 'fq=bah:"z"', 'fq=bar:"y"']),
-            ('bar', ['facet.field=bar', 'facet.field=x', 'fq=bah:"z"', 'fq=foo:"x"']),
-            ('bah', ['facet.field=bah', 'facet.field=x', 'fq=bar:"y"', 'fq=foo:"x"']),
+            ('foo', [
+             'facet.field=foo', 'facet.field=x', 'fq=bah:"z"', 'fq=bar:"y"']),
+            ('bar', [
+             'facet.field=bar', 'facet.field=x', 'fq=bah:"z"', 'fq=foo:"x"']),
+            ('bah', [
+             'facet.field=bah', 'facet.field=x', 'fq=bar:"y"', 'fq=foo:"x"']),
         ])
 
     def testSelectedFacetValues(self):
@@ -305,10 +320,10 @@ class FacettingHelperTest(TestCase, cleanup.CleanUp):
         self.assertEqual(info(), [('foo', 'Title of Xy')])
         request.form['fq'] = ['foo:"x"', 'bar:"y"']
         self.assertEqual(info(),
-            [('foo', 'Title of X'), ('bar', 'Title of Y')])
+                         [('foo', 'Title of X'), ('bar', 'Title of Y')])
         request.form['fq'] = ['foo:"x"', 'bar:"y"', 'bah:"z"']
         self.assertEqual(info(), [('foo', 'Title of X'), ('bar', 'Title of Y'),
-            ('bah', 'Title of Z')])
+                                  ('bah', 'Title of Z')])
 
     def testEmptyFacetField(self):
         context = Dummy()
