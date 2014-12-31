@@ -117,9 +117,9 @@ class SolrMaintenanceView(BrowserView):
         flush = notimeout(flush)
 
         def checkPoint():
-            for boost_values, data in updates.values():
+            for my_boost_values, data in updates.values():
                 adder = data.pop('_solr_adder')
-                adder(conn, boost_values=boost_values, **data)
+                adder(conn, boost_values=my_boost_values, **data)
             updates.clear()
             msg = 'intermediate commit (%d items processed, ' \
                   'last batch in %s)...\n' % (processed, lap.next())
@@ -318,8 +318,12 @@ class SolrMaintenanceView(BrowserView):
                     deleted += 1
                     continue
                 if not IUUIDAware.providedBy(ob):
-                    log('Object %s of type %s does not support uuids, skipping.\n' %
-                        ('/'.join(ob.getPhysicalPath()), ob.meta_type))
+                    no_skipping_msg = 'Object %s of type %s does not ' + \
+                        'support uuids, skipping.\n'
+                    log(
+                        no_skipping_msg %
+                        ('/'.join(ob.getPhysicalPath()), ob.meta_type)
+                    )
                     continue
                 uuid = IUUID(ob)
                 if uuid != flare[key]:
@@ -344,6 +348,8 @@ class SolrMaintenanceView(BrowserView):
             start += batch
             resp = SolrResponse(conn.search(q='*:*', rows=batch, start=start))
             res = resp.results()
-        msg = 'solr cleanup finished, %s item(s) removed, %s item(s) reindexed\n' % (deleted, reindexed)
+        finished_msg = 'solr cleanup finished, %s item(s) removed, ' + \
+            '%s item(s) reindexed\n'
+        msg = finished_msg % (deleted, reindexed)
         log(msg)
         logger.info(msg)
