@@ -230,7 +230,7 @@ class SolrIndexProcessor(object):
 
             data, missing = self.getData(obj, attributes=[uniqueKey])
             prepareData(data)
-            if not uniqueKey in data:
+            if uniqueKey not in data:
                 msg = 'Can not unindex: no unique key for object %r'
                 logger.info(msg, obj)
                 return
