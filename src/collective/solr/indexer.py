@@ -57,14 +57,18 @@ def datehandler(value):
 
     if isinstance(value, DateTime):
         v = value.toZone('UTC')
-        value = '%04d-%02d-%02dT%02d:%02d:%06.3fZ' % (v.year(),
-            v.month(), v.day(), v.hour(), v.minute(), v.second())
+        value = '%04d-%02d-%02dT%02d:%02d:%06.3fZ' % (
+            v.year(), v.month(), v.day(), v.hour(), v.minute(), v.second()
+        )
     elif isinstance(value, datetime):
         # Convert a timezone aware timetuple to a non timezone aware time
         # tuple representing utc time. Does nothing if object is not
         # timezone aware
         value = datetime(*value.utctimetuple()[:7])
-        value = '%s.%03dZ' % (value.strftime('%Y-%m-%dT%H:%M:%S'), value.microsecond % 1000)
+        value = '%s.%03dZ' % (
+            value.strftime('%Y-%m-%dT%H:%M:%S'),
+            value.microsecond % 1000
+        )
     elif isinstance(value, date):
         value = '%s.000Z' % value.strftime('%Y-%m-%dT%H:%M:%S')
     return value
@@ -102,6 +106,7 @@ class DefaultAdder(object):
         data.pop('links', '')
         conn.add(**data)
 
+
 class BinaryAdder(DefaultAdder):
     """
     """
@@ -116,12 +121,17 @@ class BinaryAdder(DefaultAdder):
             return super(BinaryAdder, self).__call__(conn, **data)
         ignore = ('SearchableText', 'created', 'Type', 'links',
                   'description', 'Date')
-        postdata = dict([('literal.%s' % key, val) for key, val in data.iteritems()
-                     if key not in ignore])
-        portal_state = self.context.restrictedTraverse('@@plone_portal_state')
+        postdata = dict(
+            [
+                ('literal.%s' % key, val) for key, val in data.iteritems()
+                if key not in ignore
+            ]
+        )
         postdata['stream.file'] = self.getpath()
-        postdata['stream.contentType'] = data.get('content_type',
-                                                 'application/octet-stream')
+        postdata['stream.contentType'] = data.get(
+            'content_type',
+            'application/octet-stream'
+        )
         postdata['fmap.content'] = 'SearchableText'
         postdata['extractFormat'] = 'text'
 
@@ -133,6 +143,7 @@ class BinaryAdder(DefaultAdder):
         except SolrException, e:
             logger.warn('Error %s @ %s', e, data['path_string'])
             conn.reset()
+
 
 def boost_values(obj, data):
     """ calculate boost values using a method or skin script;  returns
@@ -182,7 +193,9 @@ class SolrIndexProcessor(object):
                 try:
                     logger.debug('indexing %r (%r)', obj, data)
                     pt = data.get('portal_type', 'default')
-                    logger.debug('indexing %r with %r adder (%r)', obj, pt, data)
+                    logger.debug(
+                        'indexing %r with %r adder (%r)', obj, pt, data
+                    )
 
                     adder = queryAdapter(obj, ISolrAddHandler, name=pt)
 
@@ -300,7 +313,7 @@ class SolrIndexProcessor(object):
         if attributes is None:
             attributes = schema.keys()
         obj = self.wrapObject(obj)
-        data, marker = {}, []
+        data = {}
         for name in attributes:
             try:
                 value = getattr(obj, name)
@@ -311,8 +324,8 @@ class SolrIndexProcessor(object):
             except AttributeError:
                 continue
             except Exception:
-                logger.exception('Error occured while getting data for '
-                    'indexing!')
+                logger.exception(
+                    'Error occured while getting data for indexing!')
                 continue
             field = schema[name]
             handler = handlers.get(field.class_, None)
