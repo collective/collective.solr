@@ -160,12 +160,16 @@ class FacettingHelperTest(TestCase, cleanup.CleanUp):
                          (['bar:foo'], dict(bar=['foo'])))
         # and via the request
         request['facet.field'] = ['foo:bar', 'bar:foo']
-        self.assertEqual(facetParameters(view),
-                         (['foo:bar', 'bar:foo'], dict(foo=['bar'], bar=['foo'])))
+        self.assertEqual(
+            facetParameters(view),
+            (['foo:bar', 'bar:foo'], dict(foo=['bar'], bar=['foo']))
+        )
         # white space shouldn't matter
         request['facet.field'] = ['foo : bar', 'bar  :foo']
-        self.assertEqual(facetParameters(view),
-                         (['foo : bar', 'bar  :foo'], dict(foo=['bar'], bar=['foo'])))
+        self.assertEqual(
+            facetParameters(view),
+            (['foo : bar', 'bar  :foo'], dict(foo=['bar'], bar=['foo']))
+        )
         # clean up...
         getGlobalSiteManager().unregisterUtility(cfg, ISolrConnectionConfig)
 
@@ -348,26 +352,35 @@ class FacettingHelperTest(TestCase, cleanup.CleanUp):
         view = DummyView(context=context, request=request)
         info = convertFacets(fields, view)
         self.assertEqual(len(info), 1)
-        self.assertEqual([(c['name'], c['count']) for c in info[0]['counts']], [
-            ('', 6),
-            ('bar', 4),
-            ('foo', 2),
-            ('nil', 0),
-        ])
+        self.assertEqual(
+            [(c['name'], c['count']) for c in info[0]['counts']],
+            [
+                ('', 6),
+                ('bar', 4),
+                ('foo', 2),
+                ('nil', 0),
+            ]
+        )
         # let's filter out zero counts
         filter = lambda name, count: count > 0
         info = convertFacets(fields, view, filter=filter)
         self.assertEqual(len(info), 1)
-        self.assertEqual([(c['name'], c['count']) for c in info[0]['counts']], [
-            ('', 6),
-            ('bar', 4),
-            ('foo', 2),
-        ])
+        self.assertEqual(
+            [(c['name'], c['count']) for c in info[0]['counts']],
+            [
+                ('', 6),
+                ('bar', 4),
+                ('foo', 2),
+            ]
+        )
         # and also unnamed facets
         filter = lambda name, count: name and count > 0
         info = convertFacets(fields, view, filter=filter)
         self.assertEqual(len(info), 1)
-        self.assertEqual([(c['name'], c['count']) for c in info[0]['counts']], [
-            ('bar', 4),
-            ('foo', 2),
-        ])
+        self.assertEqual(
+            [(c['name'], c['count']) for c in info[0]['counts']],
+            [
+                ('bar', 4),
+                ('foo', 2),
+            ]
+        )

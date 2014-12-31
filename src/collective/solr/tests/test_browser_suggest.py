@@ -1,6 +1,5 @@
 # -*- coding: UTF-8 -*-
 from zope.component import getUtility
-from zope.component import queryUtility
 from collective.solr.interfaces import ISolrConnectionManager
 from collective.solr.testing import (
     COLLECTIVE_SOLR_INTEGRATION_TESTING
