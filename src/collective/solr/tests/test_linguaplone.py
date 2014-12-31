@@ -1,34 +1,39 @@
-from collective.solr.tests.utils import pingSolr
-from collective.solr.tests.base import SolrTestCase
-from collective.solr.tests.layer import lingua
+# -*- coding: utf-8 -*-
 
-from zope.component import getUtility
-from transaction import commit, abort
 from Products.CMFCore.utils import getToolByName
-from collective.solr.interfaces import ISolrConnectionConfig
-from collective.solr.interfaces import ISearch
 from collective.solr.dispatcher import solrSearchResults
+from collective.solr.interfaces import ISearch
+from collective.solr.interfaces import ISolrConnectionConfig
+from collective.solr.testing import COLLECTIVE_SOLR_FUNCTIONAL_TESTING
+from collective.solr.tests.utils import pingSolr
 from collective.solr.utils import activate
+from plone.app.testing import TEST_USER_ID
+from plone.app.testing import setRoles
+from transaction import abort
+from transaction import commit
+from unittest import TestCase
+from zope.component import getUtility
 
 
-class LinguaTests(SolrTestCase):
+class LinguaTests(TestCase):
 
-    layer = lingua
+    layer = COLLECTIVE_SOLR_FUNCTIONAL_TESTING
 
-    def afterSetUp(self):
+    def setUp(self):
         activate()
+        self.portal = self.layer['portal']
         self.portal.REQUEST.RESPONSE.write = lambda x: x    # ignore output
         self.maintenance = self.portal.unrestrictedTraverse('solr-maintenance')
         self.maintenance.clear()
         self.config = getUtility(ISolrConnectionConfig)
         self.search = getUtility(ISearch)
         # also set up the languages...
-        self.setRoles(['Manager'])
+        setRoles(self.portal, TEST_USER_ID, ['Manager'])
         ltool = getToolByName(self.portal, 'portal_languages')
         ltool.manage_setLanguageSettings(defaultLanguage='en',
-            supportedLanguages=('en', 'de'))
+                                         supportedLanguages=('en', 'de'))
 
-    def beforeTearDown(self):
+    def tearDown(self):
         # due to the `commit()` in the tests below the activation of the
         # solr support in `afterSetUp` needs to be explicitly reversed,
         # but first all uncommitted changes made in the tests are aborted...
@@ -47,6 +52,7 @@ class LinguaTests(SolrTestCase):
         nt.update(title='doc foo', language='')     # language-neutral
         nt.reindexObject()
         commit()                        # indexing happens on commit
+
         def search(**kw):
             results = solrSearchResults(SearchableText='do*', **kw)
             return sorted([r.Title for r in results])
@@ -55,7 +61,7 @@ class LinguaTests(SolrTestCase):
         self.assertEqual(search(Language='en'), ['some document'])
         self.assertEqual(search(Language='de'), ['ein dokument'])
         self.assertEqual(search(Language='all'),
-            ['doc foo', 'ein dokument', 'some document'])
+                         ['doc foo', 'ein dokument', 'some document'])
 
 
 def test_suite():

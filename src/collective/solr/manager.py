@@ -1,15 +1,18 @@
 # -*- coding: utf-8 -*-
-from logging import getLogger
-from persistent import Persistent
-from zope.interface import implements
-from zope.component import getUtility, queryUtility
 from collective.solr.interfaces import ISolrConnectionConfig
 from collective.solr.interfaces import ISolrConnectionManager
 from collective.solr.interfaces import IZCMLSolrConnectionConfig
+from collective.solr.local import getLocal
+from collective.solr.local import setLocal
 from collective.solr.solr import SolrConnection
-from collective.solr.local import getLocal, setLocal
-from httplib import CannotSendRequest, ResponseNotReady
+from httplib import CannotSendRequest
+from httplib import ResponseNotReady
+from logging import getLogger
+from persistent import Persistent
 from socket import error
+from zope.component import getUtility
+from zope.component import queryUtility
+from zope.interface import implements
 
 logger = getLogger('collective.solr.manager')
 marker = object()
@@ -119,7 +122,7 @@ class SolrConnectionManager(object):
             host = '%s:%d' % (config.host, config.port)
             logger.debug('opening connection to %s', host)
             conn = SolrConnection(host=host, solrBase=config.base,
-                persistent=True)
+                                  persistent=True)
             setLocal('connection', conn)
         return conn
 
@@ -130,6 +133,7 @@ class SolrConnectionManager(object):
             conn = self.getConnection()
             if conn is not None:
                 logger.debug('getting schema from solr')
+                self.setSearchTimeout()
                 try:
                     schema = conn.getSchema()
                     setLocal('schema', schema)

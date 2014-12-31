@@ -1,32 +1,46 @@
 # -*- coding: utf-8 -*-
 
-from unittest import TestSuite, defaultTestLoader
-from zope.interface import alsoProvides
-from zope.component import getMultiAdapter
-
-from collective.solr.solr import SolrException
-from collective.solr.tests.utils import pingSolr
-from collective.solr.tests.base import SolrTestCase
+from collective.solr.browser.facets import SearchBox
+from collective.solr.browser.facets import SearchFacetsView
 from collective.solr.browser.interfaces import IThemeSpecific
-from collective.solr.browser.facets import SearchBox, SearchFacetsView
 from collective.solr.dispatcher import solrSearchResults
+from collective.solr.solr import SolrException
+from collective.solr.testing import COLLECTIVE_SOLR_INTEGRATION_TESTING
+from collective.solr.tests.utils import pingSolr
 from collective.solr.utils import activate
+from plone.app.testing import TEST_USER_ID
+from plone.app.testing import setRoles
+from unittest import TestCase
+from unittest import TestSuite
+from unittest import defaultTestLoader
+from zope.component import getMultiAdapter
+from zope.interface import alsoProvides
 
 
-class SolrFacettingTests(SolrTestCase):
+class SolrFacettingTests(TestCase):
+    layer = COLLECTIVE_SOLR_INTEGRATION_TESTING
 
-    def afterSetUp(self):
-        activate()
+    def setUp(self):
+        self.portal = self.layer['portal']
+        self.app = self.layer['app']
         self.portal.REQUEST.RESPONSE.write = lambda x: x    # ignore output
-        self.maintenance = self.portal.unrestrictedTraverse('solr-maintenance')
+        self.maintenance = \
+            self.portal.unrestrictedTraverse('@@solr-maintenance')
+        activate()
         self.maintenance.clear()
         self.maintenance.reindex()
 
-    def beforeTearDown(self):
+    def tearDown(self):
         activate(active=False)
 
+    def afterSetUp(self):
+        self.maintenance = self.portal.unrestrictedTraverse('solr-maintenance')
+
+    def beforeTearDown(self):
+        pass
+
     def testFacettedSearchWithKeywordArguments(self):
-        self.setRoles(('Manager',))
+        setRoles(self.portal, TEST_USER_ID, ['Manager'])
         self.portal.invokeFactory('Event', id='event1', title='Welcome')
         self.maintenance.reindex()
         results = solrSearchResults(
@@ -56,7 +70,7 @@ class SolrFacettingTests(SolrTestCase):
         self.assertEqual(states, dict(private=0, published=2))
 
     def testMultiFacettedSearch(self):
-        self.setRoles(('Manager',))
+        setRoles(self.portal, TEST_USER_ID, ['Manager'])
         self.portal.invokeFactory('Event', id='event1', title='Welcome')
         self.maintenance.reindex()
         results = solrSearchResults(
@@ -123,14 +137,14 @@ class SolrFacettingTests(SolrTestCase):
     def checkOrder(self, html, *order):
         for item in order:
             position = html.find(item)
-            self.failUnless(
+            self.assertTrue(
                 position >= 0,
                 'menu item "%s" missing or out of order' % item
             )
             html = html[position:]
 
     def testFacetsInformationView(self):
-        self.setRoles(('Manager',))
+        setRoles(self.portal, TEST_USER_ID, ['Manager'])
         self.portal.invokeFactory('Event', id='event1', title='Welcome')
         self.maintenance.reindex()
         request = self.app.REQUEST
@@ -172,7 +186,7 @@ class SolrFacettingTests(SolrTestCase):
             '<input', 'name="facet" value="true"',
             '<input', 'value="foo"',
             '</form>')
-        self.failIf('portal_type' in output)
+        self.assertFalse('portal_type' in output)
 
     def testUnknownFacetField(self):
         request = self.app.REQUEST
@@ -180,10 +194,6 @@ class SolrFacettingTests(SolrTestCase):
         request.form['facet'] = 'true'
         request.form['facet_field'] = 'foo'
         alsoProvides(request, IThemeSpecific)
-        view = getMultiAdapter(
-            (self.portal, request),
-            name='search-facets'
-        )
         self.assertRaises(SolrException, solrSearchResults, request)
 
     def testNoFacetFields(self):
@@ -195,7 +205,7 @@ class SolrFacettingTests(SolrTestCase):
         view = getMultiAdapter((self.portal, request), name='search-facets')
         view = view.__of__(self.portal)     # needed to traverse `view/`
         output = view(results=solrSearchResults(request))
-        self.failIf('portal-searchfacets' in output, output)
+        self.assertFalse('portal-searchfacets' in output, output)
 
     def testEmptyFacetValue(self):
         # let's artificially create an empty value;  while this is a
@@ -217,7 +227,7 @@ class SolrFacettingTests(SolrTestCase):
         # only one list item (`<dd>`)
         self.assertEqual(len(output.split('<dd>')), 2)
         # let's also make sure there are no empty filter queries
-        self.failIf('fq=portal_type%3A&amp;' in output)
+        self.assertFalse('fq=portal_type%3A&amp;' in output)
 
     def testFacetOrder(self):
         request = self.app.REQUEST

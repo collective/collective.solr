@@ -5,7 +5,10 @@ These tests try to make sure the error handling for searches via Solr is more
 or less sane, i.e. misconfigurations, connection errors and other things are
 handled gracefully.  We'll use a testbrowser to verify these issues:
 
-  >>> browser = self.getBrowser(loggedIn=False)
+  >>> from plone.testing.z2 import Browser
+  >>> browser = Browser(layer['app'])
+  >>> maintenance = layer['portal'].unrestrictedTraverse('@@solr-maintenance')
+  >>> from collective.solr.testing import activateAndReindex
 
 First let's make sure an appropriate exceptions is raised if Solr hasn't even
 been configured in our Plone site yet.  This basically tests the same as
@@ -27,7 +30,10 @@ searches should in fact be possible, but things like network failures get in
 the way.  First we need to activate Solr support and reindex the site's
 content:
 
-  >>> self.activateAndReindex()
+  >>> activateAndReindex(layer['portal'])
+  >>> import transaction
+  >>> transaction.commit()
+  >>> browser = Browser(layer['app'])
 
 Then we start searching: the first time around things are fine:
 
@@ -58,7 +64,14 @@ instead.  So we "trick" the framework by letting it know about the exception
 and telling it that it's okay (by means of status code 200).  This way the
 intended error message is returned and we can continue the test:
 
-  >>> self.setStatusCode('error', 200)
+  >>> from ZPublisher import HTTPResponse
+  >>> HTTPResponse.status_codes['error'] = 200
+  >>> import transaction
+  >>> transaction.commit()
+  >>> browser = Browser(layer['app'])
+  >>> browser.open('http://nohost/plone/')
+  >>> browser.getControl('Search Site').value = 'Welcome'
+  >>> browser.getForm(name='searchform').submit()
 
 As a last thing we need to activate a monkey patch, which will make the
 publisher check for and render browser views registered for specific
@@ -85,12 +98,16 @@ timeout error is provoked:
   >>> def action(handler):
   ...   sleep(3)
   >>> thread = fakeServer([action, action], port=55555)
-  >>> self.setStatusCode('timeout', 200)
   >>> getUtility(ISolrConnectionConfig).search_timeout = 2
+  >>> transaction.commit()
 
 And try the search again:
 
-  >>> browser.reload()
+  >>> browser.getControl('Search Site').value = 'Welcome'
+  >>> try:
+  ...     browser.getForm(name='searchform').submit()
+  ... except Exception:
+  ...     pass
   >>> browser.contents
   '...Solr Error...
    ...The request to the Solr server has timed out.  No search results could be found...
@@ -100,4 +117,11 @@ In the end we need to clean up our changes to avoid having ill effects on
 other tests:
 
   >>> getUtility(ISolrConnectionManager).setHost(active=False, port=port)
+  >>> import urllib
+  >>> urllib.urlopen('http://127.0.0.1:55555')
+  Traceback (most recent call last):
+  IOError: ...
+  >>> urllib.urlopen('http://127.0.0.1:55555')
+  Traceback (most recent call last):
+  IOError: ...
   >>> thread.join()

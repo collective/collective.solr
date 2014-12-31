@@ -65,9 +65,7 @@ setup(
     ],
     extras_require={
         'test': [
-            'collective.testcaselayer',
             'Products.LinguaPlone >=3.1a1',
-            'Products.PloneTestCase',
             'plone.app.contentlisting',  # Comes with Plone 4.2,
                                          # only a test req for 4.1 compat
         ]
