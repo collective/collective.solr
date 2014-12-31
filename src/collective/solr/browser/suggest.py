@@ -81,7 +81,9 @@ class AutocompleteView(BrowserView):
 
         groups = results.get('grouped')['title_autocomplete']['groups']
 
-        suggestions = [x['doclist']['docs'][0]['title_autocomplete'] for x in groups]
+        suggestions = [
+            x['doclist']['docs'][0]['title_autocomplete'] for x in groups
+        ]
 
         result = []
         for suggestion in suggestions:
