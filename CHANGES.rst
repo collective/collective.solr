@@ -4,6 +4,9 @@ Changelog
 4.0.4 (unreleased)
 ------------------
 
+- Pep8.
+  [timo,do3cc]
+
 - Add "actual_result_count" attribute to SolrResponse to emulate
   catalog attribute.
   [cekk]
@@ -19,10 +22,10 @@ Changelog
 4.0.2 (2014-05-14)
 ------------------
 
-- Fix typo in Binary Indexer
+- Fix typo in Binary Indexer.
   [giacomos]
 
-- Fix typo in facet search
+- Fix typo in facet search.
   [tschorr]
 
 - Add facet title vocabulary factory for review_state.

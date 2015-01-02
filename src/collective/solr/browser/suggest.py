@@ -76,12 +76,14 @@ class AutocompleteView(BrowserView):
             connection.solrBase + '/autocomplete?' + params, '', {})
         results = json.loads(response.read())
 
-        if not 'grouped' in results:
+        if 'grouped' not in results:
             return json.dumps([])
 
         groups = results.get('grouped')['title_autocomplete']['groups']
 
-        suggestions = [x['doclist']['docs'][0]['title_autocomplete'] for x in groups]
+        suggestions = [
+            x['doclist']['docs'][0]['title_autocomplete'] for x in groups
+        ]
 
         result = []
         for suggestion in suggestions:

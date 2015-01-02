@@ -67,6 +67,8 @@ def prepareData(data):
 
 
 simpleTerm = compile(r'^[\w\d]+$', UNICODE)
+
+
 def isSimpleTerm(term):
     if isinstance(term, str):
         term = unicode(term, 'utf-8', 'ignore')
@@ -80,6 +82,8 @@ def isSimpleTerm(term):
 operators = compile(r'(.*)\s+(AND|OR|NOT)\s+', UNICODE)
 simpleCharacters = compile(r'^[\w\d\?\*\s]+$', UNICODE)
 is_digit = compile('\d', UNICODE)
+
+
 def isSimpleSearch(term):
     term = term.strip()
     if isinstance(term, str):
@@ -131,6 +135,8 @@ def splitSimpleSearch(term):
 
 
 wildCard = compile(r'^[\w\d\s*?]*[*?]+[\w\d\s*?]*$', UNICODE)
+
+
 def isWildCard(term):
     if isinstance(term, str):
         term = unicode(term, 'utf-8', 'ignore')

@@ -1,6 +1,6 @@
 # simple benchmarking tests for measuring raw xml parsing speed
 # usage:
-# $ wget -O parts/test/data.xml 'http://localhost:8983/solr/select/?q=foo&rows=...'
+# $ wget -O parts/test/data.xml 'http://localhost:8983/solr/select/?q=foo&rows=...'  # noqa
 # $ bin/test --tests-pattern=benchmark -v -v
 
 from unittest import TestCase, defaultTestLoader
