@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from Missing import MV
-from Products.LinguaPlone.catalog import languageFilter
 from collective.solr.exceptions import SolrInactiveException
 from collective.solr.interfaces import ISearch
 from collective.solr.interfaces import ISolrConnectionConfig
@@ -19,6 +18,11 @@ from time import time
 from zope.component import queryUtility
 from zope.interface import implements
 
+try:
+    from Products.LinguaPlone.catalog import languageFilter
+except ImportError:
+    def languageFilter(args):
+        pass
 
 logger = getLogger('collective.solr.search')
 

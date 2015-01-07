@@ -32,9 +32,12 @@ class CollectiveSolr(PloneSandboxLayer):
 
     def setUpPloneSite(self, portal):
         applyProfile(portal, 'collective.solr:search')
-        from zope.event import notify
-        from zope.traversing.interfaces import BeforeTraverseEvent
-        notify(BeforeTraverseEvent(portal, portal.REQUEST))
+
+
+class LegacyCollectiveSolr(CollectiveSolr):
+
+    def setUpPloneSite(self, portal):
+        super(LegacyCollectiveSolr, self).setUpPloneSite(portal)
         acl_users = getToolByName(portal, 'acl_users')
         acl_users.userFolderAddUser('user1', 'secret', ['Manager'], [])
         login(portal, 'user1')
@@ -72,9 +75,10 @@ def activateAndReindex(portal):
     response.write = original
 
 COLLECTIVE_SOLR_FIXTURE = CollectiveSolr()
+LEGACY_COLLECTIVE_SOLR_FIXTURE = LegacyCollectiveSolr()
 COLLECTIVE_SOLR_INTEGRATION_TESTING = IntegrationTesting(
-    bases=(COLLECTIVE_SOLR_FIXTURE,),
+    bases=(LEGACY_COLLECTIVE_SOLR_FIXTURE,),
     name="CollectiveSolr:Integration")
 COLLECTIVE_SOLR_FUNCTIONAL_TESTING = FunctionalTesting(
-    bases=(COLLECTIVE_SOLR_FIXTURE,),
+    bases=(LEGACY_COLLECTIVE_SOLR_FIXTURE,),
     name="CollectiveSolr:Functional")

@@ -7,6 +7,18 @@ Changelog
 - Pep8.
   [timo,do3cc]
 
+- Refactor tests. Tests are now based on plone.app.testing. You can now
+  use the Fixture COLLECTIVE_SOLR_FIXTURE and the utility method
+  collective.solr.testing:activateAndReindex() to test your code with solr
+  [do3cc]
+
+- Refactor ISearch. The method buildQuery has been replaced with buildQueryAndParameters.
+  Responsabilities have been divided in the search view and the utility, now they are
+  all in the search utility. If you used the method before, please analyse
+  the changes in collective.solr.dispatcher:solrSearchResults from 4.0.3 to now.
+  You can probably benefit from the changes.
+  [do3cc]
+
 - Add "actual_result_count" attribute to SolrResponse to emulate
   catalog attribute.
   [cekk]
