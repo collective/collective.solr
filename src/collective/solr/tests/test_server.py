@@ -443,7 +443,7 @@ class SolrServerTests(TestCase):
         conn.add(UID='bar', Title='foo', commitWithin='1000')
         conn.flush()
         self.assertEqual(self.search('+Title:Foo').results().numFound, '0')
-        sleep(2.0)
+        sleep(3.0)
         self.assertEqual(self.search('+Title:Foo').results().numFound, '2')
 
     def testFilterInvalidCharacters(self):

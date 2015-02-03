@@ -23,6 +23,8 @@ Changelog
   catalog attribute.
   [cekk]
 
+- Add browserlayer suport (with upgrade-step)
+  [cekk]
 
 4.0.3 (2014-06-18)
 ------------------

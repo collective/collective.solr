@@ -1,0 +1,17 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:genericsetup="http://namespaces.zope.org/genericsetup"
+    i18n_domain="solr">
+
+  <genericsetup:upgradeStep
+    title="Upgrade to collective.solr 2"
+    description="Add browserlayer support"
+    source="1"
+    destination="2"
+    handler=".setuphandlers.migrateTo2"
+    sortkey="1"
+    profile="collective.solr:default"
+    />
+
+
+</configure>
