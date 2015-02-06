@@ -26,6 +26,12 @@ Changelog
 - Add browserlayer suport (with upgrade-step)
   [cekk]
 
+- Use public method to get blob path (fixes error on maintenance/reindex also)
+  [tomgross]
+
+- Fix UnicodeError in BinaryAdder
+  [tomgross]
+
 4.0.3 (2014-06-18)
 ------------------
 
