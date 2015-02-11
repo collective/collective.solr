@@ -12,7 +12,6 @@ from zope.interface import Interface
 from ZODB.POSException import ConflictError
 from Products.CMFCore.utils import getToolByName
 from Products.CMFCore.CMFCatalogAware import CMFCatalogAware
-from Products.CMFPlone.utils import safe_unicode
 from Products.Archetypes.CatalogMultiplex import CatalogMultiplex
 from Products.Archetypes.interfaces import IBaseObject
 from plone.app.content.interfaces import IIndexableObjectWrapper
@@ -109,13 +108,14 @@ class DefaultAdder(object):
 
 
 class BinaryAdder(DefaultAdder):
-    """
+    """ Add binary content to index via tika
     """
 
     def getpath(self):
         field = self.context.getPrimaryField()
         blob = field.get(self.context).blob
-        return blob.committed() or blob._p_blob_committed or blob._p_blob_uncommitted
+        return blob.committed() or blob._p_blob_committed or \
+               blob._p_blob_uncommitted
 
     def __call__(self, conn, **data):
         if 'ZOPETESTCASE' in os.environ:
