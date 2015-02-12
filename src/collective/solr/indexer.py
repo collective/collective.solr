@@ -115,7 +115,7 @@ class BinaryAdder(DefaultAdder):
         field = self.context.getPrimaryField()
         blob = field.get(self.context).blob
         return blob.committed() or blob._p_blob_committed or \
-               blob._p_blob_uncommitted
+            blob._p_blob_uncommitted
 
     def __call__(self, conn, **data):
         if 'ZOPETESTCASE' in os.environ:
