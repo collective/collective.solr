@@ -15,7 +15,7 @@ Changelog
 - Refactor ISearch. The method buildQuery has been replaced with buildQueryAndParameters.
   Responsabilities have been divided in the search view and the utility, now they are
   all in the search utility. If you used the method before, please analyse
-  the changes in collective.solr.dispatcher:solrSearchResults from 4.0.3 to now.
+  the changes in collective.solr.dispatcher:solrSearchResults from 4.0.3 to 4.1.0
   You can probably benefit from the changes.
   [do3cc]
 
