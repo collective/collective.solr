@@ -154,51 +154,51 @@ class SolrMaintenanceTests(TestCase):
         # initially the solr index should be empty
         self.assertEqual(numFound(self.search()), 0)
 
-        ## first test the only_portal_types parameter
+        # first test the only_portal_types parameter
         maintenance.reindex(only_portal_types=[])
         self.assertEqual(numFound(self.search()), 8)
         maintenance.clear()
 
         maintenance.reindex(only_portal_types=['Folder'])
-        self.assertEqual(numFound(self.search()), 4)
+        self.assertEqual(numFound(self.search()), 5)
         maintenance.clear()
 
         maintenance.reindex(only_portal_types=['Folder', 'Collection'])
-        self.assertEqual(numFound(self.search()), 6)
+        self.assertEqual(numFound(self.search()), 7)
         maintenance.clear()
 
         maintenance.reindex(
             only_portal_types=['Folder', 'Collection', 'NotExistingPortalType']
         )
-        self.assertEqual(numFound(self.search()), 6)
+        self.assertEqual(numFound(self.search()), 7)
         maintenance.clear()
 
-        ## then the ignore_portal_types
+        # then the ignore_portal_types
         maintenance.reindex(ignore_portal_types=[])
         self.assertEqual(numFound(self.search()), 8)
         maintenance.clear()
 
         maintenance.reindex(ignore_portal_types=['Folder'])
-        self.assertEqual(numFound(self.search()), 4)
+        self.assertEqual(numFound(self.search()), 3)
         maintenance.clear()
 
         maintenance.reindex(ignore_portal_types=['Folder', 'Collection'])
-        self.assertEqual(numFound(self.search()), 2)
+        self.assertEqual(numFound(self.search()), 1)
         maintenance.clear()
 
         maintenance.reindex(
             ignore_portal_types=['Folder', 'Collection',
                                  'NotExistingPortalType']
         )
-        self.assertEqual(numFound(self.search()), 2)
+        self.assertEqual(numFound(self.search()), 1)
         maintenance.clear()
 
-        ## and then both, which is not supported
+        # and then both, which is not supported
         msg = maintenance.reindex(ignore_portal_types=['Collection'],
                                   only_portal_types=['Folder'])
         self.assertEquals(
             msg,
-            'It is not possible to combine ignore_portal_types with ' \
+            'It is not possible to combine ignore_portal_types with '
             'only_portal_types')
 
     def testPartialReindex(self):

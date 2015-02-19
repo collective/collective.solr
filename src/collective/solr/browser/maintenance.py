@@ -145,9 +145,9 @@ class SolrMaintenanceView(BrowserView):
                    obj.portal_type in ignore_portal_types:
                     continue
 
-                if (only_portal_types and \
-                    obj.portal_type in only_portal_types) or \
-                    not only_portal_types:
+                if (only_portal_types and
+                        obj.portal_type in only_portal_types) or \
+                        not only_portal_types:
 
                     data, missing = proc.getData(obj)
                     prepareData(data)
