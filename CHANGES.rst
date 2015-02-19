@@ -31,7 +31,9 @@ Changelog
 
 - Fix UnicodeError in BinaryAdder
   [tomgross]
-- Added ignore_portal_types and only_portal_types parameter to reindex for maintenance_view [jkubaile]
+
+- Added ignore_portal_types and only_portal_types parameter to reindex for maintenance_view
+  [jkubaile]
 
 
 4.0.3 (2014-06-18)

@@ -93,14 +93,14 @@ class SolrMaintenanceView(BrowserView):
         conn.commit()
         return 'solr index cleared.'
 
-    def reindex(self, batch=1000, skip=0, limit=0, ignore_portal_types=[],
-                only_portal_types=[]):
+    def reindex(self, batch=1000, skip=0, limit=0, ignore_portal_types=None,
+                only_portal_types=None):
         """ find all contentish objects (meaning all objects derived from one
             of the catalog mixin classes) and (re)indexes them """
 
         if ignore_portal_types and only_portal_types:
-            return "It is not possible to combine ignore_portal_types" \
-                " with only_portal_types"
+            raise ValueError("It is not possible to combine "
+                             "ignore_portal_types with only_portal_types")
 
         manager = queryUtility(ISolrConnectionManager)
         proc = SolrIndexProcessor(manager)
@@ -141,32 +141,33 @@ class SolrMaintenanceView(BrowserView):
                 if count <= skip:
                     continue
 
-                if ignore_portal_types and \
-                   obj.portal_type in ignore_portal_types:
-                    continue
+                if ignore_portal_types:
+                    if obj.portal_type in ignore_portal_types:
+                        continue
 
-                if (only_portal_types and
-                        obj.portal_type in only_portal_types) or \
-                        not only_portal_types:
+                if only_portal_types:
+                    if obj.portal_type not in only_portal_types:
+                        continue
 
-                    data, missing = proc.getData(obj)
-                    prepareData(data)
-                    if not missing:
-                        value = data.get(key, None)
-                        if value is not None:
-                            log('indexing %r\n' % obj)
-                            pt = data.get('portal_type', 'default')
-                            adder = queryAdapter(obj, ISolrAddHandler, name=pt)
-                            if adder is None:
-                                adder = DefaultAdder(obj)
-                            data['_solr_adder'] = adder
-                            updates[value] = (boost_values(obj, data), data)
-                            processed += 1
-                            cpi.next()
-                    else:
-                        log('missing data, skipping indexing of %r.\n' % obj)
-                    if limit and count >= (skip + limit):
-                        break
+                data, missing = proc.getData(obj)
+                prepareData(data)
+                if not missing:
+                    value = data.get(key, None)
+                    if value is not None:
+                        log('indexing %r\n' % obj)
+                        pt = data.get('portal_type', 'default')
+                        adder = queryAdapter(obj, ISolrAddHandler, name=pt)
+                        if adder is None:
+                            adder = DefaultAdder(obj)
+                        data['_solr_adder'] = adder
+                        updates[value] = (boost_values(obj, data), data)
+                        processed += 1
+                        cpi.next()
+                else:
+                    log('missing data, skipping indexing of %r.\n' % obj)
+                if limit and count >= (skip + limit):
+                    break
+
         checkPoint()
         conn.commit()
         log('solr index rebuilt.\n')

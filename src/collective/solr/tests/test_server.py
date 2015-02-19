@@ -194,12 +194,9 @@ class SolrMaintenanceTests(TestCase):
         maintenance.clear()
 
         # and then both, which is not supported
-        msg = maintenance.reindex(ignore_portal_types=['Collection'],
-                                  only_portal_types=['Folder'])
-        self.assertEquals(
-            msg,
-            'It is not possible to combine ignore_portal_types with '
-            'only_portal_types')
+        self.assertRaises(ValueError, maintenance.reindex,
+                          ignore_portal_types=['Collection'],
+                          only_portal_types=['Folder'])
 
     def testPartialReindex(self):
         maintenance = self.portal.unrestrictedTraverse('news/solr-maintenance')
