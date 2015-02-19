@@ -108,25 +108,33 @@ class DefaultAdder(object):
 
 
 class BinaryAdder(DefaultAdder):
-    """
+    """ Add binary content to index via tika
     """
 
     def getpath(self):
         field = self.context.getPrimaryField()
         blob = field.get(self.context).blob
-        return blob._p_blob_committed or blob._p_blob_uncommitted
+        return blob.committed() or blob._p_blob_committed or \
+            blob._p_blob_uncommitted
 
     def __call__(self, conn, **data):
         if 'ZOPETESTCASE' in os.environ:
             return super(BinaryAdder, self).__call__(conn, **data)
         ignore = ('SearchableText', 'created', 'Type', 'links',
                   'description', 'Date')
-        postdata = dict(
-            [
-                ('literal.%s' % key, val) for key, val in data.iteritems()
-                if key not in ignore
-            ]
-        )
+        postdata = {}
+        for key, val in data.iteritems():
+            if key in ignore:
+                continue
+            if isinstance(val, list) or isinstance(val, tuple):
+                newvalue = []
+                for item in val:
+                    if isinstance(item, unicode):
+                        item = item.encode('utf-8')
+                    newvalue.append(item)
+            else:
+                newvalue = val
+            postdata['literal.%s' % key] = newvalue
         postdata['stream.file'] = self.getpath()
         postdata['stream.contentType'] = data.get(
             'content_type',
