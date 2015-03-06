@@ -50,15 +50,16 @@ class SearchDispatcher(object):
 def solrSearchResults(request=None, **keywords):
     """ perform a query using solr after translating the passed in
         parameters with portal catalog semantics """
-    search = queryUtility(ISearch)
-    config = queryUtility(ISolrConnectionConfig)
+    site = getSite()
+    search = queryUtility(ISearch, context=site)
+    config = queryUtility(ISolrConnectionConfig, context=site)
 
     if request is None:
         # try to get a request instance, so that flares can be adapted to
         # ploneflares and urls can be converted into absolute ones etc;
         # however, in this case any arguments from the request are ignored
         args = deepcopy(keywords)
-        request = getattr(getSite(), 'REQUEST', None)
+        request = getattr(site, 'REQUEST', None)
     elif IHTTPRequest.providedBy(request):
         args = deepcopy(request.form)
         args.update(keywords)  # keywords take precedence
@@ -68,7 +69,7 @@ def solrSearchResults(request=None, **keywords):
         args.update(keywords)  # keywords take precedence
         # if request is a dict, we need the real request in order to
         # be able to adapt to plone flares
-        request = getattr(getSite(), 'REQUEST', args)
+        request = getattr(site, 'REQUEST', args)
 
     if 'path' in args and 'navtree' in args['path']:
         raise FallBackException     # we can't handle navtree queries yet
