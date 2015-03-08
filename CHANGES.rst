@@ -4,7 +4,8 @@ Changelog
 4.1.1 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Added context to search utility. This allows query to be used in AJAX calls.
+  [tomgross]
 
 
 4.1.0 (2015-02-19)
