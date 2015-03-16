@@ -1,8 +1,8 @@
 Changelog
 =========
 
-4.1.1 (unreleased)
-------------------
+4.1.0-FHNW2 (2015-03-16)
+------------------------
 
 - Added context to search utility. This allows query to be used in AJAX calls.
   [tomgross]
