@@ -4,8 +4,9 @@ python:
   - "2.7"
 cache:
   directories:
-  - buildout-cache/downloads
+  - download-cache
 install:
+  - mkdir -p download-cache
   - mkdir -p buildout-cache/eggs
   - mkdir -p buildout-cache/downloads
   - pip install -U setuptools==1.4.2
