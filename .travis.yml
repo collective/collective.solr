@@ -2,6 +2,9 @@ language: python
 python:
   - "2.6"
   - "2.7"
+cache:
+  directories:
+  - buildout-cache/downloads
 install:
   - mkdir -p buildout-cache/eggs
   - mkdir -p buildout-cache/downloads
