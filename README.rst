@@ -570,3 +570,4 @@ Development was kindly sponsored by `Elkjop`_ and the
   .. _`Nordic Council and Nordic Council of Ministers`: http://www.norden.org/en/
   .. _`Solr`: http://lucene.apache.org/solr/
   .. _`Plone`: http://www.plone.org/
+
