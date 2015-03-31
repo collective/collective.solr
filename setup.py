@@ -65,7 +65,7 @@ setup(
     ],
     extras_require={
         'test': [
-            'Products.LinguaPlone >=3.1a1',
+#            'Products.LinguaPlone >=3.1a1',
             'plone.app.contentlisting',  # Comes with Plone 4.2,
                                          # only a test req for 4.1 compat
         ]
