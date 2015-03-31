@@ -1,31 +1,33 @@
 # -*- coding: utf-8 -*-
-import os
-
-from logging import getLogger
 from Acquisition import aq_get
 from DateTime import DateTime
-from datetime import date, datetime
-from zope.component import getUtility, queryUtility, queryMultiAdapter
-from zope.component import queryAdapter, adapts
-from zope.interface import implements
-from zope.interface import Interface
-from ZODB.POSException import ConflictError
-from Products.CMFCore.utils import getToolByName
-from Products.CMFCore.CMFCatalogAware import CMFCatalogAware
 from Products.Archetypes.CatalogMultiplex import CatalogMultiplex
 from Products.Archetypes.interfaces import IBaseObject
-from plone.app.content.interfaces import IIndexableObjectWrapper
-from plone.indexer.interfaces import IIndexableObject
-
+from Products.CMFCore.CMFCatalogAware import CMFCatalogAware
+from Products.CMFCore.utils import getToolByName
+from ZODB.POSException import ConflictError
+from collective.solr.interfaces import ICheckIndexable
+from collective.solr.interfaces import ISolrAddHandler
 from collective.solr.interfaces import ISolrConnectionConfig
 from collective.solr.interfaces import ISolrConnectionManager
 from collective.solr.interfaces import ISolrIndexQueueProcessor
-from collective.solr.interfaces import ICheckIndexable
-from collective.solr.interfaces import ISolrAddHandler
 from collective.solr.solr import SolrException
 from collective.solr.utils import prepareData
+from datetime import date
+from datetime import datetime
+from logging import getLogger
+from plone.app.content.interfaces import IIndexableObjectWrapper
+from plone.indexer.interfaces import IIndexableObject
 from socket import error
 from urllib import urlencode
+from zope.component import adapts
+from zope.component import getUtility
+from zope.component import queryAdapter
+from zope.component import queryMultiAdapter
+from zope.component import queryUtility
+from zope.interface import Interface
+from zope.interface import implements
+import os
 
 
 logger = getLogger('collective.solr.indexer')
@@ -75,8 +77,8 @@ def datehandler(value):
 
 
 def inthandler(value):
-    if value is None or value is "":
-        raise AttributeError("Solr cant handle none strings or empty values")
+    if value is None or value is '':
+        raise AttributeError('Solr cant handle none strings or empty values')
     else:
         return value
 
