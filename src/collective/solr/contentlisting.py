@@ -26,7 +26,7 @@ class FlareContentListingObject(object):
     def getPath(self):
         return self.flare.getPath()
 
-    def getURL(self):
+    def getURL(self, relative=False):
         return self.flare.getURL()
 
     def uuid(self):
@@ -51,6 +51,9 @@ class FlareContentListingObject(object):
 
     def Creator(self):
         return self.flare.Creator
+
+    def Author(self):
+        return self.flare.Author
 
     def Subject(self):
         return self.flare.Subject
