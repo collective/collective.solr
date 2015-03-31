@@ -25,6 +25,8 @@ from zope.component import getGlobalSiteManager
 from zope.component import getUtilitiesFor
 from zope.component import queryUtility
 from zope.configuration import xmlconfig
+from zope.event import notify
+from zope.lifecycleevent import ObjectModifiedEvent
 
 
 class UtilityTests(TestCase):
@@ -96,7 +98,6 @@ class IndexingTests(TestCase):
         setRoles(self.portal, TEST_USER_ID, ['Manager'])
         self.portal.invokeFactory('Folder', id='folder')
         self.folder = self.portal.folder
-        self.folder.unmarkCreationFlag()    # stop LinguaPlone from renaming
         commit()
 
     def tearDown(self):
@@ -114,7 +115,8 @@ class IndexingTests(TestCase):
         responses = (getData('plone_schema.xml'),
                      getData('commit_response.txt'))
         output = fakehttp(connection, *responses)           # fake responses
-        self.folder.processForm(values={'title': 'Foo'})    # updating sends
+        self.folder.title = 'Foo'
+        notify(ObjectModifiedEvent(self.folder))
         self.assertEqual(self.folder.Title(), 'Foo')
         self.assertEqual(str(output), '', 'reindexed unqueued!')
         commit()                        # indexing happens on commit
@@ -127,11 +129,10 @@ class IndexingTests(TestCase):
         connection = self.proc.getConnection()
         responses = [getData('dummy_response.txt')] * 42    # set up enough...
         output = fakehttp(connection, *responses)           # fake responses
-        ref = self.folder.addReference(self.portal.news, 'referencing')
-        self.folder.processForm(values={'title': 'Foo'})
+        notify(ObjectModifiedEvent(self.folder))
+        self.folder.title = 'Foo'
         commit()                        # indexing happens on commit
         self.assertNotEqual(repr(output).find('Foo'), -1, 'title not found')
-        self.assertEqual(repr(output).find(ref.UID()), -1, 'reference found?')
         self.assertEqual(repr(output).find('at_references'), -1,
                          '`at_references` found?')
 
@@ -253,9 +254,12 @@ class SiteSetupTests(TestCase):
         self.portal = self.layer['portal']
 
     def testBrowserResources(self):
-        registry = getToolByName(self.portal, 'portal_css')
+        records = getToolByName(self.portal, 'portal_registry').records
+        key = ('plone.resources/'
+               'resource-collective-solr-resources-style-css.css')
         css = '++resource++collective.solr.resources/style.css'
-        self.assertTrue(css in registry.getResourceIds())
+        self.assertIn(key, records)
+        self.assertIn(css, records[key].value)
 
     def testTranslation(self):
         utrans = getToolByName(self.portal, 'translation_service').utranslate
