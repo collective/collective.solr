@@ -16,8 +16,8 @@ from collective.solr.utils import prepareData
 from datetime import date
 from datetime import datetime
 from logging import getLogger
-from plone.app.content.interfaces import IIndexableObjectWrapper
 from plone.indexer.interfaces import IIndexableObject
+from plone.indexer.interfaces import IIndexableObjectWrapper
 from socket import error
 from urllib import urlencode
 from zope.component import adapts
