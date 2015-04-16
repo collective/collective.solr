@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from string import maketrans
 from re import compile, UNICODE
 
@@ -67,8 +66,6 @@ def prepareData(data):
 
 
 simpleTerm = compile(r'^[\w\d]+$', UNICODE)
-
-
 def isSimpleTerm(term):
     if isinstance(term, str):
         term = unicode(term, 'utf-8', 'ignore')
@@ -82,8 +79,6 @@ def isSimpleTerm(term):
 operators = compile(r'(.*)\s+(AND|OR|NOT)\s+', UNICODE)
 simpleCharacters = compile(r'^[\w\d\?\*\s]+$', UNICODE)
 is_digit = compile('\d', UNICODE)
-
-
 def isSimpleSearch(term):
     term = term.strip()
     if isinstance(term, str):
@@ -135,8 +130,6 @@ def splitSimpleSearch(term):
 
 
 wildCard = compile(r'^[\w\d\s*?]*[*?]+[\w\d\s*?]*$', UNICODE)
-
-
 def isWildCard(term):
     if isinstance(term, str):
         term = unicode(term, 'utf-8', 'ignore')
@@ -151,7 +144,18 @@ def prepare_wildcard(value):
     # unidecode will produce the same results
     if not isinstance(value, unicode):
         value = unicode(value, 'utf-8', 'ignore')
-    return str(unidecode(value).lower())
+
+    value = str(unidecode(value).lower())
+
+    # keywords like "AND" and "OR" must not be lowercased, otherwise Solr
+    # will interpret them as search terms.
+    # Re-capitalizing them in the lowercased value might incorrectly capitalize
+    # actual search terms, but this erroneous behaviour is both difficult to provoke
+    # and probably harmless in most cases.
+    value = value.replace(" and ", " AND ")
+    value = value.replace(" or ", " OR ")
+
+    return value
 
 
 def findObjects(origin):
