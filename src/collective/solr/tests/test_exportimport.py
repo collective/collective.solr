@@ -123,7 +123,8 @@ SOLR_XML = """\
     <effective-steps value="900" />
     <exclude-user value="True" />
     <highlight_fields />
-    <highlight_formatter_pre value="&lt;span class=&quot;highlightedSearchTerm&quot;&gt;"/>
+    <highlight_formatter_pre \
+value="&lt;span class=&quot;highlightedSearchTerm&quot;&gt;"/>
     <highlight_formatter_post value="&lt;/span&gt;"/>
     <highlight_fragsize value="100"/>
     <field-list/>
