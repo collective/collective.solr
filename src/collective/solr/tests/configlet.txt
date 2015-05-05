@@ -47,9 +47,9 @@ active without *having* it active.
     >>> config.highlight_fields
     ()
     >>> config.highlight_formatter_pre
-    '['
+    '<span class="highlightedSearchTerm">'
     >>> config.highlight_formatter_post
-    ']'
+    '</span>'
     >>> config.highlight_fragsize
     100
     >>> config.field_list
