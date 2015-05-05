@@ -67,7 +67,7 @@ class Search(object):
                 'parameter: %r (%r)', config.max_results, query, parameters
             )
         if getattr(config, 'highlight_fields', None):
-            if parameters.get('hl', 'false') == 'true'\
+            if parameters.get('hl', 'true') == 'true'\
                     and 'hl.fl' not in parameters:
                 parameters['hl'] = 'true'
                 parameters['hl.fl'] = config.highlight_fields or []
