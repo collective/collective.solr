@@ -25,8 +25,8 @@ class SuggestView(BrowserView):
         params['wt'] = 'json'
 
         params = urllib.urlencode(params, doseq=True)
-        response = connection.doPost(
-            connection.solrBase + '/spell?' + params, '', {})
+        response = connection.doGet(
+            connection.solrBase + '/spell?' + params, {})
         results = json.loads(response.read())
 
         # Check for spellcheck
@@ -50,6 +50,8 @@ class SuggestView(BrowserView):
         # Collect suggestions
         if spellcheck_suggestions[1]:
             for suggestion in spellcheck_suggestions[1]['suggestion']:
+                if 'word' in suggestion:
+                    suggestion = suggestion['word']
                 suggestions.append(dict(label=suggestion, value=suggestion))
 
         return json.dumps(suggestions)

@@ -122,8 +122,14 @@ class SolrConnection:
         self.conn.setTimeout(timeout)
 
     def doPost(self, url, body, headers):
+        return self.doGetOrPost('POST', url, body, headers)
+
+    def doGet(self, url, headers):
+        return self.doGetOrPost('GET', url, '', headers)
+
+    def doGetOrPost(self, method, url, body, headers):
         try:
-            self.conn.request('POST', url, body, headers)
+            self.conn.request(method, url, body, headers)
             return self.__errcheck(self.conn.getresponse())
         except (
             socket.error, httplib.CannotSendRequest,
@@ -136,7 +142,7 @@ class SolrConnection:
             # HTTPConnection object can get in a bad state (seems like they
             # might be "ghosted" in the zodb).
             self.__reconnect()
-            self.conn.request('POST', url, body, headers)
+            self.conn.request(method, url, body, headers)
             return self.__errcheck(self.conn.getresponse())
 
     def doUpdateXML(self, request):
