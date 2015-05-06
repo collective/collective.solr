@@ -50,8 +50,6 @@ class SuggestView(BrowserView):
         # Collect suggestions
         if spellcheck_suggestions[1]:
             for suggestion in spellcheck_suggestions[1]['suggestion']:
-                if 'word' in suggestion:
-                    suggestion = suggestion['word']
                 suggestions.append(dict(label=suggestion, value=suggestion))
 
         return json.dumps(suggestions)
