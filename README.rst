@@ -1,5 +1,6 @@
-Introduction
-============
+====================================================
+collective.solr - Solr integration for the Plone CMS
+====================================================
 
 .. image:: https://secure.travis-ci.org/collective/collective.solr.png?branch=master
     :target: http://travis-ci.org/collective/collective.solr
@@ -23,6 +24,8 @@ Introduction
     :target: https://pypi.python.org/pypi/collective.solr/
     :alt: License
 
+Introduction
+============
 
 ``collective.solr`` integrates the `Solr`_ search engine with `Plone`_.
 

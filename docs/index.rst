@@ -3,14 +3,12 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
+==================================
 Solr integration for the Plone CMS
 ==================================
 
 .. include:: introduction.rst
 
-.. include:: credits.rst
-
-.. include:: contributors.rst
 
 .. include:: feature_list.rst
 
@@ -31,6 +29,9 @@ Contents
    CHANGES
 
 
+.. include:: credits.rst
+
+.. include:: contributors.rst
 
 Indices and tables
 ==================
@@ -41,5 +42,5 @@ Indices and tables
 
 
 .. _Plone: https://plone.org
-.. _docs.plone.org: https://docs.plone.org
+.. _docs.plone.org: http://docs.plone.org
 
