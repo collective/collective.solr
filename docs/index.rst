@@ -3,13 +3,32 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to collective.solr's documentation!
-===========================================
+Solr integration for the Plone CMS
+==================================
 
-Contents:
+.. include:: introduction.rst
+
+.. include:: credits.rst
+
+.. include:: contributors.rst
+
+.. include:: feature_list.rst
+
+
+
+
+
+
+Contents
+========
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 4
+
+
+
+   development/index
+   CHANGES
 
 
 
@@ -19,4 +38,8 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
+
+
+.. _Plone: https://plone.org
+.. _docs.plone.org: https://docs.plone.org
 
