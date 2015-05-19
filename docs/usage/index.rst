@@ -66,26 +66,11 @@ TTW Configuration of Solr-Settings
 Considerations for a production Setup
 -------------------------------------
 
-Java Settings
-*************
+.. include:: java_settings.rst
 
+.. include:: monitoring.rst
 
-Monitoring
-**********
+.. include:: replication.rst
 
-
-
-Replication
-***********
-
-
-SolrCloud
-*********
-
-
-
-
-
-
-
+.. include:: solrcloud.rst
 
