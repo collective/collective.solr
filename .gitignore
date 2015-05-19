@@ -1,5 +1,6 @@
 bin
 build
+build-docs
 develop-eggs
 dist
 downloads
@@ -16,5 +17,6 @@ var
 *.mo
 *.*~
 .*.cfg
-docs/doctrees/
-docs/html/
+.Python
+pip-selfcheck.json
+.idea
