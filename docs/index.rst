@@ -23,12 +23,16 @@ Contents
 This documentation will describe all necessary information to setup and use `Solr`_ in combination with `Plone`_.
 
 .. toctree::
-   :maxdepth: 4
+    :caption: Table of Contents
+    :maxdepth: 4
 
-   base/index
-   usage/index
-   development/index
-   CHANGES
+    base/index
+    usage/index
+    development/index
+
+.. toctree::
+    :maxdepth: 1
+    CHANGES
 
 
 .. include:: credits.rst
