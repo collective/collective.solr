@@ -5,7 +5,7 @@
 SPHINXOPTS    =
 SPHINXBUILD   = sphinx-build
 PAPER         =
-BUILDDIR      = build-docs
+BUILDDIR      = build/docs
 SOURCE        = docs
 
 # Internal variables.
