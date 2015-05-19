@@ -542,35 +542,9 @@ At this point `collective.solr` does not yet have support for connecting to
 multiple servers and using the slaves as a fallback for querying. As there's no
 master-master setup yet, fault tolerance for index changes cannot be provided.
 
-Development
-===========
-
-Releases can be found on the Python Package Index at
-http://pypi.python.org/pypi/collective.solr. The code and issue trackers can be
-found on GitHub at https://github.com/collective/collective.solr.
-
-For outstanding issues and features remaining to be implemented please see the
-`to-do list`__ included in the package as well as it's `issue tracker`__.
-
-  .. __: https://github.com/collective/collective.solr/blob/master/TODO.txt
-  .. __: https://github.com/collective/collective.solr/issues
 
 
-Credits
-=======
 
-This code was inspired by `enfold.solr`_ by `Enfold Systems`_ as well as `work
-done at the snowsprint'08`__.  The `solr.py` module is based on the original
-python integration package from `Solr`_ itself.
-
-Development was kindly sponsored by `Elkjop`_ and the
-`Nordic Council and Nordic Council of Ministers`_.
-
-  .. _`enfold.solr`: https://svn.enfoldsystems.com/trac/public/browser/enfold.solr/branches/snowsprint08-buildout/enfold.solr
-  .. _`Enfold Systems`: http://www.enfoldsystems.com/
-  .. __: http://tarekziade.wordpress.com/2008/01/20/snow-sprint-report-1-indexing/
-  .. _`Elkjop`: http://www.elkjop.no/
-  .. _`Nordic Council and Nordic Council of Ministers`: http://www.norden.org/en/
   .. _`Solr`: http://lucene.apache.org/solr/
   .. _`Plone`: http://www.plone.org/
 
