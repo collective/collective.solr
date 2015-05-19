@@ -1,5 +1,5 @@
 Autocomplete suggestions with Solr
-==================================
+..................................
 
 http://wiki.apache.org/solr/Suggester
 

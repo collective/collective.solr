@@ -10,10 +10,6 @@ Solr integration for the Plone CMS
 .. include:: introduction.rst
 
 
-.. include:: feature_list.rst
-
-
-
 
 
 
@@ -32,6 +28,7 @@ This documentation will describe all necessary information to setup and use `Sol
 
 .. toctree::
     :maxdepth: 1
+
     CHANGES
 
 
