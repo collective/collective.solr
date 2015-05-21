@@ -44,7 +44,7 @@ class SolrLayer(Layer):
         self.solr_port = solr_port
         self.solr_base = solr_base
         self.solr_core = solr_core
-        self.solr_url = 'http://{}:{}{}/{}'.format(
+        self.solr_url = 'http://{0}:{1}{2}/{3}'.format(
             solr_host,
             solr_port,
             solr_base,
@@ -61,7 +61,7 @@ class SolrLayer(Layer):
             cwd=BUILDOUT_DIR
         )
         # Poll Solr until it is up and running
-        solr_ping_url = '{}/admin/ping'.format(self.solr_url)
+        solr_ping_url = '{0}/admin/ping'.format(self.solr_url)
         for i in range(1, 10):
             try:
                 result = urllib2.urlopen(solr_ping_url)
