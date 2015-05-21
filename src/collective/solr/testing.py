@@ -10,13 +10,93 @@ from plone.app.testing import TEST_USER_NAME
 from plone.app.testing import applyProfile
 from plone.app.testing import login
 from plone.app.testing import setRoles
+from plone.testing import Layer
 from plone.testing.z2 import installProduct
+from time import sleep
 from zope.configuration import xmlconfig
+
+import os
+import sys
+import urllib2
+import subprocess
+
+BUILDOUT_DIR = os.path.join(os.getcwd(), '..', '..', 'bin')
+
+
+class SolrLayer(Layer):
+    """Solr test layer that fires up and shuts down a Solr instance. This
+       layer can be used to unit test a Solr configuration without having to
+       fire up Plone.
+    """
+    proc = None
+
+    def __init__(
+            self,
+            bases=None,
+            name='Solr Layer',
+            module=None,
+            solr_host='localhost',
+            solr_port=8983,
+            solr_base='/solr',
+            solr_core='collection1'):
+        super(SolrLayer, self).__init__(bases, name, module)
+        self.solr_host = solr_host
+        self.solr_port = solr_port
+        self.solr_base = solr_base
+        self.solr_core = solr_core
+        self.solr_url = 'http://{}:{}{}/{}'.format(
+            solr_host,
+            solr_port,
+            solr_base,
+            solr_core
+        )
+
+    def setUp(self):
+        """Start Solr and poll until it is up and running.
+        """
+        self.proc = subprocess.call(
+            './solr-instance start',
+            shell=True,
+            close_fds=True,
+            cwd=BUILDOUT_DIR
+        )
+        # Poll Solr until it is up and running
+        solr_ping_url = '{}/admin/ping'.format(self.solr_url)
+        for i in range(1, 10):
+            try:
+                result = urllib2.urlopen(solr_ping_url)
+                if result.code == 200:
+                    if '<str name="status">OK</str>' in result.read():
+                        break
+            except urllib2.URLError:
+                sleep(3)
+                sys.stdout.write('.')
+            if i == 9:
+                subprocess.call(
+                    './solr-instance stop',
+                    shell=True,
+                    close_fds=True,
+                    cwd=BUILDOUT_DIR
+                )
+                sys.stdout.write('Solr Instance could not be started !!!')
+
+    def tearDown(self):
+        """Stop Solr.
+        """
+        subprocess.call(
+            './solr-instance stop',
+            shell=True,
+            close_fds=True,
+            cwd=BUILDOUT_DIR
+        )
+
+
+SOLR_FIXTURE = SolrLayer()
 
 
 class CollectiveSolr(PloneSandboxLayer):
 
-    defaultBases = (PLONE_FIXTURE,)
+    defaultBases = (PLONE_FIXTURE, SOLR_FIXTURE)
 
     def setUpZope(self, app, configurationContext):
         # Load ZCML
@@ -62,6 +142,8 @@ class LegacyCollectiveSolr(CollectiveSolr):
         portal.Members.invokeFactory('Folder', id='test_user_1_', title='')
         setRoles(portal, TEST_USER_ID, [])
 
+LEGACY_COLLECTIVE_SOLR_FIXTURE = LegacyCollectiveSolr()
+
 
 def activateAndReindex(portal):
     """ activate solr indexing and reindex the existing content """
@@ -74,11 +156,15 @@ def activateAndReindex(portal):
     maintenance.reindex()
     response.write = original
 
+
 COLLECTIVE_SOLR_FIXTURE = CollectiveSolr()
-LEGACY_COLLECTIVE_SOLR_FIXTURE = LegacyCollectiveSolr()
+
 COLLECTIVE_SOLR_INTEGRATION_TESTING = IntegrationTesting(
     bases=(LEGACY_COLLECTIVE_SOLR_FIXTURE,),
-    name="CollectiveSolr:Integration")
+    name="CollectiveSolr:Integration"
+)
+
 COLLECTIVE_SOLR_FUNCTIONAL_TESTING = FunctionalTesting(
     bases=(LEGACY_COLLECTIVE_SOLR_FIXTURE,),
-    name="CollectiveSolr:Functional")
+    name="CollectiveSolr:Functional"
+)

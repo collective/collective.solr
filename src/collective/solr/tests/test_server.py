@@ -18,7 +18,6 @@ from collective.solr.search import Search
 from collective.solr.solr import logger as logger_solr
 from collective.solr.testing import COLLECTIVE_SOLR_FUNCTIONAL_TESTING
 from collective.solr.tests.utils import numFound
-from collective.solr.tests.utils import pingSolr
 from collective.solr.utils import activate
 from operator import itemgetter
 from plone.app.testing import TEST_USER_ID
@@ -30,8 +29,6 @@ from time import sleep
 from transaction import abort
 from transaction import commit
 from unittest import TestCase
-from unittest import TestSuite
-from unittest import defaultTestLoader
 from zExceptions import Unauthorized
 from zope.component import getUtility
 from zope.component import queryUtility
@@ -1293,10 +1290,3 @@ class SolrServerTests(TestCase):
         self.assertEqual(len(results), 7)
         paths = [r.path_string for r in results]
         self.assertFalse('/plone/Members/test_user_1_' in paths)
-
-
-def test_suite():
-    if pingSolr():
-        return defaultTestLoader.loadTestsFromName(__name__)
-    else:
-        return TestSuite()

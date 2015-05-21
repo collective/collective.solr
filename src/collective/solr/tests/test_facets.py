@@ -5,13 +5,10 @@ from collective.solr.browser.interfaces import IThemeSpecific
 from collective.solr.dispatcher import solrSearchResults
 from collective.solr.solr import SolrException
 from collective.solr.testing import COLLECTIVE_SOLR_INTEGRATION_TESTING
-from collective.solr.tests.utils import pingSolr
 from collective.solr.utils import activate
 from plone.app.testing import TEST_USER_ID
 from plone.app.testing import setRoles
 from unittest import TestCase
-from unittest import TestSuite
-from unittest import defaultTestLoader
 from zope.component import getMultiAdapter
 from zope.interface import alsoProvides
 
@@ -255,10 +252,3 @@ class SolrFacettingTests(TestCase):
             'Review state',
             'Content type'
         )
-
-
-def test_suite():
-    if pingSolr():
-        return defaultTestLoader.loadTestsFromName(__name__)
-    else:
-        return TestSuite()
