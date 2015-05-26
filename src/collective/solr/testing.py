@@ -94,7 +94,7 @@ class SolrLayer(Layer):
 SOLR_FIXTURE = SolrLayer()
 
 
-class CollectiveSolr(PloneSandboxLayer):
+class CollectiveSolrLayer(PloneSandboxLayer):
 
     defaultBases = (PLONE_FIXTURE, SOLR_FIXTURE)
 
@@ -114,10 +114,10 @@ class CollectiveSolr(PloneSandboxLayer):
         applyProfile(portal, 'collective.solr:search')
 
 
-class LegacyCollectiveSolr(CollectiveSolr):
+class LegacyCollectiveSolrLayer(CollectiveSolrLayer):
 
     def setUpPloneSite(self, portal):
-        super(LegacyCollectiveSolr, self).setUpPloneSite(portal)
+        super(LegacyCollectiveSolrLayer, self).setUpPloneSite(portal)
         acl_users = getToolByName(portal, 'acl_users')
         acl_users.userFolderAddUser('user1', 'secret', ['Manager'], [])
         login(portal, 'user1')
@@ -142,7 +142,7 @@ class LegacyCollectiveSolr(CollectiveSolr):
         portal.Members.invokeFactory('Folder', id='test_user_1_', title='')
         setRoles(portal, TEST_USER_ID, [])
 
-LEGACY_COLLECTIVE_SOLR_FIXTURE = LegacyCollectiveSolr()
+LEGACY_COLLECTIVE_SOLR_FIXTURE = LegacyCollectiveSolrLayer()
 
 
 def activateAndReindex(portal):
@@ -157,7 +157,7 @@ def activateAndReindex(portal):
     response.write = original
 
 
-COLLECTIVE_SOLR_FIXTURE = CollectiveSolr()
+COLLECTIVE_SOLR_FIXTURE = CollectiveSolrLayer()
 
 COLLECTIVE_SOLR_INTEGRATION_TESTING = IntegrationTesting(
     bases=(LEGACY_COLLECTIVE_SOLR_FIXTURE,),
