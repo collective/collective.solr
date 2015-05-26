@@ -101,6 +101,7 @@ class CollectiveSolrLayer(PloneSandboxLayer):
             bases=None,
             name='Solr Plone Layer',
             module=None,
+            solr_active=False,
             solr_host='localhost',
             solr_port=8983,
             solr_base='/solr'):
@@ -124,6 +125,7 @@ class CollectiveSolrLayer(PloneSandboxLayer):
     def setUpPloneSite(self, portal):
         applyProfile(portal, 'collective.solr:search')
         solr_settings = SolrControlPanelAdapter(portal)
+        solr_settings.setActive(self.solr_active)
         solr_settings.setPort(self.solr_port)
         solr_settings.setBase(self.solr_base)
 
