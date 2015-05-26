@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from Products.CMFCore.utils import getToolByName
+from collective.solr.configlet import SolrControlPanelAdapter
 from collective.solr.utils import activate
 from plone.app.testing import FunctionalTesting
 from plone.app.testing import IntegrationTesting
@@ -37,18 +38,15 @@ class SolrLayer(Layer):
             module=None,
             solr_host='localhost',
             solr_port=8983,
-            solr_base='/solr',
-            solr_core='collection1'):
+            solr_base='/solr'):
         super(SolrLayer, self).__init__(bases, name, module)
         self.solr_host = solr_host
         self.solr_port = solr_port
         self.solr_base = solr_base
-        self.solr_core = solr_core
-        self.solr_url = 'http://{0}:{1}{2}/{3}'.format(
+        self.solr_url = 'http://{0}:{1}{2}'.format(
             solr_host,
             solr_port,
-            solr_base,
-            solr_core
+            solr_base
         )
 
     def setUp(self):
@@ -96,7 +94,20 @@ SOLR_FIXTURE = SolrLayer()
 
 class CollectiveSolrLayer(PloneSandboxLayer):
 
-    defaultBases = (PLONE_FIXTURE, SOLR_FIXTURE)
+    defaultBases = (SOLR_FIXTURE, PLONE_FIXTURE)
+
+    def __init__(
+            self,
+            bases=None,
+            name='Solr Plone Layer',
+            module=None,
+            solr_host='localhost',
+            solr_port=8983,
+            solr_base='/solr'):
+        super(CollectiveSolrLayer, self).__init__(bases, name, module)
+        self.solr_host = solr_host
+        self.solr_port = solr_port
+        self.solr_base = solr_base
 
     def setUpZope(self, app, configurationContext):
         # Load ZCML
@@ -112,6 +123,9 @@ class CollectiveSolrLayer(PloneSandboxLayer):
 
     def setUpPloneSite(self, portal):
         applyProfile(portal, 'collective.solr:search')
+        solr_settings = SolrControlPanelAdapter(portal)
+        solr_settings.setPort(self.solr_port)
+        solr_settings.setBase(self.solr_base)
 
 
 class LegacyCollectiveSolrLayer(CollectiveSolrLayer):
