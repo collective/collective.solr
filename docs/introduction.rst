@@ -11,7 +11,4 @@ It has integrated clustering and load-balancing to provide a high level of robus
 
 ``collective.solr`` comes with a default configuration and setup of Solr that makes it extremely easy to get started, yet provides a vastly superior search quality compared to Plone's integrated text search based on ``ZCTextIndex``.
 
-
-.. _Plone: https://plone.org
-
-.. _Solr: http://lucene.apache.org/solr/
+.. include:: indexes.rst

@@ -1,6 +1,8 @@
 Features
 ========
 
+Once installed and configured, this add-on introduces a number of end-user features.
+
 Solr Features
 -------------
 
@@ -22,3 +24,17 @@ ZCTextIndex Replacement
 
 
 
+
+
+Old full description of Features
+--------------------------------
+
+.. toctree:: 
+    :maxdepth: 2
+
+    languages
+    exclude
+    facets
+    binary
+    wildcard
+    suggestions

@@ -7,11 +7,31 @@
 Solr integration for the Plone CMS
 ==================================
 
+.. image:: https://secure.travis-ci.org/collective/collective.solr.png?branch=master
+    :target: http://travis-ci.org/collective/collective.solr
+
+.. image:: https://coveralls.io/repos/collective/collective.solr/badge.png?branch=master
+    :target: https://coveralls.io/r/collective/collective.solr
+
+.. image:: https://pypip.in/d/collective.solr/badge.png
+    :target: https://pypi.python.org/pypi/collective.solr/
+    :alt: Downloads
+
+.. image:: https://pypip.in/v/collective.solr/badge.png
+    :target: https://pypi.python.org/pypi/collective.solr/
+    :alt: Latest Version
+
+.. image:: https://pypip.in/egg/collective.solr/badge.png
+    :target: https://pypi.python.org/pypi/collective.solr/
+    :alt: Egg Status
+
+.. image:: https://pypip.in/license/collective.solr/badge.png
+    :target: https://pypi.python.org/pypi/collective.solr/
+    :alt: License
+
 .. include:: introduction.rst
 
-
-
-
+.. include:: status.rst
 
 Contents
 ========
@@ -37,13 +57,6 @@ This documentation will describe all necessary information to setup and use `Sol
 .. include:: contributors.rst
 
 
-Old Doumentation
-================
-
-has to splitted up and merged into new structure.
-
-.. include:: ../README_old.rst
-
 Indices and tables
 ==================
 
@@ -51,7 +64,4 @@ Indices and tables
 * :ref:`modindex`
 * :ref:`search`
 
-
-.. _Plone: https://plone.org
-.. _docs.plone.org: http://docs.plone.org
-.. _`Solr`: http://lucene.apache.org/solr/
+.. include:: indexes.rst
