@@ -2,10 +2,10 @@ Transaction handling and duplicates
 -----------------------------------
 
 This tests transaction handling when indexing in Solr, or more specifically
-properly aborting a transaction.  To do this we'll try to create some content
+properly aborting a transaction. To do this we'll try to create some content
 and fake a `ConflictError` shortly before the transaction completes.  The
 publisher will catch it and retry, but while doing so the object will get a
-different UID than the first time.  Without being able to abort the
+different UID than the first time. Without being able to abort the
 transaction Solr would receive two sets of data and consequently return two
 results when searching for this particular piece of content later on.
 

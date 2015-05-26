@@ -1,7 +1,7 @@
 Facet dependencies
 ------------------
 
-This tests dependencies of search facets.  A facet depending on another will
+This tests dependencies of search facets. A facet depending on another will
 only be displayed in case a value was already selected for the latter.  We'll
 use a testbrowser to check this.
 
