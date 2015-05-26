@@ -81,7 +81,7 @@ class SolrLayer(Layer):
     def tearDown(self):
         """Stop Solr.
         """
-        subprocess.call(
+        subprocess.check_call(
             './solr-instance stop',
             shell=True,
             close_fds=True,
@@ -99,13 +99,14 @@ class CollectiveSolrLayer(PloneSandboxLayer):
     def __init__(
             self,
             bases=None,
-            name='Solr Plone Layer',
+            name='Collective Solr Layer',
             module=None,
             solr_active=False,
             solr_host='localhost',
             solr_port=8983,
             solr_base='/solr'):
         super(CollectiveSolrLayer, self).__init__(bases, name, module)
+        self.solr_active = solr_active
         self.solr_host = solr_host
         self.solr_port = solr_port
         self.solr_base = solr_base
@@ -128,6 +129,12 @@ class CollectiveSolrLayer(PloneSandboxLayer):
         solr_settings.setActive(self.solr_active)
         solr_settings.setPort(self.solr_port)
         solr_settings.setBase(self.solr_base)
+
+    def tearDownPloneSite(self, portal):
+        solr_settings = SolrControlPanelAdapter(portal)
+        solr_settings.setActive(False)
+        solr_settings.setPort(8983)
+        solr_settings.setBase('/solr')
 
 
 class LegacyCollectiveSolrLayer(CollectiveSolrLayer):
