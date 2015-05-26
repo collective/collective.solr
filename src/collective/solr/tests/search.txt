@@ -2,7 +2,7 @@ Site Search
 -----------
 
 This tests the Solr-based replacement for Plone's site search feature.  We'll
-use a testbrowser to created an object and then search for it.  First we need
+use a testbrowser to created an object and then search for it. First we need
 to activate Solr support and reindex the site's content, though:
 
   >>> from collective.solr.testing import activateAndReindex
@@ -42,11 +42,11 @@ to activate Solr support and reindex the site's content, though:
   <Link text='Foo' url='http://nohost/plone/foo'>
 
 Some content items, for example files and image, don't have an associated
-workflow state.  Hence they cannot provide data for a `review_state` index
-as well.  However, Plone's search results listing template (`search.pt`)
+workflow state. Hence they cannot provide data for a `review_state` index
+as well. However, Plone's search results listing template (`search.pt`)
 contains the string expression "state-${result/review_state}", and the TAL
 engine will attempt to traverse `result` in case dictionary and attribute
-lookups for `review_state` weren't successful.  Let's make sure this
+lookups for `review_state` weren't successful. Let's make sure this
 behaviour won't break things:
 
   >>> portal.invokeFactory('File', id='file', title='my first foo file')
@@ -64,7 +64,7 @@ Wildcard searches
 -----------------
 
 Simple searches should be wildcard searches to reflect (and not change)
-Plone's default behaviour.  So at least for single words the search should
+Plone's default behaviour. So at least for single words the search should
 be automatically adjusted:
 
   >>> browser.open('http://nohost/plone/')

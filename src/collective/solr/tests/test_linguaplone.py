@@ -5,7 +5,6 @@ from collective.solr.dispatcher import solrSearchResults
 from collective.solr.interfaces import ISearch
 from collective.solr.interfaces import ISolrConnectionConfig
 from collective.solr.testing import COLLECTIVE_SOLR_FUNCTIONAL_TESTING
-from collective.solr.tests.utils import pingSolr
 from collective.solr.utils import activate
 from plone.app.testing import TEST_USER_ID
 from plone.app.testing import setRoles
@@ -62,11 +61,3 @@ class LinguaTests(TestCase):
         self.assertEqual(search(Language='de'), ['ein dokument'])
         self.assertEqual(search(Language='all'),
                          ['doc foo', 'ein dokument', 'some document'])
-
-
-def test_suite():
-    from unittest import TestSuite, defaultTestLoader
-    if pingSolr():
-        return defaultTestLoader.loadTestsFromName(__name__)
-    else:
-        return TestSuite()

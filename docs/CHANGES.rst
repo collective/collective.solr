@@ -4,6 +4,12 @@ Changelog
 4.1.1 (unreleased)
 ------------------
 
+- Add configurable SolrLayer for unit testing Solr configuration.
+  [timo]
+
+- Make CollectiveSolrLayer configurable, to allow testing different cores.
+  [timo]
+
 - Added context to search utility. This allows query to be used in AJAX calls.
   [tomgross]
 
