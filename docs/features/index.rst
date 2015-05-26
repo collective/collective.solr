@@ -38,3 +38,4 @@ Old full description of Features
     binary
     wildcard
     suggestions
+    highlighting
