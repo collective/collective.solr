@@ -36,6 +36,14 @@ This documentation will describe all necessary information to setup and use `Sol
 
 .. include:: contributors.rst
 
+
+Old Doumentation
+================
+
+has to splitted up and merged into new structure.
+
+.. include:: ../README_old.rst
+
 Indices and tables
 ==================
 
