@@ -94,7 +94,7 @@ SOLR_FIXTURE = SolrLayer()
 
 class CollectiveSolrLayer(PloneSandboxLayer):
 
-    defaultBases = (SOLR_FIXTURE, PLONE_FIXTURE)
+    defaultBases = (PLONE_FIXTURE,)
 
     def __init__(
             self,
@@ -110,6 +110,48 @@ class CollectiveSolrLayer(PloneSandboxLayer):
         self.solr_host = solr_host
         self.solr_port = solr_port
         self.solr_base = solr_base
+        self.solr_url = 'http://{0}:{1}{2}'.format(
+            solr_host,
+            solr_port,
+            solr_base
+        )
+
+    def setUp(self):
+        super(CollectiveSolrLayer, self).setUp()
+        self.proc = subprocess.call(
+            './solr-instance start',
+            shell=True,
+            close_fds=True,
+            cwd=BUILDOUT_DIR
+        )
+        # Poll Solr until it is up and running
+        solr_ping_url = '{0}/admin/ping'.format(self.solr_url)
+        for i in range(1, 10):
+            try:
+                result = urllib2.urlopen(solr_ping_url)
+                if result.code == 200:
+                    if '<str name="status">OK</str>' in result.read():
+                        break
+            except urllib2.URLError:
+                sleep(3)
+                sys.stdout.write('.')
+            if i == 9:
+                subprocess.call(
+                    './solr-instance stop',
+                    shell=True,
+                    close_fds=True,
+                    cwd=BUILDOUT_DIR
+                )
+                sys.stdout.write('Solr Instance could not be started !!!')
+
+    def tearDown(self):
+        super(CollectiveSolrLayer, self).tearDown()
+        subprocess.check_call(
+            './solr-instance stop',
+            shell=True,
+            close_fds=True,
+            cwd=BUILDOUT_DIR
+        )
 
     def setUpZope(self, app, configurationContext):
         # Load ZCML
