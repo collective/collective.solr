@@ -92,8 +92,10 @@ class SolrLayer(Layer):
 SOLR_FIXTURE = SolrLayer()
 
 
-class CollectiveSolrLayer(PloneSandboxLayer):
-
+class CollectiveSolrLayer(PloneSandboxLayer, SolrLayer):
+    """collective.solr test layer that fires up and shuts down a Solr instance
+       together with Plone and collective.solr installed.
+    """
     defaultBases = (PLONE_FIXTURE,)
 
     def __init__(
@@ -117,44 +119,21 @@ class CollectiveSolrLayer(PloneSandboxLayer):
         )
 
     def setUp(self):
+        """Call the setUp method of PloneSandboxLayer as well as the SolrLayer
+           setUp method. We need both, the Plone/ZODB setup and Solr.
+        """
         super(CollectiveSolrLayer, self).setUp()
-        self.proc = subprocess.call(
-            './solr-instance start',
-            shell=True,
-            close_fds=True,
-            cwd=BUILDOUT_DIR
-        )
-        # Poll Solr until it is up and running
-        solr_ping_url = '{0}/admin/ping'.format(self.solr_url)
-        for i in range(1, 10):
-            try:
-                result = urllib2.urlopen(solr_ping_url)
-                if result.code == 200:
-                    if '<str name="status">OK</str>' in result.read():
-                        break
-            except urllib2.URLError:
-                sleep(3)
-                sys.stdout.write('.')
-            if i == 9:
-                subprocess.call(
-                    './solr-instance stop',
-                    shell=True,
-                    close_fds=True,
-                    cwd=BUILDOUT_DIR
-                )
-                sys.stdout.write('Solr Instance could not be started !!!')
+        SolrLayer.setUp(self)
 
     def tearDown(self):
+        """Call the tearDown method of PloneSandboxLayer as well as the
+           SolrLayer tearDown method. We need both, the Plone/ZODB setup and
+           Solr.
+        """
         super(CollectiveSolrLayer, self).tearDown()
-        subprocess.check_call(
-            './solr-instance stop',
-            shell=True,
-            close_fds=True,
-            cwd=BUILDOUT_DIR
-        )
+        SolrLayer.tearDown(self)
 
     def setUpZope(self, app, configurationContext):
-        # Load ZCML
         import collective.indexing
         xmlconfig.file('configure.zcml',
                        collective.indexing,
