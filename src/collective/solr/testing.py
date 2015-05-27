@@ -132,6 +132,12 @@ class CollectiveSolrLayer(PloneSandboxLayer, SolrLayer):
         super(CollectiveSolrLayer, self).tearDown()
         SolrLayer.tearDown(self)
 
+    def setUpZope(self, app, configurationContext):
+        import collective.solr
+        xmlconfig.file('configure.zcml',
+                       collective.solr,
+                       context=configurationContext)
+
     def setUpPloneSite(self, portal):
         applyProfile(portal, 'collective.solr:search')
         solr_settings = SolrControlPanelAdapter(portal)
@@ -149,13 +155,13 @@ class CollectiveSolrLayer(PloneSandboxLayer, SolrLayer):
 class LegacyCollectiveSolrLayer(CollectiveSolrLayer):
 
     def setUpZope(self, app, configurationContext):
+        super(LegacyCollectiveSolrLayer, self).setUpZope(
+            app,
+            configurationContext
+        )
         import collective.indexing
         xmlconfig.file('configure.zcml',
                        collective.indexing,
-                       context=configurationContext)
-        import collective.solr
-        xmlconfig.file('configure.zcml',
-                       collective.solr,
                        context=configurationContext)
         installProduct(app, 'collective.indexing')
 
