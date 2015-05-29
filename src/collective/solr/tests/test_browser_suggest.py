@@ -58,6 +58,9 @@ class MockConnection():
     def doPost(self, url, foo, bar):
         return MockResponse()
 
+    def doGet(self, url, bar):
+        return MockResponse()
+
 
 class MockSolrConnectionManager():
 

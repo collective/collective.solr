@@ -25,8 +25,8 @@ class SuggestView(BrowserView):
         params['wt'] = 'json'
 
         params = urllib.urlencode(params, doseq=True)
-        response = connection.doPost(
-            connection.solrBase + '/spell?' + params, '', {})
+        response = connection.doGet(
+            connection.solrBase + '/spell?' + params, {})
         results = json.loads(response.read())
 
         # Check for spellcheck
