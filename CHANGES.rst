@@ -7,6 +7,10 @@ Changelog
 - Added context to search utility. This allows query to be used in AJAX calls.
   [tomgross]
 
+- Use GET method in spell check request (as it's an idempotent request which
+  does not affect server state)
+  [reinhardt]
+
 
 4.1.0 (2015-02-19)
 ------------------
