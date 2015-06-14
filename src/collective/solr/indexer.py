@@ -14,7 +14,11 @@ from Products.CMFCore.utils import getToolByName
 from Products.CMFCore.CMFCatalogAware import CMFCatalogAware
 from Products.Archetypes.CatalogMultiplex import CatalogMultiplex
 from Products.Archetypes.interfaces import IBaseObject
-from plone.app.content.interfaces import IIndexableObjectWrapper
+try:
+    from plone.app.content.interfaces import IIndexableObjectWrapper
+except ImportError:
+    # Plone 5
+    from plone.indexer.interfaces import IIndexableObjectWrapper
 from plone.indexer.interfaces import IIndexableObject
 
 from collective.solr.interfaces import ISolrConnectionConfig
