@@ -149,7 +149,7 @@ class SearchFacetsView(BrowserView, FacetMixin):
         for idx, query in enumerate(fq):
             field, value = query.split(':', 1)
             params = self.request.form.copy()
-            params['fq'] = fq[:idx] + fq[idx+1:]
+            params['fq'] = fq[:idx] + fq[idx + 1:]
             if field not in facets:
                 params['facet.field'] = facets + [field]
             if value.startswith('"') and value.endswith('"'):
