@@ -16,5 +16,6 @@ var
 *.mo
 *.*~
 .*.cfg
-docs/doctrees/
-docs/html/
+.Python
+pip-selfcheck.json
+.idea

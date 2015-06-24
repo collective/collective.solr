@@ -1,8 +1,13 @@
-from setuptools import setup, find_packages
+import os.path
+from setuptools import setup
+from setuptools import find_packages
 
 version = '4.1.1.dev0'
 long_description = \
-    open("README.rst").read() + '\n' + open('CHANGES.rst').read()
+    open("README.rst").read() + '\n' + \
+    open(os.path.join('docs', 'CHANGES.rst')).read() + \
+    open(os.path.join('docs', 'credits.rst')).read() + \
+    open(os.path.join('docs', 'contributors.rst')).read(),
 
 setup(
     name='collective.solr',
@@ -25,6 +30,8 @@ setup(
     keywords='plone cmf zope indexing searching solr lucene',
     author='Jarn AS',
     author_email='info@jarn.com',
+    maintainer='Plone Community',
+    maintainer_email='plone-developers@lists.sourceforge.net',
     url='http://plone.org/products/collective.solr',
     license='GPL version 2',
     packages=find_packages('src'),

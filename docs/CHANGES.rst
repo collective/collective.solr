@@ -314,8 +314,7 @@ Changelog
 3.0a1 - 2011-06-23
 ------------------
 
-Upgrade notes
-*************
+**Upgrade notes**
 
 * Changed the names of the indexes used to emulate the `path` index. You need
   to adjust your schema and rename `physicalPath` to `path_string`,
@@ -323,8 +322,7 @@ Upgrade notes
   also requires a full Solr reindex to pick up the new data.
   [hannosch]
 
-Changes
-*******
+**Changes**
 
 * Added `object_provides` index to example schema, as it's used in the
   collection portlet to find collections.
