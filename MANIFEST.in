@@ -1,5 +1,5 @@
 exclude better-defaults.diff
-exclude bootstrap.py
+exclude bootstrap-buildout.py
 exclude *.cfg
 exclude .coveragerc
 exclude docs/Makefile

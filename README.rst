@@ -90,7 +90,7 @@ The following buildout configuration may be used to get started quickly::
 
 After saving this to let's say ``solr.cfg`` the buildout can be run and the `Solr`_ server and `Plone`_ instance started::
 
-  $ python bootstrap.py
+  $ python bootstrap-buildout.py
   $ bin/buildout -c solr.cfg
   ...
   $ bin/solr-instance start
@@ -123,7 +123,7 @@ Example::
 Current Project Status
 ======================
 
-The code is used in production in many sites and considered stable. 
+The code is used in production in many sites and considered stable.
 This add-on can be installed in a `Plone`_ 4.1 (or later) site to enable indexing operations as well as searching (site and live search) using `Solr`_.
 Doing so will not only significantly improve search quality and performance - especially for a large number of indexed objects, but also reduce the memory footprint of your `Plone`_ instance by allowing you to remove the ``SearchableText``, ``Description`` and ``Title`` indexes from the catalog.
 In large sites with 100000 content objects and more, searches using ``ZCTextIndex`` often taken 10 seconds or more and require a good deal of memory from ZODB caches.
