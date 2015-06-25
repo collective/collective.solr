@@ -88,6 +88,7 @@ The following buildout configuration may be used to get started quickly::
   [instance]
   eggs += collective.solr
 
+
 After saving this to let's say ``solr.cfg`` the buildout can be run and the `Solr`_ server and `Plone`_ instance started::
 
   $ python bootstrap-buildout.py
