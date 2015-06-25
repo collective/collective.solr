@@ -9,8 +9,11 @@ cache:
 env:
   - PLONE_VERSION=4.3.x SOLR_VERSION=4.10.x
   - PLONE_VERSION=5.0.x SOLR_VERSION=4.10.x
-  - PLONE_VERSION=4.3.x SOLR_VERSION=5.2.x
-  - PLONE_VERSION=5.0.x SOLR_VERSION=5.2.x
+  - PLONE_VERSION=4.3.x SOLR_VERSION=5.0.x
+  - PLONE_VERSION=5.0.x SOLR_VERSION=5.0.x
+matrix:
+  allow_failures:
+    - env: PLONE_VERSION=5.0.x
 before_install:
   - mkdir -p $HOME/buildout-cache/{eggs,downloads,solr}
 install:
