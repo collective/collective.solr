@@ -172,7 +172,7 @@ class SolrConnection:
     def doSendXML(self, request):
         try:
             rsp = self.doPost(
-                self.solrBase+'/update', request,
+                self.solrBase + '/update', request,
                 self.xmlheaders
             )
             data = rsp.read()
