@@ -71,7 +71,8 @@ class SearchExtender(object):
                 label=_('label_showinsearch', default=u"Show in search"),
                 visible={"edit": "visible", "view": "invisible"},
                 description="",
-            )),
+            )
+        ),
 
         ExtentionTextField(
             'searchwords',
@@ -87,8 +88,9 @@ class SearchExtender(object):
                     u"specified on new lines."
                 ),
                 visible={"edit": "visible", "view": "invisible"},
-            )),
-        ]
+            )
+        ),
+    ]
 
     def __init__(self, context):
         self.context = context
