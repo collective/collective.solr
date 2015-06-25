@@ -19,8 +19,8 @@ install:
   - python bootstrap-buildout.py -c travis.cfg
   - bin/buildout -N -t 20 -c travis.cfg
 script:
-  - bin/test
   - bin/code-analysis
+  - bin/test
 after_success:
   - bin/createcoverage run bin/test
   - pip install -q coveralls
