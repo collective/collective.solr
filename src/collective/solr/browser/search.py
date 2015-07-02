@@ -28,7 +28,9 @@ class Search(PloneAppSearchBrowserView):
                 result = [
                     {
                         'id': x.id,
+                        'portal_type': x.portal_type,
                         'title': x.Title,
+                        'description': x.description,
                         'url': x.getURL(),
                     }
                     for x in catalog(SearchableText=SearchableText)

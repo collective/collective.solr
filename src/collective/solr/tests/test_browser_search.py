@@ -71,8 +71,9 @@ class SuggestTermsViewIntegrationTest(unittest.TestCase):
         self.portal.invokeFactory(
             'Document',
             id='doc1',
-            title='My First Document'
+            title=u'My First Document',
         )
+        self.portal.setDescription(u'This is my first document.')
         self.request.set('format', 'json')
         self.request.set('SearchableText', 'First')
 
@@ -95,6 +96,14 @@ class SuggestTermsViewIntegrationTest(unittest.TestCase):
             u'My First Document',
         )
         self.assertEqual(
+            json.loads(view())[0]['description'],
+            u'This is my first document.',
+        )
+        self.assertEqual(
             json.loads(view())[0]['url'],
             u'{}/doc1'.format(self.portal.absolute_url())
+        )
+        self.assertEqual(
+            json.loads(view())[0]['portal_type'],
+            u'Document'
         )
