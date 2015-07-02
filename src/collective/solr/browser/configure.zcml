@@ -55,4 +55,15 @@
       class=".suggest.AutocompleteView"
       permission="zope2.View"/>
 
+  <configure package="plone.app.search">
+    <browser:page
+        name="search"
+        class="collective.solr.browser.search.Search"
+        permission="zope2.View"
+        for="*"
+        layer="collective.solr.browser.interfaces.IThemeSpecific"
+        template="search.pt"
+        />
+  </configure>
+
 </configure>
