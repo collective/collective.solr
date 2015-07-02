@@ -371,6 +371,7 @@ class SolrErrorHandlingTests(TestCase):
 
 
 class SolrServerTests(TestCase):
+
     layer = COLLECTIVE_SOLR_FUNCTIONAL_TESTING
 
     def setUp(self):

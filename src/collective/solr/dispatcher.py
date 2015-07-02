@@ -53,7 +53,6 @@ def solrSearchResults(request=None, **keywords):
     site = getSite()
     search = queryUtility(ISearch, context=site)
     config = queryUtility(ISolrConnectionConfig, context=site)
-
     if request is None:
         # try to get a request instance, so that flares can be adapted to
         # ploneflares and urls can be converted into absolute ones etc;

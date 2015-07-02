@@ -109,7 +109,7 @@ class SuggestTermsViewIntegrationTest(unittest.TestCase):
         self.failUnless(view())
         self.assertEqual(view(), '[]')
 
-    def test_suggest_terms_view_with_param_not_in_solf(self):
+    def test_suggest_terms_view_with_param_not_in_solr(self):
         self.request.set('term', 'abcdef')
         view = getMultiAdapter(
             (self.portal, self.portal.REQUEST),

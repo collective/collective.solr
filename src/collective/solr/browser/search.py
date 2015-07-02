@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
-import json
-
+from collective.solr.dispatcher import solrSearchResults
 from plone.app.search.browser import Search as PloneAppSearchBrowserView
-from Products.CMFCore.utils import getToolByName
+
+import json
 
 
 class Search(PloneAppSearchBrowserView):
@@ -22,18 +22,26 @@ class Search(PloneAppSearchBrowserView):
                 'application/json; charset=utf-8'
             )
             SearchableText = self.request.get('SearchableText')
-            result = []
+            result = {
+                'data': [],
+                'suggestions': [],
+            }
             if SearchableText:
-                catalog = getToolByName(self.context, 'portal_catalog')
-                result = [
+                solr_search = solrSearchResults(
+                    SearchableText=SearchableText,
+                    spellcheck='true',
+                    use_solr='true',
+                )
+                result['data'] = [
                     {
                         'id': x.id,
                         'portal_type': x.portal_type,
                         'title': x.Title,
-                        'description': x.description,
+                        'description': x.get('description', u''),
                         'url': x.getURL(),
                     }
-                    for x in catalog(SearchableText=SearchableText)
+                    for x in solr_search.results()
                 ]
+                result['suggestions'] = solr_search.spellcheck
             return json.dumps(result, indent=2, sort_keys=True)
         return super(PloneAppSearchBrowserView, self).__call__()
