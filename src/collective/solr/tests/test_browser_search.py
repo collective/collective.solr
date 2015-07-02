@@ -132,7 +132,6 @@ class JsonSolrFacettingTests(unittest.TestCase):
             id='doc1',
             title=u'My First Document',
         )
-        self.portal.setDescription(u'This is my first document.')
         self.maintenance.reindex()
         self.request.set('format', 'json')
         self.request.set('SearchableText', 'fist')
@@ -148,5 +147,41 @@ class JsonSolrFacettingTests(unittest.TestCase):
             len(result['data']),
             0
         )
+        self.assertTrue(result['suggestions'])
+        self.assertEqual(
+            [u'first'],
+            result['suggestions']['suggestions'].values()[0]['suggestion']
+        )
+
+    def test_browser_search_view_suggest_multiple(self):
+        self.portal.invokeFactory(
+            'Document',
+            id='doc1',
+            title=u'My farst Document',
+        )
+        self.portal.invokeFactory(
+            'Document',
+            id='doc2',
+            title=u'My fbrst Document',
+        )
+        self.maintenance.reindex()
+        self.request.set('format', 'json')
+        self.request.set('SearchableText', 'first')
+
+        view = getMultiAdapter(
+            (self.portal, self.request),
+            name="search"
+        )
+        view = view.__of__(self.portal)
+        result = json.loads(view())
+
+        self.assertEqual(
+            len(result['data']),
+            0
+        )
 
         self.assertTrue(result['suggestions'])
+        self.assertEqual(
+            [u'farst', u'fbrst'],
+            result['suggestions']['suggestions'].values()[0]['suggestion']
+        )
