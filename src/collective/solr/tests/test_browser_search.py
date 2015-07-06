@@ -186,3 +186,40 @@ class JsonSolrTests(unittest.TestCase):
             [u'farst', u'fbrst'],
             result['suggestions'].values()[0]['suggestion']
         )
+
+    def test_browser_search_autocomplete(self):
+        self.portal.invokeFactory(
+            'Document',
+            id='doc1',
+            title=u'Colorless green ideas sleep furiously',
+        )
+        self.portal.invokeFactory(
+            'Document',
+            id='doc2',
+            title=u'Furiously sleep ideas green colorless',
+        )
+        self.maintenance.reindex()
+        self.request.set('format', 'json')
+        self.request.set('autocomplete', 'True')
+        self.request.set('SearchableText', 'Col')
+
+        view = getMultiAdapter(
+            (self.portal, self.request),
+            name="search"
+        )
+        view = view.__of__(self.portal)
+
+        result = json.loads(view())
+
+        self.assertEqual(
+            len(result['data']),
+            2
+        )
+        self.assertTrue(
+            'Colorless green ideas sleep furiously'
+            in [x.get('title') for x in result['data']]
+        )
+        self.assertTrue(
+            'Furiously sleep ideas green colorless'
+            in [x.get('title') for x in result['data']]
+        )
