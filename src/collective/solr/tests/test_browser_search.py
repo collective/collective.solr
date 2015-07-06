@@ -11,7 +11,8 @@ import json
 import unittest
 
 
-class JsonSolrFacettingTests(unittest.TestCase):
+class JsonSolrTests(unittest.TestCase):
+
     layer = COLLECTIVE_SOLR_INTEGRATION_TESTING
 
     def setUp(self):
@@ -150,7 +151,7 @@ class JsonSolrFacettingTests(unittest.TestCase):
         self.assertTrue(result['suggestions'])
         self.assertEqual(
             [u'first'],
-            result['suggestions']['suggestions'].values()[0]['suggestion']
+            result['suggestions'].values()[0]['suggestion']
         )
 
     def test_browser_search_view_suggest_multiple(self):
@@ -183,5 +184,5 @@ class JsonSolrFacettingTests(unittest.TestCase):
         self.assertTrue(result['suggestions'])
         self.assertEqual(
             [u'farst', u'fbrst'],
-            result['suggestions']['suggestions'].values()[0]['suggestion']
+            result['suggestions'].values()[0]['suggestion']
         )
