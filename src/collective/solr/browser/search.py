@@ -42,11 +42,10 @@ class Search(PloneAppSearchBrowserView):
                     }
                     for x in solr_search.results()
                 ]
-                result['suggestions'] = self.extract_suggestions(
-                    solr_search.spellcheck
-                )
+                if getattr(solr_search, 'spellcheck', False):
+                    if solr_search.spellcheck.get('suggestions'):
+                        result['suggestions'] = solr_search.spellcheck.get(
+                            'suggestions'
+                        )
             return json.dumps(result, indent=2, sort_keys=True)
         return super(PloneAppSearchBrowserView, self).__call__()
-
-    def extract_suggestions(self, result):
-        return result
