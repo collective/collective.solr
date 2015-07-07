@@ -72,8 +72,8 @@ class AutocompleteView(BrowserView):
         params['wt'] = 'json'
 
         params = urllib.urlencode(params, doseq=True)
-        response = connection.doPost(
-            connection.solrBase + '/autocomplete?' + params, '', {})
+        response = connection.doGet(
+            connection.solrBase + '/autocomplete?' + params, {})
         results = json.loads(response.read())
 
         if 'grouped' not in results:
