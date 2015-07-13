@@ -15,6 +15,7 @@
                title="Search Site"
                accesskey="4"
                i18n:attributes="title title_search_title;"
+               tal:attributes="value request/SearchableText|nothing;"
                class="searchPage form-control" />
 
         <input class="searchButton"
