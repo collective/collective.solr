@@ -52,7 +52,7 @@
   <browser:page
       for="*"
       name="solr-autocomplete"
-      class=".suggest.AutocompleteView"
+      class=".search.AutocompleteView"
       permission="zope2.View" />
 
   <configure package="plone.app.search">

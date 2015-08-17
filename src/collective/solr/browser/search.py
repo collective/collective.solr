@@ -1,8 +1,12 @@
 # -*- coding: utf-8 -*-
 from collective.solr.dispatcher import solrSearchResults
+from collective.solr.interfaces import ISolrConnectionManager
 from plone.app.search.browser import Search as PloneAppSearchBrowserView
+from Products.Five.browser import BrowserView
+from zope.component import getUtility
 
 import json
+import urllib
 
 
 class Search(PloneAppSearchBrowserView):
@@ -49,3 +53,40 @@ class Search(PloneAppSearchBrowserView):
                         )
             return json.dumps(result, indent=2, sort_keys=True)
         return super(PloneAppSearchBrowserView, self).__call__()
+
+
+class AutocompleteView(BrowserView):
+
+    def __call__(self):
+        term = self.request.get('term', '')
+        if not term:
+            return json.dumps([])
+        manager = getUtility(ISolrConnectionManager)
+        connection = manager.getConnection()
+
+        if connection is None:
+            return json.dumps([])
+
+        params = {}
+        params['q'] = term
+        params['wt'] = 'json'
+
+        params = urllib.urlencode(params, doseq=True)
+        response = connection.doGet(
+            connection.solrBase + '/autocomplete?' + params, {})
+        results = json.loads(response.read())
+
+        if 'grouped' not in results:
+            return json.dumps([])
+
+        groups = results.get('grouped')['autocomplete']['groups']
+
+        suggestions = [
+            x['doclist']['docs'][0]['autocomplete'] for x in groups
+        ]
+
+        result = []
+        for suggestion in suggestions:
+            result.append(dict(label=suggestion, value=suggestion))
+
+        return json.dumps(result)
