@@ -410,6 +410,8 @@ class SolrServerTests(TestCase):
         fields.remove('default')
         # remove field not defined for a folder
         fields.remove('getRemoteUrl')
+        # remove autocomplete field
+        fields.remove('autocomplete')
         proc = SolrIndexProcessor(manager)
         # without explicit attributes all data should be returned
         data, missing = proc.getData(self.folder)

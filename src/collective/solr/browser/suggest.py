@@ -79,10 +79,10 @@ class AutocompleteView(BrowserView):
         if 'grouped' not in results:
             return json.dumps([])
 
-        groups = results.get('grouped')['title_autocomplete']['groups']
+        groups = results.get('grouped')['autocomplete']['groups']
 
         suggestions = [
-            x['doclist']['docs'][0]['title_autocomplete'] for x in groups
+            x['doclist']['docs'][0]['autocomplete'] for x in groups
         ]
 
         result = []
