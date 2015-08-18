@@ -118,21 +118,45 @@
         source: solrAutocompleteSearch
       });
 
+      var renderSearchResult = function(items){
+          console.log(items);
+          var outputHTML = "";
+          for (item_key in items.data){
+              var item = items.data[item_key];
+              var searchResult =
+                "<dt class='contenttype-" + item.portal_type.toLowerCase().replace(" ", "-") + "'>" +
+                  "<a href='" + item.url + "' class='state-None'>" + item.title + "</a>" +
+                "</dt>" +
+                "<dd>" +
+                  "<span class='discreet'>" +
+                    "<span class='documentAuthor'>erstellt von " +
+                      "<a href='" + item.author_url + "'>" + item.author + "</a>" +
+                    "</span>" +
+                    "<span>" +
+                      "<span class='documentPublished'> - " +
+                        "<span>Veröffentlicht </span>" +
+                          item.publish_date +
+                        "</span>" +
+                        "<span class='documentModified'> - " +
+                          "<span>zuletzt verändert: </span>" +
+                          item.last_modified +
+                        "</span>" +
+                    "</span>" +
+                  "</span>" +
+                  "<div>" + item.description + "</div>" +
+                "</dd>";
+              outputHTML += searchResult;
+          }
+          $(".searchResults").html(outputHTML);
+      };
+
+
       $('#solr-autocomplete form').submit(function(event) {
         event.preventDefault();
         var SearchableText = $('#SearchableText').val();
         var url = '@@search?format=json&SearchableText=' + SearchableText;
         var SearchResults = [];
-        $.getJSON(url, function(data) {
-          var items = [];
-          $.each( data, function( key, val ) {
-            items.push( "<li id='" + key + "'>" + val + "</li>" );
-          });
-          $( "<ul/>", {
-            "class": "my-new-list",
-            html: items.join( "" )
-          }).appendTo( "#search-results dd" );
-        });
+        $.getJSON(url, renderSearchResult);
 
       });
     });
@@ -169,32 +193,6 @@
       </div>
     <div id="search-results" style="display: block;">
       <dl class="searchResults">
-        <dt class="contenttype-document">
-          <a href="http://localhost:8080/Plone/plone-1"
-             class="state-None">Plone</a>
-        </dt>
-        <dd>
-          <!--
-          <span class="discreet">
-            <span class="documentAuthor">erstellt von <a href="http://localhost:8080/Plone/author/admin">admin</a></span>
-            <span>
-              <span class="documentPublished">
-                —
-                <span>Veröffentlicht</span>
-                17.08.2015
-              </span>
-              <span class="documentModified">
-                —
-                <span>zuletzt verändert:</span>
-                17.08.2015 17:56
-              </span>
-            </span>
-          </span>
-          <div></div>
-          -->
-        </dd>
-
-
       </dl>
     </div>
 
