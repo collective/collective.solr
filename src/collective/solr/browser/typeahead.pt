@@ -13,10 +13,11 @@
     #solr-autocomplete {
       text-align: center;
     }
-    #solr-autocomplete input {
-      width: 300px;
-      height: 30px;
-      font-size: 20px;
+
+    #solr-autocomplete input[type='submit'] {
+      width: 200px;
+      font-size: 2em;
+      vertical-align: middle;
     }
 
     .tt-menu,
@@ -33,9 +34,9 @@
       font-size: 24px;
       line-height: 30px;
       border: 2px solid #ccc;
-      -webkit-border-radius: 8px;
-         -moz-border-radius: 8px;
-              border-radius: 8px;
+      -webkit-border-radius: 5px;
+         -moz-border-radius: 5px;
+              border-radius: 5px;
       outline: none;
     }
 
@@ -64,9 +65,9 @@
       background-color: #fff;
       border: 1px solid #ccc;
       border: 1px solid rgba(0, 0, 0, 0.2);
-      -webkit-border-radius: 8px;
-         -moz-border-radius: 8px;
-              border-radius: 8px;
+      -webkit-border-radius: 5px;
+         -moz-border-radius: 5px;
+              border-radius: 5px;
       -webkit-box-shadow: 0 5px 10px rgba(0,0,0,.2);
          -moz-box-shadow: 0 5px 10px rgba(0,0,0,.2);
               box-shadow: 0 5px 10px rgba(0,0,0,.2);
@@ -117,12 +118,85 @@
         source: solrAutocompleteSearch
       });
 
+      $('#solr-autocomplete form').submit(function(event) {
+        event.preventDefault();
+        var SearchableText = $('SearchableText').val();
+        var url = '@@search?format=json&SearchableText=' + SearchableText;
+        var SearchResults = [];
+        $.getJSON(url, function(data) {
+          var items = [];
+          $.each( data, function( key, val ) {
+            items.push( "<li id='" + key + "'>" + val + "</li>" );
+          });
+          $( "<ul/>", {
+            "class": "my-new-list",
+            html: items.join( "" )
+          }).appendTo( "#search-results dd" );
+        });)
+
+      });
     });
 
   </script>
 
   <div id="solr-autocomplete">
-    <input class="typeahead" type="text" placeholder="Search">
+    <form name="searchform">
+      <input class="searchPage typeahead"
+             id="SearchableText"
+             name="SearchableText"
+             type="text"
+             size="25"
+             title="Search Website"
+             value=""
+             placeholder="Search"
+             />
+      <input type="submit" value="Search" />
+    </form>
+  </div>
+
+  <div class="row">
+
+    <div class="cell width-full position-0">
+      <h1 class="documentFirstHeading">Search Results</h1>
+    </div>
+    <div class="visualClear"></div>
+    <div id="search-results-bar">
+        <span>
+          <strong id="search-results-number">0</strong>
+          Artikel gefunden.
+        </span>
+      </div>
+    <div id="search-results" style="display: block;">
+      <dl class="searchResults">
+        <dt class="contenttype-document">
+          <a href="http://localhost:8080/Plone/plone-1"
+             class="state-None">Plone</a>
+        </dt>
+        <dd>
+          <!--
+          <span class="discreet">
+            <span class="documentAuthor">erstellt von <a href="http://localhost:8080/Plone/author/admin">admin</a></span>
+            <span>
+              <span class="documentPublished">
+                —
+                <span>Veröffentlicht</span>
+                17.08.2015
+              </span>
+              <span class="documentModified">
+                —
+                <span>zuletzt verändert:</span>
+                17.08.2015 17:56
+              </span>
+            </span>
+          </span>
+          <div></div>
+          -->
+        </dd>
+
+
+      </dl>
+    </div>
+
   </div>
 
 </metal:content>
