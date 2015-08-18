@@ -1,0 +1,131 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"
+    xmlns:tal="http://xml.zope.org/namespaces/tal"
+    xmlns:metal="http://xml.zope.org/namespaces/metal"
+    xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+    lang="en"
+    metal:use-macro="context/main_template/macros/master"
+    i18n:domain="collective.solr">
+<body>
+
+<metal:content fill-slot="content">
+
+  <style type="text/css">
+    #solr-autocomplete {
+      text-align: center;
+    }
+    #solr-autocomplete input {
+      width: 300px;
+      height: 30px;
+      font-size: 20px;
+    }
+
+    .tt-menu,
+    .gist {
+      text-align: left;
+    }
+
+    .typeahead,
+    .tt-query,
+    .tt-hint {
+      width: 396px;
+      height: 30px;
+      padding: 8px 12px;
+      font-size: 24px;
+      line-height: 30px;
+      border: 2px solid #ccc;
+      -webkit-border-radius: 8px;
+         -moz-border-radius: 8px;
+              border-radius: 8px;
+      outline: none;
+    }
+
+    .typeahead {
+      background-color: #fff;
+    }
+
+    .typeahead:focus {
+      border: 2px solid #0097cf;
+    }
+
+    .tt-query {
+      -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+         -moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+              box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+    }
+
+    .tt-hint {
+      color: #999
+    }
+
+    .tt-menu {
+      width: 422px;
+      margin: 12px 0;
+      padding: 8px 0;
+      background-color: #fff;
+      border: 1px solid #ccc;
+      border: 1px solid rgba(0, 0, 0, 0.2);
+      -webkit-border-radius: 8px;
+         -moz-border-radius: 8px;
+              border-radius: 8px;
+      -webkit-box-shadow: 0 5px 10px rgba(0,0,0,.2);
+         -moz-box-shadow: 0 5px 10px rgba(0,0,0,.2);
+              box-shadow: 0 5px 10px rgba(0,0,0,.2);
+    }
+
+    .tt-suggestion {
+      padding: 3px 20px;
+      font-size: 18px;
+      line-height: 24px;
+    }
+
+    .tt-suggestion:hover {
+      cursor: pointer;
+      color: #fff;
+      background-color: #0097cf;
+    }
+
+    .tt-suggestion.tt-cursor {
+      color: #fff;
+      background-color: #0097cf;
+    }
+
+    .tt-suggestion p {
+      margin: 0;
+    }
+
+  </style>
+
+  <script type="text/javascript"
+          src="http://cdn.bootcss.com/typeahead.js/0.11.1/typeahead.bundle.min.js"></script>
+
+  <script type="text/javascript">
+
+    $(document).ready(function() {
+
+      var solrAutocompleteSearch = new Bloodhound({
+        datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value'),
+        queryTokenizer: Bloodhound.tokenizers.whitespace,
+        remote: {
+          url: '@@solr-autocomplete?format=json&term=%QUERY',
+          wildcard: '%QUERY'
+        }
+      });
+
+      $('#solr-autocomplete .typeahead').typeahead(null, {
+        name: 'autocomplete-search',
+        display: 'value',
+        source: solrAutocompleteSearch
+      });
+
+    });
+
+  </script>
+
+  <div id="solr-autocomplete">
+    <input class="typeahead" type="text" placeholder="Search">
+  </div>
+
+</metal:content>
+
+</body>
+</html>

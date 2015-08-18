@@ -60,4 +60,11 @@
         />
   </configure>
 
+  <browser:page
+      name="solr-typeahead"
+      for="*"
+      template="typeahead.pt"
+      permission="zope2.Public"
+      />
+
 </configure>
