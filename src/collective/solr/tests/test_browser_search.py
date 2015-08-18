@@ -126,6 +126,19 @@ class JsonSolrTests(unittest.TestCase):
             result['data'][0]['portal_type'],
             u'Document'
         )
+        self.assertEqual(
+            u'test_user_1_',
+            result['data'][0]['creator'],
+        )
+        self.assertEqual(
+            u'private',
+            result['data'][0]['review_state'],
+        )
+        self.assertTrue(result['data'][0]['expires'])
+        self.assertTrue(result['data'][0]['effective'])
+        self.assertTrue(result['data'][0]['created'])
+        self.assertTrue(result['data'][0]['modified'])
+        self.assertTrue(result['data'][0]['created'])
 
     def test_browser_search_view_suggest(self):
         self.portal.invokeFactory(

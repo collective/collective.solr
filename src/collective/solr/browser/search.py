@@ -41,8 +41,14 @@ class Search(PloneAppSearchBrowserView):
                         'id': x.id,
                         'portal_type': x.portal_type,
                         'title': x.Title,
-                        'description': x.get('description', u''),
+                        'description': x.description,
                         'url': x.getURL(),
+                        'expires': x.expires.ISO8601(),
+                        'effective': x.effective.ISO8601(),
+                        'created': x.created.ISO8601(),
+                        'modified': x.modified.ISO8601(),
+                        'creator': x.Creator,
+                        'review_state': x.review_state,
                     }
                     for x in solr_search.results()
                 ]
