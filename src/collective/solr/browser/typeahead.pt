@@ -118,7 +118,7 @@
         source: solrAutocompleteSearch
       });
 
-      var renderSearchResult = function(items){
+      var renderSearchResult = function(items) {
           console.log(items);
           var outputHTML = "";
           for (item_key in items.data){
@@ -148,16 +148,28 @@
               outputHTML += searchResult;
           }
           $(".searchResults").html(outputHTML);
-      };
 
+          // Suggestions
+          var SearchableText = $('#SearchableText').val();
+          if (items.suggestions) {
+            var suggestion_data = items.suggestions[SearchableText.toLowerCase()];
+            if (suggestion_data) {
+              if (suggestion_data["suggestion"].length > 0) {
+                var suggestion_term = suggestion_data["suggestion"][0];
+                var suggestion_url = '@@solr-typeahead?SearchableText=' + suggestion_term;
+                $( "#solr-suggestion").html(
+                  "<label>Meinten Sie:</label><a href='" + suggestion_url + "'>" + suggestion_term + "</a>"
+                );
+              }
+            }
+          };
+      };
 
       $('#solr-autocomplete form').submit(function(event) {
         event.preventDefault();
         var SearchableText = $('#SearchableText').val();
         var url = '@@search?format=json&SearchableText=' + SearchableText;
-        var SearchResults = [];
         $.getJSON(url, renderSearchResult);
-
       });
     });
 
@@ -178,6 +190,8 @@
       <input type="submit" value="Search" />
     </form>
   </div>
+
+  <div id="solr-suggestion"></div>
 
   <div class="row">
 
