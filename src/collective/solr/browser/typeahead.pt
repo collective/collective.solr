@@ -120,7 +120,7 @@
 
       $('#solr-autocomplete form').submit(function(event) {
         event.preventDefault();
-        var SearchableText = $('SearchableText').val();
+        var SearchableText = $('#SearchableText').val();
         var url = '@@search?format=json&SearchableText=' + SearchableText;
         var SearchResults = [];
         $.getJSON(url, function(data) {
@@ -132,7 +132,7 @@
             "class": "my-new-list",
             html: items.join( "" )
           }).appendTo( "#search-results dd" );
-        });)
+        });
 
       });
     });
@@ -148,6 +148,7 @@
              size="25"
              title="Search Website"
              value=""
+             autocomplete="off"
              placeholder="Search"
              />
       <input type="submit" value="Search" />
