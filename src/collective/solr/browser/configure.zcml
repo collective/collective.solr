@@ -45,12 +45,6 @@
 
   <browser:page
       for="*"
-      name="suggest-terms"
-      class=".suggest.SuggestView"
-      permission="zope2.View" />
-
-  <browser:page
-      for="*"
       name="solr-autocomplete"
       class=".search.AutocompleteView"
       permission="zope2.View" />
