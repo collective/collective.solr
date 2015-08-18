@@ -24,7 +24,6 @@ collective.solr - Solr integration for the Plone CMS
     :target: https://pypi.python.org/pypi/collective.solr/
     :alt: License
 
-
 .. contents::
     :depth: 1
 
