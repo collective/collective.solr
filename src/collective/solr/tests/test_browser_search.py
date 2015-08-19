@@ -19,6 +19,7 @@ class JsonSolrTests(unittest.TestCase):
         self.portal = self.layer['portal']
         self.request = self.layer['request']
         self.app = self.layer['app']
+        self.portal_url = self.portal.absolute_url()
         self.portal.REQUEST.RESPONSE.write = lambda x: x    # ignore output
         self.maintenance = \
             self.portal.unrestrictedTraverse('@@solr-maintenance')
@@ -51,7 +52,7 @@ class JsonSolrTests(unittest.TestCase):
             name="search"
         )
         view = view.__of__(self.portal)
-        self.assertEqual(json.loads(view())['data'], [])
+        self.assertEqual(json.loads(view())['member'], [])
 
     def test_search_view_with_format_json(self):
         self.request.set('format', 'json')
@@ -60,7 +61,7 @@ class JsonSolrTests(unittest.TestCase):
             name="search"
         )
         view = view.__of__(self.portal)
-        self.assertEqual(json.loads(view())['data'], [])
+        self.assertEqual(json.loads(view())['member'], [])
 
     def test_search_view_without_param(self):
         self.request.set('format', 'json')
@@ -70,7 +71,7 @@ class JsonSolrTests(unittest.TestCase):
         )
         view = view.__of__(self.portal)
         self.assertTrue(view())
-        self.assertEqual(json.loads(view())['data'], [])
+        self.assertEqual(json.loads(view())['member'], [])
 
     def test_search_view_with_empty_param(self):
         self.request.set('format', 'json')
@@ -81,7 +82,7 @@ class JsonSolrTests(unittest.TestCase):
         )
         view = view.__of__(self.portal)
         self.assertTrue(view())
-        self.assertEqual(json.loads(view())['data'], [])
+        self.assertEqual(json.loads(view())['member'], [])
 
     def test_search_view(self):
         self.portal.invokeFactory(
@@ -103,42 +104,96 @@ class JsonSolrTests(unittest.TestCase):
         result = json.loads(view())
 
         self.assertEqual(
-            len(result['data']),
+            len(result['member']),
             1
         )
         self.assertEqual(
-            result['data'][0]['id'],
+            result['member'][0]['id'],
             u'doc1',
         )
         self.assertEqual(
-            result['data'][0]['title'],
+            result['member'][0]['title'],
             u'My First Document',
         )
         self.assertEqual(
-            result['data'][0]['description'],
+            result['member'][0]['description'],
             u'This is my first document.',
         )
         self.assertEqual(
-            result['data'][0]['url'],
+            result['member'][0]['url'],
             u'{}/doc1'.format(self.portal.absolute_url())
         )
         self.assertEqual(
-            result['data'][0]['portal_type'],
+            result['member'][0]['portal_type'],
             u'Document'
         )
         self.assertEqual(
             u'test_user_1_',
-            result['data'][0]['creator'],
+            result['member'][0]['creator'],
         )
         self.assertEqual(
             u'private',
-            result['data'][0]['review_state'],
+            result['member'][0]['review_state'],
         )
-        self.assertTrue(result['data'][0]['expires'])
-        self.assertTrue(result['data'][0]['effective'])
-        self.assertTrue(result['data'][0]['created'])
-        self.assertTrue(result['data'][0]['modified'])
-        self.assertTrue(result['data'][0]['created'])
+        self.assertTrue(result['member'][0]['expires'])
+        self.assertTrue(result['member'][0]['effective'])
+        self.assertTrue(result['member'][0]['created'])
+        self.assertTrue(result['member'][0]['modified'])
+        self.assertTrue(result['member'][0]['created'])
+
+    def test_browser_search_batching(self):
+        for i in range(0, 23):
+            self.portal.invokeFactory(
+                'Document',
+                id='doc{}'.format(i),
+                title=u'Document {}'.format(i),
+            )
+        self.maintenance.reindex()
+        self.request.set('format', 'json')
+        self.request.set('SearchableText', 'Document')
+
+        view = getMultiAdapter(
+            (self.portal, self.request),
+            name="search"
+        )
+        view = view.__of__(self.portal)
+
+        result = json.loads(view())
+
+        self.assertEqual(
+            len(result['member']),
+            10
+        )
+
+        self.assertEqual(
+            10,
+            result['itemsPerPage']
+        )
+
+        self.assertEqual(
+            23,
+            result['totalItems']
+        )
+
+        self.assertEqual(
+            '{}/@@search?b_start:int=0'.format(self.portal_url),
+            result['firstPage']
+        )
+
+        self.assertEqual(
+            '{}/@@search?b_start:int=10'.format(self.portal_url),
+            result['nextPage']
+        )
+
+        self.assertEqual(
+            None,
+            result['previousPage']
+        )
+
+        self.assertEqual(
+            '{}/@@search?b_start:int=20'.format(self.portal_url),
+            result['lastPage']
+        )
 
     def test_browser_search_view_suggest(self):
         self.portal.invokeFactory(
@@ -158,7 +213,7 @@ class JsonSolrTests(unittest.TestCase):
         result = json.loads(view())
 
         self.assertEqual(
-            len(result['data']),
+            len(result['member']),
             0
         )
         self.assertTrue(result['suggestions'])
@@ -190,7 +245,7 @@ class JsonSolrTests(unittest.TestCase):
         result = json.loads(view())
 
         self.assertEqual(
-            len(result['data']),
+            len(result['member']),
             0
         )
 
@@ -225,14 +280,14 @@ class JsonSolrTests(unittest.TestCase):
         result = json.loads(view())
 
         self.assertEqual(
-            len(result['data']),
+            len(result['member']),
             2
         )
         self.assertTrue(
             'Colorless green ideas sleep furiously'
-            in [x.get('title') for x in result['data']]
+            in [x.get('title') for x in result['member']]
         )
         self.assertTrue(
             'Furiously sleep ideas green colorless'
-            in [x.get('title') for x in result['data']]
+            in [x.get('title') for x in result['member']]
         )

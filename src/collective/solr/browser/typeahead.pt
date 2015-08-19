@@ -121,8 +121,8 @@
       var renderSearchResult = function(items) {
           console.log(items);
           var outputHTML = "";
-          for (item_key in items.data){
-              var item = items.data[item_key];
+          for (item_key in items.member){
+              var item = items.member[item_key];
               var searchResult =
                 "<dt class='contenttype-" + item.portal_type.toLowerCase().replace(" ", "-") + "'>" +
                   "<a href='" + item.url + "' class='state-None'>" + item.title + "</a>" +
