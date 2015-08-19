@@ -150,6 +150,30 @@
             $(".searchResults").html(outputHTML);
 
             $('#search-results-number').html((items.data) ? items.data.length : 0);
+
+            renderSearchBatching(items.data.length, 0, 10);
+        };
+
+
+        var renderSearchBatching = function(count, position, batch_size){
+          var outputHTML = "";
+
+            outputHTML += '<span class="previous">Previous '+ batch_size +' items</span>';
+            outputHTML += '<span class="previous">Next '+ batch_size +' items</span>';
+
+            var count_of_batches = Math.ceil(count / batch_size);
+
+
+            for(var i = 1 ; i < count_of_batches ; i++){
+                if(i * batch_size == position + batch_size){
+                    outputHTML += '[<span>'+ i +'</span>]';
+                }
+                else{
+                    outputHTML += '<a href="#">' + i + '</a>';
+                }
+            }
+
+            $('.listingBar').html(outputHTML);
         };
 
 
@@ -193,10 +217,13 @@
             Artikel gefunden.
           </span>
         </div>
+      <div class="listingBar"></div>
       <div id="search-results">
         <dl class="searchResults">
         </dl>
       </div>
+
+      <div class="listingBar"></div>
 
     </div>
   </div>
