@@ -26,26 +26,56 @@ class Search(PloneAppSearchBrowserView):
                 'application/json; charset=utf-8'
             )
             SearchableText = self.request.get('SearchableText')
+            url = self.context.absolute_url()
             result = {
-                'data': [],
+                '@context': 'http://www.w3.org/ns/hydra/context.jsonld',
+                '@id': url,
+                '@type': 'PagedCollection',
+                'member': [],
                 'suggestions': [],
             }
             if SearchableText:
+                b_start = int(self.request.get('b_start', 0))
+                b_size = 10
                 solr_search = solrSearchResults(
                     SearchableText=SearchableText,
                     spellcheck='true',
                     use_solr='true',
+                    b_start=b_start,
+                    b_size=b_size,
                 )
-                result['data'] = [
+                result['member'] = [
                     {
+                        '@id': x.getURL(),
                         'id': x.id,
                         'portal_type': x.portal_type,
                         'title': x.Title,
-                        'description': x.get('description', u''),
+                        'description': x.description,
                         'url': x.getURL(),
+                        'expires': x.expires.ISO8601(),
+                        'effective': x.effective.ISO8601(),
+                        'created': x.created.ISO8601(),
+                        'modified': x.modified.ISO8601(),
+                        'creator': x.Creator,
+                        'review_state': x.review_state,
                     }
-                    for x in solr_search.results()
+                    for x in solr_search.results() if x is not None
                 ]
+                result['itemsPerPage'] = b_size
+                result['totalItems'] = solr_search.actual_result_count
+                result['firstPage'] = '{}/@@search?b_start:int={}'.format(
+                    url,
+                    b_start
+                )
+                result['nextPage'] = '{}/@@search?b_start:int={}'.format(
+                    url,
+                    (b_start + b_size)
+                )
+                result['previousPage'] = None
+                result['lastPage'] = '{}/@@search?b_start:int={}'.format(
+                    url,
+                    (solr_search.actual_result_count / 10) * b_size
+                )
                 if getattr(solr_search, 'spellcheck', False):
                     if solr_search.spellcheck.get('suggestions'):
                         result['suggestions'] = solr_search.spellcheck.get(
