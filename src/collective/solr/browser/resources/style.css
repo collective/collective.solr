@@ -69,7 +69,7 @@ body.template-search #content-core {
     text-align: center;
   }
 
-#solr-autocomplete input[type='submit'] {
+#solr-autocomplete #solr-submit {
   width: 150px;
   font-size: 2em;
   height: 36px;
@@ -79,6 +79,11 @@ body.template-search #content-core {
 .tt-menu,
 .gist {
   text-align: left;
+}
+
+.tt-menu.tt-open {
+  margin-top: 0px;
+  border-radius: 0px;
 }
 
 .typeahead,

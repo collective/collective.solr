@@ -62,20 +62,9 @@ class Search(PloneAppSearchBrowserView):
                     for x in solr_search.results() if x is not None
                 ]
                 result['itemsPerPage'] = b_size
+                result['startIndex'] = b_start
                 result['totalItems'] = solr_search.actual_result_count
-                result['firstPage'] = '{}/@@search?b_start:int={}'.format(
-                    url,
-                    b_start
-                )
-                result['nextPage'] = '{}/@@search?b_start:int={}'.format(
-                    url,
-                    (b_start + b_size)
-                )
-                result['previousPage'] = None
-                result['lastPage'] = '{}/@@search?b_start:int={}'.format(
-                    url,
-                    (solr_search.actual_result_count / 10) * b_size
-                )
+
                 if getattr(solr_search, 'spellcheck', False):
                     if solr_search.spellcheck.get('suggestions'):
                         result['suggestions'] = solr_search.spellcheck.get(

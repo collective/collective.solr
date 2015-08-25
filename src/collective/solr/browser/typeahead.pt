@@ -28,7 +28,7 @@
              autocomplete="off"
              placeholder="Search"
              />
-      <input type="submit" id="solr-submit" value="Search" />
+      <button id="solr-submit" value="Search">Search</button>
   </div>
 
   <div id="solr-suggestion"></div>
