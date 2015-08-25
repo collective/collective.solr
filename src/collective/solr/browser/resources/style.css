@@ -69,7 +69,7 @@ body.template-search #content-core {
     text-align: center;
   }
 
-#solr-autocomplete #solr-submit {
+#solr-submit {
   width: 150px;
   font-size: 2em;
   height: 36px;

@@ -125,9 +125,21 @@ var SolrTypeaheadSearch = function(){
         for (var i = 1 ; i < countOfBatches ; i++){
             var pageStartIndex = (i - 1) * items.itemsPerPage;
 
-            if(i == currentPageIndex)
-                outputHTML += '[<span>'+ i +'</span>]';
-            else
+            if (i == currentPageIndex) {
+                outputHTML += '[<span>' + i + '</span>]';
+                continue;
+            }
+
+            if (i == 2 && currentPageIndex - 3 >= 2) {
+                outputHTML += "<span>  ...  </span>";
+                continue;
+            }
+            if (i == countOfBatches - 2 && currentPageIndex + 3 <= countOfBatches - 2) {
+                outputHTML += "<span>  ...  </span>";
+                continue;
+            }
+
+            if (i == 1 || i == countOfBatches - 1 || (i - 3 < currentPageIndex && i + 3 > currentPageIndex))
                 outputHTML += "<a class='solr-batching' href='"
                    + '@@search?b_start:int=' + pageStartIndex +
                    '&format=json&SearchableText=' + $('#SearchableText').val() + "'>" + i + "</a>";
@@ -176,16 +188,16 @@ var SolrTypeaheadSearch = function(){
                 "<dd>" +
                   "<span class='discreet'>" +
                     "<span class='documentAuthor'>erstellt von " +
-                      "<a href='" + item.author_url + "'>" + item.author + "</a>" +
+                      "<a href='" + item.author_url + "'>" + item.creator + "</a>" +
                     "</span>" +
                     "<span>" +
                       "<span class='documentPublished'> - " +
                         "<span>Veröffentlicht </span>" +
-                          item.publish_date +
+                          item.effective +
                         "</span>" +
                         "<span class='documentModified'> - " +
                           "<span>zuletzt verändert: </span>" +
-                          item.last_modified +
+                          item.modified +
                         "</span>" +
                     "</span>" +
                   "</span>" +
