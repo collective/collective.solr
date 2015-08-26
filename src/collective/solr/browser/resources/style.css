@@ -65,15 +65,26 @@ body.template-search #content-core {
 }
 
 /* Typeahead */
-#solr-autocomplete {
+#solr-autocomplete,
+#solr-autocomplete-viewlet{
     text-align: center;
   }
 
-#solr-submit {
+#solr-autocomplete-viewlet{
+  margin: 10px 0 10px 0;
+}
+
+#solr-submit,
+#solr-submit-viewlet{
   width: 150px;
-  font-size: 2em;
+  font-size: 20px;
   height: 36px;
   vertical-align: top;
+}
+
+#solr-submit-viewlet{
+  display: inline-block;
+
 }
 
 .tt-menu,
@@ -157,9 +168,8 @@ body.template-search #content-core {
 
 .typeahead {
   height: 16px;
-  font-size: 1em !important;
+  font-size: 18px !important;
   border-radius: 0;
-
 }
 
 .tt-input {

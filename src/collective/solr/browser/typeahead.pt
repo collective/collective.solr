@@ -13,12 +13,8 @@
   <script type="text/javascript"
           src="http://cdn.bootcss.com/typeahead.js/0.11.1/typeahead.bundle.min.js"></script>
 
-  <script type="text/javascript" src="++resource++collective.solr.resources/scripts.js">
-
-  </script>
-
   <div id="solr-autocomplete">
-      <input class="searchPage typeahead"
+      <input class="typeahead"
              id="SearchableText"
              name="SearchableText"
              type="text"

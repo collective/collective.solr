@@ -12,15 +12,7 @@
 
 
 $(document).ready(function() {
-    var x = new SolrTypeaheadSearch();
-});
-
-
-var SolrTypeaheadSearch = function(){
-    var self = this;
-
-    //Init typeahead plugin
-    self.solrAutocompleteSearch = new Bloodhound({
+    var solrAutocompleteSearch = new Bloodhound({
         datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value'),
         queryTokenizer: Bloodhound.tokenizers.whitespace,
         remote: {
@@ -29,7 +21,45 @@ var SolrTypeaheadSearch = function(){
         }
     });
 
-    $('#solr-autocomplete .typeahead').typeahead(null, {
+    var x = new SolrTypeaheadSearch(solrAutocompleteSearch);
+    var y = new SolrTypeahedSearchViewlet(solrAutocompleteSearch);
+});
+
+
+var SolrTypeahedSearchViewlet = function(solrAutocompleteSearch){
+    var self = this;
+    self.solrAutocompleteSearch = solrAutocompleteSearch;
+
+    $('#SearchableTextViewlet').typeahead(null, {
+        name: 'autocomplete-search-viewlet',
+        display: 'value',
+        source: self.solrAutocompleteSearch
+    }).on('typeahead:selected', function(e){
+        $('#to-solr-page')[0].click();
+    });
+
+    $('#to-solr-page').click(function(){
+       var curHref = $(this).attr("href");
+       var SearchableText = $('#SearchableTextViewlet').val();
+       $(this).attr('href', curHref + SearchableText);
+    });
+
+    $('#SearchableTextViewlet').keypress(function (e) {
+        var key = e.which;
+        if(key == 13) {
+            $('#to-solr-page')[0].click();
+        }
+    });
+
+};
+
+var SolrTypeaheadSearch = function(solrAutocompleteSearch){
+    var self = this;
+
+    //Init typeahead plugin
+    self.solrAutocompleteSearch = solrAutocompleteSearch;
+
+    $('#SearchableText').typeahead(null, {
         name: 'autocomplete-search',
         display: 'value',
         source: self.solrAutocompleteSearch
@@ -45,11 +75,8 @@ var SolrTypeaheadSearch = function(){
         }
     });
 
-
-
     // Executes query to Solr
     self.query = function(url){
-        var SearchableText = $('#SearchableText').val();
         if (!url)
             url = self.buildURL(null);
         $.getJSON(url, self.renderSearchResult);
