@@ -75,6 +75,14 @@ var SolrTypeaheadSearch = function(solrAutocompleteSearch){
         }
     });
 
+    self.initinalize = function(){
+        var urlQuery = $('#solr-url-query').text();
+        if (urlQuery){
+            $('#SearchableText').typeahead('val', urlQuery);
+            self.query();
+        }
+    };
+
     // Executes query to Solr
     self.query = function(url){
         if (!url)
@@ -234,5 +242,7 @@ var SolrTypeaheadSearch = function(solrAutocompleteSearch){
           }
         return outputHTML;
     };
+
+    self.initinalize();
 
 };

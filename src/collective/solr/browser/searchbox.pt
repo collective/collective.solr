@@ -19,6 +19,9 @@
              autocomplete="off"
              placeholder="Search"
              />
-      <a id="to-solr-page" href="/site/solr-typeahead?SearchableText="><button id="solr-submit-viewlet" value="Search">Search</button></a>
+      <a id="to-solr-page"
+         tal:attributes="href string: ${context/absolute_url_path}/solr-typeahead?SearchableText= ">
+          <button id="solr-submit-viewlet" value="Search">Search</button>
+      </a>
   </div>
 </div>
