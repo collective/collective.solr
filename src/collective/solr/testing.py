@@ -13,13 +13,14 @@ from plone.app.testing import login
 from plone.app.testing import setRoles
 from plone.testing import Layer
 from plone.testing.z2 import installProduct
+from random import randint
 from time import sleep
 from zope.configuration import xmlconfig
-
 import os
+import subprocess
 import sys
 import urllib2
-import subprocess
+import socket
 
 BUILDOUT_DIR = os.path.join(os.getcwd(), '..', '..', 'bin')
 
@@ -37,9 +38,13 @@ class SolrLayer(Layer):
             name='Solr Layer',
             module=None,
             solr_host='localhost',
-            solr_port=8983,
+            solr_port='RANDOM',
             solr_base='/solr'):
+
         super(SolrLayer, self).__init__(bases, name, module)
+        if solr_port == 'RANDOM':
+            solr_port = self._find_available_solr_port()
+
         self.solr_host = solr_host
         self.solr_port = solr_port
         self.solr_base = solr_base
@@ -48,6 +53,18 @@ class SolrLayer(Layer):
             solr_port,
             solr_base
         )
+
+    def _find_available_solr_port(self):
+        for i in range(1 << 20):
+            random_port = randint(1024, (1 << 16) - 1)
+            try:
+                a_socket = socket.socket(socket.AF_INET)
+                a_socket.bind(('127.0.0.1', random_port))
+                return random_port
+            except socket.error:
+                continue
+            finally:
+                a_socket.close()
 
     def setUp(self):
         """Start Solr and poll until it is up and running.
