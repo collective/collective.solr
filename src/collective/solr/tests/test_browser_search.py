@@ -191,7 +191,7 @@ class JsonSolrTests(unittest.TestCase):
         )
 
         self.assertEqual(
-            '{}/@@search?b_start:int=20'.format(self.portal_url),
+            '{}/@@search?b_start:int=10'.format(self.portal_url),
             result['lastPage']
         )
 
