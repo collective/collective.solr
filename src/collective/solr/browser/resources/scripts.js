@@ -195,16 +195,21 @@ var SolrTypeaheadSearch = function(solrAutocompleteSearch){
                 var suggestionData = items.suggestions[key];
 
                 if (suggestionData &&
-                    suggestionData["suggestion"].length > 0 &&
-                    queryWithNoSuggestion.length > 1) {
-
+                    suggestionData["suggestion"].length > 0) {
                     var suggestion = suggestionData["suggestion"][0];
-                    outputHTML += "<span class='suggestion-title'>Meinten Sie: </span>" +
-                        "<span class='suggestion'>" +
-                          "<span class='pref'>" + queryWithNoSuggestion[0] + "</span>" +
-                          "<span class='sugg'>" + suggestion + "</span>" +
-                          "<span class='suff'>" + queryWithNoSuggestion[1] + "</span>" +
-                        "</span>";
+                    if (queryWithNoSuggestion.length == 2) {
+                        outputHTML += "<span class='suggestion-title'>Meinten Sie: </span>" +
+                            "<span class='suggestion'>" +
+                            "<span class='pref'>" + queryWithNoSuggestion[0] + "</span>" +
+                            "<span class='sugg'>" + suggestion + "</span>" +
+                            "<span class='suff'>" + queryWithNoSuggestion[1] + "</span>" +
+                            "</span>";
+                    }
+                    else
+                        outputHTML +="<span class='suggestion-title'>Meinten Sie: </span>" +
+                            "<span class='suggestion'>" +
+                            "<span class='sugg'>" + suggestion + "</span>" +
+                            "</span>";
                 }
         };
         return outputHTML;

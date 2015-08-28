@@ -16,6 +16,9 @@ from plone.testing.z2 import installProduct
 from time import sleep
 from zope.configuration import xmlconfig
 
+from plone.app.robotframework.testing import REMOTE_LIBRARY_BUNDLE_FIXTURE
+from plone.testing import z2
+
 import os
 import sys
 import urllib2
@@ -168,6 +171,26 @@ class LegacyCollectiveSolrLayer(CollectiveSolrLayer):
 LEGACY_COLLECTIVE_SOLR_FIXTURE = LegacyCollectiveSolrLayer()
 
 
+class RobotLegacyCollectiveSolrLayer(LegacyCollectiveSolrLayer):
+
+    def setUpPloneSite(self, portal):
+        super(RobotLegacyCollectiveSolrLayer, self).setUpPloneSite(portal)
+        acl_users = getToolByName(portal, 'acl_users')
+        acl_users.userFolderAddUser('user2', 'secret', ['Manager'], [])
+        login(portal, 'user2')
+        wfAction = portal.portal_workflow.doActionFor
+        for i in xrange(1, 23):
+            portal.invokeFactory(
+                'Document',
+                id='some-page-' + str(i),
+                title='Welcome to Plone')
+            wfAction(portal['some-page-' + str(i)], 'publish')
+        activateAndReindex(portal)
+
+
+ROBOT_LEGACY_COLLECTIVE_SOLR_LAYER = RobotLegacyCollectiveSolrLayer()
+
+
 def activateAndReindex(portal):
     """ activate solr indexing and reindex the existing content """
     activate()
@@ -190,4 +213,13 @@ COLLECTIVE_SOLR_INTEGRATION_TESTING = IntegrationTesting(
 COLLECTIVE_SOLR_FUNCTIONAL_TESTING = FunctionalTesting(
     bases=(LEGACY_COLLECTIVE_SOLR_FIXTURE,),
     name="CollectiveSolr:Functional"
+)
+
+COLLECTIVE_SOLR_ACCEPTANCE_TESTING = FunctionalTesting(
+    bases=(
+        ROBOT_LEGACY_COLLECTIVE_SOLR_LAYER,
+        REMOTE_LIBRARY_BUNDLE_FIXTURE,
+        z2.ZSERVER_FIXTURE
+    ),
+    name='CollectiveSolr:AcceptanceTesting'
 )
