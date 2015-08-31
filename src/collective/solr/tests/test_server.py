@@ -409,6 +409,8 @@ class SolrServerTests(TestCase):
         fields.remove('default')
         # remove field not defined for a folder
         fields.remove('getRemoteUrl')
+        # remove field which is only for some form of better accid
+        fields.remove('_version_')
         proc = SolrIndexProcessor(manager)
         # without explicit attributes all data should be returned
         data, missing = proc.getData(self.folder)
