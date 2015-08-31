@@ -68,11 +68,18 @@
          provides="plone.app.layout.icons.interfaces.IContentIcon" />
 
   <adapter factory=".configlet.SolrControlPanelAdapter" />
+  <adapter factory=".configlet.TypeaheadSearchControlPanelAdapter" />
 
   <browser:page
       name="solr-controlpanel"
       for="Products.CMFPlone.interfaces.IPloneSiteRoot"
       class=".configlet.SolrControlPanel"
+      permission="cmf.ManagePortal" />
+
+  <browser:page
+      name="typeahead-search-controlpanel"
+      for="Products.CMFPlone.interfaces.IPloneSiteRoot"
+      class=".configlet.TypeaheadSearchControlPanel"
       permission="cmf.ManagePortal" />
 
   <utility

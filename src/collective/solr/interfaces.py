@@ -7,6 +7,7 @@ from zope.schema import Int
 from zope.schema import List
 from zope.schema import Text
 from zope.schema import TextLine
+from zope.schema import Choice
 from zope.schema.interfaces import IVocabularyFactory
 
 from collective.solr import SolrMessageFactory as _
@@ -395,3 +396,15 @@ class ICheckIndexable(Interface):
     def __call__():
         """ Return `True`, if context is indexable and `False`otherwise
         """
+
+class ITypeaheadSearchSchema(Interface):
+
+    results_page_mode = Choice(
+        title=_(u'Results page view mode'),
+        description=_(u'Select view mode of typeahead search results page'),
+        values=['Batching', 'InfiniteScroll']
+    )
+
+
+class ITypeaheadSearchConfig(ITypeaheadSearchSchema):
+    """ utility to hold the typeahead search configuration """

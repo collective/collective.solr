@@ -21,10 +21,14 @@ $(document).ready(function() {
         }
     });
 
-    var x = new SolrTypeaheadSearch(solrAutocompleteSearch);
+    var x = new SolrTypeaheadSearchBatching(solrAutocompleteSearch);
+    var z = new SolrTypeaheadSearchIScroll(solrAutocompleteSearch);
     var y = new SolrTypeahedSearchViewlet(solrAutocompleteSearch);
 });
 
+
+var LOADING_SPINNER = '<div class="spinner"><div class="bounce1"></div>' +
+    '<div class="bounce2"></div><div class="bounce3"></div></div>';
 
 var SolrTypeahedSearchViewlet = function(solrAutocompleteSearch){
     var self = this;
@@ -53,7 +57,8 @@ var SolrTypeahedSearchViewlet = function(solrAutocompleteSearch){
 
 };
 
-var SolrTypeaheadSearch = function(solrAutocompleteSearch){
+
+var SolrTypeaheadSearchBatching = function(solrAutocompleteSearch){
     var self = this;
 
     //Init typeahead plugin
@@ -244,6 +249,196 @@ var SolrTypeaheadSearch = function(solrAutocompleteSearch){
                 "</dd>";
               outputHTML += searchResult;
           }
+        return outputHTML;
+    };
+
+    self.initinalize();
+
+};
+
+
+var SolrTypeaheadSearchIScroll = function(solrAutocompleteSearch){
+    var self = this;
+
+    //Init typeahead plugin
+    self.solrAutocompleteSearch = solrAutocompleteSearch;
+
+    $('#SearchableTextIScroll').typeahead(null, {
+        name: 'autocomplete-search-iscroll',
+        display: 'value',
+        source: self.solrAutocompleteSearch
+    }).on('typeahead:selected', function(e){
+        self.query(null, true);
+    });
+
+    $('#SearchableTextIScroll').keypress(function (e) {
+        var key = e.which;
+        if(key == 13) {
+            $('#solr-submit').focus();
+            self.query(null, true);
+        }
+    });
+
+    self.initinalize = function(){
+        var urlQuery = $('#solr-url-query').text();
+        if (urlQuery){
+            $('#SearchableTextIScroll').typeahead('val', urlQuery);
+            self.query(null, true);
+        }
+    };
+
+    // Executes query to Solr
+    self.query = function(url, isNewQuery){
+        $('#iscroll-next-container').html(LOADING_SPINNER);
+
+        if (!url)
+            url = self.buildURL(null);
+        $.getJSON(url).then(function(data){
+            self.renderSearchResult(data, isNewQuery)
+        });
+    };
+
+    // Builds url for query
+    self.buildURL = function(startIndex){
+        var SearchableText = $('#SearchableTextIScroll').val();
+        var url = '@@search?format=json&SearchableText=' + SearchableText;
+
+        if (startIndex)
+            url += '&b_start:int=' + startIndex;
+
+        return url;
+    };
+
+    $('#solr-submit-iscroll').click(function(event) {
+        self.query(null, true);
+    });
+
+    // Renders search page based on results
+    self.renderSearchResult = function(items, isNewQuery) {
+        if (isNewQuery)
+            $(".searchResults").html("");
+        $(".searchResults").append(self.getResultsListHTML(items));
+
+        if ($(document).height() < $(window).height()){
+            var nextPageStart = items.startIndex + items.itemsPerPage;
+            if (nextPageStart < items.totalItems)
+                self.query(self.buildURL(nextPageStart), false);
+        }
+
+        $(window).off("scroll").scroll(function(){
+            if($(window).scrollTop() == $(document).height() - $(window).height()) {
+                var nextPageStart = items.startIndex + items.itemsPerPage;
+                if (nextPageStart < items.totalItems)
+                    self.query(self.buildURL(nextPageStart), false);
+            }
+        });
+
+        $('#iscroll-next-container').html(self.getNextButtonHTML(items));
+
+        $('#iscroll-next').click(function(event){
+           event.preventDefault();
+           var url = $(this).attr('href');
+           self.query(url, false);
+        });
+
+        $('#iscroll-to-top').click(function(event){
+           event.preventDefault();
+           $("html, body").animate({ scrollTop: 0 }, 400);
+        });
+
+        if (!isNewQuery)
+            return;
+
+
+        $('#search-results-number').html(items.totalItems);
+        $( "#solr-suggestion").html(self.getSuggestionsHTML(items));
+
+        // After render events binding
+        $('.suggestion').click(function(event){
+            var searchText = "";
+            $(this).find("span").each(function(){
+                searchText += $(this).text();
+            });
+            $('#SearchableTextIScroll').val(searchText);
+            self.query(null, true);
+        });
+
+    };
+
+    // Creates suggestions html
+    self.getSuggestionsHTML = function(items){
+        var SearchableText = $('#SearchableText').val();
+
+        var outputHTML = "";
+
+        if (items.suggestions) {
+            for (var key in items.suggestions)
+                var queryWithNoSuggestion = SearchableText.toLowerCase().split(key);
+                var suggestionData = items.suggestions[key];
+
+                if (suggestionData &&
+                    suggestionData["suggestion"].length > 0) {
+                    var suggestion = suggestionData["suggestion"][0];
+                    if (queryWithNoSuggestion.length == 2) {
+                        outputHTML += "<span class='suggestion-title'>Meinten Sie: </span>" +
+                            "<span class='suggestion'>" +
+                            "<span class='pref'>" + queryWithNoSuggestion[0] + "</span>" +
+                            "<span class='sugg'>" + suggestion + "</span>" +
+                            "<span class='suff'>" + queryWithNoSuggestion[1] + "</span>" +
+                            "</span>";
+                    }
+                    else
+                        outputHTML +="<span class='suggestion-title'>Meinten Sie: </span>" +
+                            "<span class='suggestion'>" +
+                            "<span class='sugg'>" + suggestion + "</span>" +
+                            "</span>";
+                }
+        };
+        return outputHTML;
+    };
+
+    // Creates results list HTML
+    self.getResultsListHTML = function(items){
+        var outputHTML = "";
+        for (item_key in items.member){
+          var item = items.member[item_key];
+          var searchResult =
+                "<dt class='contenttype-" + item.portal_type.toLowerCase().replace(" ", "-") + "'>" +
+                  "<a href='" + item.url + "' class='state-None'>" + item.title + "</a>" +
+                "</dt>" +
+                "<dd>" +
+                  "<span class='discreet'>" +
+                    "<span class='documentAuthor'>erstellt von " +
+                      "<a href='" + item.author_url + "'>" + item.creator + "</a>" +
+                    "</span>" +
+                    "<span>" +
+                      "<span class='documentPublished'> - " +
+                        "<span>Veröffentlicht </span>" +
+                          item.effective +
+                        "</span>" +
+                        "<span class='documentModified'> - " +
+                          "<span>zuletzt verändert: </span>" +
+                          item.modified +
+                        "</span>" +
+                    "</span>" +
+                  "</span>" +
+                  "<div>" + item.description + "</div>" +
+                "</dd>";
+              outputHTML += searchResult;
+          }
+        return outputHTML;
+    };
+
+    self.getNextButtonHTML = function(items){
+        var outputHTML = "";
+        if (items.startIndex + items.itemsPerPage < items.totalItems)
+            outputHTML += "<a id='iscroll-next' href='" +
+                self.buildURL(items.startIndex + items.itemsPerPage) +
+                "'>Next 10 items</a>"
+        else if ($(document).height() > $(window).height())
+            outputHTML += "<a id='iscroll-to-top' href='#'>To The Top</a>";
+
+
         return outputHTML;
     };
 

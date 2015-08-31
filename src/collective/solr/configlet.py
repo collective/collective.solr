@@ -9,7 +9,8 @@ from plone.app.controlpanel.form import ControlPanelForm
 from collective.solr.interfaces import ISolrSchema, _
 from collective.solr.interfaces import ISolrConnectionConfig
 from collective.solr.interfaces import ISolrConnectionManager
-
+from collective.solr.interfaces import ITypeaheadSearchSchema
+from collective.solr.interfaces import ITypeaheadSearchConfig
 
 class SolrControlPanelAdapter(SchemaAdapterBase):
     adapts(IPloneSiteRoot)
@@ -291,3 +292,30 @@ class SolrControlPanel(ControlPanelForm):
         'help_solr_settings',
         default='Settings to enable and configure Solr integration.')
     form_name = _('label_solr_settings', default='Solr settings')
+
+
+class TypeaheadSearchControlPanelAdapter(SchemaAdapterBase):
+    adapts(IPloneSiteRoot)
+    implements(ITypeaheadSearchSchema)
+
+    def getResultsPageMode(self):
+        util = queryUtility(ITypeaheadSearchConfig)
+        return getattr(util, 'results_page_mode', '')
+
+    def setResultsPageMode(self, value):
+        util = queryUtility(ITypeaheadSearchConfig)
+        if util is not None:
+            util.results_page_mode = value
+
+    results_page_mode = property(getResultsPageMode, setResultsPageMode)
+
+
+class TypeaheadSearchControlPanel(ControlPanelForm):
+
+    form_fields = FormFields(ITypeaheadSearchSchema)
+
+    label = _('label_typeahead_search_settings', default='Typeahead search settings')
+    description = _(
+        'help_typeahead_search_settings',
+        default='Settings to configure typeahead search.')
+    form_name = _('label_typeahead_search_settings', default='Typeahead search settings')

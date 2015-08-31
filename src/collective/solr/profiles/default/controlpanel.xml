@@ -13,4 +13,18 @@
     i18n:attributes="title">
      <permission>Manage portal</permission>
   </configlet>
+
+  <configlet
+    title="Typeahead Search Settings"
+    action_id="TypeaheadSearchSettings"
+    appId="TypeaheadSearchSettings"
+    category="Products"
+    condition_expr=""
+    icon_expr="string:${portal_url}/++resource++collective.solr.images/icon.png"
+    url_expr="string:${portal_url}/@@typeahead-search-controlpanel"
+    visible="True"
+    i18n:attributes="title">
+     <permission>Manage portal</permission>
+  </configlet>
+
 </object>

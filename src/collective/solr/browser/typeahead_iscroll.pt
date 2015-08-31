@@ -1,0 +1,59 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"
+    xmlns:tal="http://xml.zope.org/namespaces/tal"
+    xmlns:metal="http://xml.zope.org/namespaces/metal"
+    xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+    lang="en"
+    metal:use-macro="context/main_template/macros/master"
+    i18n:domain="collective.solr">
+<body>
+
+<metal:content fill-slot="content">
+<div id="content">
+
+  <script type="text/javascript"
+          src="http://cdn.bootcss.com/typeahead.js/0.11.1/typeahead.bundle.min.js"></script>
+
+  <span tal:content="python: request.get(str('SearchableText'))"
+        style="display: none;"
+        id="solr-url-query">
+  </span>
+  <div id="solr-autocomplete">
+      <input class="typeahead"
+             id="SearchableTextIScroll"
+             name="SearchableTextIScroll"
+             type="text"
+             size="25"
+             title="Search Website"
+             value=""
+             autocomplete="off"
+             placeholder="Search"
+             />
+      <button id="solr-submit-iscroll" value="Search">Search</button>
+
+  </div>
+
+  <div class="row">
+    <div id="solr-suggestion"></div>
+    <div class="width-full">
+      <h1 class="documentFirstHeading">IScroll Search Results</h1>
+    </div>
+    <div class="visualClear"></div>
+    <div id="search-results-bar">
+        <span>
+          <strong id="search-results-number">0</strong>
+          Artikel gefunden.
+        </span>
+      </div>
+    <div id="search-results" style="display: block;">
+      <dl class="searchResults">
+      </dl>
+      <div id="iscroll-next-container"></div>
+    </div>
+
+
+  </div>
+</div>
+</metal:content>
+
+</body>
+</html>

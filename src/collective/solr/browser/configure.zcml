@@ -63,7 +63,7 @@
   <browser:page
       name="solr-typeahead"
       for="*"
-      template="typeahead.pt"
+      class=".typeahead.SearchTypeahead"
       permission="zope2.Public"
       />
 
