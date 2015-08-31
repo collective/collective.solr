@@ -16,8 +16,9 @@ active without *having* it active.
     False
     >>> config.host
     '127.0.0.1'
-    >>> config.port
-    8983
+    >>> random_port = config.port
+    >>> 1024 < random_port < 2<<16
+    True
     >>> config.base
     '/solr'
     >>> config.async
@@ -191,7 +192,7 @@ parameters from the complete list of Solr indexes, provided that we use the
 correct host and port:
 
     >>> browser.getControl(name='form.host').value = '127.0.0.1'
-    >>> browser.getControl(name='form.port').value = '8983'
+    >>> browser.getControl(name='form.port').value = str(random_port)
     >>> browser.getControl(name="form.actions.save").click()
 
     >>> browser.getControl(name='form.filter_queries.add').click()

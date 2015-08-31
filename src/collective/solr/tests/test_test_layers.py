@@ -7,16 +7,16 @@ import socket
 class TestLayerTests(TestCase):
 
     expected_random_values = [
-        5485,
-        29409,
-        10547,
-        21141,
-        28218,
-        3939,
-        22352,
-        20724,
-        19392,
-        9443]
+        10090,
+        58709,
+        20377,
+        41907,
+        56288,
+        6948,
+        44367,
+        41059,
+        38351,
+        18133]
 
     def testRandomPorts(self):
         random.seed('Reproducable randomness')

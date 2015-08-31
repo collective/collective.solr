@@ -70,7 +70,7 @@ class SolrLayer(Layer):
         """Start Solr and poll until it is up and running.
         """
         self.proc = subprocess.call(
-            './solr-instance start',
+            './solr-instance start -Djetty.port={0}'.format(self.solr_port),
             shell=True,
             close_fds=True,
             cwd=BUILDOUT_DIR
@@ -94,6 +94,7 @@ class SolrLayer(Layer):
                     cwd=BUILDOUT_DIR
                 )
                 sys.stdout.write('Solr Instance could not be started !!!')
+                raise Exception("Unable to start solr")
 
     def tearDown(self):
         """Stop Solr.
@@ -121,17 +122,14 @@ class CollectiveSolrLayer(PloneSandboxLayer, SolrLayer):
             module=None,
             solr_active=False,
             solr_host='localhost',
-            solr_port=8983,
+            solr_port='RANDOM',
             solr_base='/solr'):
         super(CollectiveSolrLayer, self).__init__(bases, name, module)
         self.solr_active = solr_active
-        self.solr_host = solr_host
-        self.solr_port = solr_port
-        self.solr_base = solr_base
         self.solr_url = 'http://{0}:{1}{2}'.format(
-            solr_host,
-            solr_port,
-            solr_base
+            self.solr_host,
+            self.solr_port,
+            self.solr_base
         )
 
     def setUp(self):
@@ -165,7 +163,7 @@ class CollectiveSolrLayer(PloneSandboxLayer, SolrLayer):
     def tearDownPloneSite(self, portal):
         solr_settings = SolrControlPanelAdapter(portal)
         solr_settings.setActive(False)
-        solr_settings.setPort(8983)
+        solr_settings.setPort(self.solr_port)
         solr_settings.setBase('/solr')
 
 
