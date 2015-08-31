@@ -21,7 +21,7 @@
 #
 # ============================================================================
 
-*** Settings *****************************************************************
+*** Settings ***
 
 Resource  plone/app/robotframework/selenium.robot
 Resource  plone/app/robotframework/keywords.robot
@@ -31,7 +31,7 @@ Library  Remote  ${PLONE_URL}/RobotRemote
 Test Setup  Open test browser
 Test Teardown  Close all browsers
 
-*** Keywords *****************************************************************
+*** Keywords ***
 
 # --- Given ------------------------------------------------------------------
 
@@ -58,14 +58,14 @@ I press submit button
 
 # --- THEN -------------------------------------------------------------------
 
-Then I see solr typeahead search page with results by full query
+I see solr typeahead search page with results by full query
   Location should be  ${PLONE_URL}/solr-typeahead?SearchableText=Welcome%20to%20Plone
   Wait until page contains element  xpath=//input[@id='SearchableText' and @class="typeahead tt-input"]
   Textfield value should be  xpath=//input[@id='SearchableText' and @class="typeahead tt-input"]  Welcome to Plone
 
 # --- THEN -------------------------------------------------------------------
 
-Then I see solr typeahead search page with results by short query
+I see solr typeahead search page with results by short query
   Location should be  ${PLONE_URL}/solr-typeahead?SearchableText=Welcom
   Wait until page contains element  xpath=//input[@id='SearchableText' and @class="typeahead tt-input"]
   Textfield value should be  xpath=//input[@id='SearchableText' and @class="typeahead tt-input"]  Welcom
@@ -75,7 +75,7 @@ Then I see solr typeahead search page with results by short query
 I press on autocomplete suggestion
   Click element  css=div.tt-suggestion.tt-selectable
 
-*** Test Cases ***************************************************************
+*** Test Cases ***
 
 Scenario: As user I want to use solr typeahead viewlet to search for something and select autocomplete suggestion
   [Documentation]  Example of a BDD-style (Behavior-driven development) test.

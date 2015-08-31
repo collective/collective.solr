@@ -21,7 +21,7 @@
 #
 # ============================================================================
 
-*** Settings *****************************************************************
+*** Settings ***
 
 Resource  plone/app/robotframework/selenium.robot
 Resource  plone/app/robotframework/keywords.robot
@@ -31,11 +31,12 @@ Library  Remote  ${PLONE_URL}/RobotRemote
 Test Setup  Open test browser
 Test Teardown  Close all browsers
 
-*** Keywords *****************************************************************
+*** Keywords ***
 
 # --- Given ------------------------------------------------------------------
 
 a solr typeahead page
+  Set Selenium Speed  .1 seconds
   Go To  ${PLONE_URL}/solr-typeahead
   Wait until page contains element  xpath=//input[@id='SearchableText' and @class="typeahead tt-input"]
   Element should contain  id=search-results-number  0
@@ -58,7 +59,7 @@ I press submit button
 
 # --- THEN -------------------------------------------------------------------
 
-Then I see results by short query
+I see results by short query
   Location should be  ${PLONE_URL}/solr-typeahead
   Wait until page contains element  xpath=//input[@id='SearchableText' and @class="typeahead tt-input"]
   Textfield value should be  xpath=//input[@id='SearchableText' and @class="typeahead tt-input"]  Welcom
@@ -69,12 +70,78 @@ Then I see results by short query
 
   Page should contain  Next 10 items
   Page should contain  [1]
-  Page should contain element xpath=//a[@class="solr-batching" and @text()="2"]
+  Page should contain element  xpath=//a[@class="solr-batching" and contains(text(),'2')]
+  Page should contain element  xpath=//a[@class="solr-batching" and contains(text(),'3')]
+  Xpath Should Match X Times  //dt[@class="contenttype-document"]  10
 
-  Wait until page contains element  div.qqq
+# --- WHEN -------------------------------------------------------------------
 
+I press on suggestion text
+  Click element  css=span.suggestion
 
-*** Test Cases ***************************************************************
+# --- THEN -------------------------------------------------------------------
+
+I see suggestion in search field
+  Textfield value should be  xpath=//input[@id='SearchableText' and @class="typeahead tt-input"]  welcome
+
+# --- WHEN -------------------------------------------------------------------
+
+I click on next 10 items button
+  Click element  xpath=//a[contains(text(), 'Next 10 items')]
+
+# --- THEN -------------------------------------------------------------------
+
+I see second page with elements
+  Page should contain  Next 10 items
+  Page should contain  Previous 10 items
+  Page should contain  [2]
+  Page should contain element  xpath=//a[@class="solr-batching" and contains(text(),'1')]
+  Page should contain element  xpath=//a[@class="solr-batching" and contains(text(),'3')]
+  Textfield value should be  xpath=//input[@id='SearchableText' and @class="typeahead tt-input"]  welcome
+
+  Xpath Should Match X Times  //dt[@class="contenttype-document"]  10
+
+# --- WHEN -------------------------------------------------------------------
+
+I click on previous 10 items button
+  Click element  xpath=//a[contains(text(), 'Previous 10 items')]
+
+# --- THEN -------------------------------------------------------------------
+
+I see first page with elements
+  Page should contain  Next 10 items
+  Page should not contain  Previous 10 items
+  Page should contain  [1]
+  Page should contain element  xpath=//a[@class="solr-batching" and contains(text(),'2')]
+  Page should contain element  xpath=//a[@class="solr-batching" and contains(text(),'3')]
+  Textfield value should be  xpath=//input[@id='SearchableText' and @class="typeahead tt-input"]  welcome
+
+  Xpath Should Match X Times  //dt[@class="contenttype-document"]  10
+
+# --- WHEN -------------------------------------------------------------------
+
+I click on the last page button
+  Click element  xpath=//a[@class="solr-batching" and contains(text(),'3')]
+
+# --- THEN -------------------------------------------------------------------
+
+I see third (last) page with elements
+  Page should not contain  Next 10 items
+  Page should contain  Previous 10 items
+  Page should contain  [3]
+  Page should contain element  xpath=//a[@class="solr-batching" and contains(text(),'1')]
+  Page should contain element  xpath=//a[@class="solr-batching" and contains(text(),'2')]
+  Textfield value should be  xpath=//input[@id='SearchableText' and @class="typeahead tt-input"]  welcome
+
+  Xpath Should Match X Times  //dt[@class="contenttype-document"]  3
+
+# --- THEN -------------------------------------------------------------------
+
+I can check results finally
+  Xpath Should Match X Times  //a[@class="state-None" and contains(text(), 'Welcome to Plone')]  3
+  Xpath Should Match X Times  //a[contains(text(), 'user2')]  3
+
+*** Test Cases ***
 
 Scenario: As user I want to use solr typeahead viewlet to search for something and select autocomplete suggestion
   [Documentation]  Example of a BDD-style (Behavior-driven development) test.
@@ -83,7 +150,12 @@ Scenario: As user I want to use solr typeahead viewlet to search for something a
     Then I see autocomplete suggestion
     When I press submit button
     Then I see results by short query
-
-
-
-
+    When I press on suggestion text
+    Then I see suggestion in search field
+    When I click on next 10 items button
+    Then I see second page with elements
+    When I click on previous 10 items button
+    Then I see first page with elements
+    When I click on the last page button
+    Then I see third (last) page with elements
+    Then I can check results finally

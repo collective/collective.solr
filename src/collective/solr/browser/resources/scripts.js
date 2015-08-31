@@ -218,7 +218,6 @@ var SolrTypeaheadSearch = function(solrAutocompleteSearch){
     // Creates results list HTML
     self.getResultsListHTML = function(items){
         var outputHTML = "";
-        console.log(items);
         for (item_key in items.member){
           var item = items.member[item_key];
           var searchResult =
