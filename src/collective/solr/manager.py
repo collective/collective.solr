@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from collective.solr.interfaces import ISolrConnectionConfig
 from collective.solr.interfaces import ISolrConnectionManager
+from collective.solr.interfaces import ITypeaheadSearchConfig
 from collective.solr.interfaces import IZCMLSolrConnectionConfig
 from collective.solr.local import getLocal
 from collective.solr.local import setLocal
@@ -60,6 +61,17 @@ class SolrConnectionConfig(BaseSolrConnectionConfig, Persistent):
     def getId(self):
         """ return a unique id to be used with GenericSetup """
         return 'solr'
+
+
+class TypeaheadSearchConfig(object):
+    implements(ITypeaheadSearchConfig)
+
+    results_page_mode = u'Batching'
+
+    def getId(self):
+        """ return a unique id to be used with GenericSetup
+        """
+        return 'typeahead_search'
 
 
 class ZCMLSolrConnectionConfig(object):

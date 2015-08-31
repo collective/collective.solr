@@ -402,7 +402,7 @@ class ITypeaheadSearchSchema(Interface):
     results_page_mode = Choice(
         title=_(u'Results page view mode'),
         description=_(u'Select view mode of typeahead search results page'),
-        values=['Batching', 'InfiniteScroll']
+        values=[u'Batching', u'InfiniteScroll']
     )
 
 
