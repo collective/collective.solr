@@ -96,8 +96,6 @@ class SolrLayer(Layer):
                     raise Exception("Solr is not configured correctly. "
                                     "If you are using a multicore setup, "
                                     "refer to the documentation")
-                if getattr(http_error, 'code', 200) == 500:
-                    import pdb;pdb.set_trace()
                 sleep(3)
                 sys.stdout.write('.')
             if i == 9:
