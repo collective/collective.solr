@@ -262,6 +262,8 @@ var SolrTypeaheadSearchIScroll = function(solrAutocompleteSearch){
 
     //Init typeahead plugin
     self.solrAutocompleteSearch = solrAutocompleteSearch;
+    self.busy = false;
+
 
     $('#SearchableTextIScroll').typeahead(null, {
         name: 'autocomplete-search-iscroll',
@@ -289,6 +291,7 @@ var SolrTypeaheadSearchIScroll = function(solrAutocompleteSearch){
 
     // Executes query to Solr
     self.query = function(url, isNewQuery){
+        self.busy = true;
         $('#iscroll-next-container').html(LOADING_SPINNER);
 
         if (!url)
@@ -324,9 +327,10 @@ var SolrTypeaheadSearchIScroll = function(solrAutocompleteSearch){
             if (nextPageStart < items.totalItems)
                 self.query(self.buildURL(nextPageStart), false);
         }
+        self.busy = false;
 
         $(window).off("scroll").scroll(function(){
-            if($(window).scrollTop() == $(document).height() - $(window).height()) {
+            if($(window).scrollTop() == $(document).height() - $(window).height() && !self.busy) {
                 var nextPageStart = items.startIndex + items.itemsPerPage;
                 if (nextPageStart < items.totalItems)
                     self.query(self.buildURL(nextPageStart), false);
@@ -367,7 +371,7 @@ var SolrTypeaheadSearchIScroll = function(solrAutocompleteSearch){
 
     // Creates suggestions html
     self.getSuggestionsHTML = function(items){
-        var SearchableText = $('#SearchableText').val();
+        var SearchableText = $('#SearchableTextIScroll').val();
 
         var outputHTML = "";
 

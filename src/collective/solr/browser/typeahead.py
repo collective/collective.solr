@@ -1,7 +1,11 @@
 __author__ = 'tamm'
 
+from collective.solr.interfaces import ITypeaheadSearchConfig
+
 from Products.Five import BrowserView
 from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
+
+from zope.component import queryUtility
 
 
 class SearchTypeahead(BrowserView):
@@ -12,6 +16,10 @@ class SearchTypeahead(BrowserView):
     BATCHING = False
 
     def __call__(self, *args, **kwargs):
-        if self.BATCHING:
+        self.config = queryUtility(ITypeaheadSearchConfig)
+
+        if self.config.results_page_mode == u'Batching':
             return self.batching_template()
-        return self.iscroll_template()
+
+        if self.config.results_page_mode == u'InfiniteScroll':
+            return self.iscroll_template()
