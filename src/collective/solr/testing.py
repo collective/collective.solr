@@ -31,6 +31,7 @@ class SolrLayer(Layer):
        fire up Plone.
     """
     proc = None
+    admin_ping_url = None
 
     def __init__(
             self,
@@ -76,14 +77,27 @@ class SolrLayer(Layer):
             cwd=BUILDOUT_DIR
         )
         # Poll Solr until it is up and running
-        solr_ping_url = '{0}/admin/ping'.format(self.solr_url)
+        if self.admin_ping_url:
+            solr_ping_url = self.admin_ping_url
+        else:
+            solr_ping_url = '{0}/admin/ping'.format(self.solr_url)
+
+        http_error = None
         for i in range(1, 10):
             try:
                 result = urllib2.urlopen(solr_ping_url)
                 if result.code == 200:
                     if '<str name="status">OK</str>' in result.read():
+                        os.environ['SOLR_HOST'] = '{0}:{1}'.format(
+                            self.solr_host, self.solr_port)
                         break
-            except urllib2.URLError:
+            except urllib2.URLError, http_error:
+                if getattr(http_error, 'code', 200) == 404:
+                    raise Exception("Solr is not configured correctly. "
+                                    "If you are using a multicore setup, "
+                                    "refer to the documentation")
+                if getattr(http_error, 'code', 200) == 500:
+                    import pdb;pdb.set_trace()
                 sleep(3)
                 sys.stdout.write('.')
             if i == 9:
@@ -94,7 +108,7 @@ class SolrLayer(Layer):
                     cwd=BUILDOUT_DIR
                 )
                 sys.stdout.write('Solr Instance could not be started !!!')
-                raise Exception("Unable to start solr")
+                raise Exception("Unable to start solr", http_error)
 
     def tearDown(self):
         """Stop Solr.
