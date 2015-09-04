@@ -180,7 +180,8 @@ class ISolrSchema(Interface):
             default=u'Specify a threshold (in milliseconds) after which '
                     u'queries are considered to be slow causing them to '
                     u'be logged. Set to "0" to prevent any logging.'
-        )
+        ),
+        default=0,
     )
 
     effective_steps = Int(
@@ -260,6 +261,7 @@ class ISolrSchema(Interface):
                     u'between 0 and 1.'
         ),
         required=False,
+        default=0.0,
     )
 
     atomic_updates = Bool(

@@ -67,8 +67,6 @@
          factory="plone.app.layout.icons.icons.CatalogBrainContentIcon"
          provides="plone.app.layout.icons.interfaces.IContentIcon" />
 
-  <adapter factory=".configlet.SolrControlPanelAdapter" />
-
   <browser:page
       name="solr-controlpanel"
       for="Products.CMFPlone.interfaces.IPloneSiteRoot"
