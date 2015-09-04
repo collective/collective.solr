@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import json
 from Products.CMFCore.utils import getToolByName
 from collective.solr.configlet import SolrControlPanelAdapter
 from collective.solr.utils import activate
@@ -85,17 +86,20 @@ class SolrLayer(Layer):
         http_error = None
         for i in range(1, 10):
             try:
-                result = urllib2.urlopen(solr_ping_url)
+                request = urllib2.Request(
+                    '{0}/admin/cores?wt=json'.format(self.solr_url))
+                core_data = json.load(urllib2.urlopen(request))
+                cores = [x['name'] for x in core_data['status'].values()]
+                for core in cores:
+                    solr_ping_url = '{0}/{1}/admin/ping'.format(
+                        self.solr_url, core)
+                    result = urllib2.urlopen(solr_ping_url)
                 if result.code == 200:
                     if '<str name="status">OK</str>' in result.read():
                         os.environ['SOLR_HOST'] = '{0}:{1}'.format(
                             self.solr_host, self.solr_port)
                         break
             except urllib2.URLError, http_error:
-                if getattr(http_error, 'code', 200) == 404:
-                    raise Exception("Solr is not configured correctly. "
-                                    "If you are using a multicore setup, "
-                                    "refer to the documentation")
                 sleep(3)
                 sys.stdout.write('.')
             if i == 9:
