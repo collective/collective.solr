@@ -7,7 +7,6 @@ from zope.schema.vocabulary import SimpleTerm, SimpleVocabulary
 
 from collective.solr import SolrMessageFactory
 from collective.solr.interfaces import IFacetTitleVocabularyFactory
-from collective.solr.interfaces import ISolrConnectionConfig
 from collective.solr.interfaces import ISolrConnectionManager
 
 
@@ -25,9 +24,7 @@ class SolrIndexes(object):
                     if 'indexed' in info and info.get('indexed', False):
                         items.append(name)
         if not items:
-            config = queryUtility(ISolrConnectionConfig)
-            if config is not None:
-                items = config.filter_queries
+            items = api.portal.get_registry_record(name='collective.solr.filter_queries')
         return SimpleVocabulary([SimpleTerm(item) for item in items])
 
 

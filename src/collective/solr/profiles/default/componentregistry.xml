@@ -3,9 +3,6 @@
  <adapters/>
  <utilities>
   <utility
-     interface="collective.solr.interfaces.ISolrConnectionConfig"
-     factory="collective.solr.manager.SolrConnectionConfig"/>
-  <utility
      interface="collective.solr.interfaces.ISolrConnectionManager"
      factory="collective.solr.manager.SolrConnectionManager"/>
   <utility

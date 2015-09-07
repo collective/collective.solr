@@ -1,70 +1,26 @@
 # -*- coding: utf-8 -*-
-from collective.solr.interfaces import ISolrConnectionConfig
 from collective.solr.interfaces import ISolrConnectionManager
 from collective.solr.interfaces import IZCMLSolrConnectionConfig
 from collective.solr.local import getLocal
 from collective.solr.local import setLocal
 from collective.solr.solr import SolrConnection
+from collective.solr.utils import getConfig
+from collective.solr.utils import isActive
 from httplib import CannotSendRequest
 from httplib import ResponseNotReady
 from logging import getLogger
-from persistent import Persistent
 from socket import error
-from zope.component import getUtility
 from zope.component import queryUtility
 from zope.interface import implements
+from plone import api
 
 logger = getLogger('collective.solr.manager')
 marker = object()
 
 
-class BaseSolrConnectionConfig(object):
-    """ utility to hold the connection configuration for the solr server """
-    implements(ISolrConnectionConfig)
-
-    def __init__(self):
-        self.active = False
-        self.host = None
-        self.port = None
-        self.base = None
-        self.async = False
-        self.auto_commit = True
-        self.commit_within = 0
-        self.index_timeout = 0
-        self.search_timeout = 0
-        self.max_results = 0
-        self.required = []
-        self.search_pattern = None
-        self.facets = []
-        self.filter_queries = []
-        self.slow_query_threshold = 0
-        self.effective_steps = 1
-        self.exclude_user = False
-        self.field_list = []
-
-
-class SolrConnectionConfig(BaseSolrConnectionConfig, Persistent):
-
-    max_results = 0             # provide backwards compatibility
-    auto_commit = True
-    commit_within = 0
-    required = ()
-    search_pattern = None
-    facets = ()
-    filter_queries = ()
-    slow_query_threshold = 0
-    effective_steps = 1
-    exclude_user = False
-    field_list = []
-
-    def getId(self):
-        """ return a unique id to be used with GenericSetup """
-        return 'solr'
-
-
 class ZCMLSolrConnectionConfig(object):
     '''Connection values that can be configured through zcml'''
-    implements(IZCMLSolrConnectionConfig)
+    #implements(IZCMLSolrConnectionConfig)
 
     def __init__(self, host, port, base):
         self.host = '%s:%d' % (host, port)
@@ -83,7 +39,7 @@ class SolrConnectionManager(object):
 
     def setHost(self, active=False, host='localhost', port=8983, base='/solr'):
         """ set connection parameters """
-        config = getUtility(ISolrConnectionConfig)
+        config = getConfig()
         config.active = active
         config.host = host
         config.port = port
@@ -102,14 +58,14 @@ class SolrConnectionManager(object):
 
     def getConnection(self):
         """ returns an existing connection or opens one """
-        config = getUtility(ISolrConnectionConfig)
-        if not config.active:
+        if not isActive():
             return None
         conn = getLocal('connection')
         if conn is not None:
             return conn
 
         zcmlconfig = queryUtility(IZCMLSolrConnectionConfig)
+        config_host = api.portal.get_registry_record(name='collective.solr.host')
         if zcmlconfig is not None:
             # use connection parameters defined in zcml...
             logger.debug('opening connection to %s', zcmlconfig.host)
@@ -117,11 +73,13 @@ class SolrConnectionManager(object):
                                   solrBase=zcmlconfig.base,
                                   persistent=True)
             setLocal('connection', conn)
-        elif config.host is not None:
+        elif config_host is not None:
             # otherwise use connection parameters defined in control panel...
-            host = '%s:%d' % (config.host, config.port)
+            config_port = api.portal.get_registry_record(name='collective.solr.port')
+            config_base = api.portal.get_registry_record(name='collective.solr.base')
+            host = '%s:%d' % (config_host, config_port)
             logger.debug('opening connection to %s', host)
-            conn = SolrConnection(host=host, solrBase=config.base,
+            conn = SolrConnection(host=host, solrBase=config_base,
                                   persistent=True)
             setLocal('connection', conn)
         return conn
@@ -158,11 +116,11 @@ class SolrConnectionManager(object):
     def setIndexTimeout(self):
         """ set the timeout on the current (or to be opened) connection
             to the value specified for indexing operations """
-        config = getUtility(ISolrConnectionConfig)
-        self.setTimeout(config.index_timeout or None)
+        index_timeout = api.portal.get_registry_record(name='collective.solr.index_timeout')
+        self.setTimeout(index_timeout or None)
 
     def setSearchTimeout(self):
         """ set the timeout on the current (or to be opened) connection
             to the value specified for search operations """
-        config = getUtility(ISolrConnectionConfig)
-        self.setTimeout(config.search_timeout or None)
+        search_timeout = api.portal.get_registry_record(name='collective.solr.index_timeout')
+        self.setTimeout(search_timeout or None)
