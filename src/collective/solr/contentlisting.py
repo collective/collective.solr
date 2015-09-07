@@ -27,8 +27,8 @@ class FlareContentListingObject(object):
     def getPath(self):
         return self.flare.getPath()
 
-    def getURL(self):
-        return self.flare.getURL()
+    def getURL(self, relative=False):
+        return self.flare.getURL(relative)
 
     def uuid(self):
         if 'UID' in self.flare:
@@ -109,6 +109,9 @@ class FlareContentListingObject(object):
 
     def PortalType(self):
         return self.flare.portal_type
+
+    def Author(self):
+        return self.getUserData(self.Creator())
 
     def getUserData(self, username):
         request = getRequest()
