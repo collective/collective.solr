@@ -1,14 +1,12 @@
 # -*- coding: utf-8 -*-
 from AccessControl import getSecurityManager
 from DateTime import DateTime
-from collective.solr.interfaces import ISolrConnectionConfig
 from collective.solr.queryparser import quote
 from collective.solr.utils import isSimpleSearch
 from collective.solr.utils import isWildCard
 from collective.solr.utils import prepare_wildcard
 from collective.solr.utils import splitSimpleSearch
-from zope.component import queryUtility
-
+from plone import api
 
 ranges = {
     'min': '[%s TO *]',
@@ -263,10 +261,10 @@ def cleanupQueryParameters(args, schema):
 def optimizeQueryParameters(query, params):
     """ optimize query parameters by using filter queries for
         configured indexes """
-    config = queryUtility(ISolrConnectionConfig)
+    filter_queries = api.portal.get_registry_record(name='collective.solr.filter_queries')
     fq = []
-    if config is not None:
-        for idxs in config.filter_queries:
+    if filter_queries is not None:
+        for idxs in filter_queries:
             idxs = set(idxs.split(' '))
             if idxs.issubset(query.keys()):
                 fq.append(' '.join([query.pop(idx) for idx in idxs]))

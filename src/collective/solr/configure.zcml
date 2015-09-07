@@ -97,12 +97,6 @@
   <adapter name="path_parents" factory=".attributes.path_parents" />
 
   <adapter
-      factory=".exportimport.SolrConfigXMLAdapter"
-      provides="Products.GenericSetup.interfaces.IBody"
-      for=".interfaces.ISolrConnectionConfig
-           Products.GenericSetup.interfaces.ISetupEnviron" />
-
-  <adapter
       zcml:condition="installed plone.app.contentlisting"
       factory="plone.app.contentlisting.contentlisting.ContentListing"
       for="collective.solr.parser.SolrResponse"
@@ -113,22 +107,5 @@
       factory="collective.solr.contentlisting.FlareContentListingObject"
       for="collective.solr.flare.PloneFlare"
       />
-
-<!--  <subscriber for="Products.CMFPlone.interfaces.IReorderedEvent"
-              handler=".events.reorderedEvent" />-->
-
-  <genericsetup:exportStep
-      name="solr"
-      title="Solr configuration"
-      description="Export settings for Solr integration."
-      handler="collective.solr.exportimport.exportSolrSettings" />
-
-  <genericsetup:importStep
-      name="solr"
-      title="Solr configuration"
-      description="Import settings for Solr integration."
-      handler="collective.solr.exportimport.importSolrSettings">
-    <depends name="componentregistry"/>
-  </genericsetup:importStep>
 
 </configure>

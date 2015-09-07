@@ -264,11 +264,6 @@ class ISolrSchema(Interface):
         default=0.0,
     )
 
-
-class ISolrConnectionConfig(ISolrSchema):
-    """ utility to hold the connection configuration for the solr server """
-
-
 class IZCMLSolrConnectionConfig(Interface):
     """Solr connection settings configured through ZCML.
     """

@@ -20,14 +20,16 @@ except ImportError:
     # Plone 5
     from plone.indexer.interfaces import IIndexableObjectWrapper
 from plone.indexer.interfaces import IIndexableObject
+from plone import api
 
-from collective.solr.interfaces import ISolrConnectionConfig
+from collective.solr.interfaces import ISolrSchema
 from collective.solr.interfaces import ISolrConnectionManager
 from collective.solr.interfaces import ISolrIndexQueueProcessor
 from collective.solr.interfaces import ICheckIndexable
 from collective.solr.interfaces import ISolrAddHandler
 from collective.solr.solr import SolrException
 from collective.solr.utils import prepareData
+from collective.solr.utils import getConfig
 from socket import error
 from urllib import urlencode
 
@@ -199,9 +201,9 @@ class SolrIndexProcessor(object):
                 return          # don't index with no data...
             prepareData(data)
             if data.get(uniqueKey, None) is not None and not missing:
-                config = getUtility(ISolrConnectionConfig)
-                if config.commit_within:
-                    data['commitWithin'] = config.commit_within
+                config_commit_within = api.portal.get_registry_record(name='collective.solr.commit_within')
+                if config_commit_within:
+                    data['commitWithin'] = config_commit_within
                 try:
                     logger.debug('indexing %r (%r)', obj, data)
                     pt = data.get('portal_type', 'default')
@@ -263,7 +265,7 @@ class SolrIndexProcessor(object):
     def commit(self, wait=None):
         conn = self.getConnection()
         if conn is not None:
-            config = getUtility(ISolrConnectionConfig)
+            config = getConfig()
             if not isinstance(wait, bool):
                 wait = not config.async
             try:
