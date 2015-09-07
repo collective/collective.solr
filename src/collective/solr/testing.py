@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 from Products.CMFCore.utils import getToolByName
-from collective.solr.configlet import SolrControlPanelAdapter
 from collective.solr.utils import activate
 from plone.app.testing import FunctionalTesting
 from plone.app.testing import IntegrationTesting
-from plone.app.testing import PLONE_FIXTURE
+try:
+    from plone.app.contenttypes.testing import PLONE_APP_CONTENTTYPES_FIXTURE as PLONE_FIXTURE
+except ImportError:
+    from plone.app.testing import PLONE_FIXTURE
 from plone.app.testing import PloneSandboxLayer
 from plone.app.testing import TEST_USER_ID
 from plone.app.testing import TEST_USER_NAME
@@ -13,6 +15,7 @@ from plone.app.testing import login
 from plone.app.testing import setRoles
 from plone.testing import Layer
 from plone.testing.z2 import installProduct
+from plone import api
 from time import sleep
 from zope.configuration import xmlconfig
 
@@ -20,9 +23,15 @@ import os
 import sys
 import urllib2
 import subprocess
+import pkg_resources
 
 BIN_DIR = os.path.dirname(os.path.realpath(sys.argv[0]))
 
+try:
+    pkg_resources.get_distribution('Products.LinguaPlone')
+    HAS_LINGUAPLONE = True
+except pkg_resources.DistributionNotFound:
+    HAS_LINGUAPLONE = False
 
 class SolrLayer(Layer):
     """Solr test layer that fires up and shuts down a Solr instance. This
@@ -101,9 +110,9 @@ class CollectiveSolrLayer(PloneSandboxLayer):
             bases=None,
             name='Collective Solr Layer',
             module=None,
-            solr_host='localhost',
+            solr_host=u'localhost',
             solr_port=8983,
-            solr_base='/solr',
+            solr_base=u'/solr',
             solr_active=False):
         super(PloneSandboxLayer, self).__init__(bases, name, module)
         self.solr_active = solr_active
@@ -135,16 +144,14 @@ class CollectiveSolrLayer(PloneSandboxLayer):
     def setUpPloneSite(self, portal):
         self.solr_layer.setUp()
         applyProfile(portal, 'collective.solr:search')
-        solr_settings = SolrControlPanelAdapter(portal)
-        solr_settings.setActive(self.solr_active)
-        solr_settings.setPort(self.solr_port)
-        solr_settings.setBase(self.solr_base)
+        api.portal.set_registry_record('collective.solr.active', self.solr_active)
+        api.portal.set_registry_record('collective.solr.port', self.solr_port)
+        api.portal.set_registry_record('collective.solr.base', self.solr_base)
 
     def tearDownPloneSite(self, portal):
-        solr_settings = SolrControlPanelAdapter(portal)
-        solr_settings.setActive(False)
-        solr_settings.setPort(8983)
-        solr_settings.setBase('/solr')
+        api.portal.set_registry_record('collective.solr.active', False)
+        api.portal.set_registry_record('collective.solr.port', 8983)
+        api.portal.set_registry_record('collective.solr.base', u'/solr')
         self.solr_layer.tearDown()
 
 
