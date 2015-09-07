@@ -81,7 +81,7 @@ Viewing the site control panel
 
 Click the cancel button:
 
-    >>> browser.getControl(name="form.actions.cancel").click()
+    >>> browser.getControl(name="form.buttons.cancel").click()
     >>> browser.url.endswith('plone_control_panel')
     True
 
