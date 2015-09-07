@@ -17,6 +17,7 @@ from collective.solr.parser import SolrResponse
 from collective.solr.search import Search
 from collective.solr.solr import logger as logger_solr
 from collective.solr.testing import COLLECTIVE_SOLR_FUNCTIONAL_TESTING
+from collective.solr.testing import HAS_LINGUAPLONE
 from collective.solr.tests.utils import numFound
 from collective.solr.utils import activate
 from operator import itemgetter
@@ -33,6 +34,8 @@ from zExceptions import Unauthorized
 from zope.component import getUtility
 from zope.component import queryUtility
 from zope.schema.interfaces import IVocabularyFactory
+
+import pkg_resources
 
 DEFAULT_OBJS = [
     {'Title': 'News', 'getId': 'aggregator', 'Type': 'Collection',
@@ -319,7 +322,8 @@ class SolrErrorHandlingTests(TestCase):
         self.folder = self.portal.folder
         self.config = getUtility(ISolrConnectionConfig)
         self.port = self.config.port        # remember previous port setting
-        self.folder.unmarkCreationFlag()    # stop LinguaPlone from renaming
+        if HAS_LINGUAPLONE:
+            self.folder.unmarkCreationFlag()    # stop LinguaPlone from renaming
         # Prevent collective indexing queues to pile up for folder createion
         commit()
 
@@ -388,7 +392,8 @@ class SolrServerTests(TestCase):
         self.maintenance.clear()
         self.config = getUtility(ISolrConnectionConfig)
         self.search = getUtility(ISearch)
-        self.folder.unmarkCreationFlag()    # stop LinguaPlone from renaming
+        if HAS_LINGUAPLONE:
+            self.folder.unmarkCreationFlag()    # stop LinguaPlone from renaming
 
     def tearDown(self):
         # due to the `commit()` in the tests below the activation of the
