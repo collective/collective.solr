@@ -70,6 +70,10 @@ class SolrLayer(Layer):
     def setUp(self):
         """Start Solr and poll until it is up and running.
         """
+        status = subprocess.check_output(['./solr-instance', 'status'],
+                                         cwd=BUILDOUT_DIR)
+        if status != 'Solr not running.\n':
+            raise Exception("Sor is already running: %s", status)
         self.proc = subprocess.call(
             './solr-instance start -Djetty.port={0}'.format(self.solr_port),
             shell=True,
