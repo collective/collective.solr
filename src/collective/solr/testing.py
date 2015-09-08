@@ -32,7 +32,6 @@ class SolrLayer(Layer):
        fire up Plone.
     """
     proc = None
-    admin_ping_url = None
 
     def __init__(
             self,
@@ -77,11 +76,6 @@ class SolrLayer(Layer):
             close_fds=True,
             cwd=BUILDOUT_DIR
         )
-        # Poll Solr until it is up and running
-        if self.admin_ping_url:
-            solr_ping_url = self.admin_ping_url
-        else:
-            solr_ping_url = '{0}/admin/ping'.format(self.solr_url)
 
         http_error = None
         for i in range(1, 10):
@@ -90,15 +84,25 @@ class SolrLayer(Layer):
                     '{0}/admin/cores?wt=json'.format(self.solr_url))
                 core_data = json.load(urllib2.urlopen(request))
                 cores = [x['name'] for x in core_data['status'].values()]
+                solr_ping_urls = []
+                status = []
                 for core in cores:
                     solr_ping_url = '{0}/{1}/admin/ping'.format(
                         self.solr_url, core)
+                    solr_ping_urls.append(solr_ping_url)
+                for solr_ping_url in solr_ping_urls:
                     result = urllib2.urlopen(solr_ping_url)
-                if result.code == 200:
-                    if '<str name="status">OK</str>' in result.read():
-                        os.environ['SOLR_HOST'] = '{0}:{1}'.format(
-                            self.solr_host, self.solr_port)
-                        break
+                    if result.code == 200:
+                        if '<str name="status">OK</str>' in result.read():
+                            os.environ['SOLR_HOST'] = '{0}:{1}'.format(
+                                self.solr_host, self.solr_port)
+                            status.append(True)
+                        else:
+                            status.append(False)
+                    else:
+                        status.append(False)
+                if False not in status:
+                    break
             except urllib2.URLError, http_error:
                 sleep(3)
                 sys.stdout.write('.')
