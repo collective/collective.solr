@@ -119,7 +119,7 @@ class Search(object):
 
         languageFilter(args)
         prepareData(args)
-        mangleQuery(args, config, schema)
+        mangleQuery(args, self.config, schema)
 
         logger.debug('building query for "%r", %r', default, args)
         schema = self.getManager().getSchema() or {}
