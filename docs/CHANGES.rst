@@ -4,6 +4,19 @@ Changelog
 4.1.1 (unreleased)
 ------------------
 
+- Ported atomic updates from ftw.solr.
+  This requires you need to update your solr config, load the new solr config and
+  do a full reindex. Please also note
+  [mathias.leimgruber]
+
+  - Added support for atomic updates.
+    This means whenever possible, only the necessary / specified attributes get updated in Solr, and more importantly, re-indexed by Plone's indexers.
+    IMPORTANT: This requires the Solr instance to have an <updateLog/> configured in
+    solrconfig.xml and the schema needs to contain a _version_ field.
+    Further all your indexes configured in solr.cfg needs the stored:true attribute.
+    See http://wiki.apache.org/solr/Atomic_Updates for details.
+    [lgraf]
+
 - solr.cfg has been moved from https://github.com/collective/collective.solr/raw/master/buildout/solr.cfg to https://github.com/collective/collective.solr/raw/master/solr.cfg.
   [timo]
 
