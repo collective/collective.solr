@@ -34,9 +34,11 @@ from xml.etree.cElementTree import fromstring
 from xml.sax.saxutils import escape
 import codecs
 import urllib
+from collective.solr.interfaces import ISolrConnectionConfig
 from collective.solr.parser import SolrSchema
 from collective.solr.timeout import HTTPConnectionWithTimeout
 from collective.solr.utils import translation_map
+from zope.component import queryUtility
 
 from logging import getLogger
 logger = getLogger(__name__)
@@ -212,7 +214,33 @@ class SolrConnection:
         xstr = '<delete><query>%s</query></delete>' % self.escapeVal(query)
         return self.doUpdateXML(xstr)
 
-    def add(self, boost_values=None, **fields):
+    def get_schema(self):
+        """Memoized access to Solr Schema.
+
+        We need to know which one is the uniqueKey in the add() method below,
+        but don't want to hit Solr with a request for the schema on every
+        single add().
+        """
+        if not hasattr(self, '_schema'):
+            self._schema = self.getSchema()
+        return self._schema
+
+    def add(self, boost_values=None, atomic_updates=True, **fields):
+        solr_config = queryUtility(ISolrConnectionConfig)
+        atomic_updates_enabled = getattr(solr_config,
+                                         'atomic_updates',
+                                         atomic_updates)
+
+        schema = self.get_schema()
+        uniqueKey = schema.get('uniqueKey', None)
+        if uniqueKey is None:
+            raise Exception("Could not get uniqueKey from Solr schema")
+
+        if uniqueKey not in fields:
+            logger.warn("uniqueKey '%s' missing for item %s, skipping" %
+                        (uniqueKey, fields))
+            return
+
         within = fields.pop('commitWithin', None)
         if within:
             lst = ['<add commitWithin="%s">' % str(within)]
@@ -225,11 +253,24 @@ class SolrConnection:
         else:
             lst.append('<doc>')
         for f, v in fields.items():
+
+            # Add update="set" attribute to each field except for the uniqueKey
+            # field.
+            if f == uniqueKey:
+                tmpl = '<field name="%s">%%s</field>' % self.escapeKey(f)
+                lst.append(tmpl % self.escapeVal(v))
+                continue
+
             if f in boost_values:
-                tmpl = '<field name="%s" boost="%s">%%s</field>' % (
+                tmpl = '<field name="%s" boost="%s" update="set">%%s</field>' % (
                     self.escapeKey(f), boost_values[f])
             else:
-                tmpl = '<field name="%s">%%s</field>' % self.escapeKey(f)
+                tmpl = '<field name="%s" update="set">%%s</field>' % self.escapeKey(f)
+
+            if not atomic_updates_enabled:
+                # Remove update="set", since it breaks the index time boosting.
+                tmpl = tmpl.replace(' update="set"', '')
+
             if isinstance(v, (list, tuple)):  # multi-valued
                 for value in v:
                     lst.append(tmpl % self.escapeVal(value))
@@ -238,6 +279,10 @@ class SolrConnection:
         lst.append('</doc>')
         lst.append('</add>')
         xstr = ''.join(lst)
+
+        if self.conn.debuglevel > 0:
+            logger.info('Update message:\n' + xstr)
+
         return self.doUpdateXML(xstr)
 
     def commit(self, waitSearcher=True, optimize=False):

@@ -8,6 +8,7 @@ from Products.Five.browser import BrowserView
 from plone.uuid.interfaces import IUUID, IUUIDAware
 from zope.interface import implements
 from zope.component import queryUtility, queryAdapter
+from collective.indexing.indexer import getOwnIndexMethod
 from collective.solr.indexer import DefaultAdder
 from collective.solr.flare import PloneFlare
 from collective.solr.interfaces import ISolrConnectionManager
@@ -94,7 +95,7 @@ class SolrMaintenanceView(BrowserView):
         return 'solr index cleared.'
 
     def reindex(self, batch=1000, skip=0, limit=0, ignore_portal_types=None,
-                only_portal_types=None):
+                only_portal_types=None, idxs=[]):
         """ find all contentish objects (meaning all objects derived from one
             of the catalog mixin classes) and (re)indexes them """
 
@@ -102,6 +103,7 @@ class SolrMaintenanceView(BrowserView):
             raise ValueError("It is not possible to combine "
                              "ignore_portal_types with only_portal_types")
 
+        atomic = idxs != []
         manager = queryUtility(ISolrConnectionManager)
         proc = SolrIndexProcessor(manager)
         conn = manager.getConnection()
@@ -135,8 +137,17 @@ class SolrMaintenanceView(BrowserView):
             zodb_conn.cacheGC()
         cpi = checkpointIterator(checkPoint, batch)
         count = 0
+
+        if atomic:
+            log('indexing only {0} \n'.format(idxs))
+
         for path, obj in findObjects(self.context):
             if ICheckIndexable(obj)():
+
+                if getOwnIndexMethod(obj, 'indexObject') is not None:
+                    log('skipping indexing of %r via private method.\n' % obj)
+                    continue
+
                 count += 1
                 if count <= skip:
                     continue
@@ -149,12 +160,23 @@ class SolrMaintenanceView(BrowserView):
                     if obj.portal_type not in only_portal_types:
                         continue
 
-                data, missing = proc.getData(obj)
+                attributes = None
+                if atomic:
+                    attributes = idxs
+
+                # For atomic updates to work the uniqueKey must be present
+                # in *every* update operation.
+                if attributes and key not in attributes:
+                    attributes.append(key)
+
+                data, missing = proc.getData(obj, attributes=attributes)
                 prepareData(data)
-                if not missing:
+
+                if not missing or atomic:
                     value = data.get(key, None)
                     if value is not None:
                         log('indexing %r\n' % obj)
+
                         pt = data.get('portal_type', 'default')
                         adder = queryAdapter(obj, ISolrAddHandler, name=pt)
                         if adder is None:

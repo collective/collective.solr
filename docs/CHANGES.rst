@@ -6,6 +6,11 @@ Changelog
 
 - Add support for using different request handlers in search requests.
   [buchi]
+- Ported atomic updates from ftw.solr.
+  This requires you to update your solr config, load the new solr config and
+  do a full reindex. For more informations check the "feature" section.
+  The feature was implemented in ftw.solr by [lgraf].
+  [mathias.leimgruber]
 
 - solr.cfg has been moved from https://github.com/collective/collective.solr/raw/master/buildout/solr.cfg to https://github.com/collective/collective.solr/raw/master/solr.cfg.
   [timo]

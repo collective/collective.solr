@@ -281,6 +281,18 @@ class SolrControlPanelAdapter(SchemaAdapterBase):
     levenshtein_distance = property(
         getLevenshteinDistance, setLevenshteinDistance)
 
+    def getAtomicUpdates(self):
+        util = queryUtility(ISolrConnectionConfig)
+        return getattr(util, 'atomic_updates', True)
+
+    def setAtomicUpdates(self, value):
+        util = queryUtility(ISolrConnectionConfig)
+        if util is not None:
+            util.atomic_updates = value
+
+    atomic_updates = property(
+        getAtomicUpdates, setAtomicUpdates)
+
 
 class SolrControlPanel(ControlPanelForm):
 

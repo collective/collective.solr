@@ -109,25 +109,20 @@ class QueueIndexerTests(TestCase):
         output = fakehttp(self.mngr.getConnection(), response)
         self.proc.index(foo)
         self.assert_(str(output).find(
-            '<field name="price">42.0</field>') > 0, '"price" data not found')
+            '<field name="price" update="set">42.0</field>') > 0,
+            '"price" data not found')
         # then only a subset...
         response = getData('add_response.txt')
         output = fakehttp(self.mngr.getConnection(), response)
         self.proc.index(foo, attributes=['id', 'name'])
         output = str(output)
         self.assert_(
-            output.find('<field name="name">foo</field>') > 0,
+            output.find('<field name="name" update="set">foo</field>') > 0,
             '"name" data not found'
         )
         # at this point we'd normally check for a partial update:
-        #   self.assertEqual(output.find('price'), -1, '"price" data found?')
-        #   self.assertEqual(output.find('42'), -1, '"price" data found?')
-        # however, until SOLR-139 has been implemented (re)index operations
-        # always need to provide data for all attributes in the schema...
-        self.assert_(
-            output.find('<field name="price">42.0</field>') > 0,
-            '"price" data not found'
-        )
+        self.assertEqual(output.find('price'), -1, '"price" data found?')
+        self.assertEqual(output.find('42'), -1, '"price" data found?')
 
     def testDateIndexing(self):
         foo = Foo(id='zeidler', name='andi', cat='nerd',
@@ -136,7 +131,8 @@ class QueueIndexerTests(TestCase):
         # fake add response
         output = fakehttp(self.mngr.getConnection(), response)
         self.proc.index(foo)
-        required = '<field name="timestamp">1972-05-11T03:45:00.000Z</field>'
+        required = ('<field name="timestamp" update="set">'
+                    '1972-05-11T03:45:00.000Z</field>')
         self.assert_(str(output).find(required) > 0, '"date" data not found')
 
     def testDateIndexingWithPythonDateTime(self):
@@ -146,7 +142,8 @@ class QueueIndexerTests(TestCase):
         # fake add response
         output = fakehttp(self.mngr.getConnection(), response)
         self.proc.index(foo)
-        required = '<field name="timestamp">1980-09-29T14:02:00.000Z</field>'
+        required = ('<field name="timestamp" update="set">'
+                    '1980-09-29T14:02:00.000Z</field>')
         self.assert_(str(output).find(required) > 0, '"date" data not found')
 
     def testDateIndexingWithPythonDate(self):
@@ -156,7 +153,8 @@ class QueueIndexerTests(TestCase):
         # fake add response
         output = fakehttp(self.mngr.getConnection(), response)
         self.proc.index(foo)
-        required = '<field name="timestamp">1982-08-05T00:00:00.000Z</field>'
+        required = ('<field name="timestamp" update="set">'
+                    '1982-08-05T00:00:00.000Z</field>')
         self.assert_(str(output).find(required) > 0, '"date" data not found')
 
     def testReindexObject(self):
@@ -206,7 +204,7 @@ class QueueIndexerTests(TestCase):
         self.proc.index(foo)
         output = str(output)
         self.assertTrue(
-            output.find('<field name="cat">nerd</field>') > 0,
+            output.find('<field name="cat" update="set">nerd</field>') > 0,
             '"cat" data not found'
         )
         self.assertEqual(output.find('price'), -1, '"price" data found?')
@@ -348,6 +346,11 @@ class ThreadedConnectionTests(TestCase):
         log = []
 
         def runner():
+
+            # fake schema response on solr connection - caches the schema
+            fakehttp(mngr.getConnection(), getData('schema.xml'))
+            mngr.getConnection().get_schema()
+
             fakehttp(mngr.getConnection(), schema)      # fake schema response
             # read and cache the schema
             mngr.getSchema()
