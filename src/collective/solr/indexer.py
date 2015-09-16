@@ -195,6 +195,12 @@ class SolrIndexProcessor(object):
                 attributes = set(schema.keys()).intersection(attributes)
                 if not attributes:
                     return
+
+                if uniqueKey not in attributes:
+                    # The uniqueKey is required in order to identify the
+                    # document when doing atomic updates.
+                    attributes.add(uniqueKey)
+
             data, missing = self.getData(obj, attributes=attributes)
             if not data:
                 return          # don't index with no data...
