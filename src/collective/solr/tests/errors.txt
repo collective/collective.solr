@@ -118,7 +118,7 @@ other tests:
 
   >>> getUtility(ISolrConnectionManager).setHost(active=False, port=port)
   >>> import urllib
-  >>> urllib.urlopen('http://127.0.0.1:55555')
+  >>> urllib.urlopen('http://127.0.0.1:55555').read()
   Traceback (most recent call last):
   IOError: ...
   >>> urllib.urlopen('http://127.0.0.1:55555')

@@ -118,6 +118,20 @@ Example::
             <solr:connection host="localhost" port="8983" base="/solr/plone"/>
        </configure>
 
+Testing
+-------
+
+collective.solr provides a testing layer that you can use in your projects. It contains one assumption at the momment:
+- It assumes that the script for starting solr is called solr-instance
+- It assumes you are running a single core and have the ping handler configured on /admin/ping (This is the default)
+
+Out of the box, it will assign solr to a unused random port.
+For multi core setups, you can customize the layer by Subclassing it and setting the proper full url to the attribute admin_ping_url::
+
+    class MySolrLayer(SolrLayer):
+        def __init__(self, *args, **kwargs):
+            super(MySolrLayer, self).__init__(*args, **kwargs)
+            self.admin_ping_url = '{0}/catalog/admin/ping'.format(self.solr_url)
 
 
 Current Project Status
