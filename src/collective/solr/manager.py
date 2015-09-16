@@ -135,7 +135,7 @@ class SolrConnectionManager(object):
                 logger.debug('getting schema from solr')
                 self.setSearchTimeout()
                 try:
-                    schema = conn.getSchema()
+                    schema = conn.get_schema()
                     setLocal('schema', schema)
                 except (error, CannotSendRequest, ResponseNotReady):
                     logger.exception('exception while getting schema')
