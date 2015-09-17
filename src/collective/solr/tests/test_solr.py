@@ -9,7 +9,13 @@ class TestSolr(TestCase):
     def test_add(self):
         add_request = getData('add_request.txt')
         add_response = getData('add_response.txt')
+
         c = SolrConnection(host='localhost:8983', persistent=True)
+
+        # fake schema response - caches the schema
+        fakehttp(c, getData('schema.xml'))
+        c.get_schema()
+
         output = fakehttp(c, add_response)
         c.add(id='500', name='python test doc')
         res = c.flush()
@@ -30,6 +36,11 @@ class TestSolr(TestCase):
         add_request = getData('add_request_with_boost_values.txt')
         add_response = getData('add_response.txt')
         c = SolrConnection(host='localhost:8983', persistent=True)
+
+        # fake schema response - caches the schema
+        fakehttp(c, getData('schema.xml'))
+        c.get_schema()
+
         output = fakehttp(c, add_response)
         boost = {'': 2, 'id': 0.5, 'name': 5}
         c.add(boost_values=boost, id='500', name='python test doc')

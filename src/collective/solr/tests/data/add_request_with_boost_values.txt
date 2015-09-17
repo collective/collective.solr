@@ -1,7 +1,7 @@
 POST /solr/update HTTP/1.1
 Host: localhost
 Accept-Encoding: identity
-Content-Length: 124
+Content-Length: 125
 Content-Type: text/xml; charset=utf-8
 
-<add><doc boost="2"><field name="id" boost="0.5">500</field><field name="name" boost="5">python test doc</field></doc></add>
+<add><doc boost="2"><field name="id">500</field><field name="name" boost="5" update="set">python test doc</field></doc></add>
