@@ -39,7 +39,7 @@ class SolrLayer(Layer):
             name='Solr Layer',
             module=None,
             solr_host='localhost',
-            solr_port='RANDOM',
+            solr_port=8983,
             solr_base='/solr'):
 
         super(SolrLayer, self).__init__(bases, name, module)
@@ -134,7 +134,7 @@ class CollectiveSolrLayer(PloneSandboxLayer, SolrLayer):
             module=None,
             solr_active=False,
             solr_host='localhost',
-            solr_port='RANDOM',
+            solr_port=8983,
             solr_base='/solr'):
         super(CollectiveSolrLayer, self).__init__(
             bases,
