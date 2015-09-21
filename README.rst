@@ -70,9 +70,9 @@ ZCTextIndex Replacement
 Detailed Documentation
 ======================
 
-A full Documentation of the Solr integration of Plone could be found in `docs.plone.org collective.solr`_.
+A full Documentation of the Solr integration of Plone could be found in `Plone Training Solr`_.
 
-.. _`docs.plone.org collective.solr`: http://docs.plone.org/external/collective.solr/docs/index.html
+.. _`Plone Training Solr`: http://plone-training-solr.readthedocs.org/
 
 
 Installation & Configuration
