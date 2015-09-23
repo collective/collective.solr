@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-import json
 from Products.CMFCore.utils import getToolByName
 from collective.solr.configlet import SolrControlPanelAdapter
 from collective.solr.utils import activate
@@ -106,7 +105,8 @@ class SolrLayer(Layer):
                 cwd=BUILDOUT_DIR
             )
             sys.stdout.write('Solr Instance could not be started !!!')
-            raise Exception("Unable to start solr", http_error)
+            raise Exception("Unable to start solr, %i %s", http_error.code,
+                            http_error.msg)
 
     def tearDown(self):
         """Stop Solr.
