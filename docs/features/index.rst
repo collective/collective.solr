@@ -39,3 +39,4 @@ Old full description of Features
     wildcard
     suggestions
     highlighting
+    atomic_updates
