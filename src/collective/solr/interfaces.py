@@ -272,7 +272,8 @@ class ISolrSchema(Interface):
                     u'Unfortunately atomic updates are not compatible with '
                     u'index time boosting. If you enable atomic updates, '
                     u'index time boosting no longer works.'),
-        default=True
+        default=True,
+        required=False,
     )
 
 
