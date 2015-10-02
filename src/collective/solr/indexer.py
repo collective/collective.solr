@@ -173,13 +173,14 @@ class SolrIndexProcessor(object):
         self.manager = manager
 
     def index(self, obj, attributes=None):
+        """Index the specified attributes for obj using atomic updates, or all
+        of them if `attributes` is `None`.
+        Also make sure the `uniqueKey` is part of attributes, and passing the
+        attributes to the self.getData() call to avoid causing Plone to index
+        all fields instead of just the necessary ones.
+        """
         conn = self.getConnection()
         if conn is not None and ICheckIndexable(obj)():
-            # unfortunately with current versions of solr we need to provide
-            # data for _all_ fields during an <add> -- partial updates aren't
-            # supported (see https://issues.apache.org/jira/browse/SOLR-139)
-            # however, the reindexing can be skipped if none of the given
-            # attributes match existing solr indexes...
             schema = self.manager.getSchema()
             if schema is None:
                 msg = 'unable to fetch schema, skipping indexing of %r'
@@ -194,7 +195,13 @@ class SolrIndexProcessor(object):
                 attributes = set(schema.keys()).intersection(attributes)
                 if not attributes:
                     return
-            data, missing = self.getData(obj)
+
+                if uniqueKey not in attributes:
+                    # The uniqueKey is required in order to identify the
+                    # document when doing atomic updates.
+                    attributes.add(uniqueKey)
+
+            data, missing = self.getData(obj, attributes=attributes)
             if not data:
                 return          # don't index with no data...
             prepareData(data)

@@ -4,6 +4,12 @@ Changelog
 4.1.1 (unreleased)
 ------------------
 
+- Ported atomic updates from ftw.solr.
+  This requires you need to update your solr config, load the new solr config and
+  do a full reindex. For more informations check the "feature" section.
+  The feature was implemented in ftw.solr by [lgraf].
+  [mathias.leimgruber]
+
 - solr.cfg has been moved from https://github.com/collective/collective.solr/raw/master/buildout/solr.cfg to https://github.com/collective/collective.solr/raw/master/solr.cfg.
   [timo]
 
