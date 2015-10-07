@@ -105,8 +105,11 @@ class SolrLayer(Layer):
                 cwd=BUILDOUT_DIR
             )
             sys.stdout.write('Solr Instance could not be started !!!')
-            raise Exception("Unable to start solr, %i %s", http_error.code,
-                            http_error.msg)
+            try:
+                raise Exception("Unable to start solr, %i %s", http_error.code,
+                                http_error.msg)
+            except AttributeError:
+                raise http_error
 
     def tearDown(self):
         """Stop Solr.
