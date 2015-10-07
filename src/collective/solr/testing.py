@@ -47,10 +47,10 @@ class SolrLayer(Layer):
         if solr_port == 'RANDOM':
             solr_port = self._find_available_solr_port()
 
-        self.solr_host = solr_host
-        self.solr_port = solr_port
-        self.solr_base = solr_base
-        self.solr_url = 'http://{0}:{1}{2}'.format(
+        self['solr_host'] = solr_host
+        self['solr_port'] = solr_port
+        self['solr_base'] = solr_base
+        self['solr_url'] = 'http://{0}:{1}{2}'.format(
             solr_host,
             solr_port,
             solr_base
@@ -71,7 +71,7 @@ class SolrLayer(Layer):
     def _startSolr(self):
         print 'start again'
         self.proc = subprocess.call(
-            './solr-instance start -Djetty.port={0}'.format(self.solr_port),
+            './solr-instance start -Djetty.port={0}'.format(self['solr_port']),
             shell=True,
             close_fds=True,
             cwd=BUILDOUT_DIR
@@ -101,12 +101,12 @@ class SolrLayer(Layer):
                     psutil.Process(pid)
                 except psutil.NoSuchProcess:
                     self._startSolr()
-                solr_ping_url = self.solr_url + '/admin/ping'
+                solr_ping_url = self['solr_url'] + '/admin/ping'
                 result = urllib2.urlopen(solr_ping_url)
                 if result.code == 200:
                     if '<str name="status">OK</str>' in result.read():
                         os.environ['SOLR_HOST'] = '{0}:{1}'.format(
-                            self.solr_host, self.solr_port)
+                            self['solr_host'], self['solr_port'])
                         running = True
                         break
             except urllib2.URLError, http_error:
@@ -162,11 +162,11 @@ class CollectiveSolrLayer(PloneSandboxLayer, SolrLayer):
             solr_host=solr_host,
             solr_port=solr_port,
             solr_base=solr_base)
-        self.solr_active = solr_active
-        self.solr_url = 'http://{0}:{1}{2}'.format(
-            self.solr_host,
-            self.solr_port,
-            self.solr_base
+        self['solr_active'] = solr_active
+        self['solr_url'] = 'http://{0}:{1}{2}'.format(
+            self['solr_host'],
+            self['solr_port'],
+            self['solr_base']
         )
 
     def setUp(self):
@@ -194,20 +194,20 @@ class CollectiveSolrLayer(PloneSandboxLayer, SolrLayer):
         applyProfile(portal, 'collective.solr:search')
         self.updateSolrSettings(portal)
         solr_settings = SolrControlPanelAdapter(portal)
-        solr_settings.setActive(self.solr_active)
-        solr_settings.setPort(self.solr_port)
-        solr_settings.setBase(self.solr_base)
+        solr_settings.setActive(self['solr_active'])
+        solr_settings.setPort(self['solr_port'])
+        solr_settings.setBase(self['solr_base'])
 
     def updateSolrSettings(self, portal):
         solr_settings = SolrControlPanelAdapter(portal)
-        solr_settings.setActive(self.solr_active)
-        solr_settings.setPort(self.solr_port)
-        solr_settings.setBase(self.solr_base)
+        solr_settings.setActive(self['solr_active'])
+        solr_settings.setPort(self['solr_port'])
+        solr_settings.setBase(self['solr_base'])
 
     def tearDownPloneSite(self, portal):
         solr_settings = SolrControlPanelAdapter(portal)
         solr_settings.setActive(False)
-        solr_settings.setPort(self.solr_port)
+        solr_settings.setPort(self['solr_port'])
         solr_settings.setBase('/solr')
 
 
