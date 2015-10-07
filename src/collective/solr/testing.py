@@ -1,26 +1,28 @@
 # -*- coding: utf-8 -*-
-from Products.CMFCore.utils import getToolByName
+import os
+import socket
+import subprocess
+import sys
+import urllib2
+from random import randint
+from time import sleep
+
+import psutil
 from collective.solr.configlet import SolrControlPanelAdapter
 from collective.solr.utils import activate
-from plone.app.testing import FunctionalTesting
-from plone.app.testing import IntegrationTesting
 from plone.app.testing import PLONE_FIXTURE
-from plone.app.testing import PloneSandboxLayer
 from plone.app.testing import TEST_USER_ID
 from plone.app.testing import TEST_USER_NAME
+from plone.app.testing import FunctionalTesting
+from plone.app.testing import IntegrationTesting
+from plone.app.testing import PloneSandboxLayer
 from plone.app.testing import applyProfile
 from plone.app.testing import login
 from plone.app.testing import setRoles
 from plone.testing import Layer
 from plone.testing.z2 import installProduct
-from random import randint
-from time import sleep
+from Products.CMFCore.utils import getToolByName
 from zope.configuration import xmlconfig
-import os
-import subprocess
-import sys
-import urllib2
-import socket
 
 BUILDOUT_DIR = os.path.join(os.getcwd(), '..', '..', 'bin')
 
@@ -66,13 +68,8 @@ class SolrLayer(Layer):
             finally:
                 a_socket.close()
 
-    def setUp(self):
-        """Start Solr and poll until it is up and running.
-        """
-        status = subprocess.check_output(['./solr-instance', 'status'],
-                                         cwd=BUILDOUT_DIR)
-        if status != 'Solr not running.\n':
-            raise Exception("Sor is already running: %s", status)
+    def _startSolr(self):
+        print 'start again'
         self.proc = subprocess.call(
             './solr-instance start -Djetty.port={0}'.format(self.solr_port),
             shell=True,
@@ -80,12 +77,30 @@ class SolrLayer(Layer):
             cwd=BUILDOUT_DIR
         )
 
+    def setUp(self):
+        """Start Solr and poll until it is up and running.
+        """
+        status = subprocess.check_output(['./solr-instance', 'status'],
+                                         cwd=BUILDOUT_DIR)
+        if status != 'Solr not running.\n':
+            raise Exception("Sor is already running: %s", status)
+        self._startSolr()
+
         http_error = None
         waiting_time = 30.0
         time_step = 0.5
         running = False
         for i in range(int(waiting_time/time_step)):
             try:
+                status = subprocess.check_output(['./solr-instance', 'status'],
+                                                 cwd=BUILDOUT_DIR)
+                if 'Solr running with PID' not in status:
+                    self._startSolr()
+                try:
+                    pid = int(status.split(',')[1].strip('\n) '))
+                    psutil.Process(pid)
+                except psutil.NoSuchProcess:
+                    self._startSolr()
                 solr_ping_url = self.solr_url + '/admin/ping'
                 result = urllib2.urlopen(solr_ping_url)
                 if result.code == 200:
@@ -98,18 +113,19 @@ class SolrLayer(Layer):
                 sleep(time_step)
                 sys.stdout.write('.')
         if not running:
-            subprocess.call(
-                './solr-instance stop',
-                shell=True,
-                close_fds=True,
-                cwd=BUILDOUT_DIR
-            )
             sys.stdout.write('Solr Instance could not be started !!!')
             try:
                 raise Exception("Unable to start solr, %i %s", http_error.code,
                                 http_error.msg)
             except AttributeError:
                 raise http_error
+            finally:
+                subprocess.call(
+                    './solr-instance stop',
+                    shell=True,
+                    close_fds=True,
+                    cwd=BUILDOUT_DIR
+                )
 
     def tearDown(self):
         """Stop Solr.

@@ -61,6 +61,7 @@ setup(
         'plone.app.vocabularies',
         'plone.browserlayer',
         'plone.indexer',
+        'psutil',
         'setuptools',
         'transaction',
         'zope.component',
