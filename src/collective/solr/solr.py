@@ -264,11 +264,14 @@ class SolrConnection:
         del self.xmlbody[:]
 
     def search(self, **params):
+        request_handler = params.get('request_handler', 'select')
+        if 'request_handler' in params:
+            del params['request_handler']
         request = urllib.urlencode(params, doseq=True)
         logger.debug('sending request: %s' % request)
         try:
             response = self.doPost(
-                '%s/select' % self.solrBase, request,
+                '%s/%s' % (self.solrBase, request_handler), request,
                 self.formheaders
             )
         finally:
