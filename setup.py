@@ -82,5 +82,6 @@ setup(
       target=plone
       [zopectl.command]
       solr_clear_index=collective.solr.commands:solr_clear_index
+      solr_reindex=collective.solr.commands:solr_reindex
     ''',
 )

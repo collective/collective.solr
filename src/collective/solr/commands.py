@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 from collective.solr.interfaces import ISolrConnectionManager
+from collective.solr.browser.maintenance import SolrMaintenanceView
 from zope.component import queryUtility
 from zope.site.hooks import setHooks
 from zope.site.hooks import setSite
+from Testing.makerequest import makerequest
 
 import logging
 import sys
@@ -12,8 +14,8 @@ logger = logging.getLogger()
 
 def _get_site(app, args):
     name = None
-    if len(args) > 0:
-        name = args[0]
+    if len(args) > 2:
+        name = args[-1]
         if name not in app:
             logger.error("Specified site '%s' not found in database." % name)
             sys.exit(1)
@@ -49,3 +51,12 @@ def solr_clear_index(app, args):
     conn.deleteByQuery('[* TO *]')
     conn.commit(optimize=True)
     conn.close()
+
+def solr_reindex(app, args):
+    """Reindex Solr. This is equivalent to /@@solr-maintenance/reindex, but
+    can handle more documents. Using reindex from the browser will stop
+    eventually if there are too many documents, leaving the index incomplete
+    """
+    site = makerequest(_get_site(app, args))
+    mv = SolrMaintenanceView(site, site.REQUEST)
+    mv.reindex()
