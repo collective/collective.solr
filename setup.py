@@ -35,7 +35,7 @@ setup(
     author_email='info@jarn.com',
     maintainer='Plone Community',
     maintainer_email='plone-developers@lists.sourceforge.net',
-    url='http://plone.org/products/collective.solr',
+    url='https://github.com/collective/collective.solr',
     license='GPL version 2',
     packages=find_packages('src'),
     package_dir={'': 'src'},
