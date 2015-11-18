@@ -1,7 +1,7 @@
 from unittest import TestCase
 from unittest import skip
 from collective.solr.extender import DexteritySearchExtender
-from collective.solr.testing import COLLECTIVE_SOLR_DEXTERITY_INTEGRATION_TESTING
+from collective.solr.testing import COLLECTIVE_SOLR_DEXTERITY_INTEGRATION_TESTING  # noqa E501
 from plone.app.testing import TEST_USER_ID
 from plone.app.testing import setRoles
 from plone.dexterity.fti import DexterityFTI
