@@ -57,7 +57,6 @@ setup(
         'plone.app.content',
         'plone.app.controlpanel',
         'plone.app.layout',
-        'plone.app.testing',
         'plone.app.vocabularies',
         'plone.browserlayer',
         'plone.indexer',
@@ -75,6 +74,7 @@ setup(
             'Products.LinguaPlone >=3.1a1',
             'plone.app.contentlisting',  # Comes with Plone 4.2,
                                          # only a test req for 4.1 compat
+            'plone.app.testing',
         ]
     },
     entry_points='''
