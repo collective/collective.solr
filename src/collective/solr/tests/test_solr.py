@@ -101,6 +101,20 @@ class TestSolr(TestCase):
         self.assertEqual(normalize(output.get()), normalize(search_request))
         self.failUnless(res.find(('.//doc')))
 
+    def test_search_with_default_request_handler(self):
+        search_response = getData('search_response.txt')
+        c = SolrConnection(host='localhost:8983', persistent=True)
+        fakehttp(c, search_response)
+        c.search(q='+id:[* TO *]')
+        self.assertEqual('/solr/select', c.conn.url)
+
+    def test_search_with_custom_request_handler(self):
+        search_response = getData('search_response.txt')
+        c = SolrConnection(host='localhost:8983', persistent=True)
+        fakehttp(c, search_response)
+        c.search(request_handler='custom', q='+id:[* TO *]')
+        self.assertEqual('/solr/custom', c.conn.url)
+
     def test_delete(self):
         delete_request = getData('delete_request.txt')
         delete_response = getData('delete_response.txt')
