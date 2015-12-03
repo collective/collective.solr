@@ -4,13 +4,21 @@ from archetypes.schemaextender.field import ExtensionField
 from archetypes.schemaextender.interfaces import ISchemaExtender
 from archetypes.schemaextender.interfaces import IBrowserLayerAwareExtender
 from collective.solr.browser.interfaces import IThemeSpecific
+from plone.supermodel import directives
+from plone.autoform.interfaces import IFormFieldProvider
+from plone.app.dexterity.behaviors.metadata import MetadataBase
+from plone.app.dexterity.behaviors.metadata import DCFieldProperty
 from plone.indexer import indexer
+from plone.supermodel import model
 from Products.Archetypes.atapi import BooleanField
 from Products.Archetypes.atapi import BooleanWidget
 from Products.Archetypes.atapi import TextAreaWidget
 from Products.Archetypes.atapi import TextField
 from Products.Archetypes.interfaces import IBaseObject
+from zope import schema
+from zope.interface import implementer
 from zope.interface import implements
+from zope.interface import provider
 from zope.interface import Interface
 
 from collective.solr import SolrMessageFactory as _
@@ -97,3 +105,35 @@ class SearchExtender(object):
 
     def getFields(self):
         return self._fields
+
+
+@provider(IFormFieldProvider)
+class IElevationFields(model.Schema):
+    directives.fieldset(
+        'settings',
+        label=_(u'Settings'),
+        fields=('showinsearch', 'searchwords'),
+    )
+
+    showinsearch = schema.Bool(
+        title=_('label_showinsearch', default=u"Show in search"),
+        description=u"",
+        default=True,
+    )
+
+    searchwords = schema.Text(
+        title=_('label_searchwords', default=u"Search words"),
+        description=_(
+            'help_searchwords',
+            default=u"Specify words for which this item will show up "
+            u"as the first search result. Multiple words can be "
+            u"specified on new lines."
+        ),
+        required=False,
+    )
+
+
+@implementer(IElevationFields)
+class DexteritySearchExtender(MetadataBase):
+    showinsearch = DCFieldProperty(IElevationFields['showinsearch'])
+    searchwords = DCFieldProperty(IElevationFields['searchwords'])

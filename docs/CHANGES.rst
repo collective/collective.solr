@@ -23,6 +23,9 @@ Changelog
   does not affect server state)
   [reinhardt]
 
+- Added behavior that provides showinsearch and searchwords for dexterity types.
+  [reinhardt]
+
 
 4.1.0 (2015-02-19)
 ------------------

@@ -168,6 +168,19 @@ class LegacyCollectiveSolrLayer(CollectiveSolrLayer):
 LEGACY_COLLECTIVE_SOLR_FIXTURE = LegacyCollectiveSolrLayer()
 
 
+class DexterityCollectiveSolrLayer(CollectiveSolrLayer):
+
+    def setUpZope(self, app, configurationContext):
+        super(DexterityCollectiveSolrLayer, self).setUpZope(
+            app, configurationContext)
+        import plone.dexterity
+        xmlconfig.file('configure.zcml',
+                       plone.dexterity,
+                       context=configurationContext)
+
+DEXTERITY_COLLECTIVE_SOLR_FIXTURE = DexterityCollectiveSolrLayer()
+
+
 def activateAndReindex(portal):
     """ activate solr indexing and reindex the existing content """
     activate()
@@ -185,6 +198,11 @@ COLLECTIVE_SOLR_FIXTURE = CollectiveSolrLayer()
 COLLECTIVE_SOLR_INTEGRATION_TESTING = IntegrationTesting(
     bases=(LEGACY_COLLECTIVE_SOLR_FIXTURE,),
     name="CollectiveSolr:Integration"
+)
+
+COLLECTIVE_SOLR_DEXTERITY_INTEGRATION_TESTING = IntegrationTesting(
+    bases=(DEXTERITY_COLLECTIVE_SOLR_FIXTURE,),
+    name="CollectiveSolr:DexterityIntegration"
 )
 
 COLLECTIVE_SOLR_FUNCTIONAL_TESTING = FunctionalTesting(

@@ -1,4 +1,9 @@
-<configure xmlns="http://namespaces.zope.org/zope" i18n_domain="solr">
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:plone="http://namespaces.plone.org/plone"
+    i18n_domain="solr">
+
+  <include package="plone.behavior" file="meta.zcml" />
 
   <adapter factory=".extender.searchwords" name="searchwords" />
   <adapter factory=".extender.showinsearch" name="showinsearch" />
@@ -8,5 +13,12 @@
       name="collective.solr.SearchExtender"
       provides="archetypes.schemaextender.interfaces.ISchemaExtender"
       factory=".extender.SearchExtender" />
+
+  <plone:behavior
+      title="Search Extender"
+      description="Provides additional search metadata for elevation"
+      provides=".extender.IElevationFields"
+      factory=".extender.DexteritySearchExtender"
+      />
 
 </configure>
