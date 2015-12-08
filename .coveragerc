@@ -1,9 +1,10 @@
 [report]
 omit =
+    /home/travis/buildout-cache/eggs/*
+    lib/*
     /home/*/.buildout/eggs/*
     /usr/*
     bin/test
-    buildout-cache/eggs/*
     eggs/*
     parts/*
     buildout/*
