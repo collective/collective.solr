@@ -52,6 +52,7 @@ setup(
         'ZODB3',
         'Zope2 >= 2.13',
         'archetypes.schemaextender',
+        'argparse', # we need to support Python 2.6 (Plone 4.x)
         'collective.indexing >= 2.0a2',
         'collective.js.showmore',
         'plone.app.content',
