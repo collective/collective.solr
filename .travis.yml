@@ -25,8 +25,7 @@ install:
   - bin/buildout -N -t 20 -c travis.cfg
 script:
   - bin/code-analysis
-  - bin/test
-  - bin/coverage
+  - bin/coverage run bin/test
 after_success:
-  - pip install -q coveralls python-coveralls==2.4.0
+  - pip install -q coveralls python-coveralls==2.5.0
   - coveralls
