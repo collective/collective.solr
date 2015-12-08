@@ -70,7 +70,7 @@ class TestSolr(TestCase):
         commit_response = getData('commit_response.txt')
         c = SolrConnection(host='localhost:8983', persistent=True)
         output = fakehttp(c, commit_response)
-        c.commit(waitFlush=False)
+        c.commit()
         self.failUnlessEqual(str(output), commit_request)
 
     def test_commit_no_wait_searcher(self):
@@ -79,14 +79,6 @@ class TestSolr(TestCase):
         c = SolrConnection(host='localhost:8983', persistent=True)
         output = fakehttp(c, commit_response)
         c.commit(waitSearcher=False)
-        self.failUnlessEqual(str(output), commit_request)
-
-    def test_commit_no_wait(self):
-        commit_request = getData('commit_request_no_wait.txt')
-        commit_response = getData('commit_response.txt')
-        c = SolrConnection(host='localhost:8983', persistent=True)
-        output = fakehttp(c, commit_response)
-        c.commit(waitFlush=False, waitSearcher=False)
         self.failUnlessEqual(str(output), commit_request)
 
     def test_search(self):
