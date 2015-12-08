@@ -2,6 +2,7 @@
 omit =
     /home/travis/buildout-cache/eggs/*
     lib/*
+    src/collective/solr/tests/*
     /home/*/.buildout/eggs/*
     /usr/*
     bin/test
