@@ -26,6 +26,7 @@ install:
 script:
   - bin/code-analysis
   - bin/test
+  - bin/coverage
 after_success:
   - pip install -q coveralls python-coveralls==2.4.0
   - coveralls
