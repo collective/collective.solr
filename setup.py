@@ -52,6 +52,7 @@ setup(
         'ZODB3',
         'Zope2 >= 2.13',
         'archetypes.schemaextender',
+        'argparse', # we need to support Python 2.6 (Plone 4.x)
         'collective.indexing >= 2.0a2',
         'collective.js.showmore',
         'plone.app.content',
@@ -82,5 +83,6 @@ setup(
       target=plone
       [zopectl.command]
       solr_clear_index=collective.solr.commands:solr_clear_index
+      solr_reindex=collective.solr.commands:solr_reindex
     ''',
 )

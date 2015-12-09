@@ -23,6 +23,9 @@ Changelog
   does not affect server state)
   [reinhardt]
 
+- Add zopectl.command for reindexing. Do not rely on positional arguments in _get_site.
+  [tschorr]
+
 
 4.1.0 (2015-02-19)
 ------------------
