@@ -14,12 +14,16 @@ logger = logging.getLogger()
 
 
 def _get_site(app, args):
-    # Zope.Startup.zopectl.ZopeCmd.run_entrypoint promises to pass the entry point's
-    # name as the first argument and any further arguments after that, but that does not 
-    # work with plone.recipe.zope2instance. Using positional arguments therefore
-    # is unreliable - resolve to using a flag.
+    # Zope.Startup.zopectl.ZopeCmd.run_entrypoint promises to pass the entry
+    # point's name as the first argument and any further arguments after that,
+    # but that does not work with plone.recipe.zope2instance. Using positional
+    # arguments therefore is unreliable - resolve to using a flag.
     parser = argparse.ArgumentParser()
-    parser.add_argument('--plonesite', help='Name of the Plone site', default=None)
+    parser.add_argument(
+        '--plonesite',
+        help='Name of the Plone site',
+        default=None
+    )
     namespace, unused = parser.parse_known_args(args)
     name = namespace.plonesite
     if name is not None:
@@ -51,7 +55,8 @@ def _solr_connection():
 def solr_clear_index(app, args):
     """Removes all data from a Solr index. Equivalent to removing the
     `data/index` directory while Solr is stopped.
-    You can optionally specify the id of the Plone site with --plonesite <siteid>.
+    You can optionally specify the id of the Plone site with
+    --plonesite <siteid>.
     """
     _get_site(app, args)  # calls setSite so queryUtility works
     conn = _solr_connection()
@@ -59,11 +64,13 @@ def solr_clear_index(app, args):
     conn.commit(optimize=True)
     conn.close()
 
+
 def solr_reindex(app, args):
     """Reindex Solr. This is equivalent to /@@solr-maintenance/reindex, but
     can handle more documents. Using reindex from the browser will stop
     eventually if there are too many documents, leaving the index incomplete.
-    You can optionally specify the id of the Plone site with --plonesite <siteid>.
+    You can optionally specify the id of the Plone site with
+    --plonesite <siteid>.
     """
     site = makerequest(_get_site(app, args))
     mv = SolrMaintenanceView(site, site.REQUEST)
