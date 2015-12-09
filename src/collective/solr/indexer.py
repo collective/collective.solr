@@ -274,7 +274,7 @@ class SolrIndexProcessor(object):
                     # and we might wait a bit longer on delete's this way
                     conn.flush()
                 else:
-                    conn.commit(waitFlush=wait, waitSearcher=wait)
+                    conn.commit(waitSearcher=wait)
             except (SolrException, error):
                 logger.exception('exception during commit')
             self.manager.closeConnection()
