@@ -11,6 +11,7 @@ from zope.interface import Interface
 from ZODB.interfaces import BlobError
 from ZODB.POSException import ConflictError
 from Products.CMFCore.utils import getToolByName
+from Products.CMFCore.CMFCatalogAware import CatalogAware
 from Products.CMFCore.CMFCatalogAware import CMFCatalogAware
 from Products.Archetypes.CatalogMultiplex import CatalogMultiplex
 try:   # pragma: no cover
@@ -45,8 +46,12 @@ class BaseIndexable(object):
         self.context = context
 
     def __call__(self):
+        # the check for CatalogAware is due to comments (from p.a.discussion)
+        # subclassing it instead of CMFCatalogAware, see
+        # https://github.com/plone/plone.app.discussion/issues/77
         return isinstance(self.context, CatalogMultiplex) or \
-            isinstance(self.context, CMFCatalogAware)
+            isinstance(self.context, CMFCatalogAware) or \
+            isinstance(self.context, CatalogAware)
 
 
 def datehandler(value):
