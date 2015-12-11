@@ -269,3 +269,12 @@ def quote(term, textfield=False):
                 stack.current.append('\\%s' % special)
         i += 1
     return str(stack)
+
+
+def quote_iterable_item(term):
+    if isinstance(term, unicode):
+        term = term.encode('utf-8')
+    quoted = quote(term)
+    if not quoted.startswith('"') and not quoted == term:
+        quoted = quote('"' + term + '"')
+    return quoted
