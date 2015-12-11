@@ -12,6 +12,9 @@ New Features:
 - Solr 7 compatibility.
   [timo]
 
+- Index comments.
+  [gforcada]
+
 Bugfixes:
 
 - Make plone.protect dependency optional.
