@@ -81,7 +81,7 @@ setup(
     entry_points='''
       [z3c.autoinclude.plugin]
       target=plone
-      [zopectl.command]
+      [plone.recipe.zope2instance.ctl]
       solr_clear_index=collective.solr.commands:solr_clear_index
       solr_reindex=collective.solr.commands:solr_reindex
     ''',
