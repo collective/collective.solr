@@ -264,6 +264,25 @@ class ISolrSchema(Interface):
         default=0.0,
     )
 
+    atomic_updates = Bool(
+        title=_('label_atomic_updates',
+                default=u'Enable atomic updates'),
+        description=_(
+            'help_atomic_updates',
+            default=u'Atomic updates allows you to update only specific '
+                    u'indexes, like "reindexObject(idxs=["portal_type"])".'
+                    u'Unfortunately atomic updates are not compatible with '
+                    u'index time boosting. If you enable atomic updates, '
+                    u'index time boosting no longer works.'),
+        default=True,
+        required=False,
+    )
+
+
+class ISolrConnectionConfig(ISolrSchema):
+    """ utility to hold the connection configuration for the solr server """
+
+
 class IZCMLSolrConnectionConfig(Interface):
     """Solr connection settings configured through ZCML.
     """

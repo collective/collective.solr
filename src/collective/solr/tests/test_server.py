@@ -213,13 +213,18 @@ class SolrMaintenanceTests(TestCase):
         self.assertEqual(counts['review_state'], 2)
 
     def testReindexKeepsBoostValues(self):
+        # Disable atomic updates, in order to test the index time boosting.
+        config = getUtility(ISolrConnectionConfig)
+        config.atomic_updates = False
+
         # "special" documents get boosted during indexing...
         from Products.PythonScripts.PythonScript import PythonScript
         name = 'solr_boost_index_values'
         self.portal[name] = PythonScript(name)
-        self.portal[name].write("##parameters=data\n"
-                                "return {'': 100} "
-                                "if data['getId'] == 'special' else {}")
+        self.portal[name].write(
+            "##parameters=data\n"
+            "return {'': 100} "
+            "if data.get('getId', '') == 'special' else {}")
         self.folder.invokeFactory('Document', id='dull', title='foo',
                                   description='the bar is missing here')
         self.folder.invokeFactory('Document', id='special', title='bar',
@@ -347,10 +352,14 @@ class SolrErrorHandlingTests(TestCase):
         manager.closeConnection()   # which would trigger a reconnect
         self.folder.processForm(values={'title': 'Bar'})
         commit()                    # indexing (doesn't) happen on commit
-        self.assertEqual(log, ['exception during request %r', log[1],
+
+        # INFO:
+        # Due the "atomic update" feature the indexing mechanism catches the
+        # socket error, instead of the connection.
+        # This also means we do not have the payload sent to solr at this
+        # place.
+        self.assertEqual(log, ['exception during indexing %r', log[1],
                                'exception during request %r', '<commit/>'])
-        self.assertTrue('test_user_1_' in log[1])
-        self.assertTrue('Bar' in log[1])
 
     def testNetworkFailureBeforeSchemaCanBeLoaded(self):
         log = []

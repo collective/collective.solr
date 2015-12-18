@@ -15,6 +15,18 @@ class SolrControlPanelForm(controlpanel.RegistryEditForm):
     schema = ISolrSchema
     schema_prefix = "collective.solr"
 
+    def getAtomicUpdates(self):
+        util = queryUtility(ISolrConnectionConfig)
+        return getattr(util, 'atomic_updates', True)
+
+    def setAtomicUpdates(self, value):
+        util = queryUtility(ISolrConnectionConfig)
+        if util is not None:
+            util.atomic_updates = value
+
+    atomic_updates = property(
+        getAtomicUpdates, setAtomicUpdates)
+
 
 class SolrControlPanel(controlpanel.ControlPanelFormWrapper):
 

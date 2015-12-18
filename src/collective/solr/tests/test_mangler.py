@@ -314,6 +314,11 @@ class QueryParameterTests(TestCase):
         params = extract({'hl': ['foo', 'bar']})
         self.assertEqual(params, {'hl': ['foo', 'bar']})
 
+    def testAllowRequestHandlerParamter(self):
+        extract = subtractQueryParameters
+        params = extract({'request_handler': 'custom'})
+        self.assertEqual(params, {'request_handler': 'custom'})
+
     def testSortIndexCleanup(self):
         cleanup = cleanupQueryParameters
         schema = SolrSchema()

@@ -236,6 +236,9 @@ def subtractQueryParameters(args, request_keywords=None):
         elif key == 'b_size':
             params['rows'] = int(value)
             del args[key]
+        elif key == 'request_handler':
+            params['request_handler'] = value
+            del args[key]
 
     return params
 

@@ -110,6 +110,8 @@ class IndexingTests(TestCase):
     def testIndexObject(self):
         output = []
         connection = self.proc.getConnection()
+        connection.get_schema()  # cache schema to avoid multiple calls
+
         responses = (getData('plone_schema.xml'),
                      getData('commit_response.txt'))
         output = fakehttp(connection, *responses)           # fake responses
@@ -118,7 +120,7 @@ class IndexingTests(TestCase):
         self.assertEqual(self.folder.Title(), 'Foo')
         self.assertEqual(str(output), '', 'reindexed unqueued!')
         commit()                        # indexing happens on commit
-        required = '<field name="Title">Foo</field>'
+        required = '<field name="Title" update="set">Foo</field>'
         self.assertTrue(str(output).find(required) > 0,
                         '"title" data not found')
 

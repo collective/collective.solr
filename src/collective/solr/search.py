@@ -9,6 +9,7 @@ from collective.solr.mangler import optimizeQueryParameters
 from collective.solr.mangler import subtractQueryParameters
 from collective.solr.parser import SolrResponse
 from collective.solr.queryparser import quote
+from collective.solr.queryparser import quote_iterable_item
 from collective.solr.utils import isWildCard
 from collective.solr.utils import prepareData
 from collective.solr.utils import prepare_wildcard
@@ -159,14 +160,7 @@ class Search(object):
             elif isinstance(value, (tuple, list)):
                 # list items should be treated as literals, but
                 # nevertheless only get quoted when necessary
-                def quoteitem(term):
-                    if isinstance(term, unicode):
-                        term = term.encode('utf-8')
-                    quoted = quote(term)
-                    if not quoted.startswith('"') and not quoted == term:
-                        quoted = quote('"' + term + '"')
-                    return quoted
-                value = '(%s)' % ' OR '.join(map(quoteitem, value))
+                value = '(%s)' % ' OR '.join(map(quote_iterable_item, value))
             elif isinstance(value, set):        # sets are taken literally
                 if len(value) == 1:
                     query[name] = ''.join(value)

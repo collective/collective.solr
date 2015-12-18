@@ -1,9 +1,10 @@
 HTTP/1.1 200 OK
 Content-Type: text/xml; charset=utf-8
-Content-Length: 62
+Content-Length: 89
 Server: Jetty(6.1.3)
 
 <?xml version="1.0" encoding="UTF-8"?>
 <response>
+<uniqueKey>UID</uniqueKey>
 </response>
 

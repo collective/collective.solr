@@ -33,6 +33,7 @@ class SetupToolTests(TestCase, TarballTester):
         config.effective_steps = 900
         config.exclude_user = True
         config.levenshtein_distance = 0.2
+        config.atomic_updates = False
 
     def testImportStep(self):
         profile = 'profile-collective.solr:default'
@@ -59,6 +60,7 @@ class SetupToolTests(TestCase, TarballTester):
         self.assertEqual(config.effective_steps, 1)
         self.assertEqual(config.exclude_user, False)
         self.assertEqual(config.levenshtein_distance, 0.0)
+        self.assertTrue(config.atomic_updates)
 
     def testExportStep(self):
         tool = self.portal.portal_setup
@@ -128,6 +130,7 @@ SOLR_XML = """\
     <highlight_fragsize value="100"/>
     <field-list/>
     <levenshtein_distance value="0.2"/>
+    <atomic_updates value="False"/>
   </settings>
 </object>
 """

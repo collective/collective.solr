@@ -99,6 +99,7 @@ def fakehttp(solrconn, *fakedata):
             self.fakedata = list(fakedata)
 
         def putrequest(self, *args, **kw):
+            self.url = args[1]
             response = self.fakedata.pop(0)     # get first response
             self.sock = FakeSocket(response)    # and set up a fake socket
             output.new()                        # as well as an output buffer

@@ -9,7 +9,13 @@ class TestSolr(TestCase):
     def test_add(self):
         add_request = getData('add_request.txt')
         add_response = getData('add_response.txt')
+
         c = SolrConnection(host='localhost:8983', persistent=True)
+
+        # fake schema response - caches the schema
+        fakehttp(c, getData('schema.xml'))
+        c.get_schema()
+
         output = fakehttp(c, add_response)
         c.add(id='500', name='python test doc')
         res = c.flush()
@@ -30,9 +36,18 @@ class TestSolr(TestCase):
         add_request = getData('add_request_with_boost_values.txt')
         add_response = getData('add_response.txt')
         c = SolrConnection(host='localhost:8983', persistent=True)
+
+        # fake schema response - caches the schema
+        fakehttp(c, getData('schema.xml'))
+        c.get_schema()
+
         output = fakehttp(c, add_response)
         boost = {'': 2, 'id': 0.5, 'name': 5}
-        c.add(boost_values=boost, id='500', name='python test doc')
+        c.add(boost_values=boost,
+              atomic_updates=False, #  Force disabling atomic updates
+              id='500',
+              name='python test doc')
+
         res = c.flush()
         self.assertEqual(len(res), 1)   # one request was sent
         res = res[0]
@@ -70,7 +85,7 @@ class TestSolr(TestCase):
         commit_response = getData('commit_response.txt')
         c = SolrConnection(host='localhost:8983', persistent=True)
         output = fakehttp(c, commit_response)
-        c.commit(waitFlush=False)
+        c.commit()
         self.failUnlessEqual(str(output), commit_request)
 
     def test_commit_no_wait_searcher(self):
@@ -79,14 +94,6 @@ class TestSolr(TestCase):
         c = SolrConnection(host='localhost:8983', persistent=True)
         output = fakehttp(c, commit_response)
         c.commit(waitSearcher=False)
-        self.failUnlessEqual(str(output), commit_request)
-
-    def test_commit_no_wait(self):
-        commit_request = getData('commit_request_no_wait.txt')
-        commit_response = getData('commit_response.txt')
-        c = SolrConnection(host='localhost:8983', persistent=True)
-        output = fakehttp(c, commit_response)
-        c.commit(waitFlush=False, waitSearcher=False)
         self.failUnlessEqual(str(output), commit_request)
 
     def test_search(self):
@@ -100,6 +107,20 @@ class TestSolr(TestCase):
         normalize = lambda x: sorted(x.split('&'))      # sort request params
         self.assertEqual(normalize(output.get()), normalize(search_request))
         self.failUnless(res.find(('.//doc')))
+
+    def test_search_with_default_request_handler(self):
+        search_response = getData('search_response.txt')
+        c = SolrConnection(host='localhost:8983', persistent=True)
+        fakehttp(c, search_response)
+        c.search(q='+id:[* TO *]')
+        self.assertEqual('/solr/select', c.conn.url)
+
+    def test_search_with_custom_request_handler(self):
+        search_response = getData('search_response.txt')
+        c = SolrConnection(host='localhost:8983', persistent=True)
+        fakehttp(c, search_response)
+        c.search(request_handler='custom', q='+id:[* TO *]')
+        self.assertEqual('/solr/custom', c.conn.url)
 
     def test_delete(self):
         delete_request = getData('delete_request.txt')
