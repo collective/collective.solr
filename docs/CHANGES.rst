@@ -31,6 +31,8 @@ Changelog
 - Add zopectl.command for reindexing. Do not rely on positional arguments in _get_site.
   [tschorr]
 
+- Move inline function out of to the global scope to make it more readable.
+  [gforcada]
 
 4.1.0 (2015-02-19)
 ------------------
