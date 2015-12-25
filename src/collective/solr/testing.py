@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from Products.CMFCore.utils import getToolByName
 from collective.solr.utils import activate
+from plone.app.registry.testing import PLONE_APP_REGISTRY_FIXTURE
 from plone.app.testing import FunctionalTesting
 from plone.app.testing import IntegrationTesting
 try:
@@ -201,11 +202,13 @@ def activateAndReindex(portal):
 COLLECTIVE_SOLR_FIXTURE = CollectiveSolrLayer()
 
 LEGACY_COLLECTIVE_SOLR_INTEGRATION_TESTING = IntegrationTesting(
-    bases=(LEGACY_COLLECTIVE_SOLR_FIXTURE,),
+    bases=(PLONE_APP_REGISTRY_FIXTURE,
+           LEGACY_COLLECTIVE_SOLR_FIXTURE,),
     name="CollectiveSolr:Integration"
 )
 
 LEGACY_COLLECTIVE_SOLR_FUNCTIONAL_TESTING = FunctionalTesting(
-    bases=(LEGACY_COLLECTIVE_SOLR_FIXTURE,),
+    bases=(PLONE_APP_REGISTRY_FIXTURE,
+           LEGACY_COLLECTIVE_SOLR_FIXTURE,),
     name="CollectiveSolr:Functional"
 )

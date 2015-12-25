@@ -3,7 +3,6 @@
 from DateTime import DateTime
 from Missing import MV
 from collective.solr.interfaces import ISolrConnectionConfig
-from collective.solr.manager import SolrConnectionConfig
 from collective.solr.manager import SolrConnectionManager
 from collective.solr.queryparser import quote
 from collective.solr.search import Search
@@ -323,7 +322,6 @@ class QueryTests(TestCase):
 class InactiveQueryTests(TestCase):
 
     def testUnavailableSchema(self):
-        provideUtility(SolrConnectionConfig(), ISolrConnectionConfig)
         search = Search()
         search.manager = SolrConnectionManager()
         self.assertEqual(search.buildQueryAndParameters('foo'), ({}, {}))
@@ -333,7 +331,6 @@ class InactiveQueryTests(TestCase):
 class SearchTests(TestCase):
 
     def setUp(self):
-        provideUtility(SolrConnectionConfig(), ISolrConnectionConfig)
         self.mngr = SolrConnectionManager()
         self.mngr.setHost(active=True)
         self.conn = self.mngr.getConnection()

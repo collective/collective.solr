@@ -2,13 +2,13 @@
 
 from DateTime import DateTime
 from collective.solr.interfaces import ISolrConnectionConfig
-from collective.solr.manager import SolrConnectionConfig
 from collective.solr.mangler import cleanupQueryParameters
 from collective.solr.mangler import mangleQuery
 from collective.solr.mangler import optimizeQueryParameters
 from collective.solr.mangler import subtractQueryParameters
 from collective.solr.parser import SolrField
 from collective.solr.parser import SolrSchema
+from collective.solr.utils import getConfig
 from unittest import TestCase
 from zope.component import getGlobalSiteManager
 from zope.component import provideUtility
@@ -31,7 +31,7 @@ class Query:
 class QueryManglerTests(TestCase):
 
     def setUp(self):
-        self.config = SolrConnectionConfig()
+        self.config = getConfig()
         provideUtility(self.config, ISolrConnectionConfig)
 
     def tearDown(self):

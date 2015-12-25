@@ -41,9 +41,9 @@ class SolrConnectionManager(object):
         """ set connection parameters """
         config = getConfig()
         config.active = active
-        config.host = host
+        config.host = unicode(host)
         config.port = port
-        config.base = base
+        config.base = unicode(base)
         self.closeConnection(clearSchema=True)
 
     def closeConnection(self, clearSchema=False):

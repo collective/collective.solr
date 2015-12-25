@@ -10,7 +10,6 @@ from Products.CMFCore.CMFCatalogAware import CMFCatalogAware
 
 from collective.solr.interfaces import ISolrConnectionConfig
 from collective.solr.interfaces import ICheckIndexable
-from collective.solr.manager import SolrConnectionConfig
 from collective.solr.manager import SolrConnectionManager
 from collective.solr.indexer import SolrIndexProcessor
 from collective.solr.indexer import logger as logger_indexer
@@ -44,7 +43,6 @@ def sortFields(output):
 class QueueIndexerTests(TestCase):
 
     def setUp(self):
-        provideUtility(SolrConnectionConfig(), ISolrConnectionConfig)
         self.mngr = SolrConnectionManager()
         self.mngr.setHost(active=True)
         conn = self.mngr.getConnection()
@@ -213,7 +211,6 @@ class QueueIndexerTests(TestCase):
 class RobustnessTests(TestCase):
 
     def setUp(self):
-        provideUtility(SolrConnectionConfig(), ISolrConnectionConfig)
         self.mngr = SolrConnectionManager()
         self.mngr.setHost(active=True)
         self.conn = self.mngr.getConnection()
@@ -263,7 +260,6 @@ class RobustnessTests(TestCase):
 class FakeHTTPConnectionTests(TestCase):
 
     def setUp(self):
-        provideUtility(SolrConnectionConfig(), ISolrConnectionConfig)
         self.foo = Foo(id='500', name='python test doc')
         self.schema_request = 'GET /solr/admin/file/?file=schema.xml'
 
@@ -338,7 +334,6 @@ class FakeHTTPConnectionTests(TestCase):
 class ThreadedConnectionTests(TestCase):
 
     def testLocalConnections(self):
-        provideUtility(SolrConnectionConfig(), ISolrConnectionConfig)
         mngr = SolrConnectionManager(active=True)
         proc = SolrIndexProcessor(mngr)
         mngr.setHost(active=True)
@@ -385,7 +380,3 @@ class ThreadedConnectionTests(TestCase):
         self.failUnless(isinstance(conn, SolrConnection))
         self.assertEqual(log[1], proc)      # processors should be the same...
         self.assertNotEqual(log[2], conn)   # but not the connections
-
-
-def test_suite():
-    return defaultTestLoader.loadTestsFromName(__name__)

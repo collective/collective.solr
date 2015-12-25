@@ -13,8 +13,10 @@ from collective.solr.testing import LEGACY_COLLECTIVE_SOLR_FUNCTIONAL_TESTING
 from collective.solr.tests.utils import fakeServer
 from collective.solr.tests.utils import fakehttp
 from collective.solr.tests.utils import getData
+from collective.solr.utils import getConfig
 from plone.app.testing import TEST_USER_ID
 from plone.app.testing import setRoles
+from plone import api
 from socket import error
 from socket import timeout
 from time import sleep
@@ -63,7 +65,7 @@ class QueryManglerTests(TestCase):
     layer = LEGACY_COLLECTIVE_SOLR_FUNCTIONAL_TESTING
 
     def testExcludeUserFromAllowedRolesAndUsers(self):
-        config = queryUtility(ISolrConnectionConfig)
+        config = getConfig()
         search = queryUtility(ISearch)
         schema = search.getManager().getSchema() or {}
         # first test the default setting, i.e. not removing the user
@@ -159,7 +161,7 @@ class SiteSearchTests(TestCase):
         self.assertRaises(SolrInactiveException, search, 'foo')
 
     def testSearchWithoutServer(self):
-        config = queryUtility(ISolrConnectionConfig)
+        config = getConfig()
         config.active = True
         config.port = 55555     # random port so the real solr might still run
         search = queryUtility(ISearch)
@@ -178,9 +180,9 @@ class SiteSearchTests(TestCase):
 #        self.assertRaises(error, query, request)
 
     def testSearchTimeout(self):
-        config = queryUtility(ISolrConnectionConfig)
+        config = getConfig()
         config.active = True
-        config.search_timeout = 2   # specify the timeout
+        config.search_timeout = 2.0  # specify the timeout
         config.port = 55555         # don't let the real solr disturb us
 
         def quick(handler):         # set up fake http response
@@ -201,7 +203,7 @@ class SiteSearchTests(TestCase):
             thread.join()           # the server thread must always be joined
 
     def testSchemaUrlFallback(self):
-        config = queryUtility(ISolrConnectionConfig)
+        config = getConfig()
         config.active = True
         config.port = 55555        # random port so the real solr can still run
 
@@ -254,7 +256,7 @@ class SiteSetupTests(TestCase):
         self.portal = self.layer['portal']
 
     def testBrowserResources(self):
-        records = getToolByName(self.portal, 'portal_registry').records
+        records = api.portal.get_tool(name='portal_registry').records
         key = ('plone.resources/'
                'resource-collective-solr-resources-style-css.css')
         css = '++resource++collective.solr.resources/style.css'
@@ -265,7 +267,3 @@ class SiteSetupTests(TestCase):
         utrans = getToolByName(self.portal, 'translation_service').utranslate
         translate = lambda msg: utrans(msgid=msg, domain='solr')
         self.assertEqual(translate('portal_type'), u'Content type')
-
-
-def test_suite():
-    return defaultTestLoader.loadTestsFromName(__name__)
