@@ -128,6 +128,7 @@ class ISolrSchema(Interface):
         ),
         value_type=TextLine(),
         default=[],
+        missing_value=[],
         required=False
     )
 
