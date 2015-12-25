@@ -51,8 +51,10 @@ would essentially come down to the same, of course:
 
   >>> from collective.solr.interfaces import ISolrConnectionConfig
   >>> from collective.solr.interfaces import ISolrConnectionManager
-  >>> port = getUtility(ISolrConnectionConfig).port
-  >>> getUtility(ISolrConnectionConfig).port = 55555
+  >>> from collective.solr.utils import getConfig
+  >>> config = getConfig()
+  >>> port = config.port
+  >>> config.port = 55555
   >>> getUtility(ISolrConnectionManager).closeConnection()
 
 Also, before we try to continue, we need to prevent the test framework from
@@ -98,7 +100,7 @@ timeout error is provoked:
   >>> def action(handler):
   ...   sleep(3)
   >>> thread = fakeServer([action, action], port=55555)
-  >>> getUtility(ISolrConnectionConfig).search_timeout = 2
+  >>> config.search_timeout = 2.0
   >>> transaction.commit()
 
 And try the search again:

@@ -59,7 +59,7 @@ def makeSimpleExpressions(term, levenstein_distance):
 
 
 def mangleSearchableText(value, config):
-    pattern = getattr(config, 'search_pattern', '')
+    pattern = getattr(config, 'search_pattern', u'').encode('utf-8')
     levenstein_distance = getattr(config, 'levenshtein_distance', 0)
     value_parts = []
     base_value_parts = []
@@ -279,4 +279,4 @@ def optimizeQueryParameters(query, params):
     elif fq:
         params['fq'] = fq
     if not query:
-        query['*'] = '*:*'      # catch all if no regular query is left...
+        query['*'] = u'*:*'      # catch all if no regular query is left...

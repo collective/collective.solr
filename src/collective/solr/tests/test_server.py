@@ -20,6 +20,7 @@ from collective.solr.testing import COLLECTIVE_SOLR_FUNCTIONAL_TESTING
 from collective.solr.testing import HAS_LINGUAPLONE
 from collective.solr.tests.utils import numFound
 from collective.solr.utils import activate
+from collective.solr.utils import getConfig
 from operator import itemgetter
 from plone.app.testing import TEST_USER_ID
 from plone.app.testing import TEST_USER_NAME
@@ -66,7 +67,7 @@ class SolrMaintenanceTests(TestCase):
         commit()
         self.folder = self.portal.folder
         self.folder.review_state = 'published'
-        self.config = queryUtility(ISolrConnectionConfig)
+        self.config = getConfig()
         activate()
         manager = getUtility(ISolrConnectionManager)
         self.connection = connection = manager.getConnection()
@@ -214,7 +215,7 @@ class SolrMaintenanceTests(TestCase):
 
     def testReindexKeepsBoostValues(self):
         # Disable atomic updates, in order to test the index time boosting.
-        config = getUtility(ISolrConnectionConfig)
+        config = getConfig()
         config.atomic_updates = False
 
         # "special" documents get boosted during indexing...
@@ -248,7 +249,7 @@ class SolrMaintenanceTests(TestCase):
             log.extend(args)
         logger_solr.exception = logger
         # specify a very short timeout...
-        config = getUtility(ISolrConnectionConfig)
+        config = getConfig()
         config.index_timeout = 0.01             # huh, solr is fast!
         # reindexing should disable the timeout...
         maintenance = self.portal.unrestrictedTraverse('solr-maintenance')
@@ -266,7 +267,7 @@ class SolrMaintenanceTests(TestCase):
             log.extend(args)
         logger_solr.exception = logger
         # specify a very short timeout...
-        config = getUtility(ISolrConnectionConfig)
+        config = getConfig()
         config.index_timeout = 0.01             # huh, solr is fast!
         # syncing should disable the timeout...
         maintenance = self.portal.unrestrictedTraverse('solr-maintenance')
@@ -325,7 +326,7 @@ class SolrErrorHandlingTests(TestCase):
         setRoles(self.portal, TEST_USER_ID, ['Manager'])
         self.portal.invokeFactory('Folder', id='folder')
         self.folder = self.portal.folder
-        self.config = getUtility(ISolrConnectionConfig)
+        self.config = getConfig()
         self.port = self.config.port        # remember previous port setting
         if HAS_LINGUAPLONE:
             self.folder.unmarkCreationFlag()    # stop LinguaPlone from renaming
@@ -399,7 +400,7 @@ class SolrServerTests(TestCase):
         self.portal.REQUEST.RESPONSE.write = lambda x: x    # ignore output
         self.maintenance = self.portal.unrestrictedTraverse('solr-maintenance')
         self.maintenance.clear()
-        self.config = getUtility(ISolrConnectionConfig)
+        self.config = getConfig()
         self.search = getUtility(ISearch)
         if HAS_LINGUAPLONE:
             self.folder.unmarkCreationFlag()    # stop LinguaPlone from renaming
@@ -601,7 +602,7 @@ class SolrServerTests(TestCase):
 
     def testSolrSearchResultsInformationForCustomSearchPattern(self):
         self.maintenance.reindex()
-        self.config.search_pattern = '(Title:{value}^5 OR getId:{value})'
+        self.config.search_pattern = u'(Title:{value}^5 OR getId:{value})'
         # for single-word searches we get both, wildcards & the custom pattern
         response = solrSearchResults(SearchableText='news', Language='all')
         query = response.responseHeader['params']['q']
@@ -648,13 +649,13 @@ class SolrServerTests(TestCase):
                                   description='another foo, this time visible')
         commit()                        # indexing happens on commit
         # first we rank title higher than the description...
-        self.config.search_pattern = '(Title:{value}^5 OR Description:{value})'
+        self.config.search_pattern = u'(Title:{value}^5 OR Description:{value})'
         search = lambda term: [r.getId for r in
                                solrSearchResults(SearchableText=term)]
         self.assertEqual(search('foo'), ['doc1', 'doc2'])
         self.assertEqual(search('bar'), ['doc2', 'doc1'])
         # now let's try changing the pattern...
-        self.config.search_pattern = '(Description:{value}^5 OR Title:{value})'
+        self.config.search_pattern = u'(Description:{value}^5 OR Title:{value})'
         self.assertEqual(search('foo'), ['doc2', 'doc1'])
         self.assertEqual(search('bar'), ['doc1', 'doc2'])
 
@@ -663,22 +664,22 @@ class SolrServerTests(TestCase):
         self.assertRaises(FallBackException, solrSearchResults,
                           dict(Title='News'))
         # now let's remove all required parameters and try again
-        config = getUtility(ISolrConnectionConfig)
+        config = getConfig()
         config.required = []
         results = solrSearchResults(Title='News')
         self.assertEqual(sorted([(r.Title, r.path_string) for r in results]),
                          [('News', '/plone/news/aggregator')])
         # specifying multiple values should required only one of them...
-        config.required = ['Title', 'foo']
+        config.required = [u'Title', u'foo']
         results = solrSearchResults(Title='News')
         self.assertEqual(sorted([(r.Title, r.path_string) for r in results]),
                          [('News', '/plone/news/aggregator')])
         # but solr won't be used if none of them is present...
-        config.required = ['foo', 'bar']
+        config.required = [u'foo', u'bar']
         self.assertRaises(FallBackException, solrSearchResults,
                           dict(Title='News'))
         # except if you force it via `use_solr`...
-        config.required = ['foo', 'bar']
+        config.required = [u'foo', u'bar']
         results = solrSearchResults(Title='News', use_solr=True)
         self.assertEqual(sorted([(r.Title, r.path_string) for r in results]),
                          [('News', '/plone/news/aggregator')])
@@ -688,7 +689,7 @@ class SolrServerTests(TestCase):
         self.assertEqual(sorted([(r.Title, r.path_string) for r in results]),
                          [('News', '/plone/news/aggregator')])
         # it does respect a `False` though...
-        config.required = ['foo', 'bar']
+        config.required = [u'foo', u'bar']
         self.assertRaises(FallBackException, solrSearchResults,
                           dict(Title='News', use_solr=False))
 
@@ -917,7 +918,7 @@ class SolrServerTests(TestCase):
         self.assertEqual(results.numFound, '8')
         self.assertEqual(len(results), 8)
         # now let's limit the returned results
-        config = getUtility(ISolrConnectionConfig)
+        config = getConfig()
         config.max_results = 2
         results = self.search('+path_parents:\/plone').results()
         self.assertEqual(results.numFound, '8')
@@ -1058,7 +1059,7 @@ class SolrServerTests(TestCase):
         self.assertEqual(numFound(result), 1)
 
     def testTimeoutResetAfterSearch(self):
-        self.config.search_timeout = 1      # specify the timeout
+        self.config.search_timeout = 1.0      # specify the timeout
         connection = getUtility(ISolrConnectionManager).getConnection()
         self.assertEqual(connection.conn.sock.gettimeout(), None)
         results = self.search('+Title:Foo').results()
@@ -1191,9 +1192,9 @@ class SolrServerTests(TestCase):
     def testSearchWithOnlyFilterQueryParameters(self):
         self.maintenance.reindex()
         # let's remove all required parameters and use a filter query
-        config = getUtility(ISolrConnectionConfig)
+        config = getConfig()
         config.required = []
-        config.filter_queries = ['portal_type', 'Language']
+        config.filter_queries = [u'portal_type', u'Language']
         results = solrSearchResults(portal_type=['Document'])
         paths = [p.path_string for p in results]
         self.assertTrue('/plone/front-page' in paths)

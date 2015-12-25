@@ -10,9 +10,9 @@ from collective.solr.browser.facets import convertFacets, facetParameters
 from collective.solr.browser.facets import SearchFacetsView
 from collective.solr.interfaces import IFacetTitleVocabularyFactory
 from collective.solr.interfaces import ISolrConnectionConfig
-from collective.solr.manager import SolrConnectionConfig
 from collective.solr.parser import SolrResponse
 from collective.solr.tests.utils import getData
+from collective.solr.utils import getConfig
 
 
 class Dummy(object):
@@ -145,8 +145,7 @@ class FacettingHelperTest(TestCase, cleanup.CleanUp):
         getGlobalSiteManager().unregisterUtility(cfg, ISolrConnectionConfig)
 
     def testFacetDependencies(self):
-        cfg = SolrConnectionConfig()
-        provideUtility(cfg, ISolrConnectionConfig)
+        cfg = getConfig()
         # dependency info can be set via the configuration utility...
         cfg.facets = ['foo:bar']
         context = Dummy()
@@ -170,8 +169,6 @@ class FacettingHelperTest(TestCase, cleanup.CleanUp):
             facetParameters(view),
             (['foo : bar', 'bar  :foo'], dict(foo=['bar'], bar=['foo']))
         )
-        # clean up...
-        getGlobalSiteManager().unregisterUtility(cfg, ISolrConnectionConfig)
 
     def testNamedFacetTitleVocabulary(self):
         """Test use of IFacetTitleVocabularyFactory registrations
