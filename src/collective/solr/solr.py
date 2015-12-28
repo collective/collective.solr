@@ -262,10 +262,11 @@ class SolrConnection:
                 continue
 
             if f in boost_values:
-                tmpl = '<field name="%s" boost="%s" update="set">%%s</field>' % (
-                    self.escapeKey(f), boost_values[f])
+                tmpl = '<field name="%s" boost="%s" update="set">%%s</field>'
+                tmpl = tmpl % (self.escapeKey(f), boost_values[f])
             else:
-                tmpl = '<field name="%s" update="set">%%s</field>' % self.escapeKey(f)
+                tmpl = '<field name="%s" update="set">%%s</field>'
+                tmpl = tmpl % self.escapeKey(f)
 
             if not atomic_updates_enabled:
                 # Remove update="set", since it breaks the index time boosting.

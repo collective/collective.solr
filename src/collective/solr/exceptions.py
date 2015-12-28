@@ -2,7 +2,8 @@
 
 
 class SolrException(Exception):
-   """Base class where all other exceptions from collective.solr derive from"""
+    """Base class where all other exceptions from collective.solr derive from
+    """
 
 
 class SolrInactiveException(SolrException):
