@@ -44,7 +44,7 @@ class TestSolr(TestCase):
         output = fakehttp(c, add_response)
         boost = {'': 2, 'id': 0.5, 'name': 5}
         c.add(boost_values=boost,
-              atomic_updates=False, #  Force disabling atomic updates
+              atomic_updates=False,  # Force disabling atomic updates
               id='500',
               name='python test doc')
 
