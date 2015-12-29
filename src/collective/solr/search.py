@@ -116,10 +116,11 @@ class Search(object):
 
         params = subtractQueryParameters(args)
         params = cleanupQueryParameters(params, schema)
+        config = self.getConfig()
 
         languageFilter(args)
         prepareData(args)
-        mangleQuery(args, self.config, schema)
+        mangleQuery(args, config, schema)
 
         logger.debug('building query for "%r", %r', default, args)
         schema = self.getManager().getSchema() or {}
