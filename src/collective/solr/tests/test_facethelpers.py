@@ -1,7 +1,7 @@
 from unittest import TestCase
 from urllib import unquote
 
-from zope.component import getGlobalSiteManager, provideUtility
+from zope.component import provideUtility
 from zope.publisher.browser import TestRequest
 from zope.schema.vocabulary import SimpleTerm
 from zope.testing import cleanup
@@ -9,7 +9,6 @@ from zope.testing import cleanup
 from collective.solr.browser.facets import convertFacets, facetParameters
 from collective.solr.browser.facets import SearchFacetsView
 from collective.solr.interfaces import IFacetTitleVocabularyFactory
-from collective.solr.interfaces import ISolrConnectionConfig
 from collective.solr.parser import SolrResponse
 from collective.solr.tests.utils import getData
 from collective.solr.utils import getConfig
@@ -128,8 +127,7 @@ class FacettingHelperTest(TestCase, cleanup.CleanUp):
         # with nothing set up, no facets will be returned
         self.assertEqual(facetParameters(view), ([], {}))
         # setting up the regular config utility should give the default value
-        cfg = SolrConnectionConfig()
-        provideUtility(cfg, ISolrConnectionConfig)
+        cfg = getConfig()
         self.assertEqual(facetParameters(view), ([], {}))
         # so let's set it...
         cfg.facets = ['foo']
@@ -141,8 +139,6 @@ class FacettingHelperTest(TestCase, cleanup.CleanUp):
         request['facet.field'] = ['foo', 'bar']
         self.assertEqual(facetParameters(view),
                          (['foo', 'bar'], {}))
-        # clean up...
-        getGlobalSiteManager().unregisterUtility(cfg, ISolrConnectionConfig)
 
     def testFacetDependencies(self):
         cfg = getConfig()

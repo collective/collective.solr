@@ -265,7 +265,7 @@ def cleanupQueryParameters(args, schema):
 def optimizeQueryParameters(query, params):
     """ optimize query parameters by using filter queries for
         configured indexes """
-    filter_queries = api.portal.get_registry_record(name='collective.solr.filter_queries')
+    filter_queries = api.portal.get_registry_record(name='collective.solr.filter_queries')   # noqa
     fq = []
     if filter_queries is not None:
         for idxs in filter_queries:

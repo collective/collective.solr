@@ -43,7 +43,8 @@ class LinguaTests(TestCase):
         self.config.async = False
         commit()
 
-    @unittest.skipIf(not HAS_LINGUAPLONE, "LinguaPlone not installed. skipping")
+    @unittest.skipIf(not HAS_LINGUAPLONE,
+                     "LinguaPlone not installed. skipping")
     def testLanguageSearch(self):
         en = self.portal[self.portal.invokeFactory('Document', 'doc')]
         en.update(title='some document', language='en')

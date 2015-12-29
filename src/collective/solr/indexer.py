@@ -4,7 +4,7 @@ from lxml import etree
 from Acquisition import aq_get
 from DateTime import DateTime
 from datetime import date, datetime
-from zope.component import getUtility, queryUtility, queryMultiAdapter
+from zope.component import queryUtility, queryMultiAdapter
 from zope.component import queryAdapter, adapts
 from zope.interface import implements
 from zope.interface import Interface
@@ -22,7 +22,6 @@ except ImportError:
 from plone.indexer.interfaces import IIndexableObject
 from plone import api
 
-from collective.solr.interfaces import ISolrSchema
 from collective.solr.interfaces import ISolrConnectionManager
 from collective.solr.interfaces import ISolrIndexQueueProcessor
 from collective.solr.interfaces import ICheckIndexable
@@ -198,7 +197,7 @@ class SolrIndexProcessor(object):
                 return          # don't index with no data...
             prepareData(data)
             if data.get(uniqueKey, None) is not None and not missing:
-                config_commit_within = api.portal.get_registry_record(name='collective.solr.commit_within')
+                config_commit_within = api.portal.get_registry_record(name='collective.solr.commit_within')   # noqa
                 if config_commit_within:
                     data['commitWithin'] = config_commit_within
                 try:

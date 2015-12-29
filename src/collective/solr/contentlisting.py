@@ -143,4 +143,3 @@ class FlareContentListingObject(object):
 
     def CroppedDescription(self):
         return self.flare.Description
-

@@ -351,13 +351,12 @@ class QueryParameterTests(TestCase):
             (dict(a='a:23', b='b:42', c='c:(23 42)'), dict())
         )
         # now unconfigured...
-        config = SolrConnectionConfig()
-        provideUtility(config, ISolrConnectionConfig)
+        config = getConfig()
         self.assertEqual(
             optimize(),
             (dict(a='a:23', b='b:42', c='c:(23 42)'), dict())
         )
-        config.filter_queries = ['a']
+        config.filter_queries = [u'a']
         self.assertEqual(
             optimize(),
             (dict(b='b:42', c='c:(23 42)'), dict(fq=['a:23']))

@@ -1,14 +1,12 @@
-from unittest import TestCase, defaultTestLoader
+from unittest import TestCase
 from threading import Thread
 from re import search, findall, DOTALL
 from DateTime import DateTime
 from datetime import datetime
 from datetime import date
-from zope.component import provideUtility
 from zope.interface import implements
 from Products.CMFCore.CMFCatalogAware import CMFCatalogAware
 
-from collective.solr.interfaces import ISolrConnectionConfig
 from collective.solr.interfaces import ICheckIndexable
 from collective.solr.manager import SolrConnectionManager
 from collective.solr.indexer import SolrIndexProcessor
