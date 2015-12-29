@@ -12,7 +12,7 @@ from logging import getLogger
 from socket import error
 from zope.component import queryUtility
 from zope.interface import implements
-from plone import api
+from plone.api.portal import get_registry_record
 
 logger = getLogger('collective.solr.manager')
 marker = object()
@@ -20,7 +20,7 @@ marker = object()
 
 class ZCMLSolrConnectionConfig(object):
     '''Connection values that can be configured through zcml'''
-    #implements(IZCMLSolrConnectionConfig)
+    implements(IZCMLSolrConnectionConfig)
 
     def __init__(self, host, port, base):
         self.host = '%s:%d' % (host, port)
@@ -65,7 +65,7 @@ class SolrConnectionManager(object):
             return conn
 
         zcmlconfig = queryUtility(IZCMLSolrConnectionConfig)
-        config_host = api.portal.get_registry_record(name='collective.solr.host')
+        config_host = get_registry_record(name='collective.solr.host')
         if zcmlconfig is not None:
             # use connection parameters defined in zcml...
             logger.debug('opening connection to %s', zcmlconfig.host)
@@ -75,8 +75,8 @@ class SolrConnectionManager(object):
             setLocal('connection', conn)
         elif config_host is not None:
             # otherwise use connection parameters defined in control panel...
-            config_port = api.portal.get_registry_record(name='collective.solr.port')
-            config_base = api.portal.get_registry_record(name='collective.solr.base')
+            config_port = get_registry_record(name='collective.solr.port')
+            config_base = get_registry_record(name='collective.solr.base')
             host = '%s:%d' % (config_host, config_port)
             logger.debug('opening connection to %s', host)
             conn = SolrConnection(host=host, solrBase=config_base,
@@ -116,11 +116,11 @@ class SolrConnectionManager(object):
     def setIndexTimeout(self):
         """ set the timeout on the current (or to be opened) connection
             to the value specified for indexing operations """
-        index_timeout = api.portal.get_registry_record(name='collective.solr.index_timeout')
+        index_timeout = get_registry_record(name='collective.solr.index_timeout')   # noqa
         self.setTimeout(index_timeout or None)
 
     def setSearchTimeout(self):
         """ set the timeout on the current (or to be opened) connection
             to the value specified for search operations """
-        search_timeout = api.portal.get_registry_record(name='collective.solr.index_timeout')
+        search_timeout = get_registry_record(name='collective.solr.index_timeout')  # noqa
         self.setTimeout(search_timeout or None)

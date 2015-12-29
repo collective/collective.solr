@@ -10,7 +10,6 @@ from collective.solr.flare import PloneFlare
 from collective.solr.indexer import SolrIndexProcessor
 from collective.solr.indexer import logger as logger_indexer
 from collective.solr.interfaces import ISearch
-from collective.solr.interfaces import ISolrConnectionConfig
 from collective.solr.interfaces import ISolrConnectionManager
 from collective.solr.manager import logger as logger_manager
 from collective.solr.parser import SolrResponse
@@ -33,10 +32,8 @@ from transaction import commit
 from unittest import TestCase
 from zExceptions import Unauthorized
 from zope.component import getUtility
-from zope.component import queryUtility
 from zope.schema.interfaces import IVocabularyFactory
 
-import pkg_resources
 
 DEFAULT_OBJS = [
     {'Title': 'News', 'getId': 'aggregator', 'Type': 'Collection',
@@ -329,7 +326,7 @@ class SolrErrorHandlingTests(TestCase):
         self.config = getConfig()
         self.port = self.config.port        # remember previous port setting
         if HAS_LINGUAPLONE:
-            self.folder.unmarkCreationFlag()    # stop LinguaPlone from renaming
+            self.folder.unmarkCreationFlag()  # stop LinguaPlone from renaming
         # Prevent collective indexing queues to pile up for folder createion
         commit()
 
@@ -403,7 +400,7 @@ class SolrServerTests(TestCase):
         self.config = getConfig()
         self.search = getUtility(ISearch)
         if HAS_LINGUAPLONE:
-            self.folder.unmarkCreationFlag()    # stop LinguaPlone from renaming
+            self.folder.unmarkCreationFlag()  # stop LinguaPlone from renaming
 
     def tearDown(self):
         # due to the `commit()` in the tests below the activation of the
@@ -661,13 +658,13 @@ class SolrServerTests(TestCase):
                                   description='another foo, this time visible')
         commit()                        # indexing happens on commit
         # first we rank title higher than the description...
-        self.config.search_pattern = u'(Title:{value}^5 OR Description:{value})'
+        self.config.search_pattern = u'(Title:{value}^5 OR Description:{value})'  # noqa
         search = lambda term: [r.getId for r in
                                solrSearchResults(SearchableText=term)]
         self.assertEqual(search('foo'), ['doc1', 'doc2'])
         self.assertEqual(search('bar'), ['doc2', 'doc1'])
         # now let's try changing the pattern...
-        self.config.search_pattern = u'(Description:{value}^5 OR Title:{value})'
+        self.config.search_pattern = u'(Description:{value}^5 OR Title:{value})'  # noqa
         self.assertEqual(search('foo'), ['doc2', 'doc1'])
         self.assertEqual(search('bar'), ['doc1', 'doc2'])
 

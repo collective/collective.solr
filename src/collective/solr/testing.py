@@ -5,7 +5,7 @@ from plone.app.registry.testing import PLONE_APP_REGISTRY_FIXTURE
 from plone.app.testing import FunctionalTesting
 from plone.app.testing import IntegrationTesting
 try:
-    from plone.app.contenttypes.testing import PLONE_APP_CONTENTTYPES_FIXTURE as PLONE_FIXTURE
+    from plone.app.contenttypes.testing import PLONE_APP_CONTENTTYPES_FIXTURE as PLONE_FIXTURE  # noqa
 except ImportError:
     from plone.app.testing import PLONE_FIXTURE
 from plone.app.testing import PloneSandboxLayer
@@ -16,7 +16,7 @@ from plone.app.testing import login
 from plone.app.testing import setRoles
 from plone.testing import Layer
 from plone.testing.z2 import installProduct
-from plone import api
+from plone.api.portal import set_registry_record
 from time import sleep
 from zope.configuration import xmlconfig
 
@@ -33,6 +33,7 @@ try:
     HAS_LINGUAPLONE = True
 except pkg_resources.DistributionNotFound:
     HAS_LINGUAPLONE = False
+
 
 class SolrLayer(Layer):
     """Solr test layer that fires up and shuts down a Solr instance. This
@@ -135,14 +136,14 @@ class CollectiveSolrLayer(PloneSandboxLayer):
 
     def setUpPloneSite(self, portal):
         applyProfile(portal, 'collective.solr:search')
-        api.portal.set_registry_record('collective.solr.active', self.solr_active)
-        api.portal.set_registry_record('collective.solr.port', self.solr_port)
-        api.portal.set_registry_record('collective.solr.base', self.solr_base)
+        set_registry_record('collective.solr.active', self.solr_active)
+        set_registry_record('collective.solr.port', self.solr_port)
+        set_registry_record('collective.solr.base', self.solr_base)
 
     def tearDownPloneSite(self, portal):
-        api.portal.set_registry_record('collective.solr.active', False)
-        api.portal.set_registry_record('collective.solr.port', 8983)
-        api.portal.set_registry_record('collective.solr.base', u'/solr')
+        set_registry_record('collective.solr.active', False)
+        set_registry_record('collective.solr.port', 8983)
+        set_registry_record('collective.solr.base', u'/solr')
 
 
 class LegacyCollectiveSolrLayer(CollectiveSolrLayer):

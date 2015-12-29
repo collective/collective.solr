@@ -4,7 +4,6 @@ from Products.CMFCore.utils import getToolByName
 from collective.indexing.interfaces import IIndexQueueProcessor
 from collective.solr.exceptions import SolrInactiveException
 from collective.solr.interfaces import ISearch
-from collective.solr.interfaces import ISolrConnectionConfig
 from collective.solr.interfaces import ISolrConnectionManager
 from collective.solr.interfaces import ISolrIndexQueueProcessor
 from collective.solr.interfaces import IZCMLSolrConnectionConfig
@@ -22,7 +21,6 @@ from socket import timeout
 from time import sleep
 from transaction import commit
 from unittest import TestCase
-from unittest import defaultTestLoader
 from zope.component import getGlobalSiteManager
 from zope.component import getUtilitiesFor
 from zope.component import queryUtility

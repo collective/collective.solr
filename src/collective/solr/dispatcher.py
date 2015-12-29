@@ -52,7 +52,7 @@ def solrSearchResults(request=None, **keywords):
         parameters with portal catalog semantics """
     site = getSite()
     search = queryUtility(ISearch, context=site)
-    config_required = api.portal.get_registry_record(name='collective.solr.required')
+    config_required = api.portal.get_registry_record(name='collective.solr.required')  # noqa
 
     if request is None:
         # try to get a request instance, so that flares can be adapted to
