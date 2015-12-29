@@ -37,7 +37,6 @@ import urllib
 from collective.solr.exceptions import SolrConnectionException
 from collective.solr.interfaces import ISolrConnectionConfig
 from collective.solr.parser import SolrSchema
-from collective.solr.timeout import HTTPConnectionWithTimeout
 from collective.solr.utils import translation_map
 from zope.component import queryUtility
 
@@ -57,7 +56,7 @@ class SolrConnection:
         # responses from Solr will always be in UTF-8
         self.decoder = codecs.getdecoder('utf-8')
         # a real connection to the server is not opened at this point.
-        self.conn = HTTPConnectionWithTimeout(self.host, timeout=timeout)
+        self.conn = httplib.HTTPConnection(self.host, timeout=timeout)
         # self.conn.set_debuglevel(1000000)
         self.xmlbody = []
         self.xmlheaders = {'Content-Type': 'text/xml; charset=utf-8'}
@@ -105,7 +104,7 @@ class SolrConnection:
     def setTimeout(self, timeout):
         """ set a timeout value for the currently open connection """
         logger.debug('setting socket timeout on %r: %s', self, timeout)
-        self.conn.setTimeout(timeout)
+        self.conn.timeout = timeout
 
     def doPost(self, url, body, headers):
         return self.doGetOrPost('POST', url, body, headers)
