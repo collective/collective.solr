@@ -6,6 +6,7 @@ from collective.solr.utils import isSimpleSearch
 from collective.solr.utils import isWildCard
 from collective.solr.utils import prepare_wildcard
 from collective.solr.utils import splitSimpleSearch
+from collective.solr.utils import getConfig
 from plone import api
 
 ranges = {
@@ -60,7 +61,10 @@ def makeSimpleExpressions(term, levenstein_distance):
 
 
 def mangleSearchableText(value, config):
-    pattern = getattr(config, 'search_pattern', u'').encode('utf-8')
+    config = config or getConfig()
+    pattern = getattr(config, 'search_pattern', u'')
+    if pattern:
+        pattern = pattern.encode('utf-8')
     levenstein_distance = getattr(config, 'levenshtein_distance', 0)
     value_parts = []
     base_value_parts = []
