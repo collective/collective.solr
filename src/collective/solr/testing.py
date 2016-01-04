@@ -18,7 +18,6 @@ from plone.testing import Layer
 from plone.testing.z2 import installProduct
 from plone.api.portal import set_registry_record
 from time import sleep
-from zope.configuration import xmlconfig
 
 import os
 import sys
@@ -134,13 +133,9 @@ class CollectiveSolrLayer(PloneSandboxLayer):
     def setUpZope(self, app, configurationContext):
         # Load ZCML
         import collective.indexing
-        xmlconfig.file('configure.zcml',
-                       collective.indexing,
-                       context=configurationContext)
+        self.loadZCML(package=collective.indexing)
         import collective.solr
-        xmlconfig.file('configure.zcml',
-                       collective.solr,
-                       context=configurationContext)
+        self.loadZCML(package=collective.solr)
         installProduct(app, 'collective.indexing')
 
     def setUpPloneSite(self, portal):
