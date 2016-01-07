@@ -34,6 +34,9 @@ Changelog
 - Move inline function out of to the global scope to make it more readable.
   [gforcada]
 
+- Unify all exceptions raised by collective.solr.
+  [gforcada]
+
 4.1.0 (2015-02-19)
 ------------------
 
