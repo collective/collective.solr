@@ -88,13 +88,14 @@ class SolrLayer(Layer):
             cwd=BUILDOUT_DIR
         )
 
-
 SOLR_FIXTURE = SolrLayer()
 
 
-class CollectiveSolrLayer(PloneSandboxLayer):
-
-    defaultBases = (SOLR_FIXTURE, PLONE_FIXTURE)
+class CollectiveSolrLayer(PloneSandboxLayer, SolrLayer):
+    """collective.solr test layer that fires up and shuts down a Solr instance
+       together with Plone and collective.solr installed.
+    """
+    defaultBases = (PLONE_FIXTURE,)
 
     def __init__(
             self,
@@ -110,18 +111,32 @@ class CollectiveSolrLayer(PloneSandboxLayer):
         self.solr_host = solr_host
         self.solr_port = solr_port
         self.solr_base = solr_base
+        self.solr_url = 'http://{0}:{1}{2}'.format(
+            solr_host,
+            solr_port,
+            solr_base
+        )
+
+    def setUp(self):
+        """Call the setUp method of PloneSandboxLayer as well as the SolrLayer
+           setUp method. We need both, the Plone/ZODB setup and Solr.
+        """
+        super(CollectiveSolrLayer, self).setUp()
+        SolrLayer.setUp(self)
+
+    def tearDown(self):
+        """Call the tearDown method of PloneSandboxLayer as well as the
+           SolrLayer tearDown method. We need both, the Plone/ZODB setup and
+           Solr.
+        """
+        super(CollectiveSolrLayer, self).tearDown()
+        SolrLayer.tearDown(self)
 
     def setUpZope(self, app, configurationContext):
-        # Load ZCML
-        import collective.indexing
-        xmlconfig.file('configure.zcml',
-                       collective.indexing,
-                       context=configurationContext)
         import collective.solr
         xmlconfig.file('configure.zcml',
                        collective.solr,
                        context=configurationContext)
-        installProduct(app, 'collective.indexing')
 
     def setUpPloneSite(self, portal):
         applyProfile(portal, 'collective.solr:search')
@@ -138,6 +153,17 @@ class CollectiveSolrLayer(PloneSandboxLayer):
 
 
 class LegacyCollectiveSolrLayer(CollectiveSolrLayer):
+
+    def setUpZope(self, app, configurationContext):
+        super(LegacyCollectiveSolrLayer, self).setUpZope(
+            app,
+            configurationContext
+        )
+        import collective.indexing
+        xmlconfig.file('configure.zcml',
+                       collective.indexing,
+                       context=configurationContext)
+        installProduct(app, 'collective.indexing')
 
     def setUpPloneSite(self, portal):
         super(LegacyCollectiveSolrLayer, self).setUpPloneSite(portal)
