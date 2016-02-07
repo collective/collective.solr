@@ -37,6 +37,10 @@ Changelog
 - Unify all exceptions raised by collective.solr.
   [gforcada]
 
+- Soft commit changes while reindexing.
+  This allows to get results on searches while reindexing is taking place.
+  [gforcada]
+
 4.1.0 (2015-02-19)
 ------------------
 
