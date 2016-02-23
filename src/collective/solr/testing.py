@@ -38,8 +38,7 @@ class SolrLayer(Layer):
             module=None,
             solr_host='localhost',
             solr_port=8983,
-            solr_base='/solr',
-            solr_core='collection1'):
+            solr_base='/solr'):
         super(SolrLayer, self).__init__(bases, name, module)
         self.solr_host = solr_host
         self.solr_port = solr_port
@@ -49,7 +48,6 @@ class SolrLayer(Layer):
             solr_port,
             solr_base
         )
-        self.solr_core = solr_core
 
     def setUp(self):
         """Start Solr and poll until it is up and running.
@@ -61,10 +59,7 @@ class SolrLayer(Layer):
             cwd=BIN_DIR
         )
         # Poll Solr until it is up and running
-        solr_ping_url = '{0}/{1}/admin/ping'.format(
-            self.solr_url,
-            self.solr_core
-        )
+        solr_ping_url = '{0}/admin/ping'.format(self.solr_url)
         for i in range(1, 10):
             try:
                 result = urllib2.urlopen(solr_ping_url)
