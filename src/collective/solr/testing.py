@@ -178,7 +178,7 @@ def activateAndReindex(portal):
     activate()
     response = portal.REQUEST.RESPONSE
     original = response.write
-    response.write = lambda x: x    # temporarily ignore output
+    response.write = lambda x: x  # temporarily ignore output
     maintenance = portal.unrestrictedTraverse('@@solr-maintenance')
     maintenance.clear()
     maintenance.reindex()
