@@ -21,7 +21,7 @@ import sys
 import urllib2
 import subprocess
 
-BUILDOUT_DIR = os.path.join(os.getcwd(), '..', '..', 'bin')
+BIN_DIR = os.path.dirname(os.path.realpath(sys.argv[0]))
 
 
 class SolrLayer(Layer):
@@ -38,7 +38,8 @@ class SolrLayer(Layer):
             module=None,
             solr_host='localhost',
             solr_port=8983,
-            solr_base='/solr'):
+            solr_base='/solr',
+            solr_core='collection1'):
         super(SolrLayer, self).__init__(bases, name, module)
         self.solr_host = solr_host
         self.solr_port = solr_port
@@ -48,6 +49,7 @@ class SolrLayer(Layer):
             solr_port,
             solr_base
         )
+        self.solr_core = solr_core
 
     def setUp(self):
         """Start Solr and poll until it is up and running.
@@ -56,10 +58,13 @@ class SolrLayer(Layer):
             './solr-instance start',
             shell=True,
             close_fds=True,
-            cwd=BUILDOUT_DIR
+            cwd=BIN_DIR
         )
         # Poll Solr until it is up and running
-        solr_ping_url = '{0}/admin/ping'.format(self.solr_url)
+        solr_ping_url = '{0}/{1}/admin/ping'.format(
+            self.solr_url,
+            self.solr_core
+        )
         for i in range(1, 10):
             try:
                 result = urllib2.urlopen(solr_ping_url)
@@ -74,7 +79,7 @@ class SolrLayer(Layer):
                     './solr-instance stop',
                     shell=True,
                     close_fds=True,
-                    cwd=BUILDOUT_DIR
+                    cwd=BIN_DIR
                 )
                 sys.stdout.write('Solr Instance could not be started !!!')
 
@@ -85,7 +90,7 @@ class SolrLayer(Layer):
             './solr-instance stop',
             shell=True,
             close_fds=True,
-            cwd=BUILDOUT_DIR
+            cwd=BIN_DIR
         )
 
 
