@@ -3,7 +3,7 @@ from collective.solr.browser.facets import SearchBox
 from collective.solr.browser.facets import SearchFacetsView
 from collective.solr.browser.interfaces import IThemeSpecific
 from collective.solr.dispatcher import solrSearchResults
-from collective.solr.solr import SolrException
+from collective.solr.exceptions import SolrConnectionException
 from collective.solr.testing import COLLECTIVE_SOLR_INTEGRATION_TESTING
 from collective.solr.utils import activate
 from plone.app.testing import TEST_USER_ID
@@ -190,7 +190,7 @@ class SolrFacettingTests(TestCase):
         request.form['facet'] = 'true'
         request.form['facet_field'] = 'foo'
         alsoProvides(request, IThemeSpecific)
-        self.assertRaises(SolrException, solrSearchResults, request)
+        self.assertRaises(SolrConnectionException, solrSearchResults, request)
 
     def testNoFacetFields(self):
         request = self.app.REQUEST

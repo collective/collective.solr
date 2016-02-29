@@ -25,7 +25,7 @@ import urllib2
 import subprocess
 import pkg_resources
 
-BUILDOUT_DIR = os.path.join(os.getcwd(), '..', '..', 'bin')
+BIN_DIR = os.path.dirname(os.path.realpath(sys.argv[0]))
 
 try:
     pkg_resources.get_distribution('Products.LinguaPlone')
@@ -66,7 +66,7 @@ class SolrLayer(Layer):
             './solr-instance start',
             shell=True,
             close_fds=True,
-            cwd=BUILDOUT_DIR
+            cwd=BIN_DIR
         )
         # Poll Solr until it is up and running
         solr_ping_url = '{0}/admin/ping'.format(self.solr_url)
@@ -84,7 +84,7 @@ class SolrLayer(Layer):
                     './solr-instance stop',
                     shell=True,
                     close_fds=True,
-                    cwd=BUILDOUT_DIR
+                    cwd=BIN_DIR
                 )
                 sys.stdout.write('Solr Instance could not be started !!!')
 
@@ -95,7 +95,7 @@ class SolrLayer(Layer):
             './solr-instance stop',
             shell=True,
             close_fds=True,
-            cwd=BUILDOUT_DIR
+            cwd=BIN_DIR
         )
 
 
@@ -104,22 +104,31 @@ SOLR_FIXTURE = SolrLayer()
 
 class CollectiveSolrLayer(PloneSandboxLayer):
 
-    defaultBases = (SOLR_FIXTURE, PLONE_FIXTURE)
+    defaultBases = (PLONE_FIXTURE, )
 
     def __init__(
             self,
             bases=None,
             name='Collective Solr Layer',
             module=None,
-            solr_active=False,
-            solr_host=u'localhost',
+            solr_host='localhost',
             solr_port=8983,
-            solr_base=u'/solr'):
-        super(CollectiveSolrLayer, self).__init__(bases, name, module)
+            solr_base='/solr',
+            solr_active=False):
+        super(PloneSandboxLayer, self).__init__(bases, name, module)
         self.solr_active = solr_active
         self.solr_host = solr_host
         self.solr_port = solr_port
         self.solr_base = solr_base
+        # SolrLayer should use the same settings as CollectiveSolrLayer
+        self.solr_layer = SolrLayer(
+            bases,
+            name,
+            module,
+            solr_host=solr_host,
+            solr_port=solr_port,
+            solr_base=solr_base
+        )
 
     def setUpZope(self, app, configurationContext):
         # Load ZCML
@@ -130,6 +139,7 @@ class CollectiveSolrLayer(PloneSandboxLayer):
         installProduct(app, 'collective.indexing')
 
     def setUpPloneSite(self, portal):
+        self.solr_layer.setUp()
         applyProfile(portal, 'collective.solr:search')
         set_registry_record('collective.solr.active', self.solr_active)
         set_registry_record('collective.solr.port', self.solr_port)
@@ -139,6 +149,7 @@ class CollectiveSolrLayer(PloneSandboxLayer):
         set_registry_record('collective.solr.active', False)
         set_registry_record('collective.solr.port', 8983)
         set_registry_record('collective.solr.base', u'/solr')
+        self.solr_layer.tearDown()
 
 
 class LegacyCollectiveSolrLayer(CollectiveSolrLayer):
@@ -177,7 +188,7 @@ def activateAndReindex(portal):
     activate()
     response = portal.REQUEST.RESPONSE
     original = response.write
-    response.write = lambda x: x    # temporarily ignore output
+    response.write = lambda x: x  # temporarily ignore output
     maintenance = portal.unrestrictedTraverse('@@solr-maintenance')
     maintenance.clear()
     maintenance.reindex()

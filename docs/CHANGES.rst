@@ -4,13 +4,16 @@ Changelog
 4.1.1 (unreleased)
 ------------------
 
-- Add support for using different request handlers in search requests.
-  [buchi]
+Note: This release requires you to to update your Solr config and do a full reindex.
+
 - Ported atomic updates from ftw.solr.
   This requires you to update your solr config, load the new solr config and
   do a full reindex. For more informations check the "feature" section.
   The feature was implemented in ftw.solr by [lgraf].
   [mathias.leimgruber]
+
+- Add support for using different request handlers in search requests.
+  [buchi]
 
 - solr.cfg has been moved from https://github.com/collective/collective.solr/raw/master/buildout/solr.cfg to https://github.com/collective/collective.solr/raw/master/solr.cfg.
   [timo]
@@ -33,6 +36,14 @@ Changelog
 
 - Move inline function out of to the global scope to make it more readable.
   [gforcada]
+
+- Unify all exceptions raised by collective.solr.
+  [gforcada]
+
+- Soft commit changes while reindexing.
+  This allows to get results on searches while reindexing is taking place.
+  [gforcada]
+
 
 4.1.0 (2015-02-19)
 ------------------

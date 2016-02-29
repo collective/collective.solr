@@ -34,6 +34,7 @@ from xml.etree.cElementTree import fromstring
 from xml.sax.saxutils import escape
 import codecs
 import urllib
+from collective.solr.exceptions import SolrConnectionException
 from collective.solr.interfaces import ISolrConnectionConfig
 from collective.solr.parser import SolrSchema
 from collective.solr.utils import translation_map
@@ -41,23 +42,6 @@ from zope.component import queryUtility
 
 from logging import getLogger
 logger = getLogger(__name__)
-
-
-class SolrException(Exception):
-    """ An exception thrown by solr connections """
-
-    def __init__(self, httpcode='000', reason=None, body=None):
-        self.httpcode = httpcode
-        self.reason = reason
-        self.body = body
-
-    def __repr__(self):
-        return 'HTTP code=%s, Reason=%s, body=%s' % (
-            self.httpcode, self.reason, self.body
-        )
-
-    def __str__(self):
-        return 'HTTP code=%s, reason=%s' % (self.httpcode, self.reason)
 
 
 class SolrConnection:
@@ -109,7 +93,7 @@ class SolrConnection:
 
     def __errcheck(self, rsp):
         if rsp.status != 200:
-            ex = SolrException(rsp.status, rsp.reason)
+            ex = SolrConnectionException(rsp.status, rsp.reason)
             try:
                 ex.body = rsp.read()
             except:
@@ -160,7 +144,7 @@ class SolrConnection:
         for request in self.xmlbody:
             try:
                 responses.append(self.doSendXML(request))
-            except (SolrException, socket.error):
+            except (SolrConnectionException, socket.error):
                 logger.exception('exception during request %r', request)
             count += len(request)
         logger.debug(
@@ -186,7 +170,7 @@ class SolrConnection:
         status = parsed.attrib.get('status', 0)
         if status != 0:
             reason = parsed.documentElement.firstChild.nodeValue
-            raise SolrException(rsp.status, reason)
+            raise SolrConnectionException(rsp.status, reason)
         return parsed
 
     def escapeVal(self, val):
@@ -285,12 +269,13 @@ class SolrConnection:
 
         return self.doUpdateXML(xstr)
 
-    def commit(self, waitSearcher=True, optimize=False):
+    def commit(self, waitSearcher=True, optimize=False, soft=False):
         data = {
             'committype': optimize and 'optimize' or 'commit',
             'nowait': not waitSearcher and ' waitSearcher="false"' or '',
+            'soft': soft and ' softCommit="true"' or '',
         }
-        xstr = '<%(committype)s%(nowait)s/>' % data
+        xstr = '<%(committype)s%(soft)s%(nowait)s/>' % data
         self.doUpdateXML(xstr)
         return self.flush()
 
@@ -343,4 +328,4 @@ class SolrConnection:
                 xml = response.read()
                 return SolrSchema(xml.strip())
             self.__reconnect()          # force a new connection for each url
-        self.__errcheck(response)       # raise a solrexception
+        self.__errcheck(response)       # raise a SolrConnectionException

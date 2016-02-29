@@ -26,7 +26,7 @@ from collective.solr.interfaces import ISolrConnectionManager
 from collective.solr.interfaces import ISolrIndexQueueProcessor
 from collective.solr.interfaces import ICheckIndexable
 from collective.solr.interfaces import ISolrAddHandler
-from collective.solr.solr import SolrException
+from collective.solr.exceptions import SolrConnectionException
 from collective.solr.utils import prepareData
 from collective.solr.utils import getConfig
 from socket import error
@@ -153,7 +153,7 @@ class BinaryAdder(DefaultAdder):
         try:
             conn.doPost(url, urlencode(postdata, doseq=True), conn.formheaders)
             conn.flush()
-        except SolrException, e:
+        except SolrConnectionException, e:
             logger.warn('Error %s @ %s', e, data['path_string'])
             conn.reset()
 
@@ -222,7 +222,7 @@ class SolrIndexProcessor(object):
                     if adder is None:
                         adder = DefaultAdder(obj)
                     adder(conn, boost_values=boost_values(obj, data), **data)
-                except (SolrException, error):
+                except (SolrConnectionException, error):
                     logger.exception('exception during indexing %r', obj)
 
     def reindex(self, obj, attributes=None):
@@ -262,7 +262,7 @@ class SolrIndexProcessor(object):
             try:
                 logger.debug('unindexing %r (%r)', obj, data)
                 conn.delete(id=data_key)
-            except (SolrException, error):
+            except (SolrConnectionException, error):
                 logger.exception('exception during unindexing %r', obj)
 
     def begin(self):
@@ -283,7 +283,7 @@ class SolrIndexProcessor(object):
                     conn.flush()
                 else:
                     conn.commit(waitSearcher=wait)
-            except (SolrException, error):
+            except (SolrConnectionException, error):
                 logger.exception('exception during commit')
             self.manager.closeConnection()
 

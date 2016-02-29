@@ -2,6 +2,7 @@
 from Acquisition import aq_base
 from Missing import MV
 from Products.ZCatalog.ZCatalog import ZCatalog
+from collective.solr.exceptions import FallBackException
 from collective.solr.interfaces import IFlare
 from collective.solr.interfaces import ISearch
 from collective.solr.interfaces import ISearchDispatcher
@@ -20,11 +21,6 @@ from plone import api
 
 patchCatalogTool()  # patch catalog tool to use the dispatcher...
 patchLazy()  # ...as well as ZCatalog's Lazy class
-
-
-class FallBackException(Exception):
-    """ exception indicating the dispatcher should fall back to searching
-        the portal catalog """
 
 
 class SearchDispatcher(object):
