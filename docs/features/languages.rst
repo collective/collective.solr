@@ -8,9 +8,12 @@ The default text analysis uses libraries based on ICU standards to fold and norm
 
 Accented characters are folder into their unaccented base form and many other characters are normalized.
 This normalization is similar to what Plone does when generating url identifiers from titles.
-These changes are applied both to the indexed text and the user provided search query, so in general there's a large number of matches at the expense of specificity.
+These changes are applied both to the indexed text and the user provided search query,
+so in general there's a large number of matches at the expense of specificity.
 
-Non-alphabetic characters like hyphens, dots and colons are interpreted as word boundaries, while case changes and alphanumeric combinations are left intact; for example `WiFi` or `IPv4` will only be lower-cased but not split.
+Non-alphabetic characters like hyphens, dots and colons are interpreted as word boundaries,
+while case changes and alphanumeric combinations are left intact;
+for example `WiFi` or `IPv4` will only be lower-cased but not split.
 
 For any specific site, you likely know the supported content languages and could further tune the text analysis.
 A common example is the use of stemming, to generate base words for terms.

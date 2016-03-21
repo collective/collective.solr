@@ -7,4 +7,4 @@ The provided search form is currently more of an example and not used in many re
 You likely want to override it with a custom implementation for your specific site.
 
 Starting with Plone 4.2, Plone will contain a modernized search form whose UI supports faceting more naturally.
-At some point `c.solr` will extend this new search form rather than providing its own.
+At some point `collective.solr` will extend this new search form rather than providing its own.
