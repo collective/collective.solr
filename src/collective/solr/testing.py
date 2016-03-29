@@ -113,7 +113,7 @@ class CollectiveSolrLayer(PloneSandboxLayer):
             module=None,
             solr_host='localhost',
             solr_port=8983,
-            solr_base='/solr',
+            solr_base=u'/solr',
             solr_active=False):
         super(PloneSandboxLayer, self).__init__(bases, name, module)
         self.solr_active = solr_active
