@@ -55,11 +55,13 @@
         />
 
     <adapter
+        zcml:condition="installed plone.dexterity"
         factory=".indexer.BinaryAdderDexterity"
         name="File"
         />
 
     <adapter
+        zcml:condition="installed plone.dexterity"
         factory=".indexer.BinaryAdderDexterity"
         name="Image"
         />

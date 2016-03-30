@@ -30,7 +30,17 @@ from collective.solr.exceptions import SolrConnectionException
 from collective.solr.utils import prepareData
 from socket import error
 from urllib import urlencode
-from plone.dexterity.interfaces import IDexterityContent
+
+import pkg_resources
+
+try:
+    pkg_resources.get_distribution('plone.dexterity')
+except pkg_resources.DistributionNotFound:
+    from plone.dexterity.interfaces import IDexterityContent
+else:
+    # we can use any interface here since the adapter is registered in zcml
+    # only if plone.dexterity is installed
+    from zope.interface import Interface as IDexterityContent
 
 
 logger = getLogger('collective.solr.indexer')
