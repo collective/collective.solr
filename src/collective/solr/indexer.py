@@ -30,6 +30,7 @@ from collective.solr.exceptions import SolrConnectionException
 from collective.solr.utils import prepareData
 from socket import error
 from urllib import urlencode
+from plone.dexterity.interfaces import IDexterityContent
 
 
 logger = getLogger('collective.solr.indexer')
@@ -111,9 +112,11 @@ class DefaultAdder(object):
         conn.add(**data)
 
 
-class BinaryAdder(DefaultAdder):
+class BinaryAdderArchetypes(DefaultAdder):
     """ Add binary content to index via tika
     """
+
+    adapts(IBaseObject)
 
     def getpath(self):
         field = self.context.getPrimaryField()
@@ -123,7 +126,7 @@ class BinaryAdder(DefaultAdder):
 
     def __call__(self, conn, **data):
         if 'ZOPETESTCASE' in os.environ:
-            return super(BinaryAdder, self).__call__(conn, **data)
+            return super(BinaryAdderArchetypes, self).__call__(conn, **data)
         ignore = ('SearchableText', 'created', 'Type', 'links',
                   'description', 'Date')
         postdata = {}
@@ -155,6 +158,11 @@ class BinaryAdder(DefaultAdder):
         except SolrConnectionException, e:
             logger.warn('Error %s @ %s', e, data['path_string'])
             conn.reset()
+
+
+class BinaryAdderDexterity(BinaryAdderArchetypes):
+    """ """
+    adapts(IDexterityContent)
 
 
 def boost_values(obj, data):

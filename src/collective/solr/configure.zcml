@@ -45,12 +45,22 @@
         />
 
     <adapter
-        factory=".indexer.BinaryAdder"
+        factory=".indexer.BinaryAdderArchetypes"
         name="File"
         />
 
     <adapter
-        factory=".indexer.BinaryAdder"
+        factory=".indexer.BinaryAdderArchetypes"
+        name="Image"
+        />
+
+    <adapter
+        factory=".indexer.BinaryAdderDexterity"
+        name="File"
+        />
+
+    <adapter
+        factory=".indexer.BinaryAdderDexterity"
         name="Image"
         />
 
