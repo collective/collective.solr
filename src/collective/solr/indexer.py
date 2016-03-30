@@ -28,6 +28,7 @@ from collective.solr.interfaces import ICheckIndexable
 from collective.solr.interfaces import ISolrAddHandler
 from collective.solr.exceptions import SolrConnectionException
 from collective.solr.utils import prepareData
+from plone.dexterity.interfaces import IDexterityContent
 from socket import error
 from urllib import urlencode
 
@@ -100,6 +101,7 @@ class DefaultAdder(object):
 
     implements(ISolrAddHandler)
     adapts(IBaseObject)
+    adapts(IDexterityContent)
 
     def __init__(self, context):
         self.context = context
