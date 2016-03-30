@@ -78,22 +78,27 @@ A full Documentation of the Solr integration of Plone could be found in `docs.pl
 Installation & Configuration
 ============================
 
-The following buildout configuration may be used to get started quickly::
+Download the latest default Solr configuration from github::
+
+  $ wget https://github.com/collective/collective.solr/raw/master/solr.cfg
+  $ wget https://raw.githubusercontent.com/collective/collective.solr/master/solr-4.10.x.cfg
+
+Extend your buildout to use those files and make sure collective.solr is added
+to the eggs in your instance section::
 
   [buildout]
   extends =
-    buildout.cfg
-    https://github.com/collective/collective.solr/raw/master/solr.cfg
-    https://github.com/collective/collective.solr/raw/master/solr-5.2.x.cfg # or any other version of Solr 
+    solr.cfg
+    solr-4.10.x.cfg
 
   [instance]
   eggs += collective.solr
 
 
-After saving this to let's say ``solr.cfg`` the buildout can be run and the `Solr`_ server and `Plone`_ instance started::
+After saving this to let's say ``buildout.cfg`` the buildout can be run and the `Solr`_ server and `Plone`_ instance started::
 
   $ python bootstrap-buildout.py
-  $ bin/buildout -c solr.cfg
+  $ bin/buildout
   ...
   $ bin/solr-instance start
   $ bin/instance start
