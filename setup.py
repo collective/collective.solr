@@ -4,8 +4,8 @@ from setuptools import find_packages
 
 version = '4.1.1.dev0'
 long_description = \
-    open("README.rst").read() + '\n' + \
-    open(os.path.join('docs', 'CHANGES.rst')).read() + \
+    open('README.rst').read() + '\n' + \
+    open('CHANGES.rst').read() + \
     open(os.path.join('docs', 'credits.rst')).read() + \
     open(os.path.join('docs', 'contributors.rst')).read(),
 
