@@ -83,6 +83,8 @@ Download the latest default Solr configuration from github::
   $ wget https://github.com/collective/collective.solr/raw/master/solr.cfg
   $ wget https://raw.githubusercontent.com/collective/collective.solr/master/solr-4.10.x.cfg
 
+.. note: Please do not extend your buildout directly with those files since they are likely to change over time. Always fetch the files via wget to have a stable local copy. In general you should never rely on extending buildout config files from servers that aren't under your control.
+
 Extend your buildout to use those files and make sure collective.solr is added
 to the eggs in your instance section::
 
@@ -108,8 +110,6 @@ After activation you should review the settings in the new ``Solr Settings`` con
 To index all your content in Solr you can call the provided maintenance view::
 
   http://localhost:8080/plone/@@solr-maintenance/reindex
-
-Note that the example ``solr.cfg`` is bound to change. Always copy the file to your local buildout. In general you should never rely on extending buildout config files from servers that aren't under your control.
 
 
 Solr connection configuration in ZCML
