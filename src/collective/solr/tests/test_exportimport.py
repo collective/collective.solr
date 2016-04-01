@@ -33,6 +33,7 @@ class SetupToolTests(TestCase, TarballTester):
         config.effective_steps = 900
         config.exclude_user = True
         config.levenshtein_distance = 0.2
+        config.field_list = ('review_state', 'Title', )
         config.atomic_updates = False
 
     def testImportStep(self):
@@ -128,7 +129,10 @@ SOLR_XML = """\
     <highlight_formatter_pre value="["/>
     <highlight_formatter_post value="]"/>
     <highlight_fragsize value="100"/>
-    <field-list/>
+    <field-list>
+      <parameter name="review_state" />
+      <parameter name="Title" />
+    </field-list>
     <levenshtein_distance value="0.2"/>
     <atomic_updates value="False"/>
   </settings>
