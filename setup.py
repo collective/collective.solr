@@ -1,8 +1,13 @@
-from setuptools import setup, find_packages
+import os.path
+from setuptools import setup
+from setuptools import find_packages
 
-version = '4.0.4.dev0'
+version = '4.1.1.dev0'
 long_description = \
-    open("README.rst").read() + '\n' + open('CHANGES.rst').read()
+    open('README.rst').read() + '\n' + \
+    open('CHANGES.rst').read() + \
+    open(os.path.join('docs', 'credits.rst')).read() + \
+    open(os.path.join('docs', 'contributors.rst')).read(),
 
 setup(
     name='collective.solr',
@@ -23,9 +28,11 @@ setup(
         'Programming Language :: Python :: 2.7',
     ],
     keywords='plone cmf zope indexing searching solr lucene',
-    author='Jarn AS',
-    author_email='info@jarn.com',
-    url='http://plone.org/products/collective.solr',
+    author='Plone Community',
+    author_email='plone-developers@lists.sourceforge.net',
+    maintainer='Timo Stollenwerk',
+    maintainer_email='tisto@plone.org',
+    url='https://github.com/collective/collective.solr',
     license='GPL version 2',
     packages=find_packages('src'),
     package_dir={'': 'src'},
@@ -35,49 +42,49 @@ setup(
     zip_safe=False,
     install_requires=[
         'Acquisition',
-        'archetypes.schemaextender',
-        'collective.indexing >= 2.0a2',
-        'collective.js.showmore',
         'DateTime',
         'Plone >= 4.1',
+        'Products.Archetypes',
+        'Products.CMFCore',
+        'Products.CMFDefault',
+        'Products.GenericSetup',
+        'Unidecode',
+        'ZODB3',
+        'Zope2 >= 2.13',
+        'archetypes.schemaextender',
+        'argparse',  # we need to support Python 2.6 (Plone 4.x)
+        'collective.indexing >= 2.0a2',
+        'collective.js.showmore',
         'plone.app.content',
         'plone.app.controlpanel',
         'plone.app.layout',
         'plone.app.registry',
         'plone.app.testing',
         'plone.app.vocabularies',
-        'plone.app.testing',
         'plone.browserlayer',
         'plone.indexer',
-        'Products.Archetypes',
-        'Products.CMFCore',
-        'Products.CMFDefault',
-        'Products.GenericSetup',
         'setuptools',
         'transaction',
-        'Unidecode',
-        'ZODB3',
         'zope.component',
         'zope.formlib',
         'zope.i18nmessageid',
         'zope.interface',
         'zope.publisher',
         'zope.schema',
-        'Zope2 >= 2.13',
     ],
     extras_require={
         'test': [
-            'collective.testcaselayer',
             'Products.LinguaPlone >=3.1a1',
-            'Products.PloneTestCase',
             'plone.app.contentlisting',  # Comes with Plone 4.2,
                                          # only a test req for 4.1 compat
+            'plone.app.testing',
         ]
     },
     entry_points='''
       [z3c.autoinclude.plugin]
       target=plone
-      [zopectl.command]
+      [plone.recipe.zope2instance.ctl]
       solr_clear_index=collective.solr.commands:solr_clear_index
+      solr_reindex=collective.solr.commands:solr_reindex
     ''',
 )

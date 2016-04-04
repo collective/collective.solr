@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from logging import getLogger
 from time import time, clock, strftime
 
@@ -7,6 +8,7 @@ from Products.Five.browser import BrowserView
 from plone.uuid.interfaces import IUUID, IUUIDAware
 from zope.interface import implements
 from zope.component import queryUtility, queryAdapter
+from collective.indexing.indexer import getOwnIndexMethod
 from collective.solr.indexer import DefaultAdder
 from collective.solr.flare import PloneFlare
 from collective.solr.interfaces import ISolrConnectionManager
@@ -92,9 +94,16 @@ class SolrMaintenanceView(BrowserView):
         conn.commit()
         return 'solr index cleared.'
 
-    def reindex(self, batch=1000, skip=0, limit=0):
+    def reindex(self, batch=1000, skip=0, limit=0, ignore_portal_types=None,
+                only_portal_types=None, idxs=[]):
         """ find all contentish objects (meaning all objects derived from one
             of the catalog mixin classes) and (re)indexes them """
+
+        if ignore_portal_types and only_portal_types:
+            raise ValueError("It is not possible to combine "
+                             "ignore_portal_types with only_portal_types")
+
+        atomic = idxs != []
         manager = queryUtility(ISolrConnectionManager)
         proc = SolrIndexProcessor(manager)
         conn = manager.getConnection()
@@ -112,13 +121,13 @@ class SolrMaintenanceView(BrowserView):
         schema = manager.getSchema()
         key = schema.uniqueKey
         updates = {}            # list to hold data to be updated
-        flush = lambda: conn.flush()
+        flush = lambda: conn.commit(soft=True)
         flush = notimeout(flush)
 
         def checkPoint():
-            for boost_values, data in updates.values():
+            for my_boost_values, data in updates.values():
                 adder = data.pop('_solr_adder')
-                adder(conn, boost_values=boost_values, **data)
+                adder(conn, boost_values=my_boost_values, **data)
             updates.clear()
             msg = 'intermediate commit (%d items processed, ' \
                   'last batch in %s)...\n' % (processed, lap.next())
@@ -128,17 +137,46 @@ class SolrMaintenanceView(BrowserView):
             zodb_conn.cacheGC()
         cpi = checkpointIterator(checkPoint, batch)
         count = 0
+
+        if atomic:
+            log('indexing only {0} \n'.format(idxs))
+
         for path, obj in findObjects(self.context):
             if ICheckIndexable(obj)():
+
+                if getOwnIndexMethod(obj, 'indexObject') is not None:
+                    log('skipping indexing of %r via private method.\n' % obj)
+                    continue
+
                 count += 1
                 if count <= skip:
                     continue
-                data, missing = proc.getData(obj)
+
+                if ignore_portal_types:
+                    if obj.portal_type in ignore_portal_types:
+                        continue
+
+                if only_portal_types:
+                    if obj.portal_type not in only_portal_types:
+                        continue
+
+                attributes = None
+                if atomic:
+                    attributes = idxs
+
+                # For atomic updates to work the uniqueKey must be present
+                # in *every* update operation.
+                if attributes and key not in attributes:
+                    attributes.append(key)
+
+                data, missing = proc.getData(obj, attributes=attributes)
                 prepareData(data)
-                if not missing:
+
+                if not missing or atomic:
                     value = data.get(key, None)
                     if value is not None:
                         log('indexing %r\n' % obj)
+
                         pt = data.get('portal_type', 'default')
                         adder = queryAdapter(obj, ISolrAddHandler, name=pt)
                         if adder is None:
@@ -151,6 +189,7 @@ class SolrMaintenanceView(BrowserView):
                     log('missing data, skipping indexing of %r.\n' % obj)
                 if limit and count >= (skip + limit):
                     break
+
         checkPoint()
         conn.commit()
         log('solr index rebuilt.\n')
@@ -317,8 +356,12 @@ class SolrMaintenanceView(BrowserView):
                     deleted += 1
                     continue
                 if not IUUIDAware.providedBy(ob):
-                    log('Object %s of type %s does not support uuids, skipping.\n' %
-                        ('/'.join(ob.getPhysicalPath()), ob.meta_type))
+                    no_skipping_msg = 'Object %s of type %s does not ' + \
+                        'support uuids, skipping.\n'
+                    log(
+                        no_skipping_msg %
+                        ('/'.join(ob.getPhysicalPath()), ob.meta_type)
+                    )
                     continue
                 uuid = IUUID(ob)
                 if uuid != flare[key]:
@@ -343,6 +386,8 @@ class SolrMaintenanceView(BrowserView):
             start += batch
             resp = SolrResponse(conn.search(q='*:*', rows=batch, start=start))
             res = resp.results()
-        msg = 'solr cleanup finished, %s item(s) removed, %s item(s) reindexed\n' % (deleted, reindexed)
+        finished_msg = 'solr cleanup finished, %s item(s) removed, ' + \
+            '%s item(s) reindexed\n'
+        msg = finished_msg % (deleted, reindexed)
         log(msg)
         logger.info(msg)

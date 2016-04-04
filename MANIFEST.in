@@ -1,2 +1,16 @@
-include *.txt *.rst
+exclude better-defaults.diff
+exclude bootstrap-buildout.py
+exclude *.cfg
+exclude .coveragerc
+exclude docs/Makefile
+exclude .gitattributes
+exclude tox.ini
+global-exclude *.pyc
+global-exclude .*py.un~
+include docs/LICENSE.GPL
+recursive-include docs *.rst
+recursive-include docs *.py
+recursive-include docs *.txt
+include *.rst
+prune etc
 recursive-include src *

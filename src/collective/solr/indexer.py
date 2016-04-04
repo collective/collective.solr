@@ -14,7 +14,11 @@ from Products.CMFCore.utils import getToolByName
 from Products.CMFCore.CMFCatalogAware import CMFCatalogAware
 from Products.Archetypes.CatalogMultiplex import CatalogMultiplex
 from Products.Archetypes.interfaces import IBaseObject
-from plone.app.content.interfaces import IIndexableObjectWrapper
+try:
+    from plone.app.content.interfaces import IIndexableObjectWrapper
+except ImportError:
+    # Plone 5
+    from plone.indexer.interfaces import IIndexableObjectWrapper
 from plone.indexer.interfaces import IIndexableObject
 
 from collective.solr.interfaces import ISolrConnectionConfig
@@ -22,7 +26,7 @@ from collective.solr.interfaces import ISolrConnectionManager
 from collective.solr.interfaces import ISolrIndexQueueProcessor
 from collective.solr.interfaces import ICheckIndexable
 from collective.solr.interfaces import ISolrAddHandler
-from collective.solr.solr import SolrException
+from collective.solr.exceptions import SolrConnectionException
 from collective.solr.utils import prepareData
 from socket import error
 from urllib import urlencode
@@ -57,14 +61,18 @@ def datehandler(value):
 
     if isinstance(value, DateTime):
         v = value.toZone('UTC')
-        value = '%04d-%02d-%02dT%02d:%02d:%06.3fZ' % (v.year(),
-            v.month(), v.day(), v.hour(), v.minute(), v.second())
+        value = '%04d-%02d-%02dT%02d:%02d:%06.3fZ' % (
+            v.year(), v.month(), v.day(), v.hour(), v.minute(), v.second()
+        )
     elif isinstance(value, datetime):
         # Convert a timezone aware timetuple to a non timezone aware time
         # tuple representing utc time. Does nothing if object is not
         # timezone aware
         value = datetime(*value.utctimetuple()[:7])
-        value = '%s.%03dZ' % (value.strftime('%Y-%m-%dT%H:%M:%S'), value.microsecond % 1000)
+        value = '%s.%03dZ' % (
+            value.strftime('%Y-%m-%dT%H:%M:%S'),
+            value.microsecond % 1000
+        )
     elif isinstance(value, date):
         value = '%s.000Z' % value.strftime('%Y-%m-%dT%H:%M:%S')
     return value
@@ -102,26 +110,40 @@ class DefaultAdder(object):
         data.pop('links', '')
         conn.add(**data)
 
+
 class BinaryAdder(DefaultAdder):
-    """
+    """ Add binary content to index via tika
     """
 
     def getpath(self):
         field = self.context.getPrimaryField()
         blob = field.get(self.context).blob
-        return blob._p_blob_committed or blob._p_blob_uncommitted
+        return blob.committed() or blob._p_blob_committed or \
+            blob._p_blob_uncommitted
 
     def __call__(self, conn, **data):
         if 'ZOPETESTCASE' in os.environ:
             return super(BinaryAdder, self).__call__(conn, **data)
         ignore = ('SearchableText', 'created', 'Type', 'links',
                   'description', 'Date')
-        postdata = dict([('literal.%s' % key, val) for key, val in data.iteritems()
-                     if key not in ignore])
-        portal_state = self.context.restrictedTraverse('@@plone_portal_state')
+        postdata = {}
+        for key, val in data.iteritems():
+            if key in ignore:
+                continue
+            if isinstance(val, list) or isinstance(val, tuple):
+                newvalue = []
+                for item in val:
+                    if isinstance(item, unicode):
+                        item = item.encode('utf-8')
+                    newvalue.append(item)
+            else:
+                newvalue = val
+            postdata['literal.%s' % key] = newvalue
         postdata['stream.file'] = self.getpath()
-        postdata['stream.contentType'] = data.get('content_type',
-                                                 'application/octet-stream')
+        postdata['stream.contentType'] = data.get(
+            'content_type',
+            'application/octet-stream'
+        )
         postdata['fmap.content'] = 'SearchableText'
         postdata['extractFormat'] = 'text'
 
@@ -130,9 +152,10 @@ class BinaryAdder(DefaultAdder):
         try:
             conn.doPost(url, urlencode(postdata, doseq=True), conn.formheaders)
             conn.flush()
-        except SolrException, e:
+        except SolrConnectionException, e:
             logger.warn('Error %s @ %s', e, data['path_string'])
             conn.reset()
+
 
 def boost_values(obj, data):
     """ calculate boost values using a method or skin script;  returns
@@ -150,13 +173,14 @@ class SolrIndexProcessor(object):
         self.manager = manager
 
     def index(self, obj, attributes=None):
+        """Index the specified attributes for obj using atomic updates, or all
+        of them if `attributes` is `None`.
+        Also make sure the `uniqueKey` is part of attributes, and passing the
+        attributes to the self.getData() call to avoid causing Plone to index
+        all fields instead of just the necessary ones.
+        """
         conn = self.getConnection()
         if conn is not None and ICheckIndexable(obj)():
-            # unfortunately with current versions of solr we need to provide
-            # data for _all_ fields during an <add> -- partial updates aren't
-            # supported (see https://issues.apache.org/jira/browse/SOLR-139)
-            # however, the reindexing can be skipped if none of the given
-            # attributes match existing solr indexes...
             schema = self.manager.getSchema()
             if schema is None:
                 msg = 'unable to fetch schema, skipping indexing of %r'
@@ -171,7 +195,13 @@ class SolrIndexProcessor(object):
                 attributes = set(schema.keys()).intersection(attributes)
                 if not attributes:
                     return
-            data, missing = self.getData(obj)
+
+                if uniqueKey not in attributes:
+                    # The uniqueKey is required in order to identify the
+                    # document when doing atomic updates.
+                    attributes.add(uniqueKey)
+
+            data, missing = self.getData(obj, attributes=attributes)
             if not data:
                 return          # don't index with no data...
             prepareData(data)
@@ -182,14 +212,16 @@ class SolrIndexProcessor(object):
                 try:
                     logger.debug('indexing %r (%r)', obj, data)
                     pt = data.get('portal_type', 'default')
-                    logger.debug('indexing %r with %r adder (%r)', obj, pt, data)
+                    logger.debug(
+                        'indexing %r with %r adder (%r)', obj, pt, data
+                    )
 
                     adder = queryAdapter(obj, ISolrAddHandler, name=pt)
 
                     if adder is None:
                         adder = DefaultAdder(obj)
                     adder(conn, boost_values=boost_values(obj, data), **data)
-                except (SolrException, error):
+                except (SolrConnectionException, error):
                     logger.exception('exception during indexing %r', obj)
 
     def reindex(self, obj, attributes=None):
@@ -217,7 +249,7 @@ class SolrIndexProcessor(object):
 
             data, missing = self.getData(obj, attributes=[uniqueKey])
             prepareData(data)
-            if not uniqueKey in data:
+            if uniqueKey not in data:
                 msg = 'Can not unindex: no unique key for object %r'
                 logger.info(msg, obj)
                 return
@@ -229,7 +261,7 @@ class SolrIndexProcessor(object):
             try:
                 logger.debug('unindexing %r (%r)', obj, data)
                 conn.delete(id=data_key)
-            except (SolrException, error):
+            except (SolrConnectionException, error):
                 logger.exception('exception during unindexing %r', obj)
 
     def begin(self):
@@ -249,8 +281,8 @@ class SolrIndexProcessor(object):
                     # and we might wait a bit longer on delete's this way
                     conn.flush()
                 else:
-                    conn.commit(waitFlush=wait, waitSearcher=wait)
-            except (SolrException, error):
+                    conn.commit(waitSearcher=wait)
+            except (SolrConnectionException, error):
                 logger.exception('exception during commit')
             self.manager.closeConnection()
 
@@ -300,7 +332,7 @@ class SolrIndexProcessor(object):
         if attributes is None:
             attributes = schema.keys()
         obj = self.wrapObject(obj)
-        data, marker = {}, []
+        data = {}
         for name in attributes:
             try:
                 value = getattr(obj, name)
@@ -311,8 +343,8 @@ class SolrIndexProcessor(object):
             except AttributeError:
                 continue
             except Exception:
-                logger.exception('Error occured while getting data for '
-                    'indexing!')
+                logger.exception(
+                    'Error occured while getting data for indexing!')
                 continue
             field = schema[name]
             handler = handlers.get(field.class_, None)

@@ -41,6 +41,7 @@ def fakehttp(solrconn, *fakedata):
     """ helper function to set up a fake http request on a SolrConnection """
 
     class FakeOutput(list):
+
         """ helper class to organize output from fake connections """
 
         conn = solrconn
@@ -70,6 +71,7 @@ def fakehttp(solrconn, *fakedata):
     output = FakeOutput()
 
     class FakeSocket(StringIO):
+
         """ helper class to fake socket communication """
 
         def sendall(self, str):
@@ -89,6 +91,7 @@ def fakehttp(solrconn, *fakedata):
             return StringIO.readline(self, length)
 
     class FakeHTTPConnection(HTTPConnection):
+
         """ helper class to fake a http connection object from httplib.py """
 
         def __init__(self, host, *fakedata):
@@ -96,6 +99,7 @@ def fakehttp(solrconn, *fakedata):
             self.fakedata = list(fakedata)
 
         def putrequest(self, *args, **kw):
+            self.url = args[1]
             response = self.fakedata.pop(0)     # get first response
             self.sock = FakeSocket(response)    # and set up a fake socket
             output.new()                        # as well as an output buffer
@@ -121,14 +125,18 @@ def fakeServer(actions, port=55555):
         process the incoming requests in turn; returns a thread that should
         be 'joined' when done """
     class Handler(BaseHTTPRequestHandler):
+
         def do_POST(self):
             action = actions.pop(0)             # get next action
             action(self)                        # and process it...
+
         def do_GET(self):
             action = actions.pop(0)             # get next action
             action(self)                        # and process it...
+
         def log_request(*args, **kw):
             pass
+
     def runner():
         while actions:
             server.handle_request()

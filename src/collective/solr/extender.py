@@ -2,6 +2,8 @@
 from Acquisition import aq_base
 from archetypes.schemaextender.field import ExtensionField
 from archetypes.schemaextender.interfaces import ISchemaExtender
+from archetypes.schemaextender.interfaces import IBrowserLayerAwareExtender
+from collective.solr.browser.interfaces import IThemeSpecific
 from plone.indexer import indexer
 from Products.Archetypes.atapi import BooleanField
 from Products.Archetypes.atapi import BooleanWidget
@@ -56,7 +58,8 @@ class ExtensionBooleanField(ExtensionField, BooleanField):
 class SearchExtender(object):
     """Adapter that adds search metadata."""
 
-    implements(ISchemaExtender)
+    implements(ISchemaExtender, IBrowserLayerAwareExtender)
+    layer = IThemeSpecific
 
     _fields = [
         ExtensionBooleanField(
@@ -68,7 +71,8 @@ class SearchExtender(object):
                 label=_('label_showinsearch', default=u"Show in search"),
                 visible={"edit": "visible", "view": "invisible"},
                 description="",
-            )),
+            )
+        ),
 
         ExtentionTextField(
             'searchwords',
@@ -77,12 +81,16 @@ class SearchExtender(object):
             languageIndependent=False,
             widget=TextAreaWidget(
                 label=_('label_searchwords', default=u"Search words"),
-                description="Specify words for which this item will show up "
-                            "as the first search result. Multiple words can "
-                            "be specified on new lines.",
+                description=_(
+                    'help_searchwords',
+                    u"Specify words for which this item will show up "
+                    u"as the first search result. Multiple words can be "
+                    u"specified on new lines."
+                ),
                 visible={"edit": "visible", "view": "invisible"},
-            )),
-        ]
+            )
+        ),
+    ]
 
     def __init__(self, context):
         self.context = context

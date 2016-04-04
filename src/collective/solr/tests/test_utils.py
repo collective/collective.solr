@@ -1,19 +1,24 @@
 # -*- coding: utf-8 -*-
-
-from unittest import TestCase
-from Testing import ZopeTestCase as ztc
-
-from collective.solr.tests.utils import getData
 from collective.solr.parser import SolrResponse
-from collective.solr.utils import findObjects, isSimpleTerm, isSimpleSearch
-from collective.solr.utils import isWildCard, splitSimpleSearch
-from collective.solr.utils import setupTranslationMap, prepareData
+from collective.solr.testing import COLLECTIVE_SOLR_INTEGRATION_TESTING
+from collective.solr.tests.utils import getData
+from collective.solr.utils import findObjects
+from collective.solr.utils import isSimpleSearch
+from collective.solr.utils import isSimpleTerm
+from collective.solr.utils import isWildCard
 from collective.solr.utils import padResults
+from collective.solr.utils import prepareData
+from collective.solr.utils import setupTranslationMap
+from collective.solr.utils import splitSimpleSearch
+from unittest import TestCase
 
 
-class UtilsTests(ztc.ZopeTestCase):
+class UtilsTests(TestCase):
 
-    def afterSetUp(self):
+    layer = COLLECTIVE_SOLR_INTEGRATION_TESTING
+
+    def setUp(self):
+        self.app = self.layer['app']
         self.app.manage_addFolder(id='portal', title='Portal')
         self.portal = self.app.portal
         self.portal.manage_addFolder(id='foo', title='Foo')
@@ -24,8 +29,10 @@ class UtilsTests(ztc.ZopeTestCase):
         self.portal.bar.manage_addFolder(id='foo', title='Foo')
         self.portal.bar.foo.manage_addDocument(id='doc2', title='a document')
         self.portal.bar.foo.manage_addDocument(id='file2', title='a file')
-        self.good = ('bar', 'bar/foo', 'bar/foo/doc2', 'bar/foo/file2',
-            'foo', 'foo/bar', 'foo/bar/doc1', 'foo/bar/file1')
+        self.good = (
+            'bar', 'bar/foo', 'bar/foo/doc2', 'bar/foo/file2',
+            'foo', 'foo/bar', 'foo/bar/doc1', 'foo/bar/file1'
+        )
 
     def ids(self, results):
         return tuple(sorted([r[0] for r in results]))
@@ -42,56 +49,60 @@ class UtilsTests(ztc.ZopeTestCase):
         self.assertEqual(self.ids(found[1:]), self.good)
 
     def testSimpleTerm(self):
-        self.failUnless(isSimpleTerm('foo'))
-        self.failUnless(isSimpleTerm('foo '))
-        self.failUnless(isSimpleTerm(u'føø'))
-        self.failUnless(isSimpleTerm('føø'))
-        self.failIf(isSimpleTerm('foo!'))
-        self.failIf(isSimpleTerm('"foo"'))
-        self.failIf(isSimpleTerm(u'føø!'))
-        self.failIf(isSimpleTerm(unicode('föö', 'latin')))
-        self.failIf(isSimpleTerm('foo42'))
-        self.failIf(isSimpleTerm('foo 42'))
-        self.failIf(isSimpleTerm('42 foo'))
-        self.failUnless(isSimpleTerm('42foo'))
+        self.assertTrue(isSimpleTerm('foo'))
+        self.assertTrue(isSimpleTerm('foo '))
+        self.assertTrue(isSimpleTerm(u'føø'))
+        self.assertTrue(isSimpleTerm('føø'))
+        self.assertFalse(isSimpleTerm('foo!'))
+        self.assertFalse(isSimpleTerm('"foo"'))
+        self.assertFalse(isSimpleTerm(u'føø!'))
+        self.assertFalse(isSimpleTerm(unicode('föö', 'latin')))
+        self.assertFalse(isSimpleTerm('foo42'))
+        self.assertFalse(isSimpleTerm('foo 42'))
+        self.assertFalse(isSimpleTerm('42 foo'))
+        self.assertTrue(isSimpleTerm('42foo'))
 
     def testSimpleSearch(self):
-        self.failUnless(isSimpleSearch('foo'))
-        self.failUnless(isSimpleSearch('foo bar'))
-        self.failUnless(isSimpleSearch('foo bar '))
-        self.failUnless(isSimpleSearch('foo   bar'))
-        self.failUnless(isSimpleSearch(u'føø bär'))
-        self.failUnless(isSimpleSearch('føø bär'))
-        self.failUnless(isSimpleSearch('foo*'))
-        self.failUnless(isSimpleSearch('foo* bar*'))
-        self.failUnless(isSimpleSearch('*foo*'))
-        self.failUnless(isSimpleSearch('"foo"'))
-        self.failUnless(isSimpleSearch('"foo bar"'))
-        self.failUnless(isSimpleSearch('"foo AND bar"'))
-        self.failUnless(isSimpleSearch('foo "AND" bar'))
-        self.failUnless(isSimpleSearch('"foo" "bar"'))
-        self.failUnless(isSimpleSearch('fo?bar'))
-        self.failUnless(isSimpleSearch('foo bar?'))
-        self.failUnless(isSimpleSearch('areallyverylongword '
-            'andanotherreallylongwordwithsomecake'))
-        self.failUnless(isSimpleSearch('areallyverylongword '
-            'andanotherreallylongwordwithsomecake *'))
-        self.failIf(isSimpleSearch(''))
-        self.failIf(isSimpleSearch(u'føø bär!'))
-        self.failIf(isSimpleSearch(unicode('föö bär', 'latin')))
-        self.failIf(isSimpleSearch('foo AND bar'))
-        self.failIf(isSimpleSearch('foo OR bar'))
-        self.failIf(isSimpleSearch('foo NOT bar'))
-        self.failIf(isSimpleSearch('"foo" OR bar'))
-        self.failIf(isSimpleSearch('(foo OR bar)'))
-        self.failIf(isSimpleSearch('+foo'))
-        self.failIf(isSimpleSearch('name:foo'))
-        self.failIf(isSimpleSearch('foo && bar'))
-        self.failIf(isSimpleSearch('2000'))
-        self.failIf(isSimpleSearch('foo 2000'))
-        self.failIf(isSimpleSearch('foo 1/2000'))
-        self.failIf(isSimpleSearch('foo 42 bar11'))
-        self.failUnless(isSimpleSearch('2000 foo'))
+        self.assertTrue(isSimpleSearch('foo'))
+        self.assertTrue(isSimpleSearch('foo bar'))
+        self.assertTrue(isSimpleSearch('foo bar '))
+        self.assertTrue(isSimpleSearch('foo   bar'))
+        self.assertTrue(isSimpleSearch(u'føø bär'))
+        self.assertTrue(isSimpleSearch('føø bär'))
+        self.assertTrue(isSimpleSearch('foo*'))
+        self.assertTrue(isSimpleSearch('foo* bar*'))
+        self.assertTrue(isSimpleSearch('*foo*'))
+        self.assertTrue(isSimpleSearch('"foo"'))
+        self.assertTrue(isSimpleSearch('"foo bar"'))
+        self.assertTrue(isSimpleSearch('"foo AND bar"'))
+        self.assertTrue(isSimpleSearch('foo "AND" bar'))
+        self.assertTrue(isSimpleSearch('"foo" "bar"'))
+        self.assertTrue(isSimpleSearch('fo?bar'))
+        self.assertTrue(isSimpleSearch('foo bar?'))
+        self.assertTrue(isSimpleSearch(
+            'areallyverylongword '
+            'andanotherreallylongwordwithsomecake'
+        ))
+        self.assertTrue(isSimpleSearch(
+            'areallyverylongword '
+            'andanotherreallylongwordwithsomecake *'
+        ))
+        self.assertFalse(isSimpleSearch(''))
+        self.assertFalse(isSimpleSearch(u'føø bär!'))
+        self.assertFalse(isSimpleSearch(unicode('föö bär', 'latin')))
+        self.assertFalse(isSimpleSearch('foo AND bar'))
+        self.assertFalse(isSimpleSearch('foo OR bar'))
+        self.assertFalse(isSimpleSearch('foo NOT bar'))
+        self.assertFalse(isSimpleSearch('"foo" OR bar'))
+        self.assertFalse(isSimpleSearch('(foo OR bar)'))
+        self.assertFalse(isSimpleSearch('+foo'))
+        self.assertFalse(isSimpleSearch('name:foo'))
+        self.assertFalse(isSimpleSearch('foo && bar'))
+        self.assertFalse(isSimpleSearch('2000'))
+        self.assertFalse(isSimpleSearch('foo 2000'))
+        self.assertFalse(isSimpleSearch('foo 1/2000'))
+        self.assertFalse(isSimpleSearch('foo 42 bar11'))
+        self.assertTrue(isSimpleSearch('2000 foo'))
 
     def testSplitSimpleSearch(self):
         self.assertEqual(splitSimpleSearch('foo bar'), ['foo', 'bar'])
@@ -101,28 +112,28 @@ class UtilsTests(ztc.ZopeTestCase):
         self.assertRaises(AssertionError, splitSimpleSearch, 'foo42')
 
     def testIsWildCard(self):
-        self.failUnless(isWildCard('foo*'))
-        self.failUnless(isWildCard('fo?'))
-        self.failUnless(isWildCard('fo?o'))
-        self.failUnless(isWildCard('fo*oo'))
-        self.failUnless(isWildCard('fo?o*'))
-        self.failUnless(isWildCard('*foo'))
-        self.failUnless(isWildCard('*foo*'))
-        self.failUnless(isWildCard('foo* bar'))
-        self.failUnless(isWildCard('foo bar?'))
-        self.failUnless(isWildCard('*'))
-        self.failUnless(isWildCard('?'))
-        self.failUnless(isWildCard(u'føø*'))
-        self.failUnless(isWildCard(u'føø*'.encode('utf-8')))
-        self.failUnless(isWildCard(u'*føø*'))
-        self.failIf(isWildCard('foo'))
-        self.failIf(isWildCard('fo#o'))
-        self.failIf(isWildCard('foo bar'))
-        self.failIf(isWildCard(u'føø'))
-        self.failIf(isWildCard(u'føø'.encode('utf-8')))
+        self.assertTrue(isWildCard('foo*'))
+        self.assertTrue(isWildCard('fo?'))
+        self.assertTrue(isWildCard('fo?o'))
+        self.assertTrue(isWildCard('fo*oo'))
+        self.assertTrue(isWildCard('fo?o*'))
+        self.assertTrue(isWildCard('*foo'))
+        self.assertTrue(isWildCard('*foo*'))
+        self.assertTrue(isWildCard('foo* bar'))
+        self.assertTrue(isWildCard('foo bar?'))
+        self.assertTrue(isWildCard('*'))
+        self.assertTrue(isWildCard('?'))
+        self.assertTrue(isWildCard(u'føø*'))
+        self.assertTrue(isWildCard(u'føø*'.encode('utf-8')))
+        self.assertTrue(isWildCard(u'*føø*'))
+        self.assertFalse(isWildCard('foo'))
+        self.assertFalse(isWildCard('fo#o'))
+        self.assertFalse(isWildCard('foo bar'))
+        self.assertFalse(isWildCard(u'føø'))
+        self.assertFalse(isWildCard(u'føø'.encode('utf-8')))
         # other characters might be meaningful in solr, but we don't
         # distinguish them properly (yet)
-        self.failIf(isWildCard('foo#?'))
+        self.assertFalse(isWildCard('foo#?'))
 
 
 class TranslationTests(TestCase):

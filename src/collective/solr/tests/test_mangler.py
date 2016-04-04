@@ -1,14 +1,17 @@
-from unittest import TestCase
-from zope.component import provideUtility, getGlobalSiteManager
-from DateTime import DateTime
+# -*- coding: utf-8 -*-
 
+from DateTime import DateTime
 from collective.solr.interfaces import ISolrConnectionConfig
 from collective.solr.manager import SolrConnectionConfig
-from collective.solr.mangler import mangleQuery
-from collective.solr.mangler import extractQueryParameters
 from collective.solr.mangler import cleanupQueryParameters
+from collective.solr.mangler import mangleQuery
 from collective.solr.mangler import optimizeQueryParameters
-from collective.solr.parser import SolrSchema, SolrField
+from collective.solr.mangler import subtractQueryParameters
+from collective.solr.parser import SolrField
+from collective.solr.parser import SolrSchema
+from unittest import TestCase
+from zope.component import getGlobalSiteManager
+from zope.component import provideUtility
 
 
 def mangle(**keywords):
@@ -76,14 +79,20 @@ class QueryManglerTests(TestCase):
         keywords = mangle(foo=day)
         self.assertEqual(keywords, {'foo': '1972-05-11T00:00:00.000Z'})
         keywords = mangle(foo=(day, day + 7), foo_usage='range:min:max')
-        self.assertEqual(keywords, {'foo':
-            '[1972-05-11T00:00:00.000Z TO 1972-05-18T00:00:00.000Z]'})
+        self.assertEqual(
+            keywords,
+            {'foo': '[1972-05-11T00:00:00.000Z TO 1972-05-18T00:00:00.000Z]'}
+        )
         keywords = mangle(foo=[day], foo_usage='range:min')
-        self.assertEqual(keywords, {'foo':
-            '[1972-05-11T00:00:00.000Z TO *]'})
+        self.assertEqual(
+            keywords,
+            {'foo': '[1972-05-11T00:00:00.000Z TO *]'}
+        )
         keywords = mangle(foo=dict(query=[day], range='min'))
-        self.assertEqual(keywords, {'foo':
-            '[1972-05-11T00:00:00.000Z TO *]'})
+        self.assertEqual(
+            keywords,
+            {'foo': '[1972-05-11T00:00:00.000Z TO *]'}
+        )
         keywords = mangle(foo=Query(day))
         self.assertEqual(keywords, {'foo': '1972-05-11T00:00:00.000Z'})
 
@@ -102,11 +111,13 @@ class QueryManglerTests(TestCase):
         self.assertEqual(keywords, {'foo': '(23 AND 42)'})
         day = DateTime('1972/05/11 UTC')
         keywords = mangle(foo=dict(query=(day, day + 7), operator='or'))
-        self.assertEqual(keywords, {'foo':
-            '(1972-05-11T00:00:00.000Z OR 1972-05-18T00:00:00.000Z)'})
+        self.assertEqual(
+            keywords,
+            {'foo': '(1972-05-11T00:00:00.000Z OR 1972-05-18T00:00:00.000Z)'})
         keywords = mangle(foo=Query(query=(day, day + 7), operator='or'))
-        self.assertEqual(keywords, {'foo':
-            '(1972-05-11T00:00:00.000Z OR 1972-05-18T00:00:00.000Z)'})
+        self.assertEqual(
+            keywords,
+            {'foo': '(1972-05-11T00:00:00.000Z OR 1972-05-18T00:00:00.000Z)'})
 
     def testEffectiveRangeConversion(self):
         day = DateTime('1972/05/11 UTC')
@@ -200,7 +211,7 @@ class PathManglerTests(TestCase):
 class QueryParameterTests(TestCase):
 
     def testSortIndex(self):
-        extract = extractQueryParameters
+        extract = subtractQueryParameters
         params = extract({'sort_on': 'foo'})
         self.assertEqual(params, dict(sort='foo asc'))
         # again with dashed instead of underscores
@@ -208,7 +219,7 @@ class QueryParameterTests(TestCase):
         self.assertEqual(params, dict(sort='foo asc'))
 
     def testSortOrder(self):
-        extract = extractQueryParameters
+        extract = subtractQueryParameters
         params = extract({'sort_on': 'foo', 'sort_order': 'ascending'})
         self.assertEqual(params, dict(sort='foo asc'))
         params = extract({'sort_on': 'foo', 'sort_order': 'descending'})
@@ -228,7 +239,7 @@ class QueryParameterTests(TestCase):
         self.assertEqual(params, dict(sort='foo asc'))
 
     def testSortLimit(self):
-        extract = extractQueryParameters
+        extract = subtractQueryParameters
         params = extract({'sort_limit': 5})
         self.assertEqual(params, dict(rows=5))
         params = extract({'sort_limit': '10'})
@@ -240,7 +251,7 @@ class QueryParameterTests(TestCase):
         self.assertEqual(params, dict(rows=10))
 
     def testBatchParameters(self):
-        extract = extractQueryParameters
+        extract = subtractQueryParameters
         params = extract({'b_start': 5})
         self.assertEqual(params, dict(start=5))
         params = extract({'b_start': '10'})
@@ -251,7 +262,7 @@ class QueryParameterTests(TestCase):
         self.assertEqual(params, dict(rows=10))
 
     def testCombined(self):
-        extract = extractQueryParameters
+        extract = subtractQueryParameters
         params = extract({'sort_on': 'foo', 'sort_limit': 5})
         self.assertEqual(params, dict(sort='foo asc', rows=5))
         params = extract({'sort_on': 'foo', 'sort_order': 'reverse',
@@ -261,7 +272,7 @@ class QueryParameterTests(TestCase):
         self.assertEqual(params, dict(rows=5))
 
     def testAllowFacetParameters(self):
-        extract = extractQueryParameters
+        extract = subtractQueryParameters
         # 'facet' and 'facet.*' should be passed on...
         params = extract({'facet': 'true'})
         self.assertEqual(params, {'facet': 'true'})
@@ -280,7 +291,7 @@ class QueryParameterTests(TestCase):
         self.assertEqual(params, {'facet.foo': ('foo', 'bar')})
 
     def testAllowFilterQueryParameters(self):
-        extract = extractQueryParameters
+        extract = subtractQueryParameters
         # 'fq' should be passed on...
         params = extract({'fq': 'foo'})
         self.assertEqual(params, {'fq': 'foo'})
@@ -288,7 +299,7 @@ class QueryParameterTests(TestCase):
         self.assertEqual(params, {'fq': ['foo', 'bar']})
 
     def testAllowFieldListParameter(self):
-        extract = extractQueryParameters
+        extract = subtractQueryParameters
         # 'fl' should be passed on...
         params = extract({'fl': 'foo'})
         self.assertEqual(params, {'fl': 'foo'})
@@ -296,12 +307,17 @@ class QueryParameterTests(TestCase):
         self.assertEqual(params, {'fl': ['foo', 'bar']})
 
     def testAllowHighlightParameter(self):
-        extract = extractQueryParameters
+        extract = subtractQueryParameters
         # 'hl' should be passed on...
         params = extract({'hl': 'foo'})
         self.assertEqual(params, {'hl': 'foo'})
         params = extract({'hl': ['foo', 'bar']})
         self.assertEqual(params, {'hl': ['foo', 'bar']})
+
+    def testAllowRequestHandlerParamter(self):
+        extract = subtractQueryParameters
+        params = extract({'request_handler': 'custom'})
+        self.assertEqual(params, {'request_handler': 'custom'})
 
     def testSortIndexCleanup(self):
         cleanup = cleanupQueryParameters
@@ -330,45 +346,68 @@ class QueryParameterTests(TestCase):
             optimizeQueryParameters(query, params)
             return query, params
         # first test without the configuration utility
-        self.assertEqual(optimize(),
-            (dict(a='a:23', b='b:42', c='c:(23 42)'), dict()))
+        self.assertEqual(
+            optimize(),
+            (dict(a='a:23', b='b:42', c='c:(23 42)'), dict())
+        )
         # now unconfigured...
         config = SolrConnectionConfig()
         provideUtility(config, ISolrConnectionConfig)
-        self.assertEqual(optimize(),
-            (dict(a='a:23', b='b:42', c='c:(23 42)'), dict()))
+        self.assertEqual(
+            optimize(),
+            (dict(a='a:23', b='b:42', c='c:(23 42)'), dict())
+        )
         config.filter_queries = ['a']
-        self.assertEqual(optimize(),
-            (dict(b='b:42', c='c:(23 42)'), dict(fq=['a:23'])))
-        self.assertEqual(optimize(fq='x:13'),
-            (dict(b='b:42', c='c:(23 42)'), dict(fq=['x:13', 'a:23'])))
-        self.assertEqual(optimize(fq=['x:13', 'y:17']),
-            (dict(b='b:42', c='c:(23 42)'), dict(fq=['x:13', 'y:17', 'a:23'])))
+        self.assertEqual(
+            optimize(),
+            (dict(b='b:42', c='c:(23 42)'), dict(fq=['a:23']))
+        )
+        self.assertEqual(
+            optimize(fq='x:13'),
+            (dict(b='b:42', c='c:(23 42)'), dict(fq=['x:13', 'a:23']))
+        )
+        self.assertEqual(
+            optimize(fq=['x:13', 'y:17']),
+            (dict(b='b:42', c='c:(23 42)'), dict(fq=['x:13', 'y:17', 'a:23']))
+        )
         config.filter_queries = ['a', 'c']
-        self.assertEqual(optimize(),
+        self.assertEqual(
+            optimize(),
             (dict(b='b:42'), dict(fq=['a:23', 'c:(23 42)'])))
-        self.assertEqual(optimize(fq='x:13'),
-            (dict(b='b:42'), dict(fq=['x:13', 'a:23', 'c:(23 42)'])))
-        self.assertEqual(optimize(fq=['x:13', 'y:17']),
-            (dict(b='b:42'), dict(fq=['x:13', 'y:17', 'a:23', 'c:(23 42)'])))
+        self.assertEqual(
+            optimize(fq='x:13'),
+            (dict(b='b:42'), dict(fq=['x:13', 'a:23', 'c:(23 42)']))
+        )
+        self.assertEqual(
+            optimize(fq=['x:13', 'y:17']),
+            (dict(b='b:42'), dict(fq=['x:13', 'y:17', 'a:23', 'c:(23 42)']))
+        )
         # also test substitution of combined filter queries
         config.filter_queries = ['a c']
-        self.assertEqual(optimize(),
-            (dict(b='b:42'), dict(fq=['a:23 c:(23 42)'])))
+        self.assertEqual(
+            optimize(),
+            (dict(b='b:42'), dict(fq=['a:23 c:(23 42)']))
+        )
         config.filter_queries = ['a c', 'b']
-        self.assertEqual(optimize(),
-            ({'*': '*:*'}, dict(fq=['a:23 c:(23 42)', 'b:42'])))
+        self.assertEqual(
+            optimize(),
+            ({'*': '*:*'}, dict(fq=['a:23 c:(23 42)', 'b:42']))
+        )
         # for multiple matches the first takes precedence
         config.filter_queries = ['a', 'a c', 'b']
-        self.assertEqual(optimize(),
-            (dict(c='c:(23 42)'), dict(fq=['a:23', 'b:42'])))
+        self.assertEqual(
+            optimize(),
+            (dict(c='c:(23 42)'), dict(fq=['a:23', 'b:42']))
+        )
         # parameters not contained in the query must not be converted
         config.filter_queries = ['a nonexisting', 'b']
-        self.assertEqual(optimize(),
-            (dict(a='a:23', c='c:(23 42)'), dict(fq=['b:42'])))
+        self.assertEqual(
+            optimize(),
+            (dict(a='a:23', c='c:(23 42)'), dict(fq=['b:42']))
+        )
 
     def testFilterFacetDependencies(self):
-        extract = extractQueryParameters
+        extract = subtractQueryParameters
         # any info about facet dependencies must not be passed on to solr
         params = extract({'facet.field': 'foo:bar', 'facet.foo': 'bar:foo'})
         self.assertEqual(params, {'facet.field': 'foo', 'facet.foo': 'bar'})

@@ -48,6 +48,7 @@ class SolrConfigXMLAdapter(XMLAdapterBase):
         self.context.highlight_formatter_post = ''
         self.context.highlight_fragsize = 0
         self.context.levenshtein_distance = 0
+        self.context.atomic_updates = True
 
     def _initProperties(self, node):
         elems = node.getElementsByTagName('connection')
@@ -137,6 +138,9 @@ class SolrConfigXMLAdapter(XMLAdapterBase):
                 elif child.nodeName == 'levenshtein_distance':
                     value = float(str(child.getAttribute('value')))
                     self.context.levenshtein_distance = value
+                elif child.nodeName == 'atomic_updates':
+                    value = str(child.getAttribute('value'))
+                    self.context.atomic_updates = self._convertToBoolean(value)
 
     def _createNode(self, name, value):
         node = self._doc.createElement(name)
@@ -181,8 +185,12 @@ class SolrConfigXMLAdapter(XMLAdapterBase):
             param = self._doc.createElement('parameter')
             param.setAttribute('name', name)
             filter_queries.appendChild(param)
-        append(create('slow-query-threshold',
-            str(self.context.slow_query_threshold)))
+        append(
+            create(
+                'slow-query-threshold',
+                str(self.context.slow_query_threshold)
+            )
+        )
         append(create('effective-steps', str(self.context.effective_steps)))
         append(create('exclude-user', str(bool(self.context.exclude_user))))
         highlight_fields = self._doc.createElement('highlight_fields')
@@ -191,13 +199,35 @@ class SolrConfigXMLAdapter(XMLAdapterBase):
             param = self._doc.createElement('parameter')
             param.setAttribute('name', name)
             highlight_fields.appendChild(param)
-        append(create('highlight_formatter_pre', self.context.highlight_formatter_pre))
-        append(create('highlight_formatter_post', self.context.highlight_formatter_post))
-        append(create('highlight_fragsize', str(self.context.highlight_fragsize)))
+        append(
+            create(
+                'highlight_formatter_pre',
+                self.context.highlight_formatter_pre
+            )
+        )
+        append(
+            create(
+                'highlight_formatter_post',
+                self.context.highlight_formatter_post
+            )
+        )
+        append(
+            create(
+                'highlight_fragsize',
+                str(self.context.highlight_fragsize)
+            )
+        )
         field_list = self._doc.createElement('field-list')
         append(field_list)
-        append(create('levenshtein_distance',
-            str(self.context.levenshtein_distance)))
+        append(
+            create(
+                'levenshtein_distance',
+                str(self.context.levenshtein_distance)
+            )
+        )
+        append(create('atomic_updates',
+               str(bool(self.context.atomic_updates))))
+
         for name in self.context.field_list:
             param = self._doc.createElement('parameter')
             param.setAttribute('name', name)

@@ -34,29 +34,15 @@ from xml.etree.cElementTree import fromstring
 from xml.sax.saxutils import escape
 import codecs
 import urllib
+from collective.solr.exceptions import SolrConnectionException
+from collective.solr.interfaces import ISolrConnectionConfig
 from collective.solr.parser import SolrSchema
 from collective.solr.timeout import HTTPConnectionWithTimeout
 from collective.solr.utils import translation_map
+from zope.component import queryUtility
 
 from logging import getLogger
 logger = getLogger(__name__)
-
-
-class SolrException(Exception):
-    """ An exception thrown by solr connections """
-
-    def __init__(self, httpcode='000', reason=None, body=None):
-        self.httpcode = httpcode
-        self.reason = reason
-        self.body = body
-
-    def __repr__(self):
-        return 'HTTP code=%s, Reason=%s, body=%s' % (
-            self.httpcode, self.reason, self.body
-        )
-
-    def __str__(self):
-        return 'HTTP code=%s, reason=%s' % (self.httpcode, self.reason)
 
 
 class SolrConnection:
@@ -108,7 +94,7 @@ class SolrConnection:
 
     def __errcheck(self, rsp):
         if rsp.status != 200:
-            ex = SolrException(rsp.status, rsp.reason)
+            ex = SolrConnectionException(rsp.status, rsp.reason)
             try:
                 ex.body = rsp.read()
             except:
@@ -122,8 +108,14 @@ class SolrConnection:
         self.conn.setTimeout(timeout)
 
     def doPost(self, url, body, headers):
+        return self.doGetOrPost('POST', url, body, headers)
+
+    def doGet(self, url, headers):
+        return self.doGetOrPost('GET', url, '', headers)
+
+    def doGetOrPost(self, method, url, body, headers):
         try:
-            self.conn.request('POST', url, body, headers)
+            self.conn.request(method, url, body, headers)
             return self.__errcheck(self.conn.getresponse())
         except (
             socket.error, httplib.CannotSendRequest,
@@ -136,7 +128,7 @@ class SolrConnection:
             # HTTPConnection object can get in a bad state (seems like they
             # might be "ghosted" in the zodb).
             self.__reconnect()
-            self.conn.request('POST', url, body, headers)
+            self.conn.request(method, url, body, headers)
             return self.__errcheck(self.conn.getresponse())
 
     def doUpdateXML(self, request):
@@ -153,7 +145,7 @@ class SolrConnection:
         for request in self.xmlbody:
             try:
                 responses.append(self.doSendXML(request))
-            except (SolrException, socket.error):
+            except (SolrConnectionException, socket.error):
                 logger.exception('exception during request %r', request)
             count += len(request)
         logger.debug(
@@ -166,20 +158,20 @@ class SolrConnection:
     def doSendXML(self, request):
         try:
             rsp = self.doPost(
-                self.solrBase+'/update', request,
+                self.solrBase + '/update', request,
                 self.xmlheaders
             )
             data = rsp.read()
         finally:
             if not self.persistent:
                 self.conn.close()
-        #detect old-style error response (HTTP response code of
-        #200 with a non-zero status.
+        # detect old-style error response (HTTP response code of
+        # 200 with a non-zero status.
         parsed = fromstring(self.decoder(data)[0])
         status = parsed.attrib.get('status', 0)
         if status != 0:
             reason = parsed.documentElement.firstChild.nodeValue
-            raise SolrException(rsp.status, reason)
+            raise SolrConnectionException(rsp.status, reason)
         return parsed
 
     def escapeVal(self, val):
@@ -206,7 +198,33 @@ class SolrConnection:
         xstr = '<delete><query>%s</query></delete>' % self.escapeVal(query)
         return self.doUpdateXML(xstr)
 
-    def add(self, boost_values=None, **fields):
+    def get_schema(self):
+        """Memoized access to Solr Schema.
+
+        We need to know which one is the uniqueKey in the add() method below,
+        but don't want to hit Solr with a request for the schema on every
+        single add().
+        """
+        if not hasattr(self, '_schema'):
+            self._schema = self.getSchema()
+        return self._schema
+
+    def add(self, boost_values=None, atomic_updates=True, **fields):
+        solr_config = queryUtility(ISolrConnectionConfig)
+        atomic_updates_enabled = getattr(solr_config,
+                                         'atomic_updates',
+                                         atomic_updates)
+
+        schema = self.get_schema()
+        uniqueKey = schema.get('uniqueKey', None)
+        if uniqueKey is None:
+            raise Exception("Could not get uniqueKey from Solr schema")
+
+        if uniqueKey not in fields:
+            logger.warn("uniqueKey '%s' missing for item %s, skipping" %
+                        (uniqueKey, fields))
+            return
+
         within = fields.pop('commitWithin', None)
         if within:
             lst = ['<add commitWithin="%s">' % str(within)]
@@ -219,11 +237,25 @@ class SolrConnection:
         else:
             lst.append('<doc>')
         for f, v in fields.items():
-            if f in boost_values:
-                tmpl = '<field name="%s" boost="%s">%%s</field>' % (
-                    self.escapeKey(f), boost_values[f])
-            else:
+
+            # Add update="set" attribute to each field except for the uniqueKey
+            # field.
+            if f == uniqueKey:
                 tmpl = '<field name="%s">%%s</field>' % self.escapeKey(f)
+                lst.append(tmpl % self.escapeVal(v))
+                continue
+
+            if f in boost_values:
+                tmpl = '<field name="%s" boost="%s" update="set">%%s</field>'
+                tmpl = tmpl % (self.escapeKey(f), boost_values[f])
+            else:
+                tmpl = '<field name="%s" update="set">%%s</field>'
+                tmpl = tmpl % self.escapeKey(f)
+
+            if not atomic_updates_enabled:
+                # Remove update="set", since it breaks the index time boosting.
+                tmpl = tmpl.replace(' update="set"', '')
+
             if isinstance(v, (list, tuple)):  # multi-valued
                 for value in v:
                     lst.append(tmpl % self.escapeVal(value))
@@ -232,16 +264,19 @@ class SolrConnection:
         lst.append('</doc>')
         lst.append('</add>')
         xstr = ''.join(lst)
+
+        if self.conn.debuglevel > 0:
+            logger.info('Update message:\n' + xstr)
+
         return self.doUpdateXML(xstr)
 
-    def commit(self, waitFlush=True, waitSearcher=True, optimize=False):
+    def commit(self, waitSearcher=True, optimize=False, soft=False):
         data = {
             'committype': optimize and 'optimize' or 'commit',
             'nowait': not waitSearcher and ' waitSearcher="false"' or '',
-            'noflush': not waitFlush and not waitSearcher and
-            ' waitFlush="false"' or ''
+            'soft': soft and ' softCommit="true"' or '',
         }
-        xstr = '<%(committype)s%(noflush)s%(nowait)s/>' % data
+        xstr = '<%(committype)s%(soft)s%(nowait)s/>' % data
         self.doUpdateXML(xstr)
         return self.flush()
 
@@ -258,11 +293,14 @@ class SolrConnection:
         del self.xmlbody[:]
 
     def search(self, **params):
+        request_handler = params.get('request_handler', 'select')
+        if 'request_handler' in params:
+            del params['request_handler']
         request = urllib.urlencode(params, doseq=True)
         logger.debug('sending request: %s' % request)
         try:
             response = self.doPost(
-                '%s/select' % self.solrBase, request,
+                '%s/%s' % (self.solrBase, request_handler), request,
                 self.formheaders
             )
         finally:
@@ -291,4 +329,4 @@ class SolrConnection:
                 xml = response.read()
                 return SolrSchema(xml.strip())
             self.__reconnect()          # force a new connection for each url
-        self.__errcheck(response)       # raise a solrexception
+        self.__errcheck(response)       # raise a SolrConnectionException

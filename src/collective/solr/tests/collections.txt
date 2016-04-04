@@ -2,14 +2,29 @@ Support for Collections/Topics
 ------------------------------
 
 This tests tries to make sure Solr-based queries can also be used with
-Plone's "Collection" content type.  We'll use a testbrowser to created such
-a stored search and then view it's matches.  First we need to activate Solr
+Plone's "Collection" content type. We'll use a testbrowser to created such
+a stored search and then view it's matches. First we need to activate Solr
 support and reindex the site's content:
 
-  >>> self.activateAndReindex()
-  >>> self.setRoles(('Manager',))
+  >>> from collective.solr.testing import activateAndReindex
+  >>> from plone.app.testing import setRoles
+  >>> from plone.app.testing import TEST_USER_ID
+  >>> from plone.app.testing import TEST_USER_NAME
+  >>> from plone.app.testing import TEST_USER_PASSWORD
+  >>> from plone.testing.z2 import Browser
+  >>> from transaction import commit
+  >>> portal = layer['portal']
+  >>> setRoles(portal, TEST_USER_ID, ['Manager'])
+  >>> browser = Browser(portal)
 
-  >>> browser = self.getBrowser()
+  >>> activateAndReindex(portal)
+  >>> commit()
+
+  >>> browser.open('http://nohost/plone/login_form')
+  >>> browser.getControl(name='__ac_name').value = TEST_USER_NAME
+  >>> browser.getControl(name='__ac_password').value = TEST_USER_PASSWORD
+  >>> browser.getControl(name='submit').click()
+
   >>> browser.open('http://nohost/plone/')
   >>> browser.getLink('Collection').click()
   >>> browser.getControl(name='title').value = 'Foo'
@@ -18,14 +33,12 @@ support and reindex the site's content:
   >>> query = [{'i': 'SearchableText',
   ...           'o': 'plone.app.querystring.operation.string.contains',
   ...           'v': 'new'}]
-  >>> self.portal.foo.setQuery(query)
-  >>> import transaction
-  >>> transaction.commit()
+  >>> portal.foo.setQuery(query)
+  >>> commit()
 
   >>> browser.getLink('View').click()
   >>> browser.url
   'http://nohost/plone/foo/'
   >>> browser.contents
   '...Foo...
-   ...News...Site News...
-   ...News...Site News...'
+   ...News...NewsFolder...

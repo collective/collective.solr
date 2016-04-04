@@ -1,7 +1,12 @@
 # -*- coding: utf-8 -*-
 from collective.indexing.interfaces import IIndexQueueProcessor
 from zope.interface import Interface
-from zope.schema import Bool, Text, TextLine, Int, Float, List
+from zope.schema import Bool
+from zope.schema import Float
+from zope.schema import Int
+from zope.schema import List
+from zope.schema import Text
+from zope.schema import TextLine
 from zope.schema.interfaces import IVocabularyFactory
 
 from collective.solr import SolrMessageFactory as _
@@ -270,6 +275,20 @@ class ISolrSchema(Interface):
         required=False,
     )
 
+    atomic_updates = Bool(
+        title=_('label_atomic_updates',
+                default=u'Enable atomic updates'),
+        description=_(
+            'help_atomic_updates',
+            default=u'Atomic updates allows you to update only specific '
+                    u'indexes, like "reindexObject(idxs=["portal_type"])".'
+                    u'Unfortunately atomic updates are not compatible with '
+                    u'index time boosting. If you enable atomic updates, '
+                    u'index time boosting no longer works.'),
+        default=True,
+        required=False,
+    )
+
 
 class ISolrConnectionConfig(ISolrSchema):
     """ utility to hold the connection configuration for the solr server """
@@ -334,10 +353,12 @@ class ISearch(Interface):
     def __call__(query, **parameters):
         """ convenience alias for `search` """
 
-    def buildQuery(default=None, **args):
+    def buildQueryAndParameters(default=None, **args):
         """ helper to build a query for simple use-cases; the query is
             returned as a dictionary which might be string-joined or
-            passed to the `search` method as the `query` argument """
+            passed to the `search` method as the `query` argument,
+            additionally search parameters are substracted from the
+            args and returned as a separate dict"""
 
 
 class ICatalogTool(Interface):

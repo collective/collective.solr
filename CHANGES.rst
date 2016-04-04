@@ -1,10 +1,83 @@
 Changelog
 =========
 
-4.0.4 (unreleased)
+4.1.1 (unreleased)
 ------------------
 
-- Nothing changed yet.
+Note: This release requires you to to update your Solr config and do a full reindex.
+
+- Ported atomic updates from ftw.solr.
+  This requires you to update your solr config, load the new solr config and
+  do a full reindex. For more informations check the "feature" section.
+  The feature was implemented in ftw.solr by [lgraf].
+  [mathias.leimgruber]
+
+- Add support for using different request handlers in search requests.
+  [buchi]
+
+- solr.cfg has been moved from https://github.com/collective/collective.solr/raw/master/buildout/solr.cfg to https://github.com/collective/collective.solr/raw/master/solr.cfg.
+  [timo]
+
+- Add configurable SolrLayer for unit testing Solr configuration.
+  [timo]
+
+- Make CollectiveSolrLayer configurable, to allow testing different cores.
+  [timo]
+
+- Added context to search utility. This allows query to be used in AJAX calls.
+  [tomgross]
+
+- Use GET method in spell check request (as it's an idempotent request which
+  does not affect server state)
+  [reinhardt]
+
+- Add zopectl.command for reindexing. Do not rely on positional arguments in _get_site.
+  [tschorr]
+
+- Move inline function out of to the global scope to make it more readable.
+  [gforcada]
+
+- Unify all exceptions raised by collective.solr.
+  [gforcada]
+
+- Soft commit changes while reindexing.
+  This allows to get results on searches while reindexing is taking place.
+  [gforcada]
+
+
+4.1.0 (2015-02-19)
+------------------
+
+- Pep8.
+  [timo,do3cc]
+
+- Refactor tests. Tests are now based on plone.app.testing. You can now
+  use the Fixture COLLECTIVE_SOLR_FIXTURE and the utility method
+  collective.solr.testing:activateAndReindex() to test your code with solr
+  [do3cc]
+
+- Refactor ISearch. The method buildQuery has been replaced with buildQueryAndParameters.
+  Responsabilities have been divided in the search view and the utility, now they are
+  all in the search utility. If you used the method before, please analyse
+  the changes in collective.solr.dispatcher:solrSearchResults from 4.0.3 to 4.1.0
+  You can probably benefit from the changes.
+  [do3cc]
+
+- Add "actual_result_count" attribute to SolrResponse to emulate
+  catalog attribute.
+  [cekk]
+
+- Add browserlayer suport (with upgrade-step)
+  [cekk]
+
+- Use public method to get blob path (fixes error on maintenance/reindex also)
+  [tomgross]
+
+- Fix UnicodeError in BinaryAdder
+  [tomgross]
+
+- Added ignore_portal_types and only_portal_types parameter to reindex for maintenance_view
+  [jkubaile]
 
 
 4.0.3 (2014-06-18)
@@ -17,10 +90,10 @@ Changelog
 4.0.2 (2014-05-14)
 ------------------
 
-- Fix typo in Binary Indexer
+- Fix typo in Binary Indexer.
   [giacomos]
 
-- Fix typo in facet search
+- Fix typo in facet search.
   [tschorr]
 
 - Add facet title vocabulary factory for review_state.
@@ -268,8 +341,7 @@ Changelog
 3.0a1 - 2011-06-23
 ------------------
 
-Upgrade notes
-*************
+**Upgrade notes**
 
 * Changed the names of the indexes used to emulate the `path` index. You need
   to adjust your schema and rename `physicalPath` to `path_string`,
@@ -277,8 +349,7 @@ Upgrade notes
   also requires a full Solr reindex to pick up the new data.
   [hannosch]
 
-Changes
-*******
+**Changes**
 
 * Added `object_provides` index to example schema, as it's used in the
   collection portlet to find collections.

@@ -1,19 +1,29 @@
 # -*- coding: utf-8 -*-
-from logging import getLogger
-from time import time
-from zope.interface import implements
-from zope.component import queryUtility
 from Missing import MV
-
+from collective.solr.exceptions import SolrInactiveException
+from collective.solr.interfaces import ISearch
 from collective.solr.interfaces import ISolrConnectionConfig
 from collective.solr.interfaces import ISolrConnectionManager
-from collective.solr.interfaces import ISearch
+from collective.solr.mangler import cleanupQueryParameters
+from collective.solr.mangler import mangleQuery
+from collective.solr.mangler import optimizeQueryParameters
+from collective.solr.mangler import subtractQueryParameters
 from collective.solr.parser import SolrResponse
-from collective.solr.exceptions import SolrInactiveException
 from collective.solr.queryparser import quote
+from collective.solr.queryparser import quote_iterable_item
 from collective.solr.utils import isWildCard
+from collective.solr.utils import prepareData
 from collective.solr.utils import prepare_wildcard
+from logging import getLogger
+from time import time
+from zope.component import queryUtility
+from zope.interface import implements
 
+try:
+    from Products.LinguaPlone.catalog import languageFilter
+except ImportError:
+    def languageFilter(args):
+        pass
 
 logger = getLogger('collective.solr.search')
 
@@ -24,11 +34,17 @@ class Search(object):
 
     def __init__(self):
         self.manager = None
+        self.config = None
 
     def getManager(self):
         if self.manager is None:
             self.manager = queryUtility(ISolrConnectionManager)
         return self.manager
+
+    def getConfig(self):
+        if self.config is None:
+            self.config = queryUtility(ISolrConnectionConfig)
+        return self.config
 
     def search(self, query, **parameters):
         """ perform a search with the given querystring and parameters """
@@ -39,7 +55,7 @@ class Search(object):
         connection = manager.getConnection()
         if connection is None:
             raise SolrInactiveException
-        if not 'rows' in parameters:
+        if 'rows' not in parameters:
             parameters['rows'] = config.max_results or 10000000
             # Check if rows param is 0 for backwards compatibility. Before
             # Solr 4 'rows = 0' meant that there is no limitation. Solr 4
@@ -52,13 +68,17 @@ class Search(object):
                 'parameter: %r (%r)', config.max_results, query, parameters
             )
         if getattr(config, 'highlight_fields', None):
-            if parameters.get('hl', 'false') == 'true' and not 'hl.fl' in parameters:
+            if parameters.get('hl', 'false') == 'true'\
+                    and 'hl.fl' not in parameters:
                 parameters['hl'] = 'true'
                 parameters['hl.fl'] = config.highlight_fields or []
-                parameters['hl.simple.pre'] = config.highlight_formatter_pre or ' '
-                parameters['hl.simple.post'] = config.highlight_formatter_post or ' '
-                parameters['hl.fragsize'] = getattr(config, 'highlight_fragsize', None) or 100
-        if not 'fl' in parameters:
+                parameters['hl.simple.pre'] =\
+                    config.highlight_formatter_pre or ' '
+                parameters['hl.simple.post'] =\
+                    config.highlight_formatter_post or ' '
+                parameters['hl.fragsize'] =\
+                    getattr(config, 'highlight_fragsize', None) or 100
+        if 'fl' not in parameters:
             if config.field_list:
                 parameters['fl'] = ' '.join(config.field_list)
             else:
@@ -90,13 +110,24 @@ class Search(object):
 
     __call__ = search
 
-    def buildQuery(self, default=None, **args):
+    def buildQueryAndParameters(self, default=None, **args):
         """ helper to build a querystring for simple use-cases """
+        schema = self.getManager().getSchema() or {}
+        config = self.getConfig()
+
+        params = subtractQueryParameters(args)
+        params = cleanupQueryParameters(params, schema)
+
+        languageFilter(args)
+        prepareData(args)
+        mangleQuery(args, config, schema)
+
         logger.debug('building query for "%r", %r', default, args)
         schema = self.getManager().getSchema() or {}
         defaultSearchField = getattr(schema, 'defaultSearchField', None)
         args[None] = default
         query = {}
+
         for name, value in sorted(args.items()):
             field = schema.get(name or defaultSearchField, None)
             if field is None or not field.indexed:
@@ -116,7 +147,7 @@ class Search(object):
                         value
                     )
                 )
-                return {}
+                return {}, params
             elif field.class_ == 'solr.BoolField':
                 if not isinstance(value, (tuple, list)):
                     value = [value]
@@ -130,14 +161,7 @@ class Search(object):
             elif isinstance(value, (tuple, list)):
                 # list items should be treated as literals, but
                 # nevertheless only get quoted when necessary
-                def quoteitem(term):
-                    if isinstance(term, unicode):
-                        term = term.encode('utf-8')
-                    quoted = quote(term)
-                    if not quoted.startswith('"') and not quoted == term:
-                        quoted = quote('"' + term + '"')
-                    return quoted
-                value = '(%s)' % ' OR '.join(map(quoteitem, value))
+                value = '(%s)' % ' OR '.join(map(quote_iterable_item, value))
             elif isinstance(value, set):        # sets are taken literally
                 if len(value) == 1:
                     query[name] = ''.join(value)
@@ -169,4 +193,7 @@ class Search(object):
                 value = '+%s:%s' % (name, value)
             query[name] = value
         logger.debug('built query "%s"', query)
-        return query
+
+        if query:
+            optimizeQueryParameters(query, params)
+        return query, params

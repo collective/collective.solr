@@ -70,7 +70,7 @@ class Range(Group):
         first = last = '*'
         if len(self) == 0:
             return ''
-        if not 'TO' in self:
+        if 'TO' not in self:
             # Not valid range, quote
             return '\\%s%s\\%s' % (
                 self.start,
@@ -174,8 +174,10 @@ def quote(term, textfield=False):
                 new = Group(start='(', end=')')
                 stack.add(new)
             elif grouping in ']})':
-                if (isinstance(stack.current, Group) and
-                    stack.current.end == grouping):
+                if (
+                    isinstance(stack.current, Group) and
+                    stack.current.end == grouping
+                ):
                     stack.current.isgroup = True
                     stack.pop()
                 else:
@@ -248,11 +250,14 @@ def quote(term, textfield=False):
                     stack.current.append('\\%s' % special)
             elif special in '?*':
                 # ? and * can not be the first characters of a search
-                if (stack.current \
-                    and not getattr(stack.current[-1], 'isgroup', False) \
-                    and (isinstance(stack.current[-1], str) and \
-                         not stack.current[-1] in special)) \
-                   or isinstance(stack.current, Range):
+                if (
+                    stack.current and
+                    not getattr(stack.current[-1], 'isgroup', False) and
+                    (
+                        isinstance(stack.current[-1], str) and
+                        not stack.current[-1] in special
+                    )
+                ) or isinstance(stack.current, Range):
                     stack.current.append(special)
             elif special in '/':
                 stack.current.append('\\%s' % special)
@@ -264,3 +269,12 @@ def quote(term, textfield=False):
                 stack.current.append('\\%s' % special)
         i += 1
     return str(stack)
+
+
+def quote_iterable_item(term):
+    if isinstance(term, unicode):
+        term = term.encode('utf-8')
+    quoted = quote(term)
+    if not quoted.startswith('"') and not quoted == term:
+        quoted = quote('"' + term + '"')
+    return quoted

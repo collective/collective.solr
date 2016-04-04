@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import json
 import urllib
 
@@ -24,8 +25,8 @@ class SuggestView(BrowserView):
         params['wt'] = 'json'
 
         params = urllib.urlencode(params, doseq=True)
-        response = connection.doPost(
-            connection.solrBase + '/spell?' + params, '', {})
+        response = connection.doGet(
+            connection.solrBase + '/spell?' + params, {})
         results = json.loads(response.read())
 
         # Check for spellcheck
@@ -75,12 +76,14 @@ class AutocompleteView(BrowserView):
             connection.solrBase + '/autocomplete?' + params, '', {})
         results = json.loads(response.read())
 
-        if not 'grouped' in results:
+        if 'grouped' not in results:
             return json.dumps([])
 
         groups = results.get('grouped')['title_autocomplete']['groups']
 
-        suggestions = [x['doclist']['docs'][0]['title_autocomplete'] for x in groups]
+        suggestions = [
+            x['doclist']['docs'][0]['title_autocomplete'] for x in groups
+        ]
 
         result = []
         for suggestion in suggestions:

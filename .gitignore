@@ -13,7 +13,12 @@ htmlcov
 var
 *.egg-info
 *.py[co]
+*.mo
 *.*~
 .*.cfg
-docs/doctrees/
-docs/html/
+.Python
+pip-selfcheck.json
+.idea
+docs/Makefile
+docs/make.bat
+

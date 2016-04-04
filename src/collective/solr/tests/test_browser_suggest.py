@@ -1,6 +1,5 @@
 # -*- coding: UTF-8 -*-
 from zope.component import getUtility
-from zope.component import queryUtility
 from collective.solr.interfaces import ISolrConnectionManager
 from collective.solr.testing import (
     COLLECTIVE_SOLR_INTEGRATION_TESTING
@@ -32,7 +31,7 @@ class MockResponse():
                         "endOffset": 5,
                         "origFreq": 0,
                         "suggestion": [
-                            {"word":"Plone", "freq":13}
+                            {"word": "Plone", "freq": 13}
                         ]
                     },
                     "correctlySpelled",
@@ -57,6 +56,9 @@ class MockConnection():
     solrBase = '/solr'
 
     def doPost(self, url, foo, bar):
+        return MockResponse()
+
+    def doGet(self, url, bar):
         return MockResponse()
 
 

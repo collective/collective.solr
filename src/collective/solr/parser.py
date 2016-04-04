@@ -123,6 +123,15 @@ class SolrResponse(object):
         """ return only the list of results, i.e. a `SolrResults` instance """
         return getattr(self, 'response', [])
 
+    @property
+    def actual_result_count(self):
+        """
+        return the actual_result_count
+        """
+        if getattr(self, 'response', None):
+            return int(self.response.numFound)
+        return 0
+
     def __len__(self):
         return len(self.results())
 
