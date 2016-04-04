@@ -4,8 +4,8 @@ from setuptools import find_packages
 
 version = '4.1.1.dev0'
 long_description = \
-    open("README.rst").read() + '\n' + \
-    open(os.path.join('docs', 'CHANGES.rst')).read() + \
+    open('README.rst').read() + '\n' + \
+    open('CHANGES.rst').read() + \
     open(os.path.join('docs', 'credits.rst')).read() + \
     open(os.path.join('docs', 'contributors.rst')).read(),
 
@@ -31,10 +31,10 @@ setup(
         'Programming Language :: Python :: 2.7',
     ],
     keywords='plone cmf zope indexing searching solr lucene',
-    author='Jarn AS',
-    author_email='info@jarn.com',
-    maintainer='Plone Community',
-    maintainer_email='plone-developers@lists.sourceforge.net',
+    author='Plone Community',
+    author_email='plone-developers@lists.sourceforge.net',
+    maintainer='Timo Stollenwerk',
+    maintainer_email='tisto@plone.org',
     url='https://github.com/collective/collective.solr',
     license='GPL version 2',
     packages=find_packages('src'),
@@ -54,7 +54,7 @@ setup(
         'ZODB3',
         'Zope2 >= 2.13',
         'archetypes.schemaextender',
-        'argparse', # we need to support Python 2.6 (Plone 4.x)
+        'argparse',  # we need to support Python 2.6 (Plone 4.x)
         'collective.indexing >= 2.0a2',
         'collective.js.showmore',
         'plone.app.content',
