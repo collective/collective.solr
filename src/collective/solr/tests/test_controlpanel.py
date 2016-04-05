@@ -46,8 +46,11 @@ class SolrControlpanelIntegrationTest(unittest.TestCase):
     def test_plone_app_registry_in_controlpanel(self):
         self.controlpanel = getToolByName(self.portal, "portal_controlpanel")
         self.assertTrue(
-            'plone.app.registry' in [a.getAction(self)['id']
-            for a in self.controlpanel.listActions()])
+            'plone.app.registry' in [
+                a.getAction(self)['id']
+                for a in self.controlpanel.listActions()
+            ]
+        )
 
     def test_active_setting(self):
         self.assertTrue('active' in ISolrSchema.names())

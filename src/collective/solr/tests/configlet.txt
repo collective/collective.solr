@@ -81,7 +81,7 @@ Viewing the site control panel
 
 Click the cancel button:
 
-    >>> browser.getControl(name="form.actions.cancel").click()
+    >>> browser.getControl(name="form.buttons.cancel").click()
     >>> browser.url.endswith('plone_control_panel')
     True
 
@@ -98,46 +98,44 @@ Make some changes
     >>> browser.url.endswith('solr-controlpanel')
     True
 
-    >>> browser.getControl(name='form.active').value = True
-    >>> browser.getControl(name='form.host').value = 'foo.bar'
-    >>> browser.getControl(name='form.port').value = '1234'
-    >>> browser.getControl(name='form.base').value = '/solr'
-    >>> browser.getControl(name='form.async').value = True
-    >>> browser.getControl(name='form.auto_commit').value = False
-    >>> browser.getControl(name='form.commit_within').value = '10000'
-    >>> browser.getControl(name='form.index_timeout').value = '7'
-    >>> browser.getControl(name='form.search_timeout').value = '3.1415'
-    >>> browser.getControl(name='form.max_results').value = '23'
-    >>> browser.getControl(name='form.required.0.').value = 'foo'
-    >>> browser.getControl(name='form.required.add').click()
-    >>> browser.getControl(name='form.required.1.').value = 'bar'
-    >>> browser.getControl(name='form.search_pattern').value = '(Title:{value})'
-    >>> browser.getControl(name='form.facets.0.').value = 'type'
-    >>> browser.getControl(name='form.facets.1.').value = 'state'
-    >>> browser.getControl(name='form.filter_queries.0.').value = 'portal_type'
-    >>> browser.getControl(name='form.slow_query_threshold').value = '50'
-    >>> browser.getControl(name='form.effective_steps').value = '300'
-    >>> browser.getControl(name='form.exclude_user').value = True
-    >>> browser.getControl(name='form.highlight_fields.add').click()
-    >>> browser.getControl(name='form.highlight_fields.0.').value = 'SearchableText'
-    >>> browser.getControl(name='form.highlight_formatter_pre').value = '>'
-    >>> browser.getControl(name='form.highlight_formatter_post').value = '<'
-    >>> browser.getControl(name='form.highlight_fragsize').value = '150'
-    >>> browser.getControl(name='form.field_list.add').click()
-    >>> browser.getControl(name='form.field_list.0.').value = 'Title'
-    >>> browser.getControl(name='form.field_list.add').click()
-    >>> browser.getControl(name='form.field_list.1.').value = 'effective'
-    >>> browser.getControl(name='form.levenshtein_distance').value = '1.0'
-    >>> browser.getControl(name='form.atomic_updates').value = False
+    >>> browser.getControl(name='form.widgets.active:list').value = True
+    >>> browser.getControl(name='form.widgets.host').value = 'foo.bar'
+    >>> browser.getControl(name='form.widgets.port').value = '1234'
+    >>> browser.getControl(name='form.widgets.base').value = u'/solr'
+    >>> browser.getControl(name='form.widgets.async:list').value = True
+    >>> browser.getControl(name='form.widgets.auto_commit:list').value = False
+    >>> browser.getControl(name='form.widgets.commit_within').value = '10000'
+    >>> browser.getControl(name='form.widgets.index_timeout').value = '7'
+    >>> browser.getControl(name='form.widgets.search_timeout').value = '3.1415'
+    >>> browser.getControl(name='form.widgets.max_results').value = '23'
+    >>> browser.getControl(name='form.widgets.required').value = '''foo
+    ... bar'''
+    >>> browser.getControl(name='form.widgets.search_pattern').value = '(Title:{value})'
+    >>> browser.getControl(name='form.widgets.facets').value = '''type
+    ... state'''
+    >>> browser.getControl(name='form.widgets.filter_queries').value = 'portal_type'
+    >>> browser.getControl(name='form.widgets.slow_query_threshold').value = '50'
+    >>> browser.getControl(name='form.widgets.effective_steps').value = '300'
+    >>> browser.getControl(name='form.widgets.exclude_user:list').value = True
+    >>> browser.getControl(name='form.widgets.highlight_fields').value = 'SearchableText'
+    >>> browser.getControl(name='form.widgets.highlight_formatter_pre').value = '>'
+    >>> browser.getControl(name='form.widgets.highlight_formatter_post').value = '<'
+    >>> browser.getControl(name='form.widgets.highlight_fragsize').value = '150'
+    >>> browser.getControl(name='form.widgets.field_list').value = '''Title
+    ... effective'''
+    >>> browser.getControl(name='form.widgets.levenshtein_distance').value = '1.0'
+    >>> browser.getControl(name='form.widgets.atomic_updates:list').value = False
 
 Click the save button:
 
-    >>> browser.getControl(name="form.actions.save").click()
+    >>> browser.getControl(name="form.buttons.save").click()
     >>> browser.url.endswith('solr-controlpanel')
     True
 
 We should be informed that something has changed:
 
+    >>> open('/tmp/testbrowser.html', 'w').write(browser.contents)
+    >>> import pdb; pdb.set_trace()
     >>> 'Changes saved.' in browser.contents
     True
 
@@ -194,14 +192,14 @@ Now that the connection is active we can also select more filter query
 parameters from the complete list of Solr indexes, provided that we use the
 correct host and port:
 
-    >>> browser.getControl(name='form.host').value = '127.0.0.1'
-    >>> browser.getControl(name='form.port').value = '8983'
-    >>> browser.getControl(name="form.actions.save").click()
+    >>> browser.getControl(name='form.widgets.host').value = '127.0.0.1'
+    >>> browser.getControl(name='form.widgets.port').value = '8983'
+    >>> browser.getControl(name="form.buttons.save").click()
 
-    >>> browser.getControl(name='form.filter_queries.add').click()
-    >>> browser.getControl(name='form.filter_queries.0.').value = 'Subject'
-    >>> browser.getControl(name='form.filter_queries.1.').value = 'review_state'
-    >>> browser.getControl(name="form.actions.save").click()
+    >>> browser.getControl(name='form.widgets.filter_queries.add').click()
+    >>> browser.getControl(name='form.widgets.filter_queries.0.').value = 'Subject'
+    >>> browser.getControl(name='form.widgets.filter_queries.1.').value = 'review_state'
+    >>> browser.getControl(name="form.buttons.save").click()
     >>> sorted(config.filter_queries)
     [u'Subject', u'review_state']
 
@@ -217,7 +215,7 @@ to an empty list (please see `issue #18`__ for more infos):
     >>> browser.getControl(name='form.required.remove_0').value = True
     >>> browser.getControl(name='form.required.remove_1').value = True
     >>> browser.getControl(name='form.required.remove').click()
-    >>> browser.getControl(name="form.actions.save").click()
+    >>> browser.getControl(name="form.buttons.save").click()
     >>> 'Changes saved.' in browser.contents
     True
 

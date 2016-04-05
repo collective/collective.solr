@@ -119,7 +119,8 @@ class ISolrSchema(Interface):
                     u'when searching. Set to "10000000" or some other '
                     u'ridiculously large value that is higher than the '
                     u'possible number of rows that are expected.'
-        )
+        ),
+        default=100000,
     )
 
     required = List(
