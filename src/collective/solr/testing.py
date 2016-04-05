@@ -195,7 +195,7 @@ def activateAndReindex(portal):
     response.write = original
 
 
-COLLECTIVE_SOLR_FIXTURE = CollectiveSolrLayer()
+COLLECTIVE_SOLR_FIXTURE = CollectiveSolrLayer(solr_active=True)
 
 LEGACY_COLLECTIVE_SOLR_INTEGRATION_TESTING = IntegrationTesting(
     bases=(PLONE_APP_REGISTRY_FIXTURE,

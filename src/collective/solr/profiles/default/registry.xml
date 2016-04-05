@@ -2,7 +2,7 @@
 <registry>
   <records interface="collective.solr.interfaces.ISolrSchema"
            prefix="collective.solr">
-    <value key="active">True</value>
+    <value key="active">False</value>
     <value key="host">127.0.0.1</value>
     <value key="port">8983</value>
     <value key="base">/solr</value>
