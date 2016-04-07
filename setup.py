@@ -59,6 +59,7 @@ setup(
         'collective.js.showmore',
         'plone.app.content',
         'plone.app.layout',
+        'plone.app.registry',
         'plone.app.vocabularies',
         'plone.api',
         'plone.browserlayer',

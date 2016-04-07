@@ -15,6 +15,7 @@
   <include package="archetypes.schemaextender" />
   <include package="collective.indexing" />
   <include package="plone.browserlayer" />
+  <include package="plone.app.registry" />
   <include package="collective.js.showmore" />
 
   <include file="extender.zcml" />
