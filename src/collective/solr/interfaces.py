@@ -120,7 +120,7 @@ class ISolrSchema(Interface):
                     u'ridiculously large value that is higher than the '
                     u'possible number of rows that are expected.'
         ),
-        default=100000,
+        default=10000000,
     )
 
     required = List(
@@ -149,9 +149,7 @@ class ISolrSchema(Interface):
                     u'pattern and will be replaced by the search word '
                     u'and the search word stripped of wildcard symbols.'
         ),
-        default=u"(Title:{value}^5 OR Description:{value}^2 OR "
-                u"SearchableText:{value} OR SearchableText:({base_value}) OR "
-                u"searchwords:({base_value})^1000) showinsearch:True'",
+        default=u"+(Title:{value}^5 OR Description:{value}^2 OR SearchableText:{value} OR SearchableText:({base_value}) OR searchwords:({base_value})^1000) +showinsearch:True",
     )
 
     facets = List(

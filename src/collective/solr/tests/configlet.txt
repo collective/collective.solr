@@ -134,8 +134,6 @@ Click the save button:
 
 We should be informed that something has changed:
 
-    >>> open('/tmp/testbrowser.html', 'w').write(browser.contents)
-    >>> import pdb; pdb.set_trace()
     >>> 'Changes saved.' in browser.contents
     True
 

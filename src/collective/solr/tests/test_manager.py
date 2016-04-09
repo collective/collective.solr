@@ -30,13 +30,11 @@ class SolrConnectionConfigIntegrationTest(unittest.TestCase):
         self.assertEqual(config.commit_within, 0)
         self.assertEqual(config.index_timeout, 0.0)
         self.assertEqual(config.search_timeout, 0.0)
-        self.assertEqual(config.max_results, 0)
+        self.assertEqual(config.max_results, 10000000)
         self.assertEqual(config.required, ('SearchableText',))
         self.assertEqual(
             config.search_pattern,
-            "(Title:{value}^5 OR Description:{value}^2 OR " +
-            "SearchableText:{value} OR SearchableText:({base_value}) OR " +
-            "searchwords:({base_value})^1000) showinsearch:True'")
+            "+(Title:{value}^5 OR Description:{value}^2 OR SearchableText:{value} OR SearchableText:({base_value}) OR searchwords:({base_value})^1000) +showinsearch:True")
         self.assertEqual(config.facets, ('portal_type', 'review_state'))
         self.assertEqual(config.filter_queries, ('portal_type',))
         self.assertEqual(config.slow_query_threshold, 0)
