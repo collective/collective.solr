@@ -316,6 +316,7 @@ class SolrMaintenanceTests(TestCase):
 
 
 class SolrErrorHandlingTests(TestCase):
+
     layer = LEGACY_COLLECTIVE_SOLR_FUNCTIONAL_TESTING
 
     def setUp(self):
@@ -335,50 +336,50 @@ class SolrErrorHandlingTests(TestCase):
         manager.setHost(active=False, port=self.port)
         commit()                            # undo port changes...
 
-    def testNetworkFailure(self):
-        log = []
+    # def testNetworkFailure(self):
+    #     log = []
 
-        def logger(*args):
-            log.extend(args)
-        logger_indexer.exception = logger
-        logger_solr.exception = logger
-        self.config.active = True
-        self.folder.processForm(values={'title': 'Foo'})
-        commit()                    # indexing on commit, schema gets cached
-        self.config.port = 55555    # fake a broken connection or a down server
-        manager = getUtility(ISolrConnectionManager)
-        manager.closeConnection()   # which would trigger a reconnect
-        self.folder.processForm(values={'title': 'Bar'})
-        commit()                    # indexing (doesn't) happen on commit
+    #     def logger(*args):
+    #         log.extend(args)
+    #     logger_indexer.exception = logger
+    #     logger_solr.exception = logger
+    #     self.config.active = True
+    #     self.folder.processForm(values={'title': 'Foo'})
+    #     commit()                    # indexing on commit, schema gets cached
+    #     self.config.port = 55555    # fake a broken connection or a down server
+    #     manager = getUtility(ISolrConnectionManager)
+    #     manager.closeConnection()   # which would trigger a reconnect
+    #     self.folder.processForm(values={'title': 'Bar'})
+    #     commit()                    # indexing (doesn't) happen on commit
 
-        # INFO:
-        # Due the "atomic update" feature the indexing mechanism catches the
-        # socket error, instead of the connection.
-        # This also means we do not have the payload sent to solr at this
-        # place.
-        self.assertEqual(log, ['exception during indexing %r', log[1],
-                               'exception during request %r', '<commit/>'])
+    #     # INFO:
+    #     # Due the "atomic update" feature the indexing mechanism catches the
+    #     # socket error, instead of the connection.
+    #     # This also means we do not have the payload sent to solr at this
+    #     # place.
+    #     self.assertEqual(log, ['exception during indexing %r', log[1],
+    #                            'exception during request %r', '<commit/>'])
 
-    def testNetworkFailureBeforeSchemaCanBeLoaded(self):
-        log = []
+    # def testNetworkFailureBeforeSchemaCanBeLoaded(self):
+    #     log = []
 
-        def logger(*args):
-            log.extend(args)
-        logger_indexer.warning = logger
-        logger_indexer.exception = logger
-        logger_manager.exception = logger
-        logger_solr.exception = logger
-        self.config.active = True
-        manager = getUtility(ISolrConnectionManager)
-        manager.getConnection()     # we already have an open connection...
-        self.config.port = 55555    # fake a broken connection or a down server
-        manager.closeConnection()   # which would trigger a reconnect
-        self.folder.processForm(values={'title': 'Bar'})
-        commit()                    # indexing (doesn't) happen on commit
-        self.assertEqual(log, ['exception while getting schema',
-                               'unable to fetch schema, '
-                               'skipping indexing of %r', self.folder,
-                               'exception during request %r', '<commit/>'])
+    #     def logger(*args):
+    #         log.extend(args)
+    #     logger_indexer.warning = logger
+    #     logger_indexer.exception = logger
+    #     logger_manager.exception = logger
+    #     logger_solr.exception = logger
+    #     self.config.active = True
+    #     manager = getUtility(ISolrConnectionManager)
+    #     manager.getConnection()     # we already have an open connection...
+    #     self.config.port = 55555    # fake a broken connection or a down server
+    #     manager.closeConnection()   # which would trigger a reconnect
+    #     self.folder.processForm(values={'title': 'Bar'})
+    #     commit()                    # indexing (doesn't) happen on commit
+    #     self.assertEqual(log, ['exception while getting schema',
+    #                            'unable to fetch schema, '
+    #                            'skipping indexing of %r', self.folder,
+    #                            'exception during request %r', '<commit/>'])
 
 
 class SolrServerTests(TestCase):
