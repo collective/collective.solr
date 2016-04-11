@@ -168,7 +168,6 @@ class SolrMaintenanceView(BrowserView):
                 # in *every* update operation.
                 if attributes and key not in attributes:
                     attributes.append(key)
-
                 data, missing = proc.getData(obj, attributes=attributes)
                 prepareData(data)
 
