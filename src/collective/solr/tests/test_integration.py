@@ -116,8 +116,7 @@ class IndexingTests(TestCase):
                      getData('commit_response.txt'))
         output = fakehttp(connection, *responses)           # fake responses
         self.folder.title = 'Foo'
-        notify(ObjectModifiedEvent(self.folder))
-        self.assertEqual(self.folder.Title(), 'Foo')
+        self.portal.invokeFactory('Folder', id='myfolder', title='Foo')
         self.assertEqual(str(output), '', 'reindexed unqueued!')
         commit()                        # indexing happens on commit
         required = '<field name="Title" update="set">Foo</field>'
@@ -130,7 +129,7 @@ class IndexingTests(TestCase):
         responses = [getData('dummy_response.txt')] * 42    # set up enough...
         output = fakehttp(connection, *responses)           # fake responses
         notify(ObjectModifiedEvent(self.folder))
-        self.folder.title = 'Foo'
+        self.portal.invokeFactory('Folder', id='myfolder', title='Foo')
         commit()                        # indexing happens on commit
         self.assertNotEqual(repr(output).find('Foo'), -1, 'title not found')
         self.assertEqual(repr(output).find('at_references'), -1,
