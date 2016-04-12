@@ -213,7 +213,7 @@ class CollectiveSolrMockRegistry(object):
         self.max_results = 0
         self.required = ()
         self.search_pattern = None
-        self.facets = ()
+        self.facets = []
         self.filter_queries = ()
         self.slow_query_threshold = 0
         self.effective_steps = 1
