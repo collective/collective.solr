@@ -15,8 +15,8 @@ from collective.solr.manager import logger as logger_manager
 from collective.solr.parser import SolrResponse
 from collective.solr.search import Search
 from collective.solr.solr import logger as logger_solr
-from collective.solr.testing import COLLECTIVE_SOLR_FUNCTIONAL_TESTING
 from collective.solr.testing import HAS_LINGUAPLONE
+from collective.solr.testing import LEGACY_COLLECTIVE_SOLR_FUNCTIONAL_TESTING
 from collective.solr.tests.utils import numFound
 from collective.solr.utils import activate
 from collective.solr.utils import getConfig
@@ -55,7 +55,7 @@ DEFAULT_OBJS = [
 
 
 class SolrMaintenanceTests(TestCase):
-    layer = COLLECTIVE_SOLR_FUNCTIONAL_TESTING
+    layer = LEGACY_COLLECTIVE_SOLR_FUNCTIONAL_TESTING
 
     def setUp(self):
         self.portal = self.layer['portal']
@@ -316,8 +316,7 @@ class SolrMaintenanceTests(TestCase):
 
 
 class SolrErrorHandlingTests(TestCase):
-
-    layer = COLLECTIVE_SOLR_FUNCTIONAL_TESTING
+    layer = LEGACY_COLLECTIVE_SOLR_FUNCTIONAL_TESTING
 
     def setUp(self):
         self.portal = self.layer['portal']
@@ -383,7 +382,7 @@ class SolrErrorHandlingTests(TestCase):
 
 
 class SolrServerTests(TestCase):
-    layer = COLLECTIVE_SOLR_FUNCTIONAL_TESTING
+    layer = LEGACY_COLLECTIVE_SOLR_FUNCTIONAL_TESTING
 
     def setUp(self):
         activate()

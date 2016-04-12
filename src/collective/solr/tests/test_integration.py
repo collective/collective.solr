@@ -8,7 +8,7 @@ from collective.solr.interfaces import ISolrConnectionManager
 from collective.solr.interfaces import ISolrIndexQueueProcessor
 from collective.solr.interfaces import IZCMLSolrConnectionConfig
 from collective.solr.mangler import mangleQuery
-from collective.solr.testing import COLLECTIVE_SOLR_FUNCTIONAL_TESTING
+from collective.solr.testing import LEGACY_COLLECTIVE_SOLR_FUNCTIONAL_TESTING
 from collective.solr.tests.utils import fakeServer
 from collective.solr.tests.utils import fakehttp
 from collective.solr.tests.utils import getData
@@ -31,7 +31,7 @@ from zope.lifecycleevent import ObjectModifiedEvent
 
 class UtilityTests(TestCase):
 
-    layer = COLLECTIVE_SOLR_FUNCTIONAL_TESTING
+    layer = LEGACY_COLLECTIVE_SOLR_FUNCTIONAL_TESTING
 
     def testGenericInterface(self):
         proc = queryUtility(IIndexQueueProcessor, name='solr')
@@ -60,7 +60,7 @@ class UtilityTests(TestCase):
 
 class QueryManglerTests(TestCase):
 
-    layer = COLLECTIVE_SOLR_FUNCTIONAL_TESTING
+    layer = LEGACY_COLLECTIVE_SOLR_FUNCTIONAL_TESTING
 
     def testExcludeUserFromAllowedRolesAndUsers(self):
         config = getConfig()
@@ -82,7 +82,7 @@ class QueryManglerTests(TestCase):
 
 
 class IndexingTests(TestCase):
-    layer = COLLECTIVE_SOLR_FUNCTIONAL_TESTING
+    layer = LEGACY_COLLECTIVE_SOLR_FUNCTIONAL_TESTING
 
     def setUp(self):
         replies = (getData('plone_schema.xml'), getData('add_response.txt'),
@@ -136,10 +136,9 @@ class IndexingTests(TestCase):
         self.assertEqual(repr(output).find('at_references'), -1,
                          '`at_references` found?')
 
-
 # XXX: Comment out this test for now since it makes the test run hang. (timo)
 # class SiteSearchTests(TestCase):
-#     layer = COLLECTIVE_SOLR_FUNCTIONAL_TESTING
+#     layer = LEGACY_COLLECTIVE_SOLR_FUNCTIONAL_TESTING
 
 #     def setUp(self):
 #         self.portal = self.layer['portal']
@@ -224,7 +223,7 @@ class IndexingTests(TestCase):
 
 
 class ZCMLSetupTests(TestCase):
-    layer = COLLECTIVE_SOLR_FUNCTIONAL_TESTING
+    layer = LEGACY_COLLECTIVE_SOLR_FUNCTIONAL_TESTING
 
     def tearDown(self):
         manager = queryUtility(ISolrConnectionManager)
@@ -249,7 +248,7 @@ class ZCMLSetupTests(TestCase):
 
 
 class SiteSetupTests(TestCase):
-    layer = COLLECTIVE_SOLR_FUNCTIONAL_TESTING
+    layer = LEGACY_COLLECTIVE_SOLR_FUNCTIONAL_TESTING
 
     def setUp(self):
         self.portal = self.layer['portal']
