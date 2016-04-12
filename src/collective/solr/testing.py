@@ -219,6 +219,7 @@ class CollectiveSolrMockRegistry(object):
         self.effective_steps = 1
         self.exclude_user = False
         self.field_list = []
+        self.atomic_updates = False
 
     def __getitem__(self, name):
         name_parts = name.split('.')
