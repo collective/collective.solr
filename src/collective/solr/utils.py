@@ -19,7 +19,8 @@ def getConfig():
 def isActive():
     """ indicate if the solr connection should/can be used """
     try:
-        active = api.portal.get_registry_record(name='collective.solr.active')
+        registry = getUtility(IRegistry)
+        active = registry['collective.solr.active']
     except api.portal.InvalidParameterError:
         return False
     return active
@@ -27,7 +28,8 @@ def isActive():
 
 def activate(active=True):
     """ (de)activate the solr integration """
-    api.portal.set_registry_record('collective.solr.active', active)
+    registry = getUtility(IRegistry)
+    registry['collective.solr.active'] = active
 
 
 def setupTranslationMap():

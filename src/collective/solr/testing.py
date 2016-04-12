@@ -13,9 +13,12 @@ from plone.app.testing import TEST_USER_NAME
 from plone.app.testing import applyProfile
 from plone.app.testing import login
 from plone.app.testing import setRoles
+from plone.registry.interfaces import IRegistry
 from plone.testing import Layer
 from plone.testing.z2 import installProduct
 from plone.api.portal import set_registry_record
+from zope.interface import implementer
+from zope.component import provideUtility
 from time import sleep
 
 import os
@@ -193,6 +196,81 @@ def activateAndReindex(portal):
     maintenance.reindex()
     response.write = original
 
+
+@implementer(IRegistry)
+class CollectiveSolrMockRegistry(object):
+
+    def __init__(self):
+        self.active = False
+        self.host = u'localhost'
+        self.port = None
+        self.base = None
+        self.async = False
+        self.auto_commit = True
+        self.commit_within = 0
+        self.index_timeout = 0
+        self.search_timeout = 0
+        self.max_results = 0
+        self.required = ()
+        self.search_pattern = None
+        self.facets = ()
+        self.filter_queries = ()
+        self.slow_query_threshold = 0
+        self.effective_steps = 1
+        self.exclude_user = False
+        self.field_list = []
+
+    def __getitem__(self, name):
+        name_parts = name.split('.')
+        return getattr(self, name_parts[2])
+
+    def get(self, name, default=None):
+        return
+
+    def __setitem__(self, name, value):
+        return
+
+    def __contains__(self, name):
+        return
+
+    @property
+    def records(self):
+        return
+
+    # Schema interface API
+
+    def forInterface(self, interface, check=True, omit=(), prefix=None,
+                     factory=None):
+        return self
+
+    def registerInterface(self, interface, omit=(), prefix=None):
+        return
+
+    def collectionOfInterface(self, interface, check=True, omit=(),
+                              prefix=None, factory=None):
+        return
+
+
+class CollectiveSolrMockRegistryLayer(Layer):
+    """Solr test layer that fires up and shuts down a Solr instance. This
+       layer can be used to unit test a Solr configuration without having to
+       fire up Plone.
+    """
+
+    def setUp(self):
+        provideUtility(
+            provides=IRegistry,
+            component=CollectiveSolrMockRegistry(),
+            name=u''
+        )
+
+    def tearDown(self):
+        # XXX: we have to unregister the utility, otherwise the test fixture
+        # will bleed into other tests. This currently makes a few unit tests
+        # pass. We need to fix this properly before merging though. (timo)
+        pass
+
+COLLECTIVE_SOLR_MOCK_REGISTRY_FIXTURE = CollectiveSolrMockRegistryLayer()
 
 COLLECTIVE_SOLR_FIXTURE = CollectiveSolrLayer(solr_active=True)
 
