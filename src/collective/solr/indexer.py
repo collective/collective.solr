@@ -20,7 +20,8 @@ except ImportError:
     # Plone 5
     from plone.indexer.interfaces import IIndexableObjectWrapper
 from plone.indexer.interfaces import IIndexableObject
-from plone import api
+from zope.component import getUtility
+from plone.registry.interfaces import IRegistry
 
 from collective.solr.interfaces import ISolrConnectionManager
 from collective.solr.interfaces import ISolrIndexQueueProcessor
@@ -197,7 +198,8 @@ class SolrIndexProcessor(object):
                 return          # don't index with no data...
             prepareData(data)
             if data.get(uniqueKey, None) is not None and not missing:
-                config_commit_within = api.portal.get_registry_record(name='collective.solr.commit_within')   # noqa
+                registry = getUtility(IRegistry)
+                config_commit_within = registry['collective.solr.commit_within']   # noqa
                 if config_commit_within:
                     data['commitWithin'] = config_commit_within
                 try:

@@ -12,7 +12,8 @@ from zope.i18n import translate
 from zope.i18nmessageid import Message
 
 from collective.solr.interfaces import IFacetTitleVocabularyFactory
-from plone import api
+from zope.component import getUtility
+from plone.registry.interfaces import IRegistry
 
 
 def param(view, name):
@@ -37,7 +38,8 @@ def facetParameters(view):
     if fields is marker:
         fields = getattr(view.context, 'facet_fields', marker)
     if fields is marker:
-        fields = api.portal.get_registry_record(name='collective.solr.facets')
+        registry = getUtility(IRegistry)
+        fields = registry['collective.solr.facets']
     dependencies = {}
     for idx, field in enumerate(fields):
         if ':' in field:

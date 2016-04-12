@@ -7,7 +7,9 @@ from collective.solr.utils import isWildCard
 from collective.solr.utils import prepare_wildcard
 from collective.solr.utils import splitSimpleSearch
 from collective.solr.utils import getConfig
-from plone import api
+from zope.component import getUtility
+from plone.registry.interfaces import IRegistry
+
 
 ranges = {
     'min': '[%s TO *]',
@@ -269,7 +271,8 @@ def cleanupQueryParameters(args, schema):
 def optimizeQueryParameters(query, params):
     """ optimize query parameters by using filter queries for
         configured indexes """
-    filter_queries = api.portal.get_registry_record(name='collective.solr.filter_queries')   # noqa
+    registry = getUtility(IRegistry)
+    filter_queries = registry['collective.solr.filter_queries']
     fq = []
     if filter_queries is not None:
         for idxs in filter_queries:

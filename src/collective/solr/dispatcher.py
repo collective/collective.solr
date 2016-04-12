@@ -18,7 +18,8 @@ from zope.component import queryUtility
 from zope.component.hooks import getSite
 from zope.interface import implements
 from zope.publisher.interfaces.http import IHTTPRequest
-from plone import api
+from zope.component import getUtility
+from plone.registry.interfaces import IRegistry
 
 patchCatalogTool()  # patch catalog tool to use the dispatcher...
 patchLazy()  # ...as well as ZCatalog's Lazy class
@@ -56,7 +57,8 @@ def solrSearchResults(request=None, **keywords):
         logger.warn('No search utility found in site %s', site)
         raise FallBackException
 
-    config_required = api.portal.get_registry_record(name='collective.solr.required')  # noqa
+    registry = getUtility(IRegistry)
+    config_required = registry['collective.solr.required']
 
     if request is None:
         # try to get a request instance, so that flares can be adapted to
