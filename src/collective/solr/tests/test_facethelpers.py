@@ -10,6 +10,7 @@ from collective.solr.browser.facets import convertFacets, facetParameters
 from collective.solr.browser.facets import SearchFacetsView
 from collective.solr.interfaces import IFacetTitleVocabularyFactory
 from collective.solr.parser import SolrResponse
+from collective.solr.testing import COLLECTIVE_SOLR_MOCK_REGISTRY_FIXTURE
 from collective.solr.tests.utils import getData
 from collective.solr.utils import getConfig
 
@@ -65,11 +66,15 @@ class DummyAllCapsVocabularyFactory(object):
         return DummyAllCapsVocabulary()
 
 
-class FacettingHelperTest(TestCase, cleanup.CleanUp):
+class FacettingHelperTest(TestCase):
+
+    layer = COLLECTIVE_SOLR_MOCK_REGISTRY_FIXTURE
 
     def setUp(self):
         provideUtility(
-            DummyTitleVocabularyFactory(), IFacetTitleVocabularyFactory)
+            DummyTitleVocabularyFactory(),
+            IFacetTitleVocabularyFactory
+        )
         provideUtility(
             DummyAllCapsVocabularyFactory(), IFacetTitleVocabularyFactory,
             name='capsFacet')
@@ -165,6 +170,10 @@ class FacettingHelperTest(TestCase, cleanup.CleanUp):
             facetParameters(view),
             (['foo : bar', 'bar  :foo'], dict(foo=['bar'], bar=['foo']))
         )
+
+        # XXX: Manually clean up after the test. We should be able to remove
+        # this once our test isolation issues have been dealt with.
+        cfg.facets = []
 
     def testNamedFacetTitleVocabulary(self):
         """Test use of IFacetTitleVocabularyFactory registrations
