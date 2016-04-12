@@ -255,12 +255,12 @@ class SiteSetupTests(TestCase):
         self.portal = self.layer['portal']
 
     def testBrowserResources(self):
-        records = api.portal.get_tool(name='portal_registry').records
-        key = ('plone.resources/'
-               'resource-collective-solr-resources-style-css.css')
-        css = '++resource++collective.solr.resources/style.css'
-        self.assertIn(key, records)
-        self.assertIn(css, records[key].value)
+        cssreg = getToolByName(self.portal, "portal_css")
+        self.assertTrue(
+            cssreg.getResource(
+                '++resource++collective.solr.resources/style.css'
+            ).getEnabled()
+        )
 
     def testTranslation(self):
         utrans = getToolByName(self.portal, 'translation_service').utranslate
