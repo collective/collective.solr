@@ -8,7 +8,7 @@ from collective.solr.interfaces import ISolrIndexQueueProcessor
 from collective.solr.interfaces import IZCMLSolrConnectionConfig
 from collective.solr.mangler import mangleQuery
 from collective.solr.testing import LEGACY_COLLECTIVE_SOLR_FUNCTIONAL_TESTING
-# from collective.solr.tests.utils import fakeServer
+from collective.solr.tests.utils import fakeServer
 from collective.solr.tests.utils import fakehttp
 from collective.solr.tests.utils import getData
 from collective.solr.utils import getConfig
@@ -81,6 +81,7 @@ class QueryManglerTests(TestCase):
 
 
 class IndexingTests(TestCase):
+
     layer = LEGACY_COLLECTIVE_SOLR_FUNCTIONAL_TESTING
 
     def setUp(self):
@@ -176,6 +177,8 @@ class SiteSearchTests(TestCase):
 # #        request = dict(SearchableText='foo')
 # #        self.assertRaises(error, query, request)
 
+# XXX: Enabling this test leads to a test deadlock. Needs to be investigated.
+# (timo)
 #     def testSearchTimeout(self):
 #         config = getConfig()
 #         config.active = True
@@ -199,29 +202,30 @@ class SiteSearchTests(TestCase):
 #         finally:
 #             thread.join()           # the server thread must always be joined
 
-#     def testSchemaUrlFallback(self):
-#         config = getConfig()
-#         config.active = True
-#         config.port = 55555        # random port so the real solr can still run  # noqa
+    def testSchemaUrlFallback(self):
+        config = getConfig()
+        config.active = True
+        config.port = 55555        # random port so the real solr can still run  # noqa
 
-#         def notfound(handler):     # set up fake 404 response
-#             self.assertEqual(handler.path,
-#                              '/solr/admin/file/?file=schema.xml')
-#             handler.send_response(404, getData('not_found.txt'))
+        def notfound(handler):     # set up fake 404 response
+            self.assertEqual(handler.path,
+                             '/solr/admin/file/?file=schema.xml')
+            handler.send_response(404, getData('not_found.txt'))
 
-#         def solr12(handler):        # set up response with the schema
-#             self.assertEqual(handler.path,
-#                              '/solr/admin/get-file.jsp?file=schema.xml')
-#             handler.send_response(200, getData('schema.xml'))
-#         responses = [notfound, solr12]
-#         thread = fakeServer(responses, config.port)
-#         schema = queryUtility(ISolrConnectionManager).getSchema()
-#         thread.join()               # the server thread must always be joined
-#         self.assertEqual(responses, [])
-#         self.assertEqual(len(schema), 21)   # 21 items defined in schema.xml
+        def solr12(handler):        # set up response with the schema
+            self.assertEqual(handler.path,
+                             '/solr/admin/get-file.jsp?file=schema.xml')
+            handler.send_response(200, getData('schema.xml'))
+        responses = [notfound, solr12]
+        thread = fakeServer(responses, config.port)
+        schema = queryUtility(ISolrConnectionManager).getSchema()
+        thread.join()               # the server thread must always be joined
+        self.assertEqual(responses, [])
+        self.assertEqual(len(schema), 21)   # 21 items defined in schema.xml
 
 
 class ZCMLSetupTests(TestCase):
+
     layer = LEGACY_COLLECTIVE_SOLR_FUNCTIONAL_TESTING
 
     def tearDown(self):
@@ -247,6 +251,7 @@ class ZCMLSetupTests(TestCase):
 
 
 class SiteSetupTests(TestCase):
+
     layer = LEGACY_COLLECTIVE_SOLR_FUNCTIONAL_TESTING
 
     def setUp(self):
