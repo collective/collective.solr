@@ -1,8 +1,8 @@
 Changelog
 =========
 
-4.1.1 (unreleased)
-------------------
+5.0 (2016-04-13)
+----------------
 
 Note: This release requires you to to update your Solr config and do a full reindex. Make sure you add "updateLog = true" to your "solr-instance"
 buildout section. See https://github.com/collective/collective.solr/blob/master/solr.cfg for a working example.
