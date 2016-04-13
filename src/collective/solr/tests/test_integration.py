@@ -2,23 +2,23 @@
 
 from Products.CMFCore.utils import getToolByName
 from collective.indexing.interfaces import IIndexQueueProcessor
-from collective.solr.exceptions import SolrInactiveException
+# from collective.solr.exceptions import SolrInactiveException
 from collective.solr.interfaces import ISearch
 from collective.solr.interfaces import ISolrConnectionManager
 from collective.solr.interfaces import ISolrIndexQueueProcessor
 from collective.solr.interfaces import IZCMLSolrConnectionConfig
 from collective.solr.mangler import mangleQuery
 from collective.solr.testing import LEGACY_COLLECTIVE_SOLR_FUNCTIONAL_TESTING
-from collective.solr.tests.utils import fakeServer
+# from collective.solr.tests.utils import fakeServer
 from collective.solr.tests.utils import fakehttp
 from collective.solr.tests.utils import getData
 from collective.solr.utils import getConfig
 from plone.app.testing import TEST_USER_ID
 from plone.app.testing import setRoles
-from plone import api
-from socket import error
-from socket import timeout
-from time import sleep
+# from plone import api
+# from socket import error
+# from socket import timeout
+# from time import sleep
 from transaction import commit
 from unittest import TestCase
 from zope.component import getGlobalSiteManager
@@ -190,7 +190,7 @@ class IndexingTests(TestCase):
 #        def slow(handler):          # set up another http response
 #            sleep(3)                # but wait longer before sending it
 #            handler.send_response(200, getData('search_response.txt'))
-#        # We need a third handler, as the second one will timeout, which causes
+#        # We need a third handler, as the second one will timeout, which causes  # noqa
 #        # the SolrConnection.doPost method to catch it and try to reconnect.
 #        thread = fakeServer([quick, slow, slow], port=55555)
 #        search = queryUtility(ISearch)
@@ -203,7 +203,7 @@ class IndexingTests(TestCase):
 #    def testSchemaUrlFallback(self):
 #        config = getConfig()
 #        config.active = True
-#        config.port = 55555        # random port so the real solr can still run
+#        config.port = 55555        # random port so the real solr can still run  # noqa
 #
 #        def notfound(handler):     # set up fake 404 response
 #            self.assertEqual(handler.path,
