@@ -62,17 +62,13 @@ Search Enhancements
 * Exclude from search
 * Elevation
 
-ZCTextIndex Replacement
-***********************
-
-
 
 Detailed Documentation
 ======================
 
-A full Documentation of the Solr integration of Plone could be found in `docs.plone.org collective.solr`_.
+A full Documentation of the Solr integration of Plone could be found on `collectivesolr.readthedocs.org`_.
 
-.. _`docs.plone.org collective.solr`: http://docs.plone.org/external/collective.solr/docs/index.html
+.. _`collectivesolr.readthedocs.org`: http://collectivesolr.readthedocs.org/en/latest/
 
 
 Installation & Configuration
