@@ -4,7 +4,8 @@ Changelog
 4.1.1 (unreleased)
 ------------------
 
-Note: This release requires you to to update your Solr config and do a full reindex.
+Note: This release requires you to to update your Solr config and do a full reindex. Make sure you add "updateLog = true" to your "solr-instance"
+buildout section. See https://github.com/collective/collective.solr/blob/master/solr.cfg for a working example.
 
 - Ported atomic updates from ftw.solr.
   This requires you to update your solr config, load the new solr config and
