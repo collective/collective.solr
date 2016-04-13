@@ -11,7 +11,7 @@ from collective.solr.indexer import SolrIndexProcessor
 from collective.solr.indexer import logger as logger_indexer
 from collective.solr.interfaces import ISearch
 from collective.solr.interfaces import ISolrConnectionManager
-from collective.solr.manager import logger as logger_manager
+# from collective.solr.manager import logger as logger_manager
 from collective.solr.parser import SolrResponse
 from collective.solr.search import Search
 from collective.solr.solr import logger as logger_solr
@@ -348,7 +348,7 @@ class SolrErrorHandlingTests(TestCase):
     #     self.config.active = True
     #     self.folder.processForm(values={'title': 'Foo'})
     #     commit()                    # indexing on commit, schema gets cached
-    #     self.config.port = 55555    # fake a broken connection or a down server
+    #     self.config.port = 55555    # fake a broken connection or a down server  # noqa
     #     manager = getUtility(ISolrConnectionManager)
     #     manager.closeConnection()   # which would trigger a reconnect
     #     self.folder.processForm(values={'title': 'Bar'})
@@ -374,7 +374,7 @@ class SolrErrorHandlingTests(TestCase):
     #     self.config.active = True
     #     manager = getUtility(ISolrConnectionManager)
     #     manager.getConnection()     # we already have an open connection...
-    #     self.config.port = 55555    # fake a broken connection or a down server
+    #     self.config.port = 55555    # fake a broken connection or a down server  # noqa
     #     manager.closeConnection()   # which would trigger a reconnect
     #     self.folder.processForm(values={'title': 'Bar'})
     #     commit()                    # indexing (doesn't) happen on commit
