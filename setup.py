@@ -5,8 +5,8 @@ from setuptools import find_packages
 version = '5.0.1.dev0'
 long_description = \
     open('README.rst').read() + '\n' + \
-    open('CHANGES.rst').read() + \
-    open(os.path.join('docs', 'credits.rst')).read() + \
+    open('CHANGES.rst').read() + '\n' + \
+    open(os.path.join('docs', 'credits.rst')).read() + '\n' + \
     open(os.path.join('docs', 'contributors.rst')).read(),
 
 setup(
