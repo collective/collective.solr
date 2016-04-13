@@ -11,7 +11,7 @@ from collective.solr.indexer import SolrIndexProcessor
 from collective.solr.indexer import logger as logger_indexer
 from collective.solr.interfaces import ISearch
 from collective.solr.interfaces import ISolrConnectionManager
-# from collective.solr.manager import logger as logger_manager
+from collective.solr.manager import logger as logger_manager
 from collective.solr.parser import SolrResponse
 from collective.solr.search import Search
 from collective.solr.solr import logger as logger_solr
@@ -362,26 +362,26 @@ class SolrErrorHandlingTests(TestCase):
         self.assertEqual(log, ['exception during indexing %r', log[1],
                                'exception during request %r', '<commit/>'])
 
-    # def testNetworkFailureBeforeSchemaCanBeLoaded(self):
-    #     log = []
+    def testNetworkFailureBeforeSchemaCanBeLoaded(self):
+        log = []
 
-    #     def logger(*args):
-    #         log.extend(args)
-    #     logger_indexer.warning = logger
-    #     logger_indexer.exception = logger
-    #     logger_manager.exception = logger
-    #     logger_solr.exception = logger
-    #     self.config.active = True
-    #     manager = getUtility(ISolrConnectionManager)
-    #     manager.getConnection()     # we already have an open connection...
-    #     self.config.port = 55555    # fake a broken connection or a down server  # noqa
-    #     manager.closeConnection()   # which would trigger a reconnect
-    #     self.folder.processForm(values={'title': 'Bar'})
-    #     commit()                    # indexing (doesn't) happen on commit
-    #     self.assertEqual(log, ['exception while getting schema',
-    #                            'unable to fetch schema, '
-    #                            'skipping indexing of %r', self.folder,
-    #                            'exception during request %r', '<commit/>'])
+        def logger(*args):
+            log.extend(args)
+        logger_indexer.warning = logger
+        logger_indexer.exception = logger
+        logger_manager.exception = logger
+        logger_solr.exception = logger
+        self.config.active = True
+        manager = getUtility(ISolrConnectionManager)
+        manager.getConnection()     # we already have an open connection...
+        self.config.port = 55555    # fake a broken connection or a down server  # noqa
+        manager.closeConnection()   # which would trigger a reconnect
+        self.folder.processForm(values={'title': 'Bar'})
+        commit()                    # indexing (doesn't) happen on commit
+        self.assertEqual(log, ['exception while getting schema',
+                               'unable to fetch schema, '
+                               'skipping indexing of %r', self.folder,
+                               'exception during request %r', '<commit/>'])
 
 
 class SolrServerTests(TestCase):
