@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
-
 from Products.CMFCore.utils import getToolByName
 from collective.indexing.interfaces import IIndexQueueProcessor
-# from collective.solr.exceptions import SolrInactiveException
+from collective.solr.exceptions import SolrInactiveException
 from collective.solr.interfaces import ISearch
 from collective.solr.interfaces import ISolrConnectionManager
 from collective.solr.interfaces import ISolrIndexQueueProcessor
@@ -135,27 +134,28 @@ class IndexingTests(TestCase):
         self.assertEqual(repr(output).find('at_references'), -1,
                          '`at_references` found?')
 
-# XXX: Comment out this test for now since it makes the test run hang. (timo)
-# class SiteSearchTests(TestCase):
-#     layer = LEGACY_COLLECTIVE_SOLR_FUNCTIONAL_TESTING
 
-#     def setUp(self):
-#         self.portal = self.layer['portal']
+class SiteSearchTests(TestCase):
 
-#     def tearDown(self):
-#         # resetting the solr configuration after each test isn't strictly
-#         # needed at the moment, but it triggers the `ConnectionStateError`
-#         # when the other tests (in `errors.txt`) is trying to perform an
-#         # actual solr search...
-#         queryUtility(ISolrConnectionManager).setHost(active=False)
+    layer = LEGACY_COLLECTIVE_SOLR_FUNCTIONAL_TESTING
 
-#     def testSkinSetup(self):
-#         skins = self.portal.portal_skins.objectIds()
-#         self.assertTrue('solr_site_search' in skins, 'no solr skin?')
+    def setUp(self):
+        self.portal = self.layer['portal']
 
-#     def testInactiveException(self):
-#         search = queryUtility(ISearch)
-#         self.assertRaises(SolrInactiveException, search, 'foo')
+    def tearDown(self):
+        # resetting the solr configuration after each test isn't strictly
+        # needed at the moment, but it triggers the `ConnectionStateError`
+        # when the other tests (in `errors.txt`) is trying to perform an
+        # actual solr search...
+        queryUtility(ISolrConnectionManager).setHost(active=False)
+
+    def testSkinSetup(self):
+        skins = self.portal.portal_skins.objectIds()
+        self.assertTrue('solr_site_search' in skins, 'no solr skin?')
+
+    def testInactiveException(self):
+        search = queryUtility(ISearch)
+        self.assertRaises(SolrInactiveException, search, 'foo')
 
 #     def testSearchWithoutServer(self):
 #         config = getConfig()
