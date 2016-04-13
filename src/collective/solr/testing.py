@@ -275,6 +275,17 @@ COLLECTIVE_SOLR_MOCK_REGISTRY_FIXTURE = CollectiveSolrMockRegistryLayer()
 
 COLLECTIVE_SOLR_FIXTURE = CollectiveSolrLayer(solr_active=True)
 
+COLLECTIVE_SOLR_INTEGRATION_TESTING = IntegrationTesting(
+    bases=(COLLECTIVE_SOLR_FIXTURE,),
+    name="CollectiveSolr:Integration"
+)
+
+COLLECTIVE_SOLR_FUNCTIONAL_TESTING = FunctionalTesting(
+    bases=(COLLECTIVE_SOLR_FIXTURE,),
+    name="CollectiveSolr:Functional"
+)
+
+
 LEGACY_COLLECTIVE_SOLR_INTEGRATION_TESTING = IntegrationTesting(
     bases=(LEGACY_COLLECTIVE_SOLR_FIXTURE,),
     name="CollectiveSolr:Integration"
