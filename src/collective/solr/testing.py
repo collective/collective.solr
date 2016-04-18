@@ -5,8 +5,10 @@ from plone.app.testing import FunctionalTesting
 from plone.app.testing import IntegrationTesting
 try:
     from plone.app.contenttypes.testing import PLONE_APP_CONTENTTYPES_FIXTURE as PLONE_FIXTURE  # noqa
+    HAS_PAC = True
 except ImportError:
     from plone.app.testing import PLONE_FIXTURE
+    HAS_PAC = False
 from plone.app.testing import PloneSandboxLayer
 from plone.app.testing import TEST_USER_ID
 from plone.app.testing import TEST_USER_NAME
@@ -270,6 +272,15 @@ class CollectiveSolrMockRegistryLayer(Layer):
         # will bleed into other tests. This currently makes a few unit tests
         # pass. We need to fix this properly before merging though. (timo)
         pass
+
+
+def set_attributes(context, values):
+    if HAS_PAC:
+        for key, value in values.iteritems():
+            setattr(context, key, value)
+    else:
+        context.processForm(values=values)
+
 
 COLLECTIVE_SOLR_MOCK_REGISTRY_FIXTURE = CollectiveSolrMockRegistryLayer()
 
