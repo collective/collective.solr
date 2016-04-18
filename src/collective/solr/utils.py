@@ -5,7 +5,6 @@ from re import compile, UNICODE
 from Acquisition import aq_base
 from unidecode import unidecode
 
-from plone import api
 from collective.solr.interfaces import ISolrSchema
 from zope.component import getUtility
 from plone.registry.interfaces import IRegistry
@@ -21,7 +20,7 @@ def isActive():
     try:
         registry = getUtility(IRegistry)
         active = registry['collective.solr.active']
-    except api.portal.InvalidParameterError:
+    except KeyError:
         return False
     return active
 
