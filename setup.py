@@ -76,7 +76,7 @@ setup(
     extras_require={
         'test': [
             'plone.app.testing[robot]',
-            'plone.app.robotframework',
+            'plone.app.robotframework[debug]',
         ],
         'test4': [
             'Products.LinguaPlone >=3.1a1',
