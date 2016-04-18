@@ -25,6 +25,7 @@
 
 Resource  plone/app/robotframework/selenium.robot
 Resource  plone/app/robotframework/keywords.robot
+Resource  Products/CMFPlone/tests/robot/keywords.robot
 
 Library  Remote  ${PLONE_URL}/RobotRemote
 
@@ -34,33 +35,48 @@ Test Teardown  Close all browsers
 
 *** Test Cases ***************************************************************
 
-Scenario: As a member I want to be able to log into the website
-  [Documentation]  Example of a BDD-style (Behavior-driven development) test.
-  Given a login form
-   When I enter valid credentials
-   Then I am logged in
+Scenario: As a manager I can install and enable the add-on
+  [Documentation]  Once installed and enabled, searching produces anything since
+  ...              the content is not indexed yet
+  Given a logged-in site manager
+   When the product is activated in its configlet
+    and I search something
+   Then the result is empty
 
+Scenario: As a manager once reindexed I get results
+  [Documentation]  Once reindexed, I should get some results
+  Given a logged-in site manager
+   When I reindex the site content
+    and I search something
+   Then it returns some results
 
 *** Keywords *****************************************************************
 
 # --- Given ------------------------------------------------------------------
 
-a login form
-  Go To  ${PLONE_URL}/login_form
-  Wait until page contains  Login Name
-  Wait until page contains  Password
-
+a logged-in site manager
+  Enable autologin as  Manager  Site Administrator  Contributor  Reviewer
 
 # --- WHEN -------------------------------------------------------------------
 
-I enter valid credentials
-  Input Text  __ac_name  admin
-  Input Text  __ac_password  secret
-  Click Button  Log in
+the product is activated in its configlet
+  Go To  ${PLONE_URL}/@@solr-controlpanel
+  # TODO: It's already activated?
+
+I search something
+  Go To  ${PLONE_URL}/@@search
+  # TODO: Search something
+
+I reindex the site content
+  Go To  ${PLONE_URL}/@@solr-maintenance/reindex
 
 
 # --- THEN -------------------------------------------------------------------
 
-I am logged in
+the result is empty
+  # TODO: Test it's empty
   Wait until page contains  You are now logged in
   Page should contain  You are now logged in
+
+it returns some results
+  # TODO: Test results are shown
