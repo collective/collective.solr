@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from Products.CMFCore.utils import getToolByName
 from collective.solr.utils import activate
+from plone.app.robotframework.testing import REMOTE_LIBRARY_BUNDLE_FIXTURE
 from plone.app.testing import FunctionalTesting
 from plone.app.testing import IntegrationTesting
 try:
@@ -17,6 +18,7 @@ from plone.app.testing import login
 from plone.app.testing import setRoles
 from plone.registry.interfaces import IRegistry
 from plone.testing import Layer
+from plone.testing import z2
 from plone.testing.z2 import installProduct
 from plone.api.portal import set_registry_record
 from zope.interface import implementer
@@ -144,7 +146,7 @@ class CollectiveSolrLayer(PloneSandboxLayer):
 
     def setUpPloneSite(self, portal):
         self.solr_layer.setUp()
-        applyProfile(portal, 'collective.solr:search')
+        applyProfile(portal, 'collective.solr:default')
         set_registry_record('collective.solr.active', self.solr_active)
         set_registry_record('collective.solr.port', self.solr_port)
         set_registry_record('collective.solr.base', self.solr_base)
@@ -296,6 +298,12 @@ COLLECTIVE_SOLR_FUNCTIONAL_TESTING = FunctionalTesting(
     name="CollectiveSolr:Functional"
 )
 
+COLLECTIVE_SOLR_ROBOT_TESTING = FunctionalTesting(
+    bases=(COLLECTIVE_SOLR_FIXTURE,
+           REMOTE_LIBRARY_BUNDLE_FIXTURE,
+           z2.ZSERVER_FIXTURE),
+    name="CollectiveSolr:Acceptance"
+)
 
 LEGACY_COLLECTIVE_SOLR_INTEGRATION_TESTING = IntegrationTesting(
     bases=(LEGACY_COLLECTIVE_SOLR_FIXTURE,),
