@@ -17,6 +17,7 @@ from collective.solr.search import Search
 from collective.solr.solr import logger as logger_solr
 from collective.solr.testing import HAS_LINGUAPLONE
 from collective.solr.testing import LEGACY_COLLECTIVE_SOLR_FUNCTIONAL_TESTING
+from collective.solr.testing import set_attributes
 from collective.solr.tests.utils import numFound
 from collective.solr.utils import activate
 from collective.solr.utils import getConfig
@@ -296,7 +297,7 @@ class SolrMaintenanceTests(TestCase):
         # after a network outage some items might need (re|un)indexing...
         activate(active=False)
         setRoles(self.portal, TEST_USER_ID, ['Manager'])
-        self.portal.news.processForm(values={'title': 'Foos'})
+        set_attributes(self.portal.news, values={'title': 'Foos'})
         # we only have minute based time resolution, so force an older date
         self.portal.news.setModificationDate(DateTime() - 2)
         self.portal.news.reindexObject(idxs=['modified'])
@@ -346,12 +347,12 @@ class SolrErrorHandlingTests(TestCase):
         logger_indexer.exception = logger
         logger_solr.exception = logger
         self.config.active = True
-        self.folder.processForm(values={'title': 'Foo'})
+        set_attributes(self.folder, values={'title': 'Foo'})
         commit()                    # indexing on commit, schema gets cached
         self.config.port = 55555    # fake a broken connection or a down server  # noqa
         manager = getUtility(ISolrConnectionManager)
         manager.closeConnection()   # which would trigger a reconnect
-        self.folder.processForm(values={'title': 'Bar'})
+        set_attributes(self.folder, values={'title': 'Bar'})
         commit()                    # indexing (doesn't) happen on commit
 
         # INFO:
@@ -376,7 +377,7 @@ class SolrErrorHandlingTests(TestCase):
         manager.getConnection()     # we already have an open connection...
         self.config.port = 55555    # fake a broken connection or a down server  # noqa
         manager.closeConnection()   # which would trigger a reconnect
-        self.folder.processForm(values={'title': 'Bar'})
+        set_attributes(self.folder, values={'title': 'Bar'})
         commit()                    # indexing (doesn't) happen on commit
         self.assertEqual(log, ['exception while getting schema',
                                'unable to fetch schema, '
@@ -442,7 +443,7 @@ class SolrServerTests(TestCase):
         self.assertEqual(data, {})
 
     def testReindexObject(self):
-        self.folder.processForm(values={'title': 'Foo'})
+        set_attributes(self.folder, values={'title': 'Foo'})
         connection = getUtility(ISolrConnectionManager).getConnection()
         result = connection.search(q='+Title:Foo').read()
         self.assertEqual(numFound(result), 0)
@@ -533,7 +534,7 @@ class SolrServerTests(TestCase):
         commit()
 
     def testSearchObject(self):
-        self.folder.processForm(values={'title': 'Foo'})
+        set_attributes(self.folder, values={'title': 'Foo'})
         commit()                        # indexing happens on commit
         results = self.search('+Title:Foo').results()
         self.assertEqual(results.numFound, '1')
@@ -566,7 +567,7 @@ class SolrServerTests(TestCase):
                           ('NewsFolder', '/plone/news')])
 
     def testSolrSearchResultsWithUnicodeTitle(self):
-        self.folder.processForm(values={'title': u'Føø sekretær'})
+        set_attributes(self.folder, values={'title': u'Føø sekretær'})
         commit()
         results = solrSearchResults(SearchableText=u'Føø')
         self.assertEqual([r.Title for r in results], [u'Føø sekretær'])
@@ -577,7 +578,7 @@ class SolrServerTests(TestCase):
         results = solrSearchResults(SearchableText=u'Sekretaer')
         self.assertEqual([r.Title for r in results], [u'Føø sekretær'])
         # second set of characters
-        self.folder.processForm(values={'title': u'Åge Þor'})
+        set_attributes(self.folder, values={'title': u'Åge Þor'})
         commit()
         results = solrSearchResults(SearchableText=u'Åge')
         self.assertEqual([r.Title for r in results], [u'Åge Þor'])
@@ -885,7 +886,7 @@ class SolrServerTests(TestCase):
     def DISABLED_testAsyncIndexing(self):
         connection = getUtility(ISolrConnectionManager).getConnection()
         self.config.async = True        # enable async indexing
-        self.folder.processForm(values={'title': 'Foo'})
+        set_attributes(self.folder, values={'title': 'Foo'})
         commit()
         # indexing normally happens on commit, but with async indexing
         # enabled search results won't be up-to-date immediately...
@@ -904,7 +905,7 @@ class SolrServerTests(TestCase):
     def testNoAutoCommitIndexing(self):
         connection = getUtility(ISolrConnectionManager).getConnection()
         self.config.auto_commit = False        # disable committing
-        self.folder.processForm(values={'title': 'Foo'})
+        set_attributes(self.folder, values={'title': 'Foo'})
         commit()
         # no indexing happens, make sure we give the server some time
         sleep(4)
@@ -914,7 +915,7 @@ class SolrServerTests(TestCase):
     def testCommitWithinIndexing(self):
         connection = getUtility(ISolrConnectionManager).getConnection()
         self.config.commit_within = 1000
-        self.folder.processForm(values={'title': 'Foo'})
+        set_attributes(self.folder, values={'title': 'Foo'})
         commit()
         # no indexing happens
         result = connection.search(q='+Title:Foo').read()
@@ -986,7 +987,7 @@ class SolrServerTests(TestCase):
 
     def testFlareHelpers(self):
         folder = self.folder
-        folder.processForm(values={'title': 'Foo'})
+        set_attributes(folder, values={'title': 'Foo'})
         commit()                        # indexing happens on commit
         results = solrSearchResults(SearchableText='Foo')
         self.assertEqual(len(results), 1)
@@ -1005,7 +1006,7 @@ class SolrServerTests(TestCase):
 
     def testWildcardSearches(self):
         self.maintenance.reindex()
-        self.folder.processForm(values={'title': 'Newbie!'})
+        set_attributes(self.folder, values={'title': 'Newbie!'})
         results = solrSearchResults(SearchableText='New*')
         self.assertEqual(len(results), 2)
         commit()                        # indexing happens on commit
@@ -1025,7 +1026,7 @@ class SolrServerTests(TestCase):
 
     def testWildcardSearchesMultipleWords(self):
         self.maintenance.reindex()
-        self.folder.processForm(values={'title': 'Brazil Germany'})
+        set_attributes(self.folder, values={'title': 'Brazil Germany'})
         commit()                        # indexing happens on commit
         results = solrSearchResults(SearchableText='Braz*')
         self.assertEqual(len(results), 1)
@@ -1034,7 +1035,7 @@ class SolrServerTests(TestCase):
 
     def testWildcardSearchesUnicode(self):
         self.maintenance.reindex()
-        self.folder.processForm(values={'title': u'Ärger nøkkel'})
+        set_attributes(self.folder, values={'title': u'Ärger nøkkel'})
         commit()
         results = solrSearchResults(SearchableText=u'Ärger')
         self.assertEqual(len(results), 1)
@@ -1049,7 +1050,7 @@ class SolrServerTests(TestCase):
         connection = getUtility(ISolrConnectionManager).getConnection()
         # we cannot use `commit` here, since the transaction should get
         # aborted, so let's make sure processing the queue directly works...
-        self.folder.processForm(values={'title': 'Foo'})
+        set_attributes(self.folder, values={'title': 'Foo'})
         processQueue()
         result = connection.search(q='+Title:Foo').read()
         self.assertEqual(numFound(result), 0)
@@ -1058,7 +1059,7 @@ class SolrServerTests(TestCase):
         self.assertEqual(numFound(result), 1)
         # now let's test aborting, but make sure there's nothing left in
         # the queue (by calling `commit`)
-        self.folder.processForm(values={'title': 'Bar'})
+        set_attributes(self.folder, values={'title': 'Bar'})
         processQueue()
         result = connection.search(q='+Title:Bar').read()
         self.assertEqual(numFound(result), 0)
@@ -1220,7 +1221,7 @@ class SolrServerTests(TestCase):
         self.assertEqual(self.folder.foo(), ['News', 'NewsFolder'])
 
     def testSearchForTermWithHyphen(self):
-        self.folder.processForm(values={'title': 'foo-bar'})
+        set_attributes(self.folder, values={'title': 'foo-bar'})
         commit()
         results = solrSearchResults(SearchableText='foo')
         self.assertEqual(sorted([r.Title for r in results]), ['foo-bar'])
@@ -1229,7 +1230,7 @@ class SolrServerTests(TestCase):
         results = solrSearchResults(SearchableText='bar')
         self.assertEqual(sorted([r.Title for r in results]), ['foo-bar'])
         # second round
-        self.folder.processForm(values={'title': '2010-123'})
+        set_attributes(self.folder, values={'title': '2010-123'})
         commit()
         results = solrSearchResults(SearchableText='2010-123')
         self.assertEqual(sorted([r.Title for r in results]), ['2010-123'])
@@ -1241,16 +1242,16 @@ class SolrServerTests(TestCase):
         self.assertEqual(sorted([r.Title for r in results]), ['2010-123'])
 
     def testSearchForTermWithColon(self):
-        self.folder.processForm(values={'title': 'foo:bar'})
+        set_attributes(self.folder, values={'title': 'foo:bar'})
         commit()
         results = solrSearchResults(SearchableText='foo')
         self.assertEqual(sorted([r.Title for r in results]), ['foo:bar'])
-        results = solrSearchResults(SearchableText='foo:bar')
+        results = solrSearchResults(SearchableText='foo')
         self.assertEqual(sorted([r.Title for r in results]), ['foo:bar'])
         results = solrSearchResults(SearchableText='bar')
         self.assertEqual(sorted([r.Title for r in results]), ['foo:bar'])
         # second round
-        self.folder.processForm(values={'title': u'2010:ändern'})
+        set_attributes(self.folder, values={'title': u'2010:ändern'})
         commit()
         results = solrSearchResults(SearchableText='2010')
         self.assertEqual(sorted([r.Title for r in results]), [u'2010:ändern'])
@@ -1260,7 +1261,7 @@ class SolrServerTests(TestCase):
         self.assertEqual(sorted([r.Title for r in results]), [u'2010:ändern'])
 
     def testSearchForTermWithForwardSlash(self):
-        self.folder.processForm(values={'title': 'foo/bar'})
+        set_attributes(self.folder, values={'title': 'foo/bar'})
         commit()
         results = solrSearchResults(SearchableText='foo')
         self.assertEqual(sorted([r.Title for r in results]), ['foo/bar'])
