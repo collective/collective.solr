@@ -55,4 +55,13 @@
       class=".suggest.AutocompleteView"
       permission="zope2.View"/>
 
+  <browser:page
+      name="search"
+      class="Products.CMFPlone.browser.search.Search"
+      permission="zope2.View"
+      for="plone.app.layout.navigation.interfaces.INavigationRoot"
+      template="search.pt"
+      layer=".interfaces.IThemeSpecific"
+      />
+
 </configure>
