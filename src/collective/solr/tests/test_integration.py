@@ -12,6 +12,7 @@ from collective.solr.tests.utils import fakeServer
 from collective.solr.tests.utils import fakehttp
 from collective.solr.tests.utils import getData
 from collective.solr.utils import getConfig
+from plone import api
 from plone.app.testing import TEST_USER_ID
 from plone.app.testing import setRoles
 # from plone import api
@@ -26,6 +27,8 @@ from zope.component import queryUtility
 from zope.configuration import xmlconfig
 from zope.event import notify
 from zope.lifecycleevent import ObjectModifiedEvent
+
+import unittest
 
 
 class UtilityTests(TestCase):
@@ -257,7 +260,8 @@ class SiteSetupTests(TestCase):
     def setUp(self):
         self.portal = self.layer['portal']
 
-    def testBrowserResources(self):
+    @unittest.skipIf(api.env.plone_version() >= '5.0', 'Plone 4 Only')
+    def testBrowserResourcesPlone4(self):
         cssreg = getToolByName(self.portal, "portal_css")
         self.assertTrue(
             cssreg.getResource(
