@@ -82,7 +82,7 @@ Viewing the site control panel
 Click the cancel button:
 
     >>> browser.getControl(name="form.buttons.cancel").click()
-    >>> browser.url.endswith('plone_control_panel')
+    >>> browser.url.endswith('plone_control_panel') or browser.url.endswith('@@overview-controlpanel')
     True
 
 There should be still no changes:
