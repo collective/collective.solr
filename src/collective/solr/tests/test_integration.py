@@ -4,7 +4,6 @@ from Products.CMFCore.utils import getToolByName
 from collective.indexing.interfaces import IIndexQueueProcessor
 from collective.solr.exceptions import SolrInactiveException
 from collective.solr.interfaces import ISearch
-from collective.solr.interfaces import ISolrConnectionConfig
 from collective.solr.interfaces import ISolrConnectionManager
 from collective.solr.interfaces import ISolrIndexQueueProcessor
 from collective.solr.interfaces import IZCMLSolrConnectionConfig
@@ -13,18 +12,21 @@ from collective.solr.testing import COLLECTIVE_SOLR_FUNCTIONAL_TESTING
 from collective.solr.tests.utils import fakeServer
 from collective.solr.tests.utils import fakehttp
 from collective.solr.tests.utils import getData
+from collective.solr.utils import getConfig
 from plone.app.testing import TEST_USER_ID
 from plone.app.testing import setRoles
+from plone import api
 from socket import error
 from socket import timeout
 from time import sleep
 from transaction import commit
 from unittest import TestCase
-from unittest import defaultTestLoader
 from zope.component import getGlobalSiteManager
 from zope.component import getUtilitiesFor
 from zope.component import queryUtility
 from zope.configuration import xmlconfig
+from zope.event import notify
+from zope.lifecycleevent import ObjectModifiedEvent
 
 
 class UtilityTests(TestCase):
@@ -61,7 +63,7 @@ class QueryManglerTests(TestCase):
     layer = COLLECTIVE_SOLR_FUNCTIONAL_TESTING
 
     def testExcludeUserFromAllowedRolesAndUsers(self):
-        config = queryUtility(ISolrConnectionConfig)
+        config = getConfig()
         search = queryUtility(ISearch)
         schema = search.getManager().getSchema() or {}
         # first test the default setting, i.e. not removing the user
@@ -96,7 +98,6 @@ class IndexingTests(TestCase):
         setRoles(self.portal, TEST_USER_ID, ['Manager'])
         self.portal.invokeFactory('Folder', id='folder')
         self.folder = self.portal.folder
-        self.folder.unmarkCreationFlag()    # stop LinguaPlone from renaming
         commit()
 
     def tearDown(self):
@@ -114,7 +115,8 @@ class IndexingTests(TestCase):
         responses = (getData('plone_schema.xml'),
                      getData('commit_response.txt'))
         output = fakehttp(connection, *responses)           # fake responses
-        self.folder.processForm(values={'title': 'Foo'})    # updating sends
+        self.folder.title = 'Foo'
+        notify(ObjectModifiedEvent(self.folder))
         self.assertEqual(self.folder.Title(), 'Foo')
         self.assertEqual(str(output), '', 'reindexed unqueued!')
         commit()                        # indexing happens on commit
@@ -127,11 +129,10 @@ class IndexingTests(TestCase):
         connection = self.proc.getConnection()
         responses = [getData('dummy_response.txt')] * 42    # set up enough...
         output = fakehttp(connection, *responses)           # fake responses
-        ref = self.folder.addReference(self.portal.news, 'referencing')
-        self.folder.processForm(values={'title': 'Foo'})
+        notify(ObjectModifiedEvent(self.folder))
+        self.folder.title = 'Foo'
         commit()                        # indexing happens on commit
         self.assertNotEqual(repr(output).find('Foo'), -1, 'title not found')
-        self.assertEqual(repr(output).find(ref.UID()), -1, 'reference found?')
         self.assertEqual(repr(output).find('at_references'), -1,
                          '`at_references` found?')
 
@@ -158,7 +159,7 @@ class SiteSearchTests(TestCase):
         self.assertRaises(SolrInactiveException, search, 'foo')
 
     def testSearchWithoutServer(self):
-        config = queryUtility(ISolrConnectionConfig)
+        config = getConfig()
         config.active = True
         config.port = 55555     # random port so the real solr might still run
         search = queryUtility(ISearch)
@@ -177,9 +178,9 @@ class SiteSearchTests(TestCase):
 #        self.assertRaises(error, query, request)
 
     def testSearchTimeout(self):
-        config = queryUtility(ISolrConnectionConfig)
+        config = getConfig()
         config.active = True
-        config.search_timeout = 2   # specify the timeout
+        config.search_timeout = 2.0  # specify the timeout
         config.port = 55555         # don't let the real solr disturb us
 
         def quick(handler):         # set up fake http response
@@ -200,7 +201,7 @@ class SiteSearchTests(TestCase):
             thread.join()           # the server thread must always be joined
 
     def testSchemaUrlFallback(self):
-        config = queryUtility(ISolrConnectionConfig)
+        config = getConfig()
         config.active = True
         config.port = 55555        # random port so the real solr can still run
 
@@ -253,15 +254,14 @@ class SiteSetupTests(TestCase):
         self.portal = self.layer['portal']
 
     def testBrowserResources(self):
-        registry = getToolByName(self.portal, 'portal_css')
+        records = api.portal.get_tool(name='portal_registry').records
+        key = ('plone.resources/'
+               'resource-collective-solr-resources-style-css.css')
         css = '++resource++collective.solr.resources/style.css'
-        self.assertTrue(css in registry.getResourceIds())
+        self.assertIn(key, records)
+        self.assertIn(css, records[key].value)
 
     def testTranslation(self):
         utrans = getToolByName(self.portal, 'translation_service').utranslate
         translate = lambda msg: utrans(msgid=msg, domain='solr')
         self.assertEqual(translate('portal_type'), u'Content type')
-
-
-def test_suite():
-    return defaultTestLoader.loadTestsFromName(__name__)

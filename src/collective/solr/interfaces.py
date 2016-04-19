@@ -15,12 +15,13 @@ from collective.solr import SolrMessageFactory as _
 class ISolrSchema(Interface):
 
     active = Bool(
-        title=_('label_active', default=u'Active'), default=False,
+        title=_('label_active', default=u'Active'),
         description=_(
             'help_active',
             default=u'Check this to enable the Solr integration, i.e. '
                     u'indexing and searching using the below settings.'
-        )
+        ),
+        default=False,
     )
 
     host = TextLine(
@@ -114,7 +115,8 @@ class ISolrSchema(Interface):
                     u'when searching. Set to "10000000" or some other '
                     u'ridiculously large value that is higher than the '
                     u'possible number of rows that are expected.'
-        )
+        ),
+        default=1000000,
     )
 
     required = List(
@@ -128,6 +130,7 @@ class ISolrSchema(Interface):
         ),
         value_type=TextLine(),
         default=[],
+        missing_value=[],
         required=False
     )
 
@@ -180,7 +183,8 @@ class ISolrSchema(Interface):
             default=u'Specify a threshold (in milliseconds) after which '
                     u'queries are considered to be slow causing them to '
                     u'be logged. Set to "0" to prevent any logging.'
-        )
+        ),
+        default=0,
     )
 
     effective_steps = Int(
@@ -260,6 +264,7 @@ class ISolrSchema(Interface):
                     u'between 0 and 1.'
         ),
         required=False,
+        default=0.0,
     )
 
     atomic_updates = Bool(

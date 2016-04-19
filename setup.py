@@ -18,6 +18,9 @@ setup(
         'Development Status :: 5 - Production/Stable',
         'Environment :: Web Environment',
         'Framework :: Plone',
+        'Framework :: Plone :: 4.2',
+        'Framework :: Plone :: 4.3',
+        'Framework :: Plone :: 5.0',
         'Intended Audience :: Developers',
         'Intended Audience :: System Administrators',
         'Intended Audience :: Other Audience',
@@ -46,7 +49,6 @@ setup(
         'Plone >= 4.1',
         'Products.Archetypes',
         'Products.CMFCore',
-        'Products.CMFDefault',
         'Products.GenericSetup',
         'Unidecode',
         'ZODB3',
@@ -56,9 +58,10 @@ setup(
         'collective.indexing >= 2.0a2',
         'collective.js.showmore',
         'plone.app.content',
-        'plone.app.controlpanel',
         'plone.app.layout',
+        'plone.app.registry',
         'plone.app.vocabularies',
+        'plone.api',
         'plone.browserlayer',
         'plone.indexer',
         'setuptools',
@@ -72,10 +75,14 @@ setup(
     ],
     extras_require={
         'test': [
+            'plone.app.testing[robot]',
+            'plone.app.robotframework',
+        ],
+        'test4': [
             'Products.LinguaPlone >=3.1a1',
             'plone.app.contentlisting',  # Comes with Plone 4.2,
                                          # only a test req for 4.1 compat
-            'plone.app.testing',
+            'plone.app.testing[robot]',
         ]
     },
     entry_points='''

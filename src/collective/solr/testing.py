@@ -1,10 +1,13 @@
 # -*- coding: utf-8 -*-
 from Products.CMFCore.utils import getToolByName
-from collective.solr.configlet import SolrControlPanelAdapter
 from collective.solr.utils import activate
+from plone.app.registry.testing import PLONE_APP_REGISTRY_FIXTURE
 from plone.app.testing import FunctionalTesting
 from plone.app.testing import IntegrationTesting
-from plone.app.testing import PLONE_FIXTURE
+try:
+    from plone.app.contenttypes.testing import PLONE_APP_CONTENTTYPES_FIXTURE as PLONE_FIXTURE  # noqa
+except ImportError:
+    from plone.app.testing import PLONE_FIXTURE
 from plone.app.testing import PloneSandboxLayer
 from plone.app.testing import TEST_USER_ID
 from plone.app.testing import TEST_USER_NAME
@@ -13,15 +16,22 @@ from plone.app.testing import login
 from plone.app.testing import setRoles
 from plone.testing import Layer
 from plone.testing.z2 import installProduct
+from plone.api.portal import set_registry_record
 from time import sleep
-from zope.configuration import xmlconfig
 
 import os
 import sys
 import urllib2
 import subprocess
+import pkg_resources
 
 BIN_DIR = os.path.dirname(os.path.realpath(sys.argv[0]))
+
+try:
+    pkg_resources.get_distribution('Products.LinguaPlone')
+    HAS_LINGUAPLONE = True
+except pkg_resources.DistributionNotFound:
+    HAS_LINGUAPLONE = False
 
 
 class SolrLayer(Layer):
@@ -103,7 +113,7 @@ class CollectiveSolrLayer(PloneSandboxLayer):
             module=None,
             solr_host='localhost',
             solr_port=8983,
-            solr_base='/solr',
+            solr_base=u'/solr',
             solr_active=False):
         super(PloneSandboxLayer, self).__init__(bases, name, module)
         self.solr_active = solr_active
@@ -123,28 +133,22 @@ class CollectiveSolrLayer(PloneSandboxLayer):
     def setUpZope(self, app, configurationContext):
         # Load ZCML
         import collective.indexing
-        xmlconfig.file('configure.zcml',
-                       collective.indexing,
-                       context=configurationContext)
+        self.loadZCML(package=collective.indexing)
         import collective.solr
-        xmlconfig.file('configure.zcml',
-                       collective.solr,
-                       context=configurationContext)
+        self.loadZCML(package=collective.solr)
         installProduct(app, 'collective.indexing')
 
     def setUpPloneSite(self, portal):
         self.solr_layer.setUp()
         applyProfile(portal, 'collective.solr:search')
-        solr_settings = SolrControlPanelAdapter(portal)
-        solr_settings.setActive(self.solr_active)
-        solr_settings.setPort(self.solr_port)
-        solr_settings.setBase(self.solr_base)
+        set_registry_record('collective.solr.active', self.solr_active)
+        set_registry_record('collective.solr.port', self.solr_port)
+        set_registry_record('collective.solr.base', self.solr_base)
 
     def tearDownPloneSite(self, portal):
-        solr_settings = SolrControlPanelAdapter(portal)
-        solr_settings.setActive(False)
-        solr_settings.setPort(8983)
-        solr_settings.setBase('/solr')
+        set_registry_record('collective.solr.active', False)
+        set_registry_record('collective.solr.port', 8983)
+        set_registry_record('collective.solr.base', u'/solr')
         self.solr_layer.tearDown()
 
 
@@ -191,14 +195,16 @@ def activateAndReindex(portal):
     response.write = original
 
 
-COLLECTIVE_SOLR_FIXTURE = CollectiveSolrLayer()
+COLLECTIVE_SOLR_FIXTURE = CollectiveSolrLayer(solr_active=True)
 
 COLLECTIVE_SOLR_INTEGRATION_TESTING = IntegrationTesting(
-    bases=(LEGACY_COLLECTIVE_SOLR_FIXTURE,),
+    bases=(PLONE_APP_REGISTRY_FIXTURE,
+           LEGACY_COLLECTIVE_SOLR_FIXTURE,),
     name="CollectiveSolr:Integration"
 )
 
 COLLECTIVE_SOLR_FUNCTIONAL_TESTING = FunctionalTesting(
-    bases=(LEGACY_COLLECTIVE_SOLR_FIXTURE,),
+    bases=(PLONE_APP_REGISTRY_FIXTURE,
+           LEGACY_COLLECTIVE_SOLR_FIXTURE,),
     name="CollectiveSolr:Functional"
 )

@@ -1,14 +1,13 @@
 # -*- coding: utf-8 -*-
 from AccessControl import getSecurityManager
 from DateTime import DateTime
-from collective.solr.interfaces import ISolrConnectionConfig
 from collective.solr.queryparser import quote
 from collective.solr.utils import isSimpleSearch
 from collective.solr.utils import isWildCard
 from collective.solr.utils import prepare_wildcard
 from collective.solr.utils import splitSimpleSearch
-from zope.component import queryUtility
-
+from collective.solr.utils import getConfig
+from plone import api
 
 ranges = {
     'min': '[%s TO *]',
@@ -61,7 +60,10 @@ def makeSimpleExpressions(term, levenstein_distance):
 
 
 def mangleSearchableText(value, config):
-    pattern = getattr(config, 'search_pattern', '')
+    config = config or getConfig()
+    pattern = getattr(config, 'search_pattern', u'')
+    if pattern:
+        pattern = pattern.encode('utf-8')
     levenstein_distance = getattr(config, 'levenshtein_distance', 0)
     value_parts = []
     base_value_parts = []
@@ -266,10 +268,10 @@ def cleanupQueryParameters(args, schema):
 def optimizeQueryParameters(query, params):
     """ optimize query parameters by using filter queries for
         configured indexes """
-    config = queryUtility(ISolrConnectionConfig)
+    filter_queries = api.portal.get_registry_record(name='collective.solr.filter_queries')   # noqa
     fq = []
-    if config is not None:
-        for idxs in config.filter_queries:
+    if filter_queries is not None:
+        for idxs in filter_queries:
             idxs = set(idxs.split(' '))
             if idxs.issubset(query.keys()):
                 fq.append(' '.join([query.pop(idx) for idx in idxs]))
@@ -281,4 +283,4 @@ def optimizeQueryParameters(query, params):
     elif fq:
         params['fq'] = fq
     if not query:
-        query['*'] = '*:*'      # catch all if no regular query is left...
+        query['*'] = u'*:*'      # catch all if no regular query is left...
