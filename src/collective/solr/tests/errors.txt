@@ -37,9 +37,9 @@ content:
 
 Then we start searching: the first time around things are fine:
 
-  >>> browser.open('http://nohost/plone/')
-  >>> browser.getControl('Search Site').value = 'Welcome'
-  >>> browser.getForm(name='searchform').submit()
+  >>> browser.open('http://nohost/plone/@@search')
+  >>> browser.getControl(name='SearchableText', index=1).value = 'Welcome'
+  >>> browser.getForm(name='searchform', index=1).submit()
   >>> browser.contents
   '...Search results...1...items matching your search terms...
    ...http://nohost/plone/front-page...Welcome to Plone...'
