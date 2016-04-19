@@ -28,9 +28,9 @@ up a facet dependency:
 Initially the depending facet show not show up:
 
   >>> browser = Browser(layer['app'])
-  >>> browser.open('http://nohost/plone/@@search')
-  >>> browser.getControl(name='SearchableText', index=1).value = 'news'
-  >>> browser.getForm(name='searchform', index=1).submit()
+  >>> browser.open('http://nohost/plone/')
+  >>> browser.getControl('Search Site').value = 'news'
+  >>> browser.getForm(name='searchform').submit()
   >>> browser.url
   'http://nohost/plone/search?...&facet.field=portal_type...'
   >>> 'Review state' in browser.contents
