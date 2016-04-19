@@ -27,18 +27,18 @@ to activate Solr support and reindex the site's content, though:
   >>> browser.getControl('Title').value = 'Foo'
   >>> browser.getControl('Save').click()
   >>> commit()
-  >>> browser.url
-  'http://nohost/plone/foo'
+  >>> browser.url.startswith('http://nohost/plone/foo')
+  True
   >>> browser.contents
-  '...Info...Changes saved...
-   ...documentFirstHeading...Foo...'
+  '...Info...documentFirstHeading...Foo...'
 
-  >>> browser.getControl('Search Site').value = 'Foo'
-  >>> browser.getForm(name='searchform').submit()
+  >>> browser.open('http://nohost/plone/@@search')
+  >>> browser.getControl(name='SearchableText', index=1).value = 'Foo'
+  >>> browser.getForm(name='searchform', index=1).submit()
   >>> browser.contents
   '...Search results...1...items matching your search terms...
    ...http://nohost/plone/foo...Foo...'
-  >>> browser.getLink('Foo')
+  >>> browser.getLink(url='http://nohost/plone/foo')
   <Link text='Foo' url='http://nohost/plone/foo'>
 
 Some content items, for example files and image, don't have an associated
@@ -52,9 +52,9 @@ behaviour won't break things:
   >>> portal.invokeFactory('File', id='file', title='my first foo file')
   'file'
   >>> commit()
-  >>> browser.open('http://nohost/plone/')
-  >>> browser.getControl('Search Site').value = 'my first foo file'
-  >>> browser.getForm(name='searchform').submit()
+  >>> browser.open('http://nohost/plone/@@search')
+  >>> browser.getControl(name='SearchableText', index=1).value = 'my first foo file'
+  >>> browser.getForm(name='searchform', index=1).submit()
   >>> browser.contents
   '...Search results...1...items matching your search terms...
    ...http://nohost/plone/file...my first foo file...'
@@ -67,11 +67,11 @@ Simple searches should be wildcard searches to reflect (and not change)
 Plone's default behaviour. So at least for single words the search should
 be automatically adjusted:
 
-  >>> browser.open('http://nohost/plone/')
-  >>> browser.getControl('Search Site').value = 'Fo'
-  >>> browser.getForm(name='searchform').submit()
+  >>> browser.open('http://nohost/plone/@@search')
+  >>> browser.getControl(name='SearchableText', index=1).value = 'Fo'
+  >>> browser.getForm(name='searchform', index=1).submit()
   >>> browser.contents
   '...Search results...2...items matching your search terms...
    ...http://nohost/plone/foo...Foo...'
-  >>> browser.getLink('Foo')
+  >>> browser.getLink(url='http://nohost/plone/foo')
   <Link text='Foo' url='http://nohost/plone/foo'>
