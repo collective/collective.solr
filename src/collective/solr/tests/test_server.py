@@ -1280,7 +1280,7 @@ class SolrServerTests(TestCase):
         self.assertEqual(sorted([r.Title for r in results]), ['foo/bar'])
 
     def testBatchedSearchResults(self):
-        self.portal['front-page'].setText('aaa')
+        set_attributes(self.portal['front-page'], values={'text': 'aaa'})
         self.maintenance.reindex()
         search = lambda **kw: [getattr(i, 'Title', None) for i in
                                solrSearchResults(SearchableText='a*',
