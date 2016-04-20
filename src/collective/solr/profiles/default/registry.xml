@@ -25,6 +25,7 @@
     </value>
   </records>
 
+<!-- Disable the integration with the Plone RR
   <records prefix="plone.resources/collective.solr"
             interface='Products.CMFPlone.interfaces.IResourceRegistry'>
       <value key="js">++plone++collective.solr/search.js</value>
@@ -42,5 +43,6 @@
     <value key="last_compilation">2016-04-15 00:00:00</value>
     <value key="compile">True</value>
   </records>
+ -->
 
 </registry>
