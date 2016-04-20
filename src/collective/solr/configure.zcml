@@ -23,6 +23,8 @@
   <include file="profiles.zcml" />
   <include file="upgrades.zcml" />
 
+  <cmf:registerDirectory name="solr_site_search" />
+
   <utility
     factory=".search.Search"
     provides=".interfaces.ISearch" />
