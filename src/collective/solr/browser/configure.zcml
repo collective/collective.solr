@@ -1,6 +1,7 @@
 <configure
     xmlns="http://namespaces.zope.org/zope"
     xmlns:browser="http://namespaces.zope.org/browser"
+    xmlns:zcml="http://namespaces.zope.org/zcml"
     i18n_domain="solr">
 
   <include package="Products.CMFCore" file="permissions.zcml"
@@ -62,6 +63,17 @@
       for="plone.app.layout.navigation.interfaces.INavigationRoot"
       template="search.pt"
       layer=".interfaces.IThemeSpecific"
+      zcml:condition="have plone-5"
+      />
+
+  <browser:page
+      name="search"
+      class="plone.app.search.browser.Search"
+      permission="zope2.View"
+      for="*"
+      template="search.pt"
+      layer=".interfaces.IThemeSpecific"
+      zcml:condition="not-have plone-5"
       />
 
 </configure>
