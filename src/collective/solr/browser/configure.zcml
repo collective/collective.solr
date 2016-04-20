@@ -66,14 +66,4 @@
       zcml:condition="have plone-5"
       />
 
-  <browser:page
-      name="search"
-      class="plone.app.search.browser.Search"
-      permission="zope2.View"
-      for="*"
-      template="search.pt"
-      layer=".interfaces.IThemeSpecific"
-      zcml:condition="not-have plone-5"
-      />
-
 </configure>
