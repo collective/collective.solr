@@ -25,7 +25,7 @@
 <body>
 
   <div id="content-core" metal:fill-slot="main">
-    <div id="container"></div>
+    <div id="container" tal:attributes="data-portalUrl string:${context/portal_url}"></div>
 
 <!--!
     <form name="searchform"
@@ -331,7 +331,7 @@
         <div class="visualClear"></div>
     </form> -->
 
-    <script type="text/javascript" src="${context/portal_url}/++plone++collective.solr/dist/search.min.js">
+    <script type="text/javascript" tal:attributes="src string:${context/portal_url}/++plone++collective.solr/dist/search.min.js">
     </script>
   </div>
 
