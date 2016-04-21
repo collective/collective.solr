@@ -1,16 +1,31 @@
 import React, {PropTypes} from 'react';
 import ReactDOM from 'react-dom';
+import 'whatwg-fetch';
 
 class SearchApp extends React.Component {
   constructor(){
     super();
     this.state={
-      searchText: ''
+      searchText: '',
+      results: {},
+      portalUrl: document.getElementById('container').dataset.portalurl
     };
   }
 
   handleUserInput(searchTerm){
-    this.setState({searchText:searchTerm})
+    this.setState({searchText:searchTerm});
+    // Make the request
+    let requestHeaders = new Headers();
+    requestHeaders.append("Accept", "application/json");
+    fetch(`${this.state.portalUrl}/search?metadata_fields=Creator&metadata_fields=modified&SearchableText=` + searchTerm,
+          {headers: requestHeaders, mode: 'cors'})
+      .then((response) => response.json())
+      .then((responseData) => {
+        this.setState({results: responseData});
+      })
+      .catch((error) => {
+        console.log('Error fetching and parsing data', error);
+      })
   }
 
   render() {
@@ -18,15 +33,15 @@ class SearchApp extends React.Component {
       <div>
         <SearchBox searchText={this.state.searchText}
                    onUserInput={this.handleUserInput.bind(this)} />
-        <SearchResults results={this.props.results}
+        <SearchResults results={this.state.results}
                        searchText={this.state.searchText} />
       </div>
     )
   }
 }
-SearchApp.propTypes = {
-  results: PropTypes.arrayOf(PropTypes.object)
-}
+// SearchApp.propTypes = {
+//   results: PropTypes.arrayOf(PropTypes.object)
+// }
 
 
 class SearchBox extends React.Component {
@@ -64,9 +79,22 @@ SearchBox.propTypes = {
 
 class SearchResults extends React.Component {
   render() {
-    let filteredContacts = this.props.results.filter(
-      (result) => result.title.indexOf(this.props.searchText) !== -1
-    );
+    let resultList, noResultsFound;
+    noResultsFound = (
+      <p><strong>No results were found.</strong></p>
+    )
+    if (this.props.results.hasOwnProperty('member')) {
+      resultList = this.props.results.member;
+      if (this.props.results.items_count > 0) {
+        noResultsFound = ''
+      } else {
+        noResultsFound = (
+          <p><strong>No results were found.</strong></p>
+        )
+      }
+    } else {
+      resultList = []
+    };
     let searchTitle;
     if (this.props.searchText) {
       searchTitle = (
@@ -75,6 +103,7 @@ class SearchResults extends React.Component {
         </strong>
       )
     }
+
     return (
       <div>
         <div>
@@ -84,7 +113,7 @@ class SearchResults extends React.Component {
         </div>
         <div id="search-results-wrapper">
           <div id="search-results-bar">
-            <span id="results-count"><strong id="search-results-number">0</strong> items matching your search terms.</span>
+            <span id="results-count"><strong id="search-results-number">{this.props.results.items_count || 0}</strong> items matching your search terms.</span>
           </div>
           <div className="autotabs">
             <nav className="autotoc-nav" id="searchResultsSort">
@@ -96,15 +125,17 @@ class SearchResults extends React.Component {
               </span>
             </nav>
             <div id="search-results">
-              <p><strong>No results were found.</strong></p>
-
-                <ul>
-                  {filteredContacts.map(
-                    (item) => <SearchResultItem key={item.id}
-                                                id={item.id}
-                                                title={item.title} />
+              {noResultsFound}
+                <ol className="searchResults">
+                  {resultList.map(
+                    (item) => <SearchResultItem key={item['@id']}
+                                                id={item['@id']}
+                                                title={item.title}
+                                                description={item.description}
+                                                author={item.Creator}
+                                                modified={item.modified} />
                   )}
-                </ul>
+                </ol>
 
             </div>
           </div>
@@ -114,14 +145,29 @@ class SearchResults extends React.Component {
   }
 }
 SearchResults.propTypes = {
-  results: PropTypes.arrayOf(PropTypes.object),
+  results: PropTypes.object,
   searchText: PropTypes.string.isRequired
 }
 
 class SearchResultItem extends React.Component {
   render() {
     return (
-      <li>{this.props.id} - {this.props.title}</li>
+      <li>
+        <span className="result-title">
+          <a href={this.props.id} className="state-published">{this.props.title}</a>
+        </span>{" "}
+        <span className="discreet">
+          <span className="documentAuthor">by <a href="http://localhost:8080/Plone2/author/admin">admin</a></span>
+          <span>
+            <span class="documentModified">
+              —
+              <span>last modified {" "}</span>
+              {this.props.modified}
+            </span>
+          </span>
+        </span>
+        <p className="discreet croppedDescription">{this.props.description}</p>
+      </li>
     )
   }
 }
@@ -130,13 +176,7 @@ SearchResultItem.propTypes = {
   title: PropTypes.string.isRequired
 }
 
-let results = [
-  { id: '1', title: 'Colorless green ideas sleep furiously'},
-  { id: '2', title: 'Furiously sleep ideas green colorless'}
-]
-
-
 ReactDOM.render(
-  <SearchApp results={results} />,
+  <SearchApp />,
   document.getElementById("container")
 )
