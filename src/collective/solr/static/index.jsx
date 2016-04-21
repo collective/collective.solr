@@ -8,16 +8,46 @@ class SearchApp extends React.Component {
     this.state={
       searchText: '',
       results: {},
-      portalUrl: document.getElementById('container').dataset.portalurl
+      portalUrl: document.getElementById('container').dataset.portalurl,
+      sortOn: 'relevance'
     };
   }
 
-  handleUserInput(searchTerm){
-    this.setState({searchText:searchTerm});
+  // TODO: The query build should be improved and bypass the fact that the state
+  // does not change immediately on setState.
+
+  handleUserInput(searchTerm) {
+    this.setState({searchText: searchTerm});
+    let searchOptions = {searchText: searchTerm, sortOn: this.state.sortOn}
+    this.doSearchRequest(searchOptions);
+  }
+
+  handleUserChangeSortOn(sortOn) {
+    this.setState({sortOn: sortOn});
+    let searchOptions = {searchText: this.state.searchText, sortOn: sortOn}
+    this.doSearchRequest(searchOptions);
+  }
+
+  doSearchRequest(searchOptions) {
+    // Prepare sort_on cases
+    let sortonQuery;
+    switch (searchOptions.sortOn) {
+      case 'relevance':
+        sortonQuery = '&sort_on='
+        break;
+      case 'date':
+        sortonQuery = '&sort_on=Date&sort_order=reverse'
+        break;
+      case 'sortable_title':
+        sortonQuery = '&sort_on=sortable_title'
+        break;
+      default:
+        sortonQuery = '&sort_on='
+    }
     // Make the request
     let requestHeaders = new Headers();
     requestHeaders.append("Accept", "application/json");
-    fetch(`${this.state.portalUrl}/search?metadata_fields=Creator&metadata_fields=modified&SearchableText=` + searchTerm,
+    fetch(`${this.state.portalUrl}/search?metadata_fields=Creator&metadata_fields=modified${sortonQuery}&SearchableText=${searchOptions.searchText}`,
           {headers: requestHeaders, mode: 'cors'})
       .then((response) => response.json())
       .then((responseData) => {
@@ -27,25 +57,22 @@ class SearchApp extends React.Component {
         console.log('Error fetching and parsing data', error);
       })
   }
-
   render() {
     return (
       <div>
         <SearchBox searchText={this.state.searchText}
                    onUserInput={this.handleUserInput.bind(this)} />
         <SearchResults results={this.state.results}
-                       searchText={this.state.searchText} />
+                       searchText={this.state.searchText}
+                       onUserChangeSortOn={this.handleUserChangeSortOn.bind(this)} />
       </div>
     )
   }
 }
-// SearchApp.propTypes = {
-//   results: PropTypes.arrayOf(PropTypes.object)
-// }
 
 
 class SearchBox extends React.Component {
-  handleChange(event){
+  handleChangeSearchString(event){
     this.props.onUserInput(event.target.value)
   }
 
@@ -60,7 +87,7 @@ class SearchBox extends React.Component {
                  title="Search Site"
                  placeholder="Search"
                  value={this.props.searchText}
-                 onChange={this.handleChange.bind(this)}
+                 onChange={this.handleChangeSearchString.bind(this)}
                  />
           <span className="input-group-btn">
             <input className="searchPage allowMultiSubmit btn btn-primary" type="submit"
@@ -78,6 +105,18 @@ SearchBox.propTypes = {
 }
 
 class SearchResults extends React.Component {
+  constructor() {
+    super();
+    this.state = {
+      active_tab: 'relevance'
+    };
+  }
+
+  handleChangeSortOn(event){
+    this.setState({active_tab: event.target.dataset.sort});
+    this.props.onUserChangeSortOn(event.target.dataset.sort)
+  }
+
   render() {
     let resultList, noResultsFound;
     noResultsFound = (
@@ -119,9 +158,20 @@ class SearchResults extends React.Component {
             <nav className="autotoc-nav" id="searchResultsSort">
               <span className="autotab-heading">Sort by</span>
               <span id="sorting-options">
-                <a href="http://localhost:8080/Plone2/@@search?sort_on=" data-order="" className="active">relevance</a>
-                <a data-sort="Date" href="http://localhost:8080/Plone2/@@search?sort_on=Date&amp;sort_order=reverse" data-order="reverse" className="">date (newest first)</a>
-                <a data-sort="sortable_title" href="http://localhost:8080/Plone2/@@search?sort_on=sortable_title" data-order="" className="">alphabetically</a>
+                <a href="#" data-sort="relevance" data-order="" className={this.state.active_tab === 'relevance' ? 'active': null}
+                   onClick={this.handleChangeSortOn.bind(this)}>
+                   relevance
+                </a>
+                <a href="#" data-sort="date" data-order="reverse"
+                   className={this.state.active_tab === 'date' ? 'active': null}
+                   onClick={this.handleChangeSortOn.bind(this)}>
+                   date (newest first)
+                </a>
+                <a href="#" data-sort="sortable_title" data-order=""
+                   className={this.state.active_tab === 'sortable_title' ? 'active': null}
+                   onClick={this.handleChangeSortOn.bind(this)}>
+                   alphabetically
+                </a>
               </span>
             </nav>
             <div id="search-results">
@@ -146,7 +196,8 @@ class SearchResults extends React.Component {
 }
 SearchResults.propTypes = {
   results: PropTypes.object,
-  searchText: PropTypes.string.isRequired
+  searchText: PropTypes.string.isRequired,
+  onUserChangeSortOn: PropTypes.func.isRequired
 }
 
 class SearchResultItem extends React.Component {
