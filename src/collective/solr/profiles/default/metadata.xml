@@ -3,5 +3,6 @@
   <version>2</version>
   <dependencies>
     <dependency>profile-plone.app.registry:default</dependency>
+    <dependency>profile-plone.restapi:default</dependency>
   </dependencies>
 </metadata>
