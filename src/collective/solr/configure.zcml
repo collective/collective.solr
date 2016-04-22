@@ -110,6 +110,16 @@
       for="collective.solr.flare.PloneFlare"
       />
 
+  <adapter
+    zcml:condition="installed plone.restapi"
+    factory="collective.solr.serializer.LazySolrCatalogResultSerializer"
+    />
+
+  <adapter
+    zcml:condition="installed plone.restapi"
+    factory="collective.solr.serializer.SolrFlareSerializer"
+    />
+
   <plone:static
     directory="static"
     type="plone"
