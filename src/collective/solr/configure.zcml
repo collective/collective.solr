@@ -18,6 +18,7 @@
   <include package="plone.browserlayer" />
   <include package="plone.app.registry" />
   <include package="collective.js.showmore" />
+  <include package="plone.restapi" />
 
   <include file="extender.zcml" />
   <include file="profiles.zcml" />

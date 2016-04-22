@@ -4,7 +4,7 @@
 #
 # Run this robot test stand-alone:
 #
-#  $ bin/test -s collective.solr -t test_example.robot --all
+#  $ bin/test -s collective.solr -t test_basic.robot --all
 #
 # Run this robot test with robot server (which is faster):
 #
@@ -36,8 +36,9 @@ Test Teardown  Close all browsers
 *** Test Cases ***************************************************************
 
 Scenario: As a manager I can install and enable the add-on
+
   [Documentation]  Once installed and enabled, searching produces anything since
-  ...              the content is not indexed yet
+  ...              there are no content
   Given a logged-in site manager
    When the product is activated in its configlet
     and I search something
@@ -46,9 +47,9 @@ Scenario: As a manager I can install and enable the add-on
 Scenario: As a manager once reindexed I get results
   [Documentation]  Once reindexed, I should get some results
   Given a logged-in site manager
-   When I reindex the site content
-    and I search something
-   Then it returns some results
+    and a folder with a document 'My searchable page'
+   When I search something
+   Then it returns the result
 
 *** Keywords *****************************************************************
 
@@ -61,11 +62,10 @@ a logged-in site manager
 
 the product is activated in its configlet
   Go To  ${PLONE_URL}/@@solr-controlpanel
-  # TODO: It's already activated?
 
 I search something
   Go To  ${PLONE_URL}/@@search
-  # TODO: Search something
+  Input Text  css=.searchPage.form-control  My
 
 I reindex the site content
   Go To  ${PLONE_URL}/@@solr-maintenance/reindex
@@ -74,9 +74,7 @@ I reindex the site content
 # --- THEN -------------------------------------------------------------------
 
 the result is empty
-  # TODO: Test it's empty
-  Wait until page contains  You are now logged in
-  Page should contain  You are now logged in
+  Page should contain  No results were found
 
-it returns some results
-  # TODO: Test results are shown
+it returns the result
+  Page should contain  My searchable page
