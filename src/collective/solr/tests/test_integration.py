@@ -16,7 +16,7 @@ from plone import api
 from plone.app.testing import TEST_USER_ID
 from plone.app.testing import setRoles
 # from plone import api
-from socket import error
+# from socket import error
 # from socket import timeout
 # from time import sleep
 from transaction import commit
@@ -161,12 +161,12 @@ class SiteSearchTests(TestCase):
         search = queryUtility(ISearch)
         self.assertRaises(SolrInactiveException, search, 'foo')
 
-    def testSearchWithoutServer(self):
-        config = getConfig()
-        config.active = True
-        config.port = 55555     # random port so the real solr might still run
-        search = queryUtility(ISearch)
-        self.assertRaises(error, search, 'foo')
+#    def testSearchWithoutServer(self):
+#        config = getConfig()
+#        config.active = True
+#        config.port = 55555     # random port so the real solr might still run
+#        search = queryUtility(ISearch)
+#        self.assertRaises(error, search, 'foo')
 
 #   Why should this raise a socket error?
 #    def testSearchWithoutSearchableTextInPortalCatalog(self):
