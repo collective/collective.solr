@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from plone.app.registry.browser import controlpanel
 from collective.solr.interfaces import ISolrSchema, _
+from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 
 
 class SolrControlPanelForm(controlpanel.RegistryEditForm):
@@ -14,3 +15,4 @@ class SolrControlPanelForm(controlpanel.RegistryEditForm):
 class SolrControlPanel(controlpanel.ControlPanelFormWrapper):
 
     form = SolrControlPanelForm
+    index = ViewPageTemplateFile('browser/controlpanel.pt')
