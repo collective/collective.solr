@@ -429,10 +429,15 @@ class SolrServerTests(TestCase):
         fields.remove('getRemoteUrl')
         # remove _version_ field
         fields.remove('_version_')
+        # remove getIcon which is defined for Plone 5 only
+        fields.remove('getIcon')
+        # remove searchwords which is defined for Plone 5 only
+        fields.remove('searchwords')
 
         proc = SolrIndexProcessor(manager)
         # without explicit attributes all data should be returned
         data, missing = proc.getData(self.folder)
+
         self.assertEqual(sorted(data.keys()), fields)
         # with a list of attributes all data should be returned still.  this
         # is because current versions of solr don't support partial updates
