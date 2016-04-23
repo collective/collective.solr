@@ -43,21 +43,21 @@ Scenario: As anonymous user I can search for a document title
     and the search results should include 'Colorless Green Ideas'
   Capture screenshot  search_document_title.png
 
-# Scenario: As anonymous user I can search for a term in the document title
-#   Given a public document with the title 'Colorless Green Ideas'
-#     and an anonymous user
-#    When I search for 'Color'
+Scenario: As anonymous user I can search for a term in the document title
+  Given a public document with the title 'Colorless Green Ideas'
+    and an anonymous user
+   When I search for 'Color'
 #    Then the search returns '1' results
-#     and the search results should include 'Colorless Green Ideas'
-#   Capture screenshot  search_document_title_term.png
+    and the search results should include 'Colorless Green Ideas'
+  Capture screenshot  search_document_title_term.png
 
-# Scenario: As anonymous user I can search for a term prefix in the document title
-#   Given a public document with the title 'Colorless Green Ideas'
-#     and an anonymous user
-#    When I search for 'Color'
+Scenario: As anonymous user I can search for a term prefix in the document title
+  Given a public document with the title 'Colorless Green Ideas'
+    and an anonymous user
+   When I search for 'Color'
 #    Then the search returns '1' results
-#     and the search results should include 'Colorless Green Ideas'
-#   Capture screenshot  search_document_title_term_prefix.png
+    and the search results should include 'Colorless Green Ideas'
+  Capture screenshot  search_document_title_term_prefix.png
 
 # Scenario: As anonymous user I can search for a term suffix in the document title
 #   Given a public document with the title 'Colorless Green Ideas'
@@ -75,13 +75,13 @@ Scenario: As anonymous user I can search for a document title
 #     and the search results should include 'Colorless Green Ideas'
 #   Capture screenshot  search_document_title_term_substring.png
 
-# Scenario: As anonymous user I can do a case insensitive search for a document title
-#   Given a public document with the title 'Colorless Green Ideas'
-#     and an anonymous user
-#    When I search for 'colorless green ideas'
+Scenario: As anonymous user I can do a case insensitive search for a document title
+  Given a public document with the title 'Colorless Green Ideas'
+    and an anonymous user
+   When I search for 'colorless green ideas'
 #    Then the search returns '1' results
-#     and the search results should include 'Colorless Green Ideas'
-#   Capture screenshot  search_document_title_case_intesitive.png
+    and the search results should include 'Colorless Green Ideas'
+  Capture screenshot  search_document_title_case_intesitive.png
 
 # Scenario: As anonymous user I can do a fuzzy search for a document title
 #   Given a public document with the title 'Colorless Green Ideas'
@@ -105,6 +105,7 @@ Scenario: As anonymous user I can search for a document title
 
 *** Keywords *****************************************************************
 
+# Test Setup/Teardown
 
 TestSetup
   Open test browser
@@ -144,7 +145,7 @@ the search returns '${result_count}' results
   Wait until keyword succeeds  5s  1s  XPath Should Match X Times  //strong[@id='search-results-number' and contains(.,'${result_count}')]  1  The search should have returned '${result_count}' results.
 
 the search results should include '${term}'
-  Wait until page contains element  xpath=//ol[@class='searchResults']/li
+  Wait until page contains element  xpath=//ol[@class='searchResults']
   Page should contain  ${term}
   XPath Should Match X Times  //div[@id='search-results']//ol//li//a[contains(., '${term}')]  1  Search results should have contained '${term}'.
 
