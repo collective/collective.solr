@@ -29,6 +29,9 @@ install:
 script:
   - bin/code-analysis
   - bin/coverage run bin/test
+  # XXX: Run Robot Framework in isolation to avoid test isolation issues.
+  - ROBOTSUITE_PREFIX=ONLYROBOT
+  - bin/test --all -t ONLYROBOT
 after_success:
   - pip install -q coveralls python-coveralls==2.5.0
   - coveralls
