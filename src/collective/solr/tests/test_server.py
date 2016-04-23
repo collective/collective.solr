@@ -22,6 +22,7 @@ from collective.solr.tests.utils import numFound
 from collective.solr.utils import activate
 from collective.solr.utils import getConfig
 from operator import itemgetter
+from plone import api
 from plone.app.testing import TEST_USER_ID
 from plone.app.testing import TEST_USER_NAME
 from plone.app.testing import login
@@ -463,7 +464,7 @@ class SolrServerTests(TestCase):
         self.assertEqual(search('+path_parents:\/plone'), 1)
         self.assertEqual(search('+portal_type:Folder'), 1)
         # now let's only update one index, which shouldn't change anything...
-        self.folder.setTitle('Foo')
+        set_attributes(self.folder, values={'title': 'Foo'})
         proc.reindex(self.folder, ['UID', 'Title'])
         proc.commit()
         self.assertEqual(search('+Title:Foo'), 1)
@@ -480,7 +481,7 @@ class SolrServerTests(TestCase):
         logger_indexer.exception = logger
         logger_solr.exception = logger
         self.folder.setModificationDate(None)
-        self.folder.setTitle('Foo')
+        set_attributes(self.folder, values={'title': 'Foo'})
         self.folder.reindexObject(idxs=['modified', 'Title'])
         commit()
         self.assertEqual(log, [])
@@ -1084,6 +1085,7 @@ class SolrServerTests(TestCase):
         results = solrSearchResults(SearchableText=' ', path='/plone')
         self.assertEqual(len(results), 8)
 
+    @unittest.skipIf(api.env.plone_version() >= '5.0', 'No Topic Type in P5')
     def testSearchableTopic(self):
         self.maintenance.reindex()
         setRoles(self.portal, TEST_USER_ID, ['Manager'])
