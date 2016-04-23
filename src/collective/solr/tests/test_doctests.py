@@ -27,6 +27,9 @@ def test_suite():
         testfiles.remove('dependencies.txt')
         testfiles.remove('collections.txt')
         testfiles.remove('conflicts.txt')
+        # search ui has been replaced with react that can't be tested with zt
+        testfiles.remove('errors.txt')
+        testfiles.remove('search.txt')
     for testfile in testfiles:
         doc_suite = doctest.DocFileSuite(testfile,
                                          package='collective.solr.tests',
