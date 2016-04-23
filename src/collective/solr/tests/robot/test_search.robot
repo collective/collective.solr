@@ -29,8 +29,8 @@ Resource  Products/CMFPlone/tests/robot/keywords.robot
 
 Library  Remote  ${PLONE_URL}/RobotRemote
 
-Test Setup  Open test browser
-Test Teardown  Close all browsers
+Test Setup  TestSetup
+Test Teardown  TestTeardown
 
 
 *** Test Cases ***************************************************************
@@ -39,7 +39,7 @@ Scenario: As anonymous user I can search for a document title
   Given a public document with the title 'Colorless Green Ideas'
     and an anonymous user
    When I search for 'Colorless Green Ideas'
-#   Then the search returns '1' results
+   Then the search returns '1' results
     and the search results should include 'Colorless Green Ideas'
   Capture screenshot  search_document_title.png
 
@@ -47,7 +47,7 @@ Scenario: As anonymous user I can search for a term in the document title
   Given a public document with the title 'Colorless Green Ideas'
     and an anonymous user
    When I search for 'Color'
-#    Then the search returns '1' results
+    Then the search returns '1' results
     and the search results should include 'Colorless Green Ideas'
   Capture screenshot  search_document_title_term.png
 
@@ -55,7 +55,7 @@ Scenario: As anonymous user I can search for a term prefix in the document title
   Given a public document with the title 'Colorless Green Ideas'
     and an anonymous user
    When I search for 'Color'
-#    Then the search returns '1' results
+    Then the search returns '1' results
     and the search results should include 'Colorless Green Ideas'
   Capture screenshot  search_document_title_term_prefix.png
 
@@ -79,7 +79,7 @@ Scenario: As anonymous user I can do a case insensitive search for a document ti
   Given a public document with the title 'Colorless Green Ideas'
     and an anonymous user
    When I search for 'colorless green ideas'
-#    Then the search returns '1' results
+    Then the search returns '1' results
     and the search results should include 'Colorless Green Ideas'
   Capture screenshot  search_document_title_case_intesitive.png
 
