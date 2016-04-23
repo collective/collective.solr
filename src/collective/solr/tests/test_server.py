@@ -353,7 +353,7 @@ class SolrErrorHandlingTests(TestCase):
         self.config.port = 55555    # fake a broken connection or a down server  # noqa
         manager = getUtility(ISolrConnectionManager)
         manager.closeConnection()   # which would trigger a reconnect
-        set_attributes(self.folder, values={'title': 'Bar'})
+        self.portal.invokeFactory('Folder', id='tnf2', title='Bar')
         commit()                    # indexing (doesn't) happen on commit
 
         # INFO:
@@ -361,8 +361,8 @@ class SolrErrorHandlingTests(TestCase):
         # socket error, instead of the connection.
         # This also means we do not have the payload sent to solr at this
         # place.
-        self.assertEqual(log, ['exception during indexing %r', log[1],
-                               'exception during request %r', '<commit/>'])
+        self.assertTrue('exception during indexing %r' in log)
+        self.assertTrue('exception during request %r' in log)
 
     def testNetworkFailureBeforeSchemaCanBeLoaded(self):
         log = []
@@ -378,12 +378,14 @@ class SolrErrorHandlingTests(TestCase):
         manager.getConnection()     # we already have an open connection...
         self.config.port = 55555    # fake a broken connection or a down server  # noqa
         manager.closeConnection()   # which would trigger a reconnect
-        set_attributes(self.folder, values={'title': 'Bar'})
+        self.portal.invokeFactory('Folder', id='tnfb', title='Bar')
         commit()                    # indexing (doesn't) happen on commit
-        self.assertEqual(log, ['exception while getting schema',
-                               'unable to fetch schema, '
-                               'skipping indexing of %r', self.folder,
-                               'exception during request %r', '<commit/>'])
+        self.assertTrue(
+            'exception while getting schema',
+            'unable to fetch schema, '
+            'skipping indexing of {}'.format(self.portal.tnfb) in log
+        )
+        self.assertTrue('exception during request %r' in log)
 
 
 class SolrServerTests(TestCase):
