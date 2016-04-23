@@ -3,7 +3,7 @@ Transaction handling and duplicates
 
 This tests transaction handling when indexing in Solr, or more specifically
 properly aborting a transaction. To do this we'll try to create some content
-and fake a `ConflictError` shortly before the transaction completes.  The
+and fake a `ConflictError` shortly before the transaction completes. The
 publisher will catch it and retry, but while doing so the object will get a
 different UID than the first time. Without being able to abort the
 transaction Solr would receive two sets of data and consequently return two
@@ -34,7 +34,7 @@ and reindex the site's content:
   >>> browser.getControl('Title').value = 'Foo'
 
 Before we actually click "Save" in order to create the content, we need to
-add a monkey-patch which will raise the `ConflictError` we'd like to see.  We
+add a monkey-patch which will raise the `ConflictError` we'd like to see. We
 also keep track of the generated UIDs in order to make sure the exception was
 indeed raised:
 

@@ -22,6 +22,7 @@ from collective.solr.tests.utils import numFound
 from collective.solr.utils import activate
 from collective.solr.utils import getConfig
 from operator import itemgetter
+from plone import api
 from plone.app.testing import TEST_USER_ID
 from plone.app.testing import TEST_USER_NAME
 from plone.app.testing import login
@@ -347,12 +348,12 @@ class SolrErrorHandlingTests(TestCase):
         logger_indexer.exception = logger
         logger_solr.exception = logger
         self.config.active = True
-        set_attributes(self.folder, values={'title': 'Foo'})
+        self.portal.invokeFactory('Folder', id='tnf', title='Foo')
         commit()                    # indexing on commit, schema gets cached
         self.config.port = 55555    # fake a broken connection or a down server  # noqa
         manager = getUtility(ISolrConnectionManager)
         manager.closeConnection()   # which would trigger a reconnect
-        set_attributes(self.folder, values={'title': 'Bar'})
+        self.portal.invokeFactory('Folder', id='tnf2', title='Bar')
         commit()                    # indexing (doesn't) happen on commit
 
         # INFO:
@@ -360,8 +361,8 @@ class SolrErrorHandlingTests(TestCase):
         # socket error, instead of the connection.
         # This also means we do not have the payload sent to solr at this
         # place.
-        self.assertEqual(log, ['exception during indexing %r', log[1],
-                               'exception during request %r', '<commit/>'])
+        self.assertTrue('exception during indexing %r' in log)
+        self.assertTrue('exception during request %r' in log)
 
     def testNetworkFailureBeforeSchemaCanBeLoaded(self):
         log = []
@@ -377,12 +378,14 @@ class SolrErrorHandlingTests(TestCase):
         manager.getConnection()     # we already have an open connection...
         self.config.port = 55555    # fake a broken connection or a down server  # noqa
         manager.closeConnection()   # which would trigger a reconnect
-        set_attributes(self.folder, values={'title': 'Bar'})
+        self.portal.invokeFactory('Folder', id='tnfb', title='Bar')
         commit()                    # indexing (doesn't) happen on commit
-        self.assertEqual(log, ['exception while getting schema',
-                               'unable to fetch schema, '
-                               'skipping indexing of %r', self.folder,
-                               'exception during request %r', '<commit/>'])
+        self.assertTrue(
+            'exception while getting schema',
+            'unable to fetch schema, '
+            'skipping indexing of {}'.format(self.portal.tnfb) in log
+        )
+        self.assertTrue('exception during request %r' in log)
 
 
 class SolrServerTests(TestCase):
@@ -427,10 +430,16 @@ class SolrServerTests(TestCase):
         fields.remove('getRemoteUrl')
         # remove _version_ field
         fields.remove('_version_')
+        if api.env.plone_version() >= '5.0':
+            # remove getIcon which is defined for Plone 5 only
+            fields.remove('getIcon')
+            # remove searchwords which is defined for Plone 5 only
+            fields.remove('searchwords')
 
         proc = SolrIndexProcessor(manager)
         # without explicit attributes all data should be returned
         data, missing = proc.getData(self.folder)
+
         self.assertEqual(sorted(data.keys()), fields)
         # with a list of attributes all data should be returned still.  this
         # is because current versions of solr don't support partial updates
@@ -443,7 +452,7 @@ class SolrServerTests(TestCase):
         self.assertEqual(data, {})
 
     def testReindexObject(self):
-        set_attributes(self.folder, values={'title': 'Foo'})
+        self.portal.invokeFactory('Document', id='foo', title='Foo')
         connection = getUtility(ISolrConnectionManager).getConnection()
         result = connection.search(q='+Title:Foo').read()
         self.assertEqual(numFound(result), 0)
@@ -463,7 +472,7 @@ class SolrServerTests(TestCase):
         self.assertEqual(search('+path_parents:\/plone'), 1)
         self.assertEqual(search('+portal_type:Folder'), 1)
         # now let's only update one index, which shouldn't change anything...
-        self.folder.setTitle('Foo')
+        set_attributes(self.folder, values={'title': 'Foo'})
         proc.reindex(self.folder, ['UID', 'Title'])
         proc.commit()
         self.assertEqual(search('+Title:Foo'), 1)
@@ -480,7 +489,7 @@ class SolrServerTests(TestCase):
         logger_indexer.exception = logger
         logger_solr.exception = logger
         self.folder.setModificationDate(None)
-        self.folder.setTitle('Foo')
+        set_attributes(self.folder, values={'title': 'Foo'})
         self.folder.reindexObject(idxs=['modified', 'Title'])
         commit()
         self.assertEqual(log, [])
@@ -534,12 +543,12 @@ class SolrServerTests(TestCase):
         commit()
 
     def testSearchObject(self):
-        set_attributes(self.folder, values={'title': 'Foo'})
+        self.portal.invokeFactory('Document', id='foo', title='Foo')
         commit()                        # indexing happens on commit
         results = self.search('+Title:Foo').results()
         self.assertEqual(results.numFound, '1')
         self.assertEqual(results[0].Title, 'Foo')
-        self.assertEqual(results[0].UID, self.folder.UID())
+        self.assertEqual(results[0].UID, self.portal.foo.UID())
 
     def testSearchingTwice(self):
         connection = getUtility(ISolrConnectionManager).getConnection()
@@ -567,7 +576,7 @@ class SolrServerTests(TestCase):
                           ('NewsFolder', '/plone/news')])
 
     def testSolrSearchResultsWithUnicodeTitle(self):
-        set_attributes(self.folder, values={'title': u'Føø sekretær'})
+        self.portal.invokeFactory('Document', id='fs', title=u'Føø sekretær')
         commit()
         results = solrSearchResults(SearchableText=u'Føø')
         self.assertEqual([r.Title for r in results], [u'Føø sekretær'])
@@ -578,7 +587,7 @@ class SolrServerTests(TestCase):
         results = solrSearchResults(SearchableText=u'Sekretaer')
         self.assertEqual([r.Title for r in results], [u'Føø sekretær'])
         # second set of characters
-        set_attributes(self.folder, values={'title': u'Åge Þor'})
+        self.portal.invokeFactory('Document', id='ab', title=u'Åge Þor')
         commit()
         results = solrSearchResults(SearchableText=u'Åge')
         self.assertEqual([r.Title for r in results], [u'Åge Þor'])
@@ -915,7 +924,7 @@ class SolrServerTests(TestCase):
     def testCommitWithinIndexing(self):
         connection = getUtility(ISolrConnectionManager).getConnection()
         self.config.commit_within = 1000
-        set_attributes(self.folder, values={'title': 'Foo'})
+        self.portal.invokeFactory('Folder', id='foo', title='Foo')
         commit()
         # no indexing happens
         result = connection.search(q='+Title:Foo').read()
@@ -986,8 +995,8 @@ class SolrServerTests(TestCase):
                          len(first_level_objs))
 
     def testFlareHelpers(self):
-        folder = self.folder
-        set_attributes(folder, values={'title': 'Foo'})
+        self.portal.invokeFactory('Folder', id='foo', title='Foo')
+        folder = self.portal.foo
         commit()                        # indexing happens on commit
         results = solrSearchResults(SearchableText='Foo')
         self.assertEqual(len(results), 1)
@@ -1006,7 +1015,7 @@ class SolrServerTests(TestCase):
 
     def testWildcardSearches(self):
         self.maintenance.reindex()
-        set_attributes(self.folder, values={'title': 'Newbie!'})
+        self.portal.invokeFactory('Document', id='newbie', title='Newbie!')
         results = solrSearchResults(SearchableText='New*')
         self.assertEqual(len(results), 2)
         commit()                        # indexing happens on commit
@@ -1026,7 +1035,7 @@ class SolrServerTests(TestCase):
 
     def testWildcardSearchesMultipleWords(self):
         self.maintenance.reindex()
-        set_attributes(self.folder, values={'title': 'Brazil Germany'})
+        self.portal.invokeFactory('Document', id='bg', title='Brazil Germany')
         commit()                        # indexing happens on commit
         results = solrSearchResults(SearchableText='Braz*')
         self.assertEqual(len(results), 1)
@@ -1035,7 +1044,7 @@ class SolrServerTests(TestCase):
 
     def testWildcardSearchesUnicode(self):
         self.maintenance.reindex()
-        set_attributes(self.folder, values={'title': u'Ärger nøkkel'})
+        self.portal.invokeFactory('Document', id='an', title=u'Ärger nøkkel')
         commit()
         results = solrSearchResults(SearchableText=u'Ärger')
         self.assertEqual(len(results), 1)
@@ -1050,7 +1059,7 @@ class SolrServerTests(TestCase):
         connection = getUtility(ISolrConnectionManager).getConnection()
         # we cannot use `commit` here, since the transaction should get
         # aborted, so let's make sure processing the queue directly works...
-        set_attributes(self.folder, values={'title': 'Foo'})
+        self.portal.invokeFactory('Folder', id='foo', title='Foo')
         processQueue()
         result = connection.search(q='+Title:Foo').read()
         self.assertEqual(numFound(result), 0)
@@ -1084,6 +1093,7 @@ class SolrServerTests(TestCase):
         results = solrSearchResults(SearchableText=' ', path='/plone')
         self.assertEqual(len(results), 8)
 
+    @unittest.skipIf(api.env.plone_version() >= '5.0', 'No Topic Type in P5')
     def testSearchableTopic(self):
         self.maintenance.reindex()
         setRoles(self.portal, TEST_USER_ID, ['Manager'])
@@ -1221,7 +1231,7 @@ class SolrServerTests(TestCase):
         self.assertEqual(self.folder.foo(), ['News', 'NewsFolder'])
 
     def testSearchForTermWithHyphen(self):
-        set_attributes(self.folder, values={'title': 'foo-bar'})
+        self.portal.invokeFactory('Document', id='fb', title='foo-bar')
         commit()
         results = solrSearchResults(SearchableText='foo')
         self.assertEqual(sorted([r.Title for r in results]), ['foo-bar'])
@@ -1230,7 +1240,7 @@ class SolrServerTests(TestCase):
         results = solrSearchResults(SearchableText='bar')
         self.assertEqual(sorted([r.Title for r in results]), ['foo-bar'])
         # second round
-        set_attributes(self.folder, values={'title': '2010-123'})
+        self.portal.invokeFactory('Document', id='fb2', title='2010-123')
         commit()
         results = solrSearchResults(SearchableText='2010-123')
         self.assertEqual(sorted([r.Title for r in results]), ['2010-123'])
@@ -1242,7 +1252,7 @@ class SolrServerTests(TestCase):
         self.assertEqual(sorted([r.Title for r in results]), ['2010-123'])
 
     def testSearchForTermWithColon(self):
-        set_attributes(self.folder, values={'title': 'foo:bar'})
+        self.portal.invokeFactory('Folder', id='tmc', title='foo:bar')
         commit()
         results = solrSearchResults(SearchableText='foo')
         self.assertEqual(sorted([r.Title for r in results]), ['foo:bar'])
@@ -1251,7 +1261,7 @@ class SolrServerTests(TestCase):
         results = solrSearchResults(SearchableText='bar')
         self.assertEqual(sorted([r.Title for r in results]), ['foo:bar'])
         # second round
-        set_attributes(self.folder, values={'title': u'2010:ändern'})
+        self.portal.invokeFactory('Folder', id='tmp2', title=u'2010:ändern')
         commit()
         results = solrSearchResults(SearchableText='2010')
         self.assertEqual(sorted([r.Title for r in results]), [u'2010:ändern'])
@@ -1261,7 +1271,7 @@ class SolrServerTests(TestCase):
         self.assertEqual(sorted([r.Title for r in results]), [u'2010:ändern'])
 
     def testSearchForTermWithForwardSlash(self):
-        set_attributes(self.folder, values={'title': 'foo/bar'})
+        self.portal.invokeFactory('Document', id='fsb', title='foo/bar')
         commit()
         results = solrSearchResults(SearchableText='foo')
         self.assertEqual(sorted([r.Title for r in results]), ['foo/bar'])
@@ -1279,20 +1289,23 @@ class SolrServerTests(TestCase):
         self.assertEqual(sorted([r.Title for r in results]), ['foo/bar'])
 
     def testBatchedSearchResults(self):
-        set_attributes(self.portal['front-page'], values={'text': 'aaa'})
+        self.portal.invokeFactory('Document', id='one', title='Aaa A')
+        self.portal.invokeFactory('Document', id='two', title='Aaa B')
+        self.portal.invokeFactory('Document', id='three', title='Aaa C')
         self.maintenance.reindex()
         search = lambda **kw: [getattr(i, 'Title', None) for i in
-                               solrSearchResults(SearchableText='a*',
+                               solrSearchResults(SearchableText='A*',
+                                                 portal_type='Document',
                                                  sort_on='Title', **kw)]
         self.assertEqual(search(),
-                         ['Events', 'News', 'Welcome to Plone'])
+                         ['Aaa A', 'Aaa B', 'Aaa C'])
         # when a batch size is given, the length should remain the same,
         # but only items in the batch actually exist...
         self.assertEqual(search(b_size=2),
-                         ['Events', 'News', None])
+                         ['Aaa A', 'Aaa B', None])
         # given a start value, the batch is moved within the search results
         self.assertEqual(search(b_size=2, b_start=1),
-                         [None, 'News', 'Welcome to Plone'])
+                         [None, 'Aaa B', 'Aaa C'])
 
     def testGetObjectOnPrivateObject(self):
         self.maintenance.reindex()
