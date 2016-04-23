@@ -535,12 +535,12 @@ class SolrServerTests(TestCase):
         commit()
 
     def testSearchObject(self):
-        set_attributes(self.folder, values={'title': 'Foo'})
+        self.portal.invokeFactory('Document', id='foo', title='Foo')
         commit()                        # indexing happens on commit
         results = self.search('+Title:Foo').results()
         self.assertEqual(results.numFound, '1')
         self.assertEqual(results[0].Title, 'Foo')
-        self.assertEqual(results[0].UID, self.folder.UID())
+        self.assertEqual(results[0].UID, self.portal.foo.UID())
 
     def testSearchingTwice(self):
         connection = getUtility(ISolrConnectionManager).getConnection()
