@@ -1292,6 +1292,7 @@ class SolrServerTests(TestCase):
         self.maintenance.reindex()
         search = lambda **kw: [getattr(i, 'Title', None) for i in
                                solrSearchResults(SearchableText='A*',
+                                                 portal_type='Document',
                                                  sort_on='Title', **kw)]
         self.assertEqual(search(),
                          ['Aaa A', 'Aaa B', 'Aaa C'])
