@@ -430,10 +430,11 @@ class SolrServerTests(TestCase):
         fields.remove('getRemoteUrl')
         # remove _version_ field
         fields.remove('_version_')
-        # remove getIcon which is defined for Plone 5 only
-        fields.remove('getIcon')
-        # remove searchwords which is defined for Plone 5 only
-        fields.remove('searchwords')
+        if api.env.plone_version() >= '5.0':
+            # remove getIcon which is defined for Plone 5 only
+            fields.remove('getIcon')
+            # remove searchwords which is defined for Plone 5 only
+            fields.remove('searchwords')
 
         proc = SolrIndexProcessor(manager)
         # without explicit attributes all data should be returned
