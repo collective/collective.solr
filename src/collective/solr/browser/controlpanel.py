@@ -15,4 +15,4 @@ class SolrControlPanelForm(controlpanel.RegistryEditForm):
 class SolrControlPanel(controlpanel.ControlPanelFormWrapper):
 
     form = SolrControlPanelForm
-    index = ViewPageTemplateFile('browser/controlpanel.pt')
+    index = ViewPageTemplateFile('controlpanel.pt')

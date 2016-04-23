@@ -17,6 +17,12 @@
       directory="resources" />
 
   <browser:page
+      name="solr-controlpanel"
+      for="Products.CMFPlone.interfaces.IPloneSiteRoot"
+      class=".controlpanel.SolrControlPanel"
+      permission="cmf.ManagePortal" />
+
+  <browser:page
       for="*"
       name="solr-maintenance"
       class=".maintenance.SolrMaintenanceView"

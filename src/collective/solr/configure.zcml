@@ -70,12 +70,6 @@
          factory="plone.app.layout.icons.icons.CatalogBrainContentIcon"
          provides="plone.app.layout.icons.interfaces.IContentIcon" />
 
-  <browser:page
-      name="solr-controlpanel"
-      for="Products.CMFPlone.interfaces.IPloneSiteRoot"
-      class=".configlet.SolrControlPanel"
-      permission="cmf.ManagePortal" />
-
   <utility
       factory=".vocabularies.SolrIndexes"
       name="collective.solr.indexes" />
