@@ -30,7 +30,7 @@ script:
   - bin/code-analysis
   - bin/coverage run bin/test
   # XXX: Run Robot Framework in isolation to avoid test isolation issues.
-  - - if [ $PLONE_VERSION == 5.0.x ]; then export ROBOTSUITE_PREFIX=ONLYROBOT && bin/test -t ONLYROBOT --all; fi
+  - if [ $PLONE_VERSION == 5.0.x ]; then export ROBOTSUITE_PREFIX=ONLYROBOT && bin/test -t ONLYROBOT --all; fi
 after_success:
   - pip install -q coveralls python-coveralls==2.5.0
   - coveralls
