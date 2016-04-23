@@ -1,18 +1,17 @@
 from unittest import TestCase
 from urllib import unquote
 
-from zope.component import getGlobalSiteManager, provideUtility
+from zope.component import provideUtility
 from zope.publisher.browser import TestRequest
 from zope.schema.vocabulary import SimpleTerm
-from zope.testing import cleanup
 
 from collective.solr.browser.facets import convertFacets, facetParameters
 from collective.solr.browser.facets import SearchFacetsView
 from collective.solr.interfaces import IFacetTitleVocabularyFactory
-from collective.solr.interfaces import ISolrConnectionConfig
-from collective.solr.manager import SolrConnectionConfig
 from collective.solr.parser import SolrResponse
+from collective.solr.testing import COLLECTIVE_SOLR_MOCK_REGISTRY_FIXTURE
 from collective.solr.tests.utils import getData
+from collective.solr.utils import getConfig
 
 
 class Dummy(object):
@@ -66,11 +65,15 @@ class DummyAllCapsVocabularyFactory(object):
         return DummyAllCapsVocabulary()
 
 
-class FacettingHelperTest(TestCase, cleanup.CleanUp):
+class FacettingHelperTest(TestCase):
+
+    layer = COLLECTIVE_SOLR_MOCK_REGISTRY_FIXTURE
 
     def setUp(self):
         provideUtility(
-            DummyTitleVocabularyFactory(), IFacetTitleVocabularyFactory)
+            DummyTitleVocabularyFactory(),
+            IFacetTitleVocabularyFactory
+        )
         provideUtility(
             DummyAllCapsVocabularyFactory(), IFacetTitleVocabularyFactory,
             name='capsFacet')
@@ -128,8 +131,7 @@ class FacettingHelperTest(TestCase, cleanup.CleanUp):
         # with nothing set up, no facets will be returned
         self.assertEqual(facetParameters(view), ([], {}))
         # setting up the regular config utility should give the default value
-        cfg = SolrConnectionConfig()
-        provideUtility(cfg, ISolrConnectionConfig)
+        cfg = getConfig()
         self.assertEqual(facetParameters(view), ([], {}))
         # so let's set it...
         cfg.facets = ['foo']
@@ -141,12 +143,9 @@ class FacettingHelperTest(TestCase, cleanup.CleanUp):
         request['facet.field'] = ['foo', 'bar']
         self.assertEqual(facetParameters(view),
                          (['foo', 'bar'], {}))
-        # clean up...
-        getGlobalSiteManager().unregisterUtility(cfg, ISolrConnectionConfig)
 
     def testFacetDependencies(self):
-        cfg = SolrConnectionConfig()
-        provideUtility(cfg, ISolrConnectionConfig)
+        cfg = getConfig()
         # dependency info can be set via the configuration utility...
         cfg.facets = ['foo:bar']
         context = Dummy()
@@ -170,8 +169,10 @@ class FacettingHelperTest(TestCase, cleanup.CleanUp):
             facetParameters(view),
             (['foo : bar', 'bar  :foo'], dict(foo=['bar'], bar=['foo']))
         )
-        # clean up...
-        getGlobalSiteManager().unregisterUtility(cfg, ISolrConnectionConfig)
+
+        # XXX: Manually clean up after the test. We should be able to remove
+        # this once our test isolation issues have been dealt with.
+        cfg.facets = []
 
     def testNamedFacetTitleVocabulary(self):
         """Test use of IFacetTitleVocabularyFactory registrations

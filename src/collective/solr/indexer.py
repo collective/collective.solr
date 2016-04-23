@@ -5,7 +5,7 @@ from logging import getLogger
 from Acquisition import aq_get
 from DateTime import DateTime
 from datetime import date, datetime
-from zope.component import getUtility, queryUtility, queryMultiAdapter
+from zope.component import queryUtility, queryMultiAdapter
 from zope.component import queryAdapter, adapts
 from zope.interface import implements
 from zope.interface import Interface
@@ -20,14 +20,16 @@ except ImportError:
     # Plone 5
     from plone.indexer.interfaces import IIndexableObjectWrapper
 from plone.indexer.interfaces import IIndexableObject
+from zope.component import getUtility
+from plone.registry.interfaces import IRegistry
 
-from collective.solr.interfaces import ISolrConnectionConfig
 from collective.solr.interfaces import ISolrConnectionManager
 from collective.solr.interfaces import ISolrIndexQueueProcessor
 from collective.solr.interfaces import ICheckIndexable
 from collective.solr.interfaces import ISolrAddHandler
 from collective.solr.exceptions import SolrConnectionException
 from collective.solr.utils import prepareData
+from collective.solr.utils import getConfig
 from socket import error
 from urllib import urlencode
 
@@ -206,9 +208,10 @@ class SolrIndexProcessor(object):
                 return          # don't index with no data...
             prepareData(data)
             if data.get(uniqueKey, None) is not None and not missing:
-                config = getUtility(ISolrConnectionConfig)
-                if config.commit_within:
-                    data['commitWithin'] = config.commit_within
+                registry = getUtility(IRegistry)
+                config_commit_within = registry['collective.solr.commit_within']   # noqa
+                if config_commit_within:
+                    data['commitWithin'] = config_commit_within
                 try:
                     logger.debug('indexing %r (%r)', obj, data)
                     pt = data.get('portal_type', 'default')
@@ -270,7 +273,7 @@ class SolrIndexProcessor(object):
     def commit(self, wait=None):
         conn = self.getConnection()
         if conn is not None:
-            config = getUtility(ISolrConnectionConfig)
+            config = getConfig()
             if not isinstance(wait, bool):
                 wait = not config.async
             try:
