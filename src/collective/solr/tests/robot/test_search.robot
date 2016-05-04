@@ -91,6 +91,28 @@ Scenario: As anonymous user I can do a case insensitive search for a document ti
 #     and the search results should include 'Colorless Green Ideas'
 #   Capture screenshot  search_document_title_fuzzy.png
 
+# Scenario: As anonymous user I can filter the test results by portal type
+#   Given a public document with the title 'Colorless Green Documents'
+#     and a public folder with the title 'Colorless Green Folders'
+#     and an anonymous user
+#    When I search for 'colorless green'
+#     and I filter the search by portal type 'Folder'
+#     Then the search returns '1' results
+#     and the search results should include 'Colorless Green Folders'
+#     and the search results should not include 'Colorless Green Documents'
+#   Capture screenshot  search_document_filter_by_portal_type.png
+
+# Scenario: As anonymous user I can filter the test results by creation date
+#   Given a public document with the title 'Colorless Green Ideas' created today
+#     and a public document with the title 'Colorless Green Old Ideas' created last week
+#     and an anonymous user
+#    When I search for 'colorless green'
+#     and I filter the search by creation date 'last week'
+#     Then the search returns '1' results
+#     and the search results should include 'Colorless Green Old Ideas'
+#     and the search results should not include 'Colorless Green Ideas'
+#   Capture screenshot  search_document_filter_by_creation_date.png
+
 # Todo:
 # Synonyms
 # Phrase Search
