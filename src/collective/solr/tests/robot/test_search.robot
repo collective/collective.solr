@@ -91,16 +91,16 @@ Scenario: As anonymous user I can do a case insensitive search for a document ti
 #     and the search results should include 'Colorless Green Ideas'
 #   Capture screenshot  search_document_title_fuzzy.png
 
-# Scenario: As anonymous user I can filter the test results by portal type
-#   Given a public document with the title 'Colorless Green Documents'
-#     and a public folder with the title 'Colorless Green Folders'
-#     and an anonymous user
-#    When I search for 'colorless green'
-#     and I filter the search by portal type 'Folder'
-#     Then the search returns '1' results
-#     and the search results should include 'Colorless Green Folders'
-#     and the search results should not include 'Colorless Green Documents'
-#   Capture screenshot  search_document_filter_by_portal_type.png
+Scenario: As anonymous user I can filter the test results by portal type
+  Given a public document with the title 'Colorless Green Documents'
+    and a public folder with the title 'Colorless Green Folders'
+    and an anonymous user
+   When I search for 'colorless green'
+    and I filter the search by portal type 'Folder'
+    Then the search returns '1' results
+    and the search results should include 'Colorless Green Folders'
+    and the search results should not include 'Colorless Green Documents'
+  Capture screenshot  search_document_filter_by_portal_type.png
 
 # Scenario: As anonymous user I can filter the test results by creation date
 #   Given a public document with the title 'Colorless Green Ideas' created today
@@ -150,6 +150,27 @@ a public document with the title '${title}'
   Go to  ${PLONE_URL}/@@solr-maintenance/reindex
   Wait until page contains  solr index rebuilt
 
+a public folder with the title '${title}'
+  Enable autologin as  Manager
+  ${uid}=  Create content  type=Folder  title=${title}
+  Fire transition  ${uid}  publish
+  Go to  ${PLONE_URL}/@@solr-maintenance/reindex
+  Wait until page contains  solr index rebuilt
+
+a public document with the title '${title}' created today
+  Enable autologin as  Manager
+  ${uid}=  Create content  type=Document  title=${title}
+  Fire transition  ${uid}  publish
+  Go to  ${PLONE_URL}/@@solr-maintenance/reindex
+  Wait until page contains  solr index rebuilt
+
+a public document with the title '${title}' created last week
+  Enable autologin as  Manager
+  ${uid}=  Create content  type=Document  title=${title}  created=2016-05-01
+  Fire transition  ${uid}  publish
+  Go to  ${PLONE_URL}/@@solr-maintenance/reindex
+  Wait until page contains  solr index rebuilt
+
 an anonymous user
   Disable Autologin
 
@@ -160,6 +181,11 @@ I search for '${searchterm}'
   Go to  ${PLONE_URL}/@@search
   Input text  xpath=//main//input[@name='SearchableText']  ${searchterm}
 
+I filter the search by portal type '${portal_type}'
+  Click Element  xpath=//button[@id='search-filter-toggle']
+  Wait until page contains element  xpath=//input[@id='query-portaltype-Collection']
+  Unselect Checkbox  xpath=//input[@id='query-portaltype-Collection']
+  Unselect Checkbox  xpath=//input[@id='query-portaltype-Document']
 
 # Then
 
