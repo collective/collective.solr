@@ -26,7 +26,16 @@ class SearchApp extends React.Component {
                             sortOn: this.state.sortOn,
                             filter: this.state.filter,
                           };
-    this.doSearchRequest(searchOptions);
+    // Catch the case where the search term is empty, return 0 results without contact the server
+    if (searchTerm === '') {
+      this.setState({
+        results: {
+          items_count: 0,
+          member: [],
+        } });
+    } else {
+      this.doSearchRequest(searchOptions);
+    }
   }
 
   handleUserChangeSortOn(sortOn) {
@@ -65,7 +74,7 @@ class SearchApp extends React.Component {
     }
 
     // Add the filter query if present
-    let filterQuery = searchOptions.filter ? searchOptions.filter : null;
+    let filterQuery = searchOptions.filter ? searchOptions.filter : '';
 
     // Make the request
     let requestHeaders = new Headers();
