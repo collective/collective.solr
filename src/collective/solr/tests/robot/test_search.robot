@@ -28,6 +28,7 @@ Resource  plone/app/robotframework/keywords.robot
 Resource  Products/CMFPlone/tests/robot/keywords.robot
 
 Library  Remote  ${PLONE_URL}/RobotRemote
+Library  DateTime
 
 Test Setup  TestSetup
 Test Teardown  TestTeardown
@@ -102,16 +103,16 @@ Scenario: As anonymous user I can filter the test results by portal type
     and the search results should not include 'Colorless Green Documents'
   Capture screenshot  search_document_filter_by_portal_type.png
 
-# Scenario: As anonymous user I can filter the test results by creation date
-#   Given a public document with the title 'Colorless Green Ideas' created today
-#     and a public document with the title 'Colorless Green Old Ideas' created last week
-#     and an anonymous user
-#    When I search for 'colorless green'
-#     and I filter the search by creation date 'last week'
-#     Then the search returns '1' results
-#     and the search results should include 'Colorless Green Old Ideas'
-#     and the search results should not include 'Colorless Green Ideas'
-#   Capture screenshot  search_document_filter_by_creation_date.png
+Scenario: As anonymous user I can filter the test results by creation date
+  Given a public document with the title 'Colorless Green Ideas' created today
+    and a public document with the title 'Colorless Green Old Ideas' created last week
+    and an anonymous user
+   When I search for 'colorless green'
+    and I filter the search by creation date 'yesterday'
+    Then the search returns '1' results
+    and the search results should not include 'Colorless Green Old Ideas'
+    and the search results should include 'Colorless Green Ideas'
+  Capture screenshot  search_document_filter_by_creation_date.png
 
 # Todo:
 # Synonyms
@@ -159,14 +160,17 @@ a public folder with the title '${title}'
 
 a public document with the title '${title}' created today
   Enable autologin as  Manager
-  ${uid}=  Create content  type=Document  title=${title}
+  ${date}=  Get Current Date
+  ${uid}=  Create content  type=Document  title=${title}  created=${date}
   Fire transition  ${uid}  publish
   Go to  ${PLONE_URL}/@@solr-maintenance/reindex
   Wait until page contains  solr index rebuilt
 
 a public document with the title '${title}' created last week
   Enable autologin as  Manager
-  ${uid}=  Create content  type=Document  title=${title}  created=2016-05-01
+  ${current_date}=  Get Current Date
+  ${date}=  Subtract Time From Date  ${current_date}  7 days
+  ${uid}=  Create content  type=Document  title=${title}  created=${date}
   Fire transition  ${uid}  publish
   Go to  ${PLONE_URL}/@@solr-maintenance/reindex
   Wait until page contains  solr index rebuilt
@@ -186,6 +190,11 @@ I filter the search by portal type '${portal_type}'
   Wait until page contains element  xpath=//input[@id='query-portaltype-Collection']
   Unselect Checkbox  xpath=//input[@id='query-portaltype-Collection']
   Unselect Checkbox  xpath=//input[@id='query-portaltype-Document']
+
+I filter the search by creation date '${date_filter}'
+  Click Element  xpath=//button[@id='search-filter-toggle']
+  Wait until page contains element  xpath=//input[@id='query-portaltype-Collection']
+  Select Radio Button  created  query-date-${date_filter}
 
 # Then
 
