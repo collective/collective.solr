@@ -4,7 +4,8 @@ Changelog
 5.0.1 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Fix BlobError occuring when indexing new files (fixes #120)
+  [tomgross]
 
 
 5.0 (2016-04-13)
