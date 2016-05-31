@@ -9,6 +9,7 @@ from zope.component import getUtility, queryUtility, queryMultiAdapter
 from zope.component import queryAdapter, adapts
 from zope.interface import implements
 from zope.interface import Interface
+from ZODB.interfaces import BlobError
 from ZODB.POSException import ConflictError
 from Products.CMFCore.utils import getToolByName
 from Products.CMFCore.CMFCatalogAware import CMFCatalogAware
@@ -118,8 +119,12 @@ class BinaryAdder(DefaultAdder):
     def getpath(self):
         field = self.context.getPrimaryField()
         blob = field.get(self.context).blob
-        return blob.committed() or blob._p_blob_committed or \
-            blob._p_blob_uncommitted
+        try:
+            path = blob.committed()
+        except BlobError:
+            path = blob._p_blob_committed or blob._p_blob_uncommitted
+        logger.debug('Indexing BLOB from path %s', path)
+        return path
 
     def __call__(self, conn, **data):
         if 'ZOPETESTCASE' in os.environ:
