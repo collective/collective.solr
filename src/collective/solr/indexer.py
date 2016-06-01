@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-
-import os
-
 from logging import getLogger
 from lxml import etree
 from Acquisition import aq_get
@@ -128,9 +126,6 @@ class BinaryAdder(DefaultAdder):
         return path
 
     def __call__(self, conn, **data):
-        if 'ZOPETESTCASE' in os.environ:
-            return super(BinaryAdder, self).__call__(conn, **data)
-
         postdata = {}
         postdata['stream.file'] = self.getpath()
         postdata['stream.contentType'] = data.get(
