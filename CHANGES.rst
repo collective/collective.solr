@@ -4,7 +4,8 @@ Changelog
 5.0.1 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Make extracting text from binary content and indexing 2 steps (#65)
+  [tomgross]
 
 
 5.0 (2016-04-13)
