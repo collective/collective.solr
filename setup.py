@@ -55,6 +55,7 @@ setup(
         'argparse',  # we need to support Python 2.6 (Plone 4.x)
         'collective.indexing >= 2.0a2',
         'collective.js.showmore',
+        'lxml',
         'plone.app.content',
         'plone.app.controlpanel',
         'plone.app.layout',

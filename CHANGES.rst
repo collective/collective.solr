@@ -5,6 +5,7 @@ Changelog
 ------------------
 
 - Fix BlobError occuring when indexing new files (fixes #120)
+- Make extracting text from binary content and indexing 2 steps (#65)
   [tomgross]
 
 
