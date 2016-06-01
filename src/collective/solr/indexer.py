@@ -137,7 +137,8 @@ class BinaryAdder(DefaultAdder):
 
         url = '%s/update/extract' % conn.solrBase
         try:
-            response = conn.doPost(url, urlencode(postdata, doseq=True), conn.formheaders)
+            response = conn.doPost(
+                url, urlencode(postdata, doseq=True), conn.formheaders)
             root = etree.parse(response)
             data['SearchableText'] = root.find('.//str').text.strip()
         except SolrConnectionException, e:
