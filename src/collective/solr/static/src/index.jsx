@@ -122,6 +122,7 @@ class SearchBox extends React.Component {
                  size="25"
                  title="Search Site"
                  placeholder="Search"
+                 autocomplete="off"
                  value={this.props.searchText}
                  onChange={this.handleChangeSearchString.bind(this)}
                  />
