@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from collective.solr.parser import SolrResponse
-from collective.solr.testing import COLLECTIVE_SOLR_INTEGRATION_TESTING
+from collective.solr.testing import LEGACY_COLLECTIVE_SOLR_INTEGRATION_TESTING
 from collective.solr.tests.utils import getData
 from collective.solr.utils import findObjects
 from collective.solr.utils import isSimpleSearch
@@ -15,7 +15,7 @@ from unittest import TestCase
 
 class UtilsTests(TestCase):
 
-    layer = COLLECTIVE_SOLR_INTEGRATION_TESTING
+    layer = LEGACY_COLLECTIVE_SOLR_INTEGRATION_TESTING
 
     def setUp(self):
         self.app = self.layer['app']

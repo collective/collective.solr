@@ -2,7 +2,7 @@
 from zope.component import getUtility
 from collective.solr.interfaces import ISolrConnectionManager
 from collective.solr.testing import (
-    COLLECTIVE_SOLR_INTEGRATION_TESTING
+    LEGACY_COLLECTIVE_SOLR_INTEGRATION_TESTING
 )
 from plone.app.testing import setRoles
 from plone.app.testing import TEST_USER_ID
@@ -70,7 +70,7 @@ class MockSolrConnectionManager():
 
 class SuggestTermsViewIntegrationTest(unittest.TestCase):
 
-    layer = COLLECTIVE_SOLR_INTEGRATION_TESTING
+    layer = LEGACY_COLLECTIVE_SOLR_INTEGRATION_TESTING
 
     def setUp(self):
         self.portal = self.layer['portal']

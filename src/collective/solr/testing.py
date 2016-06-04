@@ -193,12 +193,12 @@ def activateAndReindex(portal):
 
 COLLECTIVE_SOLR_FIXTURE = CollectiveSolrLayer()
 
-COLLECTIVE_SOLR_INTEGRATION_TESTING = IntegrationTesting(
+LEGACY_COLLECTIVE_SOLR_INTEGRATION_TESTING = IntegrationTesting(
     bases=(LEGACY_COLLECTIVE_SOLR_FIXTURE,),
     name="CollectiveSolr:Integration"
 )
 
-COLLECTIVE_SOLR_FUNCTIONAL_TESTING = FunctionalTesting(
+LEGACY_COLLECTIVE_SOLR_FUNCTIONAL_TESTING = FunctionalTesting(
     bases=(LEGACY_COLLECTIVE_SOLR_FIXTURE,),
     name="CollectiveSolr:Functional"
 )

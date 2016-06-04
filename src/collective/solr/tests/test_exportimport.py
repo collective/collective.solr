@@ -2,7 +2,7 @@
 from Products.GenericSetup.tests.common import TarballTester
 from StringIO import StringIO
 from collective.solr.interfaces import ISolrConnectionConfig
-from collective.solr.testing import COLLECTIVE_SOLR_INTEGRATION_TESTING
+from collective.solr.testing import LEGACY_COLLECTIVE_SOLR_INTEGRATION_TESTING
 from unittest import TestCase
 from unittest import defaultTestLoader
 from zope.component import getUtility
@@ -10,7 +10,7 @@ from zope.component import getUtility
 
 class SetupToolTests(TestCase, TarballTester):
 
-    layer = COLLECTIVE_SOLR_INTEGRATION_TESTING
+    layer = LEGACY_COLLECTIVE_SOLR_INTEGRATION_TESTING
 
     def setUp(self):
         self.portal = self.layer['portal']

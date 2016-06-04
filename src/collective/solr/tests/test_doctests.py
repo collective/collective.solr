@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from collective.solr.testing import COLLECTIVE_SOLR_FUNCTIONAL_TESTING
+from collective.solr.testing import LEGACY_COLLECTIVE_SOLR_FUNCTIONAL_TESTING
 from plone.testing import layered
 from unittest import TestSuite
 import doctest
@@ -23,6 +23,6 @@ def test_suite():
                                          package='collective.solr.tests',
                                          optionflags=optionflags)
         layer = layered(doc_suite,
-                        layer=COLLECTIVE_SOLR_FUNCTIONAL_TESTING)
+                        layer=LEGACY_COLLECTIVE_SOLR_FUNCTIONAL_TESTING)
         suite.addTest(layer)
     return suite
