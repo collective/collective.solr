@@ -1,7 +1,7 @@
 Changelog
 =========
 
-5.0.2 (unreleased)
+5.0.2 (2016-06-04)
 ------------------
 
 - Fix README formatting.
