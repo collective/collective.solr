@@ -4,7 +4,8 @@ Changelog
 5.0.2 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Fix README formatting.
+  [timo]
 
 
 5.0.1 (2016-06-04)
