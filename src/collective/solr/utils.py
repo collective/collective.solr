@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from string import maketrans
 from re import compile, UNICODE
 
@@ -151,7 +150,18 @@ def prepare_wildcard(value):
     # unidecode will produce the same results
     if not isinstance(value, unicode):
         value = unicode(value, 'utf-8', 'ignore')
-    return str(unidecode(value).lower())
+
+    value = str(unidecode(value))
+
+    # boolean operators must not be lowercased, otherwise Solr will interpret
+    # them as search terms. So we split the search term into tokens and
+    # lowercase only the non-operator parts.
+    parts = []
+    for item in value.split():
+        parts.append(item.lower()
+                     if item not in ("AND", "OR", "NOT")
+                     else item)
+    return " ".join(parts)
 
 
 def findObjects(origin):
