@@ -1,7 +1,7 @@
 Changelog
 =========
 
-5.0.1 (unreleased)
+5.0.1 (2016-06-04)
 ------------------
 
 - Fix BlobError occuring when indexing new files (fixes #120)
