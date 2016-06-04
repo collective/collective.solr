@@ -14,8 +14,8 @@ TODOs:
 * evaluate http://www.gnuenterprise.org/~jcater/solr.py as a replacement
   (also see http://tinyurl.com/2zcogf)
 * evaluate sunburnet as a replacement https://pypi.python.org/pypi/sunburnt
-* evaluat mysolr as backend https://pypi.python.org/pypi/mysolr
+* evaluate mysolr as backend https://pypi.python.org/pypi/mysolr
 * implement LocalParams to have a nicer facet view http://wiki.apache.org/solr/SimpleFacetParameters#Multi-Select_Faceting_and_LocalParams
-* Use current search view and get rid of anicient search override
+* Use current search view and get rid of ancient search override
 * Implement a push only and read only mode
 * Play nice with eea.facetednavigation
