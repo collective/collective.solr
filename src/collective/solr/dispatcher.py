@@ -13,6 +13,7 @@ from collective.solr.parser import SolrResponse
 from collective.solr.utils import isActive
 from collective.solr.utils import padResults
 from copy import deepcopy
+from logging import getLogger
 from zope.component import queryMultiAdapter
 from zope.component import queryUtility
 from zope.component.hooks import getSite
@@ -21,6 +22,9 @@ from zope.publisher.interfaces.http import IHTTPRequest
 
 patchCatalogTool()  # patch catalog tool to use the dispatcher...
 patchLazy()  # ...as well as ZCatalog's Lazy class
+
+
+logger = getLogger('collective.solr.dispatcher')
 
 
 class SearchDispatcher(object):
@@ -48,6 +52,9 @@ def solrSearchResults(request=None, **keywords):
         parameters with portal catalog semantics """
     site = getSite()
     search = queryUtility(ISearch, context=site)
+    if search is None:
+        logger.warn('No search utility found in site %s', site)
+        raise FallBackException
     config = queryUtility(ISolrConnectionConfig, context=site)
 
     if request is None:
