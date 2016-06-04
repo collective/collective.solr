@@ -219,6 +219,10 @@ class SolrConfigXMLAdapter(XMLAdapterBase):
         )
         field_list = self._doc.createElement('field-list')
         append(field_list)
+        for name in self.context.field_list:
+            param = self._doc.createElement('parameter')
+            param.setAttribute('name', name)
+            field_list.appendChild(param)
         append(
             create(
                 'levenshtein_distance',
@@ -228,10 +232,6 @@ class SolrConfigXMLAdapter(XMLAdapterBase):
         append(create('atomic_updates',
                str(bool(self.context.atomic_updates))))
 
-        for name in self.context.field_list:
-            param = self._doc.createElement('parameter')
-            param.setAttribute('name', name)
-            facets.appendChild(param)
         return node
 
 
