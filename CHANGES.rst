@@ -4,7 +4,8 @@ Changelog
 5.0.3 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Fix Pypi page.
+  [timo]
 
 
 5.0.2 (2016-06-04)
