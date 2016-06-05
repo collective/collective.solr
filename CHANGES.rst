@@ -1,7 +1,7 @@
 Changelog
 =========
 
-5.0.3 (unreleased)
+5.0.3 (2016-06-05)
 ------------------
 
 - Fix Pypi page.
