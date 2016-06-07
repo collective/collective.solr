@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from plone import api
 from plone.app.contentlisting.interfaces import IContentListingObject
 from plone.app.layout.icons.interfaces import IContentIcon
 from plone.i18n.normalizer.interfaces import IIDNormalizer
@@ -26,8 +27,8 @@ class FlareContentListingObject(object):
     def getPath(self):
         return self.flare.getPath()
 
-    def getURL(self):
-        return self.flare.getURL()
+    def getURL(self, relative=False):
+        return self.flare.getURL(relative)
 
     def uuid(self):
         if 'UID' in self.flare:
@@ -108,6 +109,33 @@ class FlareContentListingObject(object):
 
     def PortalType(self):
         return self.flare.portal_type
+
+    def Author(self):
+        return self.getUserData(self.Creator())
+
+    def getUserData(self, username):
+        request = getRequest()
+        _usercache = request.get('usercache', None)
+        if _usercache is None:
+            self.request.set('usercache', {})
+            _usercache = {}
+        userdata = _usercache.get(username, None)
+        if userdata is None:
+            membershiptool = api.portal.get_tool('portal_membership')
+            userdata = membershiptool.getMemberInfo(self.Creator())
+            if not userdata:
+                userdata = {
+                    'username': username,
+                    'description': '',
+                    'language': '',
+                    # TODO
+                    # string:${navigation_root_url}/author/${item_creator}
+                    'home_page': '/HOMEPAGEURL',
+                    'location': '',
+                    'fullname': username
+                }
+            self.request.usercache[username] = userdata
+        return userdata
 
     # Temporary to workaround a bug in current plone.app.search<=1.1.0
     def portal_type(self):

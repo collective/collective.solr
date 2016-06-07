@@ -3,7 +3,7 @@
 # $ wget -O parts/test/data.xml 'http://localhost:8983/solr/select/?q=foo&rows=...'  # noqa
 # $ bin/test --tests-pattern=benchmark -v -v
 
-from unittest import TestCase, defaultTestLoader
+from unittest import TestCase
 from collective.solr.parser import SolrResponse
 from collective.solr.iterparse import source
 
@@ -29,7 +29,3 @@ class ParserBenchmarks(TestCase):
 
     def test5(self):
         SolrResponse(self.data)
-
-
-def test_suite():
-    return defaultTestLoader.loadTestsFromName(__name__)

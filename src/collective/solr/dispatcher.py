@@ -6,7 +6,6 @@ from collective.solr.exceptions import FallBackException
 from collective.solr.interfaces import IFlare
 from collective.solr.interfaces import ISearch
 from collective.solr.interfaces import ISearchDispatcher
-from collective.solr.interfaces import ISolrConnectionConfig
 from collective.solr.monkey import patchCatalogTool
 from collective.solr.monkey import patchLazy
 from collective.solr.parser import SolrResponse
@@ -19,6 +18,8 @@ from zope.component import queryUtility
 from zope.component.hooks import getSite
 from zope.interface import implements
 from zope.publisher.interfaces.http import IHTTPRequest
+from zope.component import getUtility
+from plone.registry.interfaces import IRegistry
 
 patchCatalogTool()  # patch catalog tool to use the dispatcher...
 patchLazy()  # ...as well as ZCatalog's Lazy class
@@ -52,10 +53,13 @@ def solrSearchResults(request=None, **keywords):
         parameters with portal catalog semantics """
     site = getSite()
     search = queryUtility(ISearch, context=site)
+
     if search is None:
         logger.warn('No search utility found in site %s', site)
         raise FallBackException
-    config = queryUtility(ISolrConnectionConfig, context=site)
+
+    registry = getUtility(IRegistry)
+    config_required = registry['collective.solr.required']
 
     if request is None:
         # try to get a request instance, so that flares can be adapted to
@@ -78,8 +82,8 @@ def solrSearchResults(request=None, **keywords):
         raise FallBackException     # we can't handle navtree queries yet
 
     use_solr = args.get('use_solr', False)  # A special key to force Solr
-    if not use_solr and config.required:
-        required = set(config.required).intersection(args)
+    if not use_solr and config_required:
+        required = set(config_required).intersection(args)
         if required:
             for key in required:
                 if not args[key]:

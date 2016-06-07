@@ -9,13 +9,16 @@ cache:
     - $HOME/buildout-cache
 env:
   - PLONE_VERSION=4.3.x SOLR_VERSION=4.10.x
-#  - PLONE_VERSION=5.0.x SOLR_VERSION=4.10.x
+  - PLONE_VERSION=5.0.x SOLR_VERSION=4.10.x
 #  - PLONE_VERSION=4.3.x SOLR_VERSION=5.1.x
 #  - PLONE_VERSION=5.0.x SOLR_VERSION=5.1.x
 #matrix:
 #  allow_failures:
 #    - env: PLONE_VERSION=4.3.x SOLR_VERSION=5.1.x
+#    - env: PLONE_VERSION=5.0.x SOLR_VERSION=5.1.x
 before_install:
+  - export DISPLAY=:99.0
+  - sh -e /etc/init.d/xvfb start
   - mkdir -p $HOME/buildout-cache/{eggs,downloads}
   - virtualenv .
   - bin/pip install --upgrade pip setuptools zc.buildout
@@ -26,6 +29,8 @@ install:
 script:
   - bin/code-analysis
   - bin/coverage run bin/test
+  # XXX: Run Robot Framework in isolation to avoid test isolation issues.
+  - if [ $PLONE_VERSION == 5.0.x ]; then export ROBOTSUITE_PREFIX=ONLYROBOT && bin/test -t ONLYROBOT --all; fi
 after_success:
   - pip install -q coveralls python-coveralls==2.5.0
   - coveralls
