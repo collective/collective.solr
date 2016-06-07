@@ -5,9 +5,7 @@
   "main": "webpack.config.js",
   "scripts": {
     "start": "webpack-dev-server",
-    "build": "NODE_ENV=production webpack -p --colors",
-    "postbuild": "if [ -d '../collective.solr' ]; then npm run integrate; fi",
-    "integrate": "cp dist/bundle.js ../collective.solr/src/collective/solr/static/dist/search.min.js && cp src/index.html ../collective.solr/src/collective/solr/static/src/. && cp src/index.jsx ../collective.solr/src/collective/solr/static/src/. && cp package.json ../collective.solr/src/collective/solr/static/. && cp webpack.config.js ../collective.solr/src/collective/solr/static/."
+    "build": "NODE_ENV=production webpack -p --colors"
   },
   "keywords": [],
   "author": "kitconcept (Timo Stollenwerk)",

@@ -30,8 +30,8 @@ class SearchApp extends React.Component {
     if (searchTerm === '') {
       this.setState({
         results: {
-          items_count: 0,
-          member: [],
+          items_total: 0,
+          items: [],
         } });
     } else {
       this.doSearchRequest(searchOptions);
@@ -79,7 +79,7 @@ class SearchApp extends React.Component {
     // Make the request
     let requestHeaders = new Headers();
     requestHeaders.append("Accept", "application/json");
-    fetch(`${this.state.portalUrl}/search?metadata_fields=Creator&metadata_fields=modified${sortonQuery}${filterQuery}&SearchableText=${searchOptions.searchText}`,
+    fetch(`${this.state.portalUrl}/@search?metadata_fields=Creator&metadata_fields=modified${sortonQuery}${filterQuery}&SearchableText=${searchOptions.searchText}`,
           { headers: requestHeaders, mode: 'cors' })
       .then((response) => response.json())
       .then((responseData) => {
@@ -328,9 +328,9 @@ class SearchResults extends React.Component {
     noResultsFound = (
       <p><strong>No results were found.</strong></p>
     );
-    if (this.props.results.hasOwnProperty('member')) {
-      resultList = this.props.results.member;
-      if (this.props.results.items_count > 0) {
+    if (this.props.results.hasOwnProperty('items')) {
+      resultList = this.props.results.items;
+      if (this.props.results.items_total > 0) {
         noResultsFound = '';
       } else {
         noResultsFound = (
@@ -360,7 +360,7 @@ class SearchResults extends React.Component {
         <div id="search-results-wrapper">
           <div id="search-results-bar">
             <span id="results-count">
-              <strong id="search-results-number">{this.props.results.items_count || 0}</strong> items matching your search terms.</span>
+              <strong id="search-results-number">{this.props.results.items_total || 0}</strong> items matching your search terms.</span>
           </div>
           <div className="autotabs">
             <nav className="autotoc-nav" id="searchResultsSort">
