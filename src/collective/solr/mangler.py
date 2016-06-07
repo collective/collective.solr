@@ -15,6 +15,7 @@ ranges = {
     'min': '[%s TO *]',
     'max': '[* TO %s]',
     'min:max': '[%s TO %s]',
+    'minmax': '[%s TO %s]',
 }
 
 sort_aliases = {

@@ -9,5 +9,8 @@
      interface="collective.solr.interfaces.ISolrIndexQueueProcessor"
      name="solr"
      factory="collective.solr.indexer.SolrIndexProcessor"/>
+   <utility
+     interface="collective.solr.interfaces.ISearch"
+     factory="collective.solr.search.Search"/>
  </utilities>
 </componentregistry>

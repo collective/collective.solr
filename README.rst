@@ -62,17 +62,13 @@ Search Enhancements
 * Exclude from search
 * Elevation
 
-ZCTextIndex Replacement
-***********************
-
-
 
 Detailed Documentation
 ======================
 
-A full Documentation of the Solr integration of Plone could be found in `docs.plone.org collective.solr`_.
+A full Documentation of the Solr integration of Plone could be found on `collectivesolr.readthedocs.org`_.
 
-.. _`docs.plone.org collective.solr`: http://docs.plone.org/external/collective.solr/docs/index.html
+.. _`collectivesolr.readthedocs.org`: http://collectivesolr.readthedocs.org/en/latest/
 
 
 Installation & Configuration
@@ -86,16 +82,26 @@ Download the latest default Solr configuration from github::
 .. note: Please do not extend your buildout directly with those files since they are likely to change over time. Always fetch the files via wget to have a stable local copy. In general you should never rely on extending buildout config files from servers that aren't under your control.
 
 Extend your buildout to use those files and make sure collective.solr is added
-to the eggs in your instance section::
+to the eggs in your instance section. Your full buildout file should look
+something like this::
 
   [buildout]
+  parts += instance
   extends =
-    solr.cfg
-    solr-4.10.x.cfg
+      http://dist.plone.org/release/4.3.8/versions.cfg
+      solr.cfg
+      solr-4.10.x.cfg
 
   [instance]
-  eggs += collective.solr
+  recipe = plone.recipe.zope2instance
+  http-address = 8080
+  user = admin:admin
+  eggs =
+      Plone
+      collective.solr
 
+  [versions]
+  collective.recipe.solrinstance = 5.3.2
 
 After saving this to let's say ``buildout.cfg`` the buildout can be run and the `Solr`_ server and `Plone`_ instance started::
 

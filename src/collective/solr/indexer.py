@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
-import os
-
 from logging import getLogger
+from lxml import etree
 from Acquisition import aq_get
 from DateTime import DateTime
 from datetime import date, datetime
@@ -9,6 +8,7 @@ from zope.component import queryUtility, queryMultiAdapter
 from zope.component import queryAdapter, adapts
 from zope.interface import implements
 from zope.interface import Interface
+from ZODB.interfaces import BlobError
 from ZODB.POSException import ConflictError
 from Products.CMFCore.utils import getToolByName
 from Products.CMFCore.CMFCatalogAware import CMFCatalogAware
@@ -120,43 +120,33 @@ class BinaryAdder(DefaultAdder):
     def getpath(self):
         field = self.context.getPrimaryField()
         blob = field.get(self.context).blob
-        return blob.committed() or blob._p_blob_committed or \
-            blob._p_blob_uncommitted
+        try:
+            path = blob.committed()
+        except BlobError:
+            path = blob._p_blob_committed or blob._p_blob_uncommitted
+        logger.debug('Indexing BLOB from path %s', path)
+        return path
 
     def __call__(self, conn, **data):
-        if 'ZOPETESTCASE' in os.environ:
-            return super(BinaryAdder, self).__call__(conn, **data)
-        ignore = ('SearchableText', 'created', 'Type', 'links',
-                  'description', 'Date')
         postdata = {}
-        for key, val in data.iteritems():
-            if key in ignore:
-                continue
-            if isinstance(val, list) or isinstance(val, tuple):
-                newvalue = []
-                for item in val:
-                    if isinstance(item, unicode):
-                        item = item.encode('utf-8')
-                    newvalue.append(item)
-            else:
-                newvalue = val
-            postdata['literal.%s' % key] = newvalue
         postdata['stream.file'] = self.getpath()
         postdata['stream.contentType'] = data.get(
             'content_type',
             'application/octet-stream'
         )
-        postdata['fmap.content'] = 'SearchableText'
         postdata['extractFormat'] = 'text'
+        postdata['extractOnly'] = 'true'
 
         url = '%s/update/extract' % conn.solrBase
-
         try:
-            conn.doPost(url, urlencode(postdata, doseq=True), conn.formheaders)
-            conn.flush()
+            response = conn.doPost(
+                url, urlencode(postdata, doseq=True), conn.formheaders)
+            root = etree.parse(response)
+            data['SearchableText'] = root.find('.//str').text.strip()
         except SolrConnectionException, e:
             logger.warn('Error %s @ %s', e, data['path_string'])
-            conn.reset()
+            data['SearchableText'] = ''
+        super(BinaryAdder, self).__call__(conn, **data)
 
 
 def boost_values(obj, data):

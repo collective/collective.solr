@@ -1,13 +1,12 @@
-import os.path
 from setuptools import setup
 from setuptools import find_packages
 
-version = '4.1.1.dev0'
-long_description = \
-    open('README.rst').read() + '\n' + \
-    open('CHANGES.rst').read() + \
-    open(os.path.join('docs', 'credits.rst')).read() + \
-    open(os.path.join('docs', 'contributors.rst')).read(),
+version = '5.0.4.dev0'
+
+long_description = '\n\n'.join([
+    open('README.rst').read(),
+    open('CHANGES.rst').read(),
+])
 
 setup(
     name='collective.solr',
@@ -57,6 +56,7 @@ setup(
         'argparse',  # we need to support Python 2.6 (Plone 4.x)
         'collective.indexing >= 2.0a2',
         'collective.js.showmore',
+        'lxml',
         'plone.app.content',
         'plone.app.layout',
         'plone.app.registry',

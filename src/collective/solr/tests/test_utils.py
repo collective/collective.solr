@@ -8,6 +8,7 @@ from collective.solr.utils import isSimpleTerm
 from collective.solr.utils import isWildCard
 from collective.solr.utils import padResults
 from collective.solr.utils import prepareData
+from collective.solr.utils import prepare_wildcard
 from collective.solr.utils import setupTranslationMap
 from collective.solr.utils import splitSimpleSearch
 from unittest import TestCase
@@ -134,6 +135,22 @@ class UtilsTests(TestCase):
         # other characters might be meaningful in solr, but we don't
         # distinguish them properly (yet)
         self.assertFalse(isWildCard('foo#?'))
+
+    def testPrepareWildcard(self):
+        self.assertEqual(prepare_wildcard("Foo"), "foo")
+        self.assertEqual(prepare_wildcard("and"), "and")
+        self.assertEqual(prepare_wildcard("or"), "or")
+        self.assertEqual(prepare_wildcard("not"), "not")
+        self.assertEqual(prepare_wildcard("Foo and bar"), "foo and bar")
+        self.assertEqual(prepare_wildcard("Foo AND Bar"), "foo AND bar")
+        self.assertEqual(prepare_wildcard("FOO AND NOT BAR"),
+                         "foo AND NOT bar")
+        self.assertEqual(prepare_wildcard("Foo OR Bar"),
+                         "foo OR bar")
+        self.assertEqual(prepare_wildcard("FOO OR NOT BAR"),
+                         "foo OR NOT bar")
+        self.assertEqual(prepare_wildcard("FOO AND BAR OR FOO AND NOT BAR"),
+                         "foo AND bar OR foo AND NOT bar")
 
 
 class TranslationTests(TestCase):

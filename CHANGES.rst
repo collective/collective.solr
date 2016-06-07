@@ -1,10 +1,47 @@
 Changelog
 =========
 
-4.1.1 (unreleased)
+5.0.4 (unreleased)
 ------------------
 
-Note: This release requires you to to update your Solr config and do a full reindex.
+- Nothing changed yet.
+
+
+5.0.3 (2016-06-05)
+------------------
+
+- Fix Pypi page.
+  [timo]
+
+
+5.0.2 (2016-06-04)
+------------------
+
+- Fix README formatting.
+  [timo]
+
+
+5.0.1 (2016-06-04)
+------------------
+
+- Fix BlobError occuring when indexing new files (fixes #120)
+  [tomgross]
+
+- Make extracting text from binary content and indexing 2 steps (#65)
+  [tomgross]
+
+- Make suggest search work when entering multiple search terms.
+  [jcharra]
+
+- Fix field-list export.
+  [gforcada]
+
+
+5.0 (2016-04-13)
+----------------
+
+Note: This release requires you to to update your Solr config and do a full reindex. Make sure you add "updateLog = true" to your "solr-instance"
+buildout section. See https://github.com/collective/collective.solr/blob/master/solr.cfg for a working example.
 
 - Ported atomic updates from ftw.solr.
   This requires you to update your solr config, load the new solr config and
