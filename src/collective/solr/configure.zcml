@@ -4,6 +4,7 @@
     xmlns:five="http://namespaces.zope.org/five"
     xmlns:zcml="http://namespaces.zope.org/zcml"
     xmlns:browser="http://namespaces.zope.org/browser"
+    xmlns:plone="http://namespaces.plone.org/plone"
     xmlns:genericsetup="http://namespaces.zope.org/genericsetup"
     xmlns:i18n="http://namespaces.zope.org/i18n"
     i18n_domain="solr">
@@ -15,7 +16,9 @@
   <include package="archetypes.schemaextender" />
   <include package="collective.indexing" />
   <include package="plone.browserlayer" />
+  <include package="plone.app.registry" />
   <include package="collective.js.showmore" />
+  <include package="plone.restapi" />
 
   <include file="extender.zcml" />
   <include file="profiles.zcml" />
@@ -67,14 +70,6 @@
          factory="plone.app.layout.icons.icons.CatalogBrainContentIcon"
          provides="plone.app.layout.icons.interfaces.IContentIcon" />
 
-  <adapter factory=".configlet.SolrControlPanelAdapter" />
-
-  <browser:page
-      name="solr-controlpanel"
-      for="Products.CMFPlone.interfaces.IPloneSiteRoot"
-      class=".configlet.SolrControlPanel"
-      permission="cmf.ManagePortal" />
-
   <utility
       factory=".vocabularies.SolrIndexes"
       name="collective.solr.indexes" />
@@ -99,12 +94,6 @@
   <adapter name="path_parents" factory=".attributes.path_parents" />
 
   <adapter
-      factory=".exportimport.SolrConfigXMLAdapter"
-      provides="Products.GenericSetup.interfaces.IBody"
-      for=".interfaces.ISolrConnectionConfig
-           Products.GenericSetup.interfaces.ISetupEnviron" />
-
-  <adapter
       zcml:condition="installed plone.app.contentlisting"
       factory="plone.app.contentlisting.contentlisting.ContentListing"
       for="collective.solr.parser.SolrResponse"
@@ -116,21 +105,20 @@
       for="collective.solr.flare.PloneFlare"
       />
 
-<!--  <subscriber for="Products.CMFPlone.interfaces.IReorderedEvent"
-              handler=".events.reorderedEvent" />-->
+  <adapter
+    zcml:condition="installed plone.restapi"
+    factory="collective.solr.serializer.LazySolrCatalogResultSerializer"
+    />
 
-  <genericsetup:exportStep
-      name="solr"
-      title="Solr configuration"
-      description="Export settings for Solr integration."
-      handler="collective.solr.exportimport.exportSolrSettings" />
+  <adapter
+    zcml:condition="installed plone.restapi"
+    factory="collective.solr.serializer.SolrFlareSerializer"
+    />
 
-  <genericsetup:importStep
-      name="solr"
-      title="Solr configuration"
-      description="Import settings for Solr integration."
-      handler="collective.solr.exportimport.importSolrSettings">
-    <depends name="componentregistry"/>
-  </genericsetup:importStep>
+  <plone:static
+    directory="static"
+    type="plone"
+    name="collective.solr"
+    />
 
 </configure>

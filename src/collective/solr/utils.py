@@ -3,23 +3,31 @@ from re import compile, UNICODE
 
 from Acquisition import aq_base
 from unidecode import unidecode
-from zope.component import queryUtility
 
-from collective.solr.interfaces import ISolrConnectionConfig
+from collective.solr.interfaces import ISolrSchema
+from zope.component import getUtility
+from plone.registry.interfaces import IRegistry
+
+
+def getConfig():
+    registry = getUtility(IRegistry)
+    return registry.forInterface(ISolrSchema, prefix='collective.solr')
 
 
 def isActive():
     """ indicate if the solr connection should/can be used """
-    config = queryUtility(ISolrConnectionConfig)
-    if config is not None:
-        return config.active
-    return False
+    try:
+        registry = getUtility(IRegistry)
+        active = registry['collective.solr.active']
+    except KeyError:
+        return False
+    return active
 
 
 def activate(active=True):
     """ (de)activate the solr integration """
-    config = queryUtility(ISolrConnectionConfig)
-    config.active = active
+    registry = getUtility(IRegistry)
+    registry['collective.solr.active'] = active
 
 
 def setupTranslationMap():
