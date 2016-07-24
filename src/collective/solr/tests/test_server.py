@@ -1335,3 +1335,45 @@ class SolrServerTests(TestCase):
         self.assertEqual(len(results), 7)
         paths = [r.path_string for r in results]
         self.assertFalse('/plone/Members/test_user_1_' in paths)
+
+    def testCleanup_removed(self):
+        self.maintenance.reindex()
+        # low level delete to force ascync index and
+        self.portal._delOb('news')
+        resp = self.search('NewsFolder')
+        self.assertEqual(len(resp), 1)
+        pf = PloneFlare(resp.results()[0])
+        self.assertEqual(pf.getObject(), None)
+        self.maintenance.cleanup()
+        resp = self.search('NewsFolder')
+        # NewsFolder was removed from index too
+        self.assertEqual(len(resp), 0)
+
+    def testCleanup_uid(self):
+        self.maintenance.reindex()
+        # low level delete to force ascync index and
+        from Products.Archetypes.config import UUID_ATTR
+        from plone.uuid.interfaces import ATTRIBUTE_NAME
+        from plone.uuid.interfaces import IUUID
+        uuid_orig = IUUID(self.portal['news'])
+
+        # Dexterity
+        setattr(self.portal['news'], ATTRIBUTE_NAME, 'test-solr-uid')
+        # Archetypes
+        setattr(self.portal['news'], UUID_ATTR, 'test-solr-uid')
+        resp = self.search('NewsFolder')
+        self.assertEqual(len(resp), 1)
+        self.assertEqual(resp.results()[0]['UID'], uuid_orig)
+        self.maintenance.cleanup()
+        resp = self.search('NewsFolder')
+        # NewsFolder was removed from index too
+        self.assertEqual(resp.results()[0]['UID'], 'test-solr-uid')
+
+    def testOptimize(self):
+        """ Test call to optimze works
+
+            There is nothing more to check
+        """
+        self.maintenance.reindex()
+        self.maintenance.optimize()
+        self.assertTrue(True)

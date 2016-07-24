@@ -354,6 +354,12 @@ class SolrMaintenanceView(BrowserView):
                     conn.delete(flare[key])
                     deleted += 1
                     continue
+                if ob is None:
+                    log('Object not found, removing: %s\n' % (
+                        flare['path_string']))
+                    conn.delete(flare[key])
+                    deleted += 1
+                    continue
                 if not IUUIDAware.providedBy(ob):
                     no_skipping_msg = 'Object %s of type %s does not ' + \
                         'support uuids, skipping.\n'
