@@ -8,7 +8,6 @@ from collective.solr.interfaces import ISolrIndexQueueProcessor
 from collective.solr.interfaces import IZCMLSolrConnectionConfig
 from collective.solr.mangler import mangleQuery
 from collective.solr.testing import LEGACY_COLLECTIVE_SOLR_FUNCTIONAL_TESTING
-from collective.solr.tests.utils import fakeServer
 from collective.solr.tests.utils import fakehttp
 from collective.solr.tests.utils import getData
 from collective.solr.utils import getConfig
@@ -204,27 +203,6 @@ class SiteSearchTests(TestCase):
 #            self.assertRaises(timeout, search, 'foo')   # but not the second
 #        finally:
 #            thread.join()           # the server thread must always be joined
-
-    def testSchemaUrlFallback(self):
-        config = getConfig()
-        config.active = True
-        config.port = 55555        # random port so the real solr can still run  # noqa
-
-        def notfound(handler):     # set up fake 404 response
-            self.assertEqual(handler.path,
-                             '/solr/admin/file/?file=schema.xml')
-            handler.send_response(404, getData('not_found.txt'))
-
-        def solr12(handler):        # set up response with the schema
-            self.assertEqual(handler.path,
-                             '/solr/admin/get-file.jsp?file=schema.xml')
-            handler.send_response(200, getData('schema.xml'))
-        responses = [notfound, solr12]
-        thread = fakeServer(responses, config.port)
-        schema = queryUtility(ISolrConnectionManager).getSchema()
-        thread.join()               # the server thread must always be joined
-        self.assertEqual(responses, [])
-        self.assertEqual(len(schema), 21)   # 21 items defined in schema.xml
 
 
 class ZCMLSetupTests(TestCase):

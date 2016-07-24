@@ -308,24 +308,20 @@ class SolrConnection:
         return response
 
     def getSchema(self):
-        schema_urls = (
-            '%s/admin/file/?file=schema.xml',         # solr 1.3
-            '%s/admin/get-file.jsp?file=schema.xml')  # solr 1.2
-        for url in schema_urls:
-            logger.debug('getting schema from: %s', url % self.solrBase)
-            try:
-                self.conn.request('GET', url % self.solrBase)
-                response = self.conn.getresponse()
-            except (
-                socket.error, httplib.CannotSendRequest,
-                httplib.ResponseNotReady, httplib.BadStatusLine
-            ):
-                # see `doPost` method for more info about these exceptions
-                self.__reconnect()
-                self.conn.request('GET', url % self.solrBase)
-                response = self.conn.getresponse()
-            if response.status == 200:
-                xml = response.read()
-                return SolrSchema(xml.strip())
-            self.__reconnect()          # force a new connection for each url
+        schema_url = '%s/admin/file/?file=schema.xml'
+        logger.debug('getting schema from: %s', schema_url % self.solrBase)
+        try:
+            self.conn.request('GET', schema_url % self.solrBase)
+            response = self.conn.getresponse()
+        except (
+            socket.error, httplib.CannotSendRequest,
+            httplib.ResponseNotReady, httplib.BadStatusLine
+        ):
+            # see `doPost` method for more info about these exceptions
+            self.__reconnect()
+            self.conn.request('GET', schema_url % self.solrBase)
+            response = self.conn.getresponse()
+        if response.status == 200:
+            xml = response.read()
+            return SolrSchema(xml.strip())
         self.__errcheck(response)       # raise a SolrConnectionException
