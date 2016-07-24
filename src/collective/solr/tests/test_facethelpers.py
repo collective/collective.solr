@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from unittest import TestCase
 from urllib import unquote
 
@@ -12,6 +13,7 @@ from collective.solr.parser import SolrResponse
 from collective.solr.testing import COLLECTIVE_SOLR_MOCK_REGISTRY_FIXTURE
 from collective.solr.tests.utils import getData
 from collective.solr.utils import getConfig
+from collective.solr.vocabularies import I18NFacetTitlesVocabularyFactory
 
 
 class Dummy(object):
@@ -77,6 +79,14 @@ class FacettingHelperTest(TestCase):
         provideUtility(
             DummyAllCapsVocabularyFactory(), IFacetTitleVocabularyFactory,
             name='capsFacet')
+
+    def test_i18n_facet_titles(self):
+        voc = I18NFacetTitlesVocabularyFactory()(context=None)
+        self.assertTrue('Bogus' in voc)
+        term = voc.getTerm(u'München')
+        self.assertEqual(term.token, 'Mnchen')
+        self.assertEqual(term.value, u'München')
+        self.assertEqual(term.title, u'München')
 
     def testConvertFacets(self):
         fields = dict(portal_type=dict(Document=10,
