@@ -1,5 +1,6 @@
 # -*- coding: UTF-8 -*-
 from zope.component import getUtility
+from collective.solr.browser.errors import ErrorView
 from collective.solr.interfaces import ISolrConnectionManager
 from collective.solr.testing import (
     LEGACY_COLLECTIVE_SOLR_INTEGRATION_TESTING
@@ -9,7 +10,8 @@ from plone.app.testing import TEST_USER_ID
 from zope.component import getMultiAdapter
 
 import json
-import unittest2 as unittest
+import socket
+import unittest
 
 
 class MockResponse():
@@ -145,3 +147,16 @@ class SuggestTermsViewIntegrationTest(unittest.TestCase):
                 "label": {"freq": 13, "word": "Plone"}
             }])
         )
+
+
+class TestErrorView(unittest.TestCase):
+
+    def test_error_view(self):
+        request = {}
+        try:
+            raise socket.error('Test Exception')
+        except Exception, e:
+            view = ErrorView(e, request)
+        self.assertEqual(
+            view.errorInfo(),
+            {'type': 'socket.error', 'value': ('Test Exception',)})
