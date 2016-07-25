@@ -892,25 +892,6 @@ class SolrServerTests(TestCase):
         self.assertTrue('/plone/events' in paths)
         self.assertEqual(len(results), 7)
 
-    def DISABLED_testAsyncIndexing(self):
-        connection = getUtility(ISolrConnectionManager).getConnection()
-        self.config.async = True        # enable async indexing
-        set_attributes(self.folder, values={'title': 'Foo'})
-        commit()
-        # indexing normally happens on commit, but with async indexing
-        # enabled search results won't be up-to-date immediately...
-        result = connection.search(q='+Title:Foo').read()
-        self.assertEqual(numFound(result),
-                         0,
-                         'this test might fail, '
-                         'especially when run standalone, because the solr '
-                         'indexing happens too quickly even though it is '
-                         'done asynchronously...')
-        # so we'll have to wait a moment for solr to process the update...
-        sleep(2)
-        result = connection.search(q='+Title:Foo').read()
-        self.assertEqual(numFound(result), 1)
-
     def testNoAutoCommitIndexing(self):
         connection = getUtility(ISolrConnectionManager).getConnection()
         self.config.auto_commit = False        # disable committing
