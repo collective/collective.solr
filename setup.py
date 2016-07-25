@@ -43,15 +43,13 @@ setup(
     install_requires=[
         'Acquisition',
         'DateTime',
-        'Plone >= 4.1',
         'Products.Archetypes',
         'Products.CMFCore',
+        'Products.CMFPlone >= 4.3.7',
         'Products.GenericSetup',
-        'Unidecode',
         'ZODB3',
         'Zope2 >= 2.13',
         'archetypes.schemaextender',
-        'argparse',  # we need to support Python 2.6 (Plone 4.x)
         'collective.indexing >= 2.0a2',
         'collective.js.showmore',
         'lxml',
@@ -62,15 +60,14 @@ setup(
         'plone.api',
         'plone.browserlayer',
         'plone.indexer',
+        'plone.restapi',
         'setuptools',
         'transaction',
         'zope.component',
-        'zope.formlib',
         'zope.i18nmessageid',
         'zope.interface',
         'zope.publisher',
         'zope.schema',
-        'plone.restapi',
     ],
     extras_require={
         'test': [
@@ -79,8 +76,6 @@ setup(
         ],
         'test4': [
             'Products.LinguaPlone >=3.1a1',
-            'plone.app.contentlisting',  # Comes with Plone 4.2,
-                                         # only a test req for 4.1 compat
             'plone.app.testing[robot]',
         ]
     },
