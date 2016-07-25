@@ -72,7 +72,7 @@ setup(
         'zope.interface',
         'zope.publisher',
         'zope.schema',
-        'plone.restapi'
+        'plone.restapi',
     ],
     extras_require={
         'test': [
