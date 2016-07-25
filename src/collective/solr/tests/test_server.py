@@ -214,7 +214,6 @@ class SolrMaintenanceTests(TestCase):
         self.assertEqual(counts['portal_type'], 2)
         self.assertEqual(counts['review_state'], 2)
 
-    @unittest.skip('XXX: Stopped working after plone.app.registry/p5 migr.')
     def testReindexKeepsBoostValues(self):
         # Disable atomic updates, in order to test the index time boosting.
         config = getConfig()

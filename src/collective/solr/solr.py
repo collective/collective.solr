@@ -35,10 +35,9 @@ from xml.sax.saxutils import escape
 import codecs
 import urllib
 from collective.solr.exceptions import SolrConnectionException
-from collective.solr.interfaces import ISolrConnectionConfig
 from collective.solr.parser import SolrSchema
+from collective.solr.utils import getConfig
 from collective.solr.utils import translation_map
-from zope.component import queryUtility
 
 from logging import getLogger
 logger = getLogger(__name__)
@@ -209,7 +208,7 @@ class SolrConnection:
         return self._schema
 
     def add(self, boost_values=None, atomic_updates=True, **fields):
-        solr_config = queryUtility(ISolrConnectionConfig)
+        solr_config = getConfig()
         atomic_updates_enabled = getattr(solr_config,
                                          'atomic_updates',
                                          atomic_updates)
