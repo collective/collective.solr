@@ -66,7 +66,7 @@ class TestSolr(TestCase):
             str(c),
             "SolrConnection{host=localhost:8983, solrBase=/solr, "
             "persistent=True, postHeaders={'Content-Type': 'text/xml; "
-            "charset=utf-8'}, reconnects=0}') )")
+            "charset=utf-8'}, reconnects=0}")
 
     def test_commit(self):
         commit_request = getData('commit_request.txt')
