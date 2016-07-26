@@ -60,6 +60,14 @@ class TestSolr(TestCase):
         self.assertEqual(len(res), 1)   # one request was sent
         self.failUnlessEqual(str(output), add_request)
 
+    def test_connection_str(self):
+        c = SolrConnection(host='localhost:8983', persistent=True)
+        self.assertEqual(
+            str(c),
+            "SolrConnection{host=localhost:8983, solrBase=/solr, "
+            "persistent=True, postHeaders={'Content-Type': 'text/xml; "
+            "charset=utf-8'}, reconnects=0}') )")
+
     def test_commit(self):
         commit_request = getData('commit_request.txt')
         commit_response = getData('commit_response.txt')

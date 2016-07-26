@@ -95,7 +95,7 @@ class SolrConnection:
             ex = SolrConnectionException(rsp.status, rsp.reason)
             try:
                 ex.body = rsp.read()
-            except:
+            except:   # pargam: no cover
                 pass
             raise ex
         return rsp

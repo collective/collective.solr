@@ -42,10 +42,10 @@ class FlareContentListingObject(object):
             interface=IContentIcon)()
 
     def getSize(self):
-        self.flare.getObjSize
+        return self.flare.getObjSize
 
     def review_state(self):
-        self.flare.review_state
+        return self.flare.review_state
 
     def listCreators(self):
         return self.flare.listCreators
