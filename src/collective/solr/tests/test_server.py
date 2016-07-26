@@ -242,6 +242,8 @@ class SolrMaintenanceTests(TestCase):
         maintenance = self.portal.unrestrictedTraverse('solr-maintenance')
         maintenance.reindex()
         self.assertEqual(search(), ['special', 'dull'])
+        # cleanup
+        del self.portal[name]
 
     def testDisabledTimeoutDuringReindex(self):
         log = []

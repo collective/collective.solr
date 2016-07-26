@@ -2,11 +2,17 @@ from unittest import TestCase
 from xml.etree.cElementTree import fromstring
 from collective.solr.solr import SolrConnection
 from collective.solr.tests.utils import getData, fakehttp
+from collective.solr.testing import COLLECTIVE_SOLR_MOCK_REGISTRY_FIXTURE
+from collective.solr.utils import getConfig
 
 
 class TestSolr(TestCase):
 
+    layer = COLLECTIVE_SOLR_MOCK_REGISTRY_FIXTURE
+
     def test_add(self):
+        config = getConfig()
+        config.atomic_updates = True
         add_request = getData('add_request.txt')
         add_response = getData('add_response.txt')
 
@@ -33,6 +39,8 @@ class TestSolr(TestCase):
         res.find('QTime')
 
     def test_add_with_boost_values(self):
+        config = getConfig()
+        config.atomic_updates = False
         add_request = getData('add_request_with_boost_values.txt')
         add_response = getData('add_response.txt')
         c = SolrConnection(host='localhost:8983', persistent=True)
@@ -50,7 +58,6 @@ class TestSolr(TestCase):
 
         res = c.flush()
         self.assertEqual(len(res), 1)   # one request was sent
-        res = res[0]
         self.failUnlessEqual(str(output), add_request)
 
     def test_commit(self):
