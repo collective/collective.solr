@@ -47,7 +47,8 @@ class ContentListingTests(TestCase):
 
     def test_uuid_object(self):
         del self.flare.flare['UID']
-        self.assertEqual(self.flare.uuid(), IUUID(self.layer['portal']['news']))
+        self.assertEqual(self.flare.uuid(),
+                         IUUID(self.layer['portal']['news']))
 
     def test_getSize(self):
         self.assertEqual(self.flare.getSize(), 42)
