@@ -67,7 +67,6 @@ setup(
         'setuptools',
         'transaction',
         'zope.component',
-        'zope.formlib',
         'zope.i18nmessageid',
         'zope.interface',
         'zope.publisher',
