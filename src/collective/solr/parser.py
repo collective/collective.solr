@@ -6,7 +6,7 @@ from DateTime import DateTime
 from zope.interface import implements
 
 from collective.solr.interfaces import ISolrFlare
-from collective.solr.iterparse import iterparse
+from xml.etree.cElementTree import iterparse
 
 
 class AttrDict(dict):

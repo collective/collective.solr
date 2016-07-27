@@ -12,7 +12,9 @@ from collective.solr.manager import SolrConnectionManager
 from collective.solr.indexer import SolrIndexProcessor
 from collective.solr.indexer import logger as logger_indexer
 from collective.solr.tests.utils import getData, fakehttp, fakemore
+from collective.solr.testing import COLLECTIVE_SOLR_MOCK_REGISTRY_FIXTURE
 from collective.solr.solr import SolrConnection
+from collective.solr.utils import getConfig
 from collective.solr.utils import prepareData
 
 
@@ -40,6 +42,8 @@ def sortFields(output):
 
 class QueueIndexerTests(TestCase):
 
+    layer = COLLECTIVE_SOLR_MOCK_REGISTRY_FIXTURE
+
     def setUp(self):
         self.mngr = SolrConnectionManager()
         self.mngr.setHost(active=True)
@@ -47,6 +51,8 @@ class QueueIndexerTests(TestCase):
         fakehttp(conn, getData('schema.xml'))       # fake schema response
         self.mngr.getSchema()                       # read and cache the schema
         self.proc = SolrIndexProcessor(self.mngr)
+        config = getConfig()
+        config.atomic_updates = True
 
     def tearDown(self):
         self.mngr.closeConnection()
@@ -208,6 +214,8 @@ class QueueIndexerTests(TestCase):
 
 class RobustnessTests(TestCase):
 
+    layer = COLLECTIVE_SOLR_MOCK_REGISTRY_FIXTURE
+
     def setUp(self):
         self.mngr = SolrConnectionManager()
         self.mngr.setHost(active=True)
@@ -218,6 +226,8 @@ class RobustnessTests(TestCase):
         def logger(*args):
             self.log.extend(args)
         logger_indexer.warning = logger
+        config = getConfig()
+        config.atomic_updates = True
 
     def tearDown(self):
         self.mngr.closeConnection()
@@ -257,9 +267,13 @@ class RobustnessTests(TestCase):
 
 class FakeHTTPConnectionTests(TestCase):
 
+    layer = COLLECTIVE_SOLR_MOCK_REGISTRY_FIXTURE
+
     def setUp(self):
         self.foo = Foo(id='500', name='python test doc')
         self.schema_request = 'GET /solr/admin/file/?file=schema.xml'
+        config = getConfig()
+        config.atomic_updates = True
 
     def testSingleRequest(self):
         mngr = SolrConnectionManager(active=True)
@@ -331,7 +345,11 @@ class FakeHTTPConnectionTests(TestCase):
 
 class ThreadedConnectionTests(TestCase):
 
+    layer = COLLECTIVE_SOLR_MOCK_REGISTRY_FIXTURE
+
     def testLocalConnections(self):
+        config = getConfig()
+        config.atomic_updates = True
         mngr = SolrConnectionManager(active=True)
         proc = SolrIndexProcessor(mngr)
         mngr.setHost(active=True)
@@ -339,7 +357,6 @@ class ThreadedConnectionTests(TestCase):
         log = []
 
         def runner():
-
             # fake schema response on solr connection - caches the schema
             fakehttp(mngr.getConnection(), getData('schema.xml'))
             mngr.getConnection().get_schema()

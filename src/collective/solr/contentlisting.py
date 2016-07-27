@@ -4,6 +4,8 @@ from plone.app.contentlisting.interfaces import IContentListingObject
 from plone.app.layout.icons.interfaces import IContentIcon
 from plone.i18n.normalizer.interfaces import IIDNormalizer
 from plone.uuid.interfaces import IUUID
+from plone.registry.interfaces import IRegistry
+from Products.CMFPlone.browser.ploneview import Plone as PloneView
 from zope.component import getMultiAdapter, getUtility
 from zope.globalrequest import getRequest
 from zope.interface import implements
@@ -42,10 +44,10 @@ class FlareContentListingObject(object):
             interface=IContentIcon)()
 
     def getSize(self):
-        self.flare.getObjSize
+        return self.flare.getObjSize
 
     def review_state(self):
-        self.flare.review_state
+        return self.flare.review_state
 
     def listCreators(self):
         return self.flare.listCreators
@@ -57,10 +59,10 @@ class FlareContentListingObject(object):
         return self.flare.Subject
 
     def Publisher(self):
-        return NotImplementedError
+        raise NotImplementedError
 
     def listContributors(self):
-        return NotImplementedError
+        raise NotImplementedError
 
     def Contributors(self):
         return self.listContributors()
@@ -89,10 +91,10 @@ class FlareContentListingObject(object):
         return self.getURL()
 
     def Language(self):
-        self.Language
+        return self.flare.Language
 
     def Rights(self):
-        return NotImplementedError
+        raise NotImplementedError
 
     def Title(self):
         return self.flare.Title
@@ -117,7 +119,7 @@ class FlareContentListingObject(object):
         request = getRequest()
         _usercache = request.get('usercache', None)
         if _usercache is None:
-            self.request.set('usercache', {})
+            request.set('usercache', {})
             _usercache = {}
         userdata = _usercache.get(username, None)
         if userdata is None:
@@ -134,12 +136,14 @@ class FlareContentListingObject(object):
                     'location': '',
                     'fullname': username
                 }
-            self.request.usercache[username] = userdata
+            request.usercache[username] = userdata
         return userdata
 
-    # Temporary to workaround a bug in current plone.app.search<=1.1.0
-    def portal_type(self):
-        return self.PortalType()
-
     def CroppedDescription(self):
-        return self.flare.Description
+        registry = getUtility(IRegistry)
+        length = registry.get('plone.search_results_description_length')
+        plone_view = PloneView(None, None)
+        if not length or not isinstance(length, int):
+            # fallback if registry key is None
+            length = 160
+        return plone_view.cropText(self.flare.Description, length)

@@ -35,10 +35,9 @@ from xml.sax.saxutils import escape
 import codecs
 import urllib
 from collective.solr.exceptions import SolrConnectionException
-from collective.solr.interfaces import ISolrConnectionConfig
 from collective.solr.parser import SolrSchema
+from collective.solr.utils import getConfig
 from collective.solr.utils import translation_map
-from zope.component import queryUtility
 
 from logging import getLogger
 logger = getLogger(__name__)
@@ -96,7 +95,7 @@ class SolrConnection:
             ex = SolrConnectionException(rsp.status, rsp.reason)
             try:
                 ex.body = rsp.read()
-            except:
+            except:   # pargam: no cover
                 pass
             raise ex
         return rsp
@@ -209,7 +208,7 @@ class SolrConnection:
         return self._schema
 
     def add(self, boost_values=None, atomic_updates=True, **fields):
-        solr_config = queryUtility(ISolrConnectionConfig)
+        solr_config = getConfig()
         atomic_updates_enabled = getattr(solr_config,
                                          'atomic_updates',
                                          atomic_updates)
@@ -308,24 +307,20 @@ class SolrConnection:
         return response
 
     def getSchema(self):
-        schema_urls = (
-            '%s/admin/file/?file=schema.xml',         # solr 1.3
-            '%s/admin/get-file.jsp?file=schema.xml')  # solr 1.2
-        for url in schema_urls:
-            logger.debug('getting schema from: %s', url % self.solrBase)
-            try:
-                self.conn.request('GET', url % self.solrBase)
-                response = self.conn.getresponse()
-            except (
-                socket.error, httplib.CannotSendRequest,
-                httplib.ResponseNotReady, httplib.BadStatusLine
-            ):
-                # see `doPost` method for more info about these exceptions
-                self.__reconnect()
-                self.conn.request('GET', url % self.solrBase)
-                response = self.conn.getresponse()
-            if response.status == 200:
-                xml = response.read()
-                return SolrSchema(xml.strip())
-            self.__reconnect()          # force a new connection for each url
+        schema_url = '%s/admin/file/?file=schema.xml'
+        logger.debug('getting schema from: %s', schema_url % self.solrBase)
+        try:
+            self.conn.request('GET', schema_url % self.solrBase)
+            response = self.conn.getresponse()
+        except (
+            socket.error, httplib.CannotSendRequest,
+            httplib.ResponseNotReady, httplib.BadStatusLine
+        ):
+            # see `doPost` method for more info about these exceptions
+            self.__reconnect()
+            self.conn.request('GET', schema_url % self.solrBase)
+            response = self.conn.getresponse()
+        if response.status == 200:
+            xml = response.read()
+            return SolrSchema(xml.strip())
         self.__errcheck(response)       # raise a SolrConnectionException

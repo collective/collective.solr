@@ -33,7 +33,6 @@ content:
   >>> activateAndReindex(layer['portal'])
   >>> import transaction
   >>> transaction.commit()
-  >>> browser = Browser(layer['app'])
 
 Then we start searching: the first time around things are fine:
 
