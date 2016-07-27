@@ -5,6 +5,7 @@ from plone.app.layout.icons.interfaces import IContentIcon
 from plone.i18n.normalizer.interfaces import IIDNormalizer
 from plone.uuid.interfaces import IUUID
 from plone.registry.interfaces import IRegistry
+from Products.CMFPlone.browser.ploneview import Plone as PloneView
 from zope.component import getMultiAdapter, getUtility
 from zope.globalrequest import getRequest
 from zope.interface import implements
@@ -58,10 +59,10 @@ class FlareContentListingObject(object):
         return self.flare.Subject
 
     def Publisher(self):
-        return NotImplementedError
+        raise NotImplementedError
 
     def listContributors(self):
-        return NotImplementedError
+        raise NotImplementedError
 
     def Contributors(self):
         return self.listContributors()
@@ -93,7 +94,7 @@ class FlareContentListingObject(object):
         return self.Language
 
     def Rights(self):
-        return NotImplementedError
+        raise NotImplementedError
 
     def Title(self):
         return self.flare.Title
@@ -141,7 +142,8 @@ class FlareContentListingObject(object):
     def CroppedDescription(self):
         registry = getUtility(IRegistry)
         length = registry.get('plone.search_results_description_length')
-        portal = api.portal.get()
-        plone_view = getMultiAdapter((portal, self.flare.request),
-                                     name='plone')
+        plone_view = PloneView(None, None)
+        if not length or not isinstance(length, int):
+            # fallback if registry key is None
+            length = 160
         return plone_view.cropText(self.flare.Description, length)

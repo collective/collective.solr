@@ -70,14 +70,14 @@ class ContentListingTests(TestCase):
     def test_Subject(self):
         self.assertEqual(self.flare.Subject(), 'Flare Subject')
 
-    def X_test_Publisher(self):
-        self.assertRaises(NotImplementedError, self.flare.Publisher())
+    def test_Publisher(self):
+        self.assertRaises(NotImplementedError, self.flare.Publisher)
 
-    def X_test_listContributors(self):
-        self.assertRaises(NotImplementedError, self.flare.listContributors())
+    def test_listContributors(self):
+        self.assertRaises(NotImplementedError, self.flare.listContributors)
 
-    def X_test_Contributors(self):
-        self.assertRaises(NotImplementedError, self.flare.Contributors())
+    def test_Contributors(self):
+        self.assertRaises(NotImplementedError, self.flare.Contributors)
 
     # def Date(self, zone=None):
     #     self.assertEqual(self.flare.Date
@@ -105,7 +105,7 @@ class ContentListingTests(TestCase):
     def Language(self):
         self.Language
 
-    def X_test_Rights(self):
+    def test_Rights(self):
         self.assertRaises(NotImplementedError, self.flare.Rights)
 
     def test_Title(self):
@@ -152,5 +152,5 @@ class ContentListingTests(TestCase):
     #         self.request.usercache[username] = userdata
     #     self.assertEqual(userdata
 
-    def X_test_CroppedDescription(self):
+    def test_CroppedDescription(self):
         self.assertEqual(self.flare.CroppedDescription(), 'Flare Description')
