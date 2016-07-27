@@ -4,6 +4,7 @@ from plone.app.contentlisting.interfaces import IContentListingObject
 from plone.app.layout.icons.interfaces import IContentIcon
 from plone.i18n.normalizer.interfaces import IIDNormalizer
 from plone.uuid.interfaces import IUUID
+from plone.registry.interfaces import IRegistry
 from zope.component import getMultiAdapter, getUtility
 from zope.globalrequest import getRequest
 from zope.interface import implements
@@ -89,7 +90,7 @@ class FlareContentListingObject(object):
         return self.getURL()
 
     def Language(self):
-        self.Language
+        return self.Language
 
     def Rights(self):
         return NotImplementedError
@@ -137,9 +138,10 @@ class FlareContentListingObject(object):
             self.request.usercache[username] = userdata
         return userdata
 
-    # Temporary to workaround a bug in current plone.app.search<=1.1.0
-    def portal_type(self):
-        return self.PortalType()
-
     def CroppedDescription(self):
-        return self.flare.Description
+        registry = getUtility(IRegistry)
+        length = registry.get('plone.search_results_description_length')
+        portal = api.portal.get()
+        plone_view = getMultiAdapter((portal, self.flare.request),
+                                     name='plone')
+        return plone_view.cropText(self.flare.Description, length)

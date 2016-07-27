@@ -20,6 +20,11 @@ class ContentListingTests(TestCase):
             'UID': 'test-uid',
             'getObjSize': 42,
             'review_state': 'published',
+            'listCreators': ['foo', 'bar'],
+            'Creator': 'Flare Creator',
+            'Title': 'Flare Title',
+            'Description': 'Flare Description',
+            'Subject': 'Flare Subject',
             }))
 
     def testInterfaceComplete(self):
@@ -38,7 +43,7 @@ class ContentListingTests(TestCase):
     def test_getPath(self):
         self.assertEqual(self.flare.getPath(), '/plone/news')
 
-    def test_getURL(self, relative=False):
+    def test_getURL(self):
         self.assertEqual(self.flare.getURL(False), '/plone/news')
         self.assertEqual(self.flare.getURL(True), '/plone/news')
 
@@ -56,71 +61,72 @@ class ContentListingTests(TestCase):
     def test_review_state(self):
         self.assertEqual(self.flare.review_state(), 'published')
 
-    # def listCreators(self):
-    #     return self.flare.listCreators
-    #
-    # def Creator(self):
-    #     return self.flare.Creator
-    #
-    # def Subject(self):
-    #     return self.flare.Subject
-    #
-    # def Publisher(self):
-    #     return NotImplementedError
-    #
-    # def listContributors(self):
-    #     return NotImplementedError
-    #
-    # def Contributors(self):
-    #     return self.listContributors()
-    #
+    def test_listCreators(self):
+        self.assertEqual(self.flare.listCreators(), ['foo', 'bar'])
+
+    def test_Creator(self):
+        self.assertEqual(self.flare.Creator(), 'Flare Creator')
+
+    def test_Subject(self):
+        self.assertEqual(self.flare.Subject(), 'Flare Subject')
+
+    def X_test_Publisher(self):
+        self.assertRaises(NotImplementedError, self.flare.Publisher())
+
+    def X_test_listContributors(self):
+        self.assertRaises(NotImplementedError, self.flare.listContributors())
+
+    def X_test_Contributors(self):
+        self.assertRaises(NotImplementedError, self.flare.Contributors())
+
     # def Date(self, zone=None):
-    #     return self.flare.Date
+    #     self.assertEqual(self.flare.Date
     #
     # def CreationDate(self, zone=None):
-    #     return self.flare.created
+    #     self.assertEqual(self.flare.created
     #
     # def EffectiveDate(self, zone=None):
     #     # Work around an incompatibility of Archetypes/DateTime
     #     # in effective. See #13362
-    #     return self.getObject().EffectiveDate()
+    #     self.assertEqual(self.getObject().EffectiveDate()
     #
     # def ExpirationDate(self, zone=None):
-    #     return self.flare.expires
+    #     self.assertEqual(self.flare.expires
     #
     # def ModificationDate(self, zone=None):
-    #     return self.flare.modified
-    #
-    # def Format(self):
-    #     raise NotImplementedError
-    #
-    # def Identifier(self):
-    #     return self.getURL()
-    #
-    # def Language(self):
-    #     self.Language
-    #
-    # def Rights(self):
-    #     return NotImplementedError
-    #
-    # def Title(self):
-    #     return self.flare.Title
-    #
-    # def Description(self):
-    #     return self.flare.Description
-    #
+    #     self.assertEqual(self.flare.modified
+
+    def test_Format(self):
+        self.assertRaises(NotImplementedError, self.flare.Format)
+
+    def test_Identifier(self):
+        self.assertEqual(self.flare.Identifier(), '/plone/news')
+
+    def Language(self):
+        self.Language
+
+    def X_test_Rights(self):
+        self.assertRaises(NotImplementedError, self.flare.Rights)
+
+    def test_Title(self):
+        self.assertEqual(self.flare.Title(), 'Flare Title')
+
+    def test_Description(self):
+        self.assertEqual(self.flare.Description(), 'Flare Description')
+
     # def Type(self):
-    #     return self.flare.Type
+    #     self.assertEqual(self.flare.Type
     #
     # def ContentTypeClass(self):
-    #     return "contenttype-" + getUtility(IIDNormalizer).normalize(
+    #     self.assertEqual("contenttype-" +
+    #
     #         self.PortalType())
     #
     # def PortalType(self):
-    #     return self.flare.portal_type
+    #     self.assertEqual(self.flare.portal_type
     #
     # def Author(self):
-    #     return self.getUserData(self.Creator())
+    #     self.assertEqual(self.getUserData(self.Creator())
     #
     # def getUserData(self, username):
     #     request = getRequest()
@@ -144,11 +150,7 @@ class ContentListingTests(TestCase):
     #                 'fullname': username
     #             }
     #         self.request.usercache[username] = userdata
-    #     return userdata
-    #
-    # # Temporary to workaround a bug in current plone.app.search<=1.1.0
-    # def portal_type(self):
-    #     return self.PortalType()
-    #
-    # def CroppedDescription(self):
-    #     return self.flare.Description
+    #     self.assertEqual(userdata
+
+    def X_test_CroppedDescription(self):
+        self.assertEqual(self.flare.CroppedDescription(), 'Flare Description')
