@@ -108,8 +108,8 @@ class ContentListingTests(TestCase):
     def test_Identifier(self):
         self.assertEqual(self.flare.Identifier(), '/plone/news')
 
-    def Language(self):
-        self.assertEqual(self.Language, 'de')
+    def test_Language(self):
+        self.assertEqual(self.flare.Language(), 'de')
 
     def test_Rights(self):
         self.assertRaises(NotImplementedError, self.flare.Rights)

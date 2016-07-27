@@ -91,7 +91,7 @@ class FlareContentListingObject(object):
         return self.getURL()
 
     def Language(self):
-        return self.Language
+        return self.flare.Language
 
     def Rights(self):
         raise NotImplementedError
