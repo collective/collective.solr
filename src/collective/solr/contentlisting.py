@@ -119,7 +119,7 @@ class FlareContentListingObject(object):
         request = getRequest()
         _usercache = request.get('usercache', None)
         if _usercache is None:
-            self.request.set('usercache', {})
+            request.set('usercache', {})
             _usercache = {}
         userdata = _usercache.get(username, None)
         if userdata is None:
@@ -136,7 +136,7 @@ class FlareContentListingObject(object):
                     'location': '',
                     'fullname': username
                 }
-            self.request.usercache[username] = userdata
+            request.usercache[username] = userdata
         return userdata
 
     def CroppedDescription(self):

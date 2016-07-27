@@ -25,6 +25,13 @@ class ContentListingTests(TestCase):
             'Title': 'Flare Title',
             'Description': 'Flare Description',
             'Subject': 'Flare Subject',
+            'Date': 'Flare Date',
+            'expires': '1.1.2099',
+            'created': '31.12.1969',
+            'modified': '27.07.2016',
+            'Language': 'de',
+            'portal_type': 'NewsItem',
+            'Type': 'Flare NewsItem',
             }))
 
     def testInterfaceComplete(self):
@@ -79,22 +86,21 @@ class ContentListingTests(TestCase):
     def test_Contributors(self):
         self.assertRaises(NotImplementedError, self.flare.Contributors)
 
-    # def Date(self, zone=None):
-    #     self.assertEqual(self.flare.Date
-    #
-    # def CreationDate(self, zone=None):
-    #     self.assertEqual(self.flare.created
-    #
-    # def EffectiveDate(self, zone=None):
-    #     # Work around an incompatibility of Archetypes/DateTime
-    #     # in effective. See #13362
-    #     self.assertEqual(self.getObject().EffectiveDate()
-    #
-    # def ExpirationDate(self, zone=None):
-    #     self.assertEqual(self.flare.expires
-    #
-    # def ModificationDate(self, zone=None):
-    #     self.assertEqual(self.flare.modified
+    def test_Date(self):
+        self.assertEqual(self.flare.Date(), 'Flare Date')
+
+    def test_CreationDate(self):
+        self.assertEqual(self.flare.CreationDate(), '31.12.1969')
+
+    def test_EffectiveDate(self):
+        self.assertEqual(self.flare.EffectiveDate(),
+                         self.layer['portal']['news'].EffectiveDate())
+
+    def test_ExpirationDate(self):
+        self.assertEqual(self.flare.ExpirationDate(), '1.1.2099')
+
+    def test_ModificationDate(self):
+        self.assertEqual(self.flare.ModificationDate(), '27.07.2016')
 
     def test_Format(self):
         self.assertRaises(NotImplementedError, self.flare.Format)
@@ -103,7 +109,7 @@ class ContentListingTests(TestCase):
         self.assertEqual(self.flare.Identifier(), '/plone/news')
 
     def Language(self):
-        self.Language
+        self.assertEqual(self.Language, 'de')
 
     def test_Rights(self):
         self.assertRaises(NotImplementedError, self.flare.Rights)
@@ -114,43 +120,24 @@ class ContentListingTests(TestCase):
     def test_Description(self):
         self.assertEqual(self.flare.Description(), 'Flare Description')
 
-    # def Type(self):
-    #     self.assertEqual(self.flare.Type
-    #
-    # def ContentTypeClass(self):
-    #     self.assertEqual("contenttype-" +
-    #
-    #         self.PortalType())
-    #
-    # def PortalType(self):
-    #     self.assertEqual(self.flare.portal_type
-    #
-    # def Author(self):
-    #     self.assertEqual(self.getUserData(self.Creator())
-    #
-    # def getUserData(self, username):
-    #     request = getRequest()
-    #     _usercache = request.get('usercache', None)
-    #     if _usercache is None:
-    #         self.request.set('usercache', {})
-    #         _usercache = {}
-    #     userdata = _usercache.get(username, None)
-    #     if userdata is None:
-    #         membershiptool = api.portal.get_tool('portal_membership')
-    #         userdata = membershiptool.getMemberInfo(self.Creator())
-    #         if not userdata:
-    #             userdata = {
-    #                 'username': username,
-    #                 'description': '',
-    #                 'language': '',
-    #                 # TODO
-    #                 # string:${navigation_root_url}/author/${item_creator}
-    #                 'home_page': '/HOMEPAGEURL',
-    #                 'location': '',
-    #                 'fullname': username
-    #             }
-    #         self.request.usercache[username] = userdata
-    #     self.assertEqual(userdata
+    def test_Type(self):
+        self.assertEqual(self.flare.Type(), 'Flare NewsItem')
+
+    def test_ContentTypeClass(self):
+        self.assertEqual(self.flare.ContentTypeClass(),
+                         'contenttype-newsitem')
+
+    def test_PortalType(self):
+        self.assertEqual(self.flare.PortalType(), 'NewsItem')
+
+    def test_Author(self):
+        self.assertEqual(self.flare.Author(),
+                         {'username': 'Flare Creator',
+                          'description': '',
+                          'language': '',
+                          'home_page': '/HOMEPAGEURL',
+                          'location': '',
+                          'fullname': 'Flare Creator'})
 
     def test_CroppedDescription(self):
         self.assertEqual(self.flare.CroppedDescription(), 'Flare Description')
