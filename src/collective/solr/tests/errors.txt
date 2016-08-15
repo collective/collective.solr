@@ -100,9 +100,9 @@ timeout error is provoked:
   >>> from collective.solr.tests.utils import fakeServer
   >>> from time import sleep
   >>> def action(handler):
-  ...   sleep(3)
+  ...   sleep(1.0)
   >>> thread = fakeServer([action, action], port=55555)
-  >>> config.search_timeout = 2.0
+  >>> config.search_timeout = 0.7
   >>> transaction.commit()
 
 And try the search again:
