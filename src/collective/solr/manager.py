@@ -126,5 +126,5 @@ class SolrConnectionManager(object):
         """ set the timeout on the current (or to be opened) connection
             to the value specified for search operations """
         registry = getUtility(IRegistry)
-        search_timeout = registry['collective.solr.index_timeout']
+        search_timeout = registry['collective.solr.search_timeout']
         self.setTimeout(search_timeout or None)
