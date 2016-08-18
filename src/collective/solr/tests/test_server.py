@@ -63,7 +63,7 @@ DEFAULT_OBJS = [
 
 
 class RaisingAdder(DefaultAdder):
-    """
+    """AddHandler that raises exceptions
     """
 
     implements(ISolrAddHandler)
@@ -263,22 +263,18 @@ class SolrMaintenanceTests(TestCase):
         del self.portal[name]
 
     def testReindexIgnoreExceptions(self):
-        # 1) register an ISolrAddHandler adapter that raises during
-        #    call, for a specific portal type
         provideAdapter(RaisingAdder, name='Image')
         search = lambda: [result['getId'] for result in
                           getUtility(ISearch)
                           ('Title:foo^2 OR Description:foo').results()]
-        # XXX todo: 
-        # 2) reindex
-        # 3) ignore_exceptions=False should raise the handler's exception, 
-        #    thereby aborting the reindex tx
+        # ignore_exceptions=False should raise the handler's exception, 
+        # thereby aborting the reindex tx
         self.folder.invokeFactory('Image', id='dull', title='foo',
                                   description='the bar is missing here')
         maintenance = self.portal.unrestrictedTraverse('solr-maintenance')
         self.assertRaises(Exception, maintenance.reindex, ignore_exceptions=False)
-        # 4) ignore_exceptions=True should commit the reindex tx, but
-        #    without indexing the object that raised
+        # ignore_exceptions=True should commit the reindex tx.
+        # The object causing the exception will not be indexed
         maintenance = self.portal.unrestrictedTraverse('solr-maintenance')
         maintenance.reindex(ignore_exceptions=True)
         self.assertEqual(numFound(self.search()), 8)
