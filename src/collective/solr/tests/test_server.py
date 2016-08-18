@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from random import randint
 from DateTime import DateTime
 from Missing import MV
 from Products.CMFCore.utils import getToolByName
@@ -7,10 +8,11 @@ from collective.indexing.queue import processQueue
 from collective.solr.dispatcher import FallBackException
 from collective.solr.dispatcher import solrSearchResults
 from collective.solr.flare import PloneFlare
-from collective.solr.indexer import SolrIndexProcessor
+from collective.solr.indexer import SolrIndexProcessor, DefaultAdder
 from collective.solr.indexer import logger as logger_indexer
 from collective.solr.interfaces import ISearch
 from collective.solr.interfaces import ISolrConnectionManager
+from collective.solr.interfaces import ISolrAddHandler
 from collective.solr.manager import logger as logger_manager
 from collective.solr.parser import SolrResponse
 from collective.solr.search import Search
@@ -33,8 +35,10 @@ from transaction import abort
 from transaction import commit
 from unittest import TestCase
 from zExceptions import Unauthorized
-from zope.component import getUtility
+from zope.component import getUtility, provideAdapter, adapts
+from zope.interface import implements
 from zope.schema.interfaces import IVocabularyFactory
+from Products.Archetypes.interfaces import IBaseObject
 
 import unittest
 
@@ -56,6 +60,19 @@ DEFAULT_OBJS = [
      'portal_type': 'Folder', 'depth': 0},
     {'Title': 'NewsFolder', 'getId': 'news', 'Type': 'Folder',
      'portal_type': 'Folder', 'depth': 0}]
+
+
+class RaisingAdder(DefaultAdder):
+    """
+    """
+
+    implements(ISolrAddHandler)
+    adapts(IBaseObject)
+
+    def __call__(self, conn, **data):
+        exceptions = [ValueError, TypeError, IndexError]
+        choice = exceptions[randint(0, len(exceptions))]
+        raise choice
 
 
 class SolrMaintenanceTests(TestCase):
@@ -244,6 +261,28 @@ class SolrMaintenanceTests(TestCase):
         self.assertEqual(search(), ['special', 'dull'])
         # cleanup
         del self.portal[name]
+
+    def testReindexIgnoreExceptions(self):
+        # 1) register an ISolrAddHandler adapter that raises during
+        #    call, for a specific portal type
+        provideAdapter(RaisingAdder, name='Image')
+        search = lambda: [result['getId'] for result in
+                          getUtility(ISearch)
+                          ('Title:foo^2 OR Description:foo').results()]
+        # XXX todo: 
+        # 2) reindex
+        # 3) ignore_exceptions=False should raise the handler's exception, 
+        #    thereby aborting the reindex tx
+        self.folder.invokeFactory('Image', id='dull', title='foo',
+                                  description='the bar is missing here')
+        maintenance = self.portal.unrestrictedTraverse('solr-maintenance')
+        self.assertRaises(Exception, maintenance.reindex, ignore_exceptions=False)
+        # 4) ignore_exceptions=True should commit the reindex tx, but
+        #    without indexing the object that raised
+        maintenance = self.portal.unrestrictedTraverse('solr-maintenance')
+        maintenance.reindex(ignore_exceptions=True)
+        self.assertEqual(numFound(self.search()), 8)
+        provideAdapter(DefaultAdder, name='Image')
 
     def testDisabledTimeoutDuringReindex(self):
         log = []

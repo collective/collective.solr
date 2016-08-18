@@ -74,4 +74,4 @@ def solr_reindex(app, args):
     """
     site = makerequest(_get_site(app, args))
     mv = SolrMaintenanceView(site, site.REQUEST)
-    mv.reindex()
+    mv.reindex(ignore_exceptions=True)

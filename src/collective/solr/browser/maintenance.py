@@ -95,7 +95,7 @@ class SolrMaintenanceView(BrowserView):
         return 'solr index cleared.'
 
     def reindex(self, batch=1000, skip=0, limit=0, ignore_portal_types=None,
-                only_portal_types=None, idxs=[]):
+                only_portal_types=None, idxs=[], ignore_exceptions=False):
         """ find all contentish objects (meaning all objects derived from one
             of the catalog mixin classes) and (re)indexes them """
 
@@ -127,7 +127,12 @@ class SolrMaintenanceView(BrowserView):
         def checkPoint():
             for my_boost_values, data in updates.values():
                 adder = data.pop('_solr_adder')
-                adder(conn, boost_values=my_boost_values, **data)
+                try:
+                    adder(conn, boost_values=my_boost_values, **data)
+                except Exception, e:
+                    logger.warn('Error %s @ %s', e, data['path_string'])
+                    if not ignore_exceptions:
+                        raise
             updates.clear()
             msg = 'intermediate commit (%d items processed, ' \
                   'last batch in %s)...\n' % (processed, lap.next())
