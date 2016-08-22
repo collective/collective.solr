@@ -178,6 +178,9 @@ class Search(object):
                         if value[0] != '"':
                             value = '"%s"' % value
                 else:
+                    if name == 'portal_type':
+                        value = '"' + value + '"'
+
                     value = quote(value)
                 if not value:   # don't search for empty strings, even quoted
                     continue
