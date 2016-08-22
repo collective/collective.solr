@@ -73,5 +73,15 @@ def solr_reindex(app, args):
     --plonesite <siteid>.
     """
     site = makerequest(_get_site(app, args))
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        '--ignore_exceptions',
+        help='Ignore exceptions during reindexing (yes/no)',
+        choices=['yes', 'no'],
+        default='yes'
+    )
+    namespace, unused = parser.parse_known_args(args)
+    ignore_exceptions = namespace.ignore_exceptions == 'yes'
     mv = SolrMaintenanceView(site, site.REQUEST)
-    mv.reindex(ignore_exceptions=True)
+    mv.reindex(ignore_exceptions=ignore_exceptions)
+
