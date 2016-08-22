@@ -1122,7 +1122,7 @@ class SolrServerTests(TestCase):
         self.assertEqual([(r.Title, r.path_string) for r in results],
                          [('News', '/plone/news/aggregator')])
         self.assertEqual(len(log), 1)
-        self.assertEqual(log[-1][1]['fq'], ['+portal_type:Collection'], log)
+        self.assertEqual(log[-1][1]['fq'], ['+portal_type:"Collection"'], log)
         # let's test again with an already existing filter query parameter
         request = dict(SearchableText='News', fq='+review_state:published')
         results = solrSearchResults(request, portal_type='Collection')
