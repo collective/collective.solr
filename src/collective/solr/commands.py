@@ -84,4 +84,3 @@ def solr_reindex(app, args):
     ignore_exceptions = namespace.ignore_exceptions == 'yes'
     mv = SolrMaintenanceView(site, site.REQUEST)
     mv.reindex(ignore_exceptions=ignore_exceptions)
-

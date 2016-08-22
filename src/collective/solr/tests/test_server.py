@@ -261,15 +261,14 @@ class SolrMaintenanceTests(TestCase):
 
     def testReindexIgnoreExceptions(self):
         provideAdapter(RaisingAdder, name='Image')
-        search = lambda: [result['getId'] for result in
-                          getUtility(ISearch)
-                          ('Title:foo^2 OR Description:foo').results()]
         # ignore_exceptions=False should raise the handler's exception, 
         # thereby aborting the reindex tx
         self.folder.invokeFactory('Image', id='dull', title='foo',
                                   description='the bar is missing here')
         maintenance = self.portal.unrestrictedTraverse('solr-maintenance')
-        self.assertRaises(Exception, maintenance.reindex, ignore_exceptions=False)
+        self.assertRaises(Exception, 
+                          maintenance.reindex, 
+                          ignore_exceptions=False)
         # ignore_exceptions=True should commit the reindex tx.
         # The object causing the exception will not be indexed
         maintenance = self.portal.unrestrictedTraverse('solr-maintenance')

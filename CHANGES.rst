@@ -4,7 +4,9 @@ Changelog
 5.0.4 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- New flag: Ignore exceptions that occur during reindexing. 
+  Ignoring exceptions becomes the default when running solr_reindex.
+  [tschorr]
 
 
 5.0.3 (2016-06-05)
