@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from random import randint
 from DateTime import DateTime
 from Missing import MV
 from Products.CMFCore.utils import getToolByName
@@ -63,16 +62,14 @@ DEFAULT_OBJS = [
 
 
 class RaisingAdder(DefaultAdder):
-    """AddHandler that raises exceptions
+    """AddHandler that raises an exception when called
     """
 
     implements(ISolrAddHandler)
     adapts(IBaseObject)
 
     def __call__(self, conn, **data):
-        exceptions = [ValueError, TypeError, IndexError]
-        choice = exceptions[randint(0, len(exceptions))]
-        raise choice
+        raise Exception('Test')
 
 
 class SolrMaintenanceTests(TestCase):
