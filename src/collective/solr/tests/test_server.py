@@ -7,7 +7,8 @@ from collective.indexing.queue import processQueue
 from collective.solr.dispatcher import FallBackException
 from collective.solr.dispatcher import solrSearchResults
 from collective.solr.flare import PloneFlare
-from collective.solr.indexer import SolrIndexProcessor, DefaultAdder
+from collective.solr.indexer import SolrIndexProcessor
+from collective.solr.indexer import DefaultAdder, BinaryAdder
 from collective.solr.indexer import logger as logger_indexer
 from collective.solr.interfaces import ISearch
 from collective.solr.interfaces import ISolrConnectionManager
@@ -34,7 +35,7 @@ from transaction import abort
 from transaction import commit
 from unittest import TestCase
 from zExceptions import Unauthorized
-from zope.component import getUtility, provideAdapter, adapts
+from zope.component import getUtility, queryAdapter
 from zope.interface import implements
 from zope.schema.interfaces import IVocabularyFactory
 from Products.Archetypes.interfaces import IBaseObject
@@ -66,7 +67,6 @@ class RaisingAdder(DefaultAdder):
     """
 
     implements(ISolrAddHandler)
-    adapts(IBaseObject)
 
     def __call__(self, conn, **data):
         raise Exception('Test')
@@ -259,22 +259,85 @@ class SolrMaintenanceTests(TestCase):
         # cleanup
         del self.portal[name]
 
+    def testReindexAddHandlers(self):
+        """ Add handlers adapt Product.Archetypes.interfaces.IBaseObject.
+        This interfaces is not implemented by p.a.contenttypes in Plone 5.0.x.
+        As a result, the DefaultAdder is used for all p.a.contenttypes content.
+        """
+        self.folder.invokeFactory('Image', id='dull', title='foo',
+                                  description='the bar is missing here')
+        # XXX results for Plone 4.x and Plone 5.0.x maybe should be the same
+        if api.env.plone_version() >= '5.0':
+            self.assertEqual(
+                queryAdapter(
+                    self.folder,
+                    ISolrAddHandler,
+                    name='Folder'),
+                None)
+            self.assertEqual(
+                queryAdapter(
+                    self.portal['front-page'],
+                    ISolrAddHandler,
+                    name='Document'),
+                None)
+            self.assertEqual(
+                queryAdapter(
+                    self.folder.dull,
+                    ISolrAddHandler,
+                    name='Image'),
+                None)
+        else:
+            self.assertEqual(
+                queryAdapter(self.folder, ISolrAddHandler, name='Folder'),
+                None)
+            self.assertEqual(
+                queryAdapter(
+                    self.portal['front-page'],
+                    ISolrAddHandler,
+                    name='Document'),
+                None)
+            self.assertEqual(
+                type(
+                    queryAdapter(
+                        self.folder.dull,
+                        ISolrAddHandler,
+                        name='Image')),
+                BinaryAdder)
+
     def testReindexIgnoreExceptions(self):
-        provideAdapter(RaisingAdder, name='Image')
-        # ignore_exceptions=False should raise the handler's exception, 
+        sm = self.portal.getSiteManager()
+        if api.env.plone_version() >= '5.0':
+            from plone.app.contenttypes.interfaces import IImage
+            sm.registerAdapter(RaisingAdder, required=(IImage,), name='Image')
+        else:
+            sm.registerAdapter(
+                RaisingAdder,
+                required=(IBaseObject,),
+                name='Image')
+        # ignore_exceptions=False should raise the handler's exception,
         # thereby aborting the reindex tx
         self.folder.invokeFactory('Image', id='dull', title='foo',
                                   description='the bar is missing here')
         maintenance = self.portal.unrestrictedTraverse('solr-maintenance')
-        self.assertRaises(Exception, 
-                          maintenance.reindex, 
+        self.assertRaises(Exception,
+                          maintenance.reindex,
                           ignore_exceptions=False)
         # ignore_exceptions=True should commit the reindex tx.
         # The object causing the exception will not be indexed
         maintenance = self.portal.unrestrictedTraverse('solr-maintenance')
         maintenance.reindex(ignore_exceptions=True)
         self.assertEqual(numFound(self.search()), 8)
-        provideAdapter(DefaultAdder, name='Image')
+        # restore defaults
+        if api.env.plone_version() >= '5.0':
+            sm.unregisterAdapter(
+                RaisingAdder,
+                required=(IImage,),
+                name='Image')
+        else:
+            sm.registerAdapter(
+                BinaryAdder,
+                required=(IBaseObject,),
+                name='Image')
 
     def testDisabledTimeoutDuringReindex(self):
         log = []
