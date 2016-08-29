@@ -2,10 +2,10 @@
 collective.solr - Solr integration for the Plone CMS
 ====================================================
 
-.. image:: https://secure.travis-ci.org/collective/collective.solr.png?branch=master
+.. image:: https://secure.travis-ci.org/collective/collective.solr.svg?branch=master
     :target: http://travis-ci.org/collective/collective.solr
 
-.. image:: https://coveralls.io/repos/collective/collective.solr/badge.png?branch=master
+.. image:: https://coveralls.io/repos/collective/collective.solr/badge.svg?branch=master
     :target: https://coveralls.io/r/collective/collective.solr
 
 .. image:: https://img.shields.io/pypi/dm/collective.solr.svg
