@@ -281,6 +281,29 @@ class ISolrSchema(Interface):
         required=False,
     )
 
+    boost_script = Text(
+        title=_('label_boost_script',
+                default=u'Python script for custom index boosting'),
+        required=False,
+        default=u'',
+        missing_value=u'',
+        description=_(
+            'help_search_pattern',
+            default=u'This script is meant to be customized according to '
+                    u'site-specific search requirements, e.g. boosting '
+                    u'certain content types like "news items", ranking older '
+                    u'content lower, consider special important content items,'
+                    u' content rating etc.'
+                    u' the indexing data that will be sent to Solr is passed '
+                    u'in as the `data` parameter, the indexable object is '
+                    u'available via the `context` binding. The return value '
+                    u'should be a dictionary consisting of field names and '
+                    u'their respecitive boost values.  use an empty string '
+                    u'as the key to set a boost value for the entire '
+                    u'document/content item.'
+        )
+    )
+
 
 class ISolrConnectionConfig(ISolrSchema):
     """ utility to hold the connection configuration for the solr server """
