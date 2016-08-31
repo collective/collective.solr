@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
 from plone.app.registry.browser import controlpanel
+from plone.protect.interfaces import IDisableCSRFProtection
 from collective.solr.interfaces import ISolrSchema, _
 from Products.CMFPlone.utils import safe_unicode
 from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 from Products.PythonScripts.PythonScript import PythonScript
+from zope.interface import alsoProvides
 
 
 class SolrControlPanelForm(controlpanel.RegistryEditForm):
@@ -25,6 +27,7 @@ class SolrControlPanelForm(controlpanel.RegistryEditForm):
             content.boost_script = '\n'.join(
                 [l for l in boost_script.splitlines()
                  if not l.startswith('##')])
+            alsoProvides(self.request, IDisableCSRFProtection)
         return content
 
     def applyChanges(self, data):
@@ -36,6 +39,9 @@ class SolrControlPanelForm(controlpanel.RegistryEditForm):
         if self.boost_script_id not in self.context:
             # "special" documents get boosted during indexing...
             portal[self.boost_script_id] = PythonScript(self.boost_script_id)
+        # since we create a PythonScript in ZODB we need to
+        # disable CSRF protection
+        alsoProvides(self.request, IDisableCSRFProtection)
         portal[self.boost_script_id].write(boost_script)
         return changes
 
