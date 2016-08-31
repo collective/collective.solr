@@ -1,6 +1,5 @@
 <configure
     xmlns="http://namespaces.zope.org/zope"
-    xmlns:cmf="http://namespaces.zope.org/cmf"
     xmlns:five="http://namespaces.zope.org/five"
     xmlns:zcml="http://namespaces.zope.org/zcml"
     xmlns:browser="http://namespaces.zope.org/browser"
@@ -23,8 +22,6 @@
   <include file="extender.zcml" />
   <include file="profiles.zcml" />
   <include file="upgrades.zcml" />
-
-  <cmf:registerDirectory name="solr_site_search" />
 
   <utility
     factory=".search.Search"
@@ -115,10 +112,9 @@
     factory="collective.solr.serializer.SolrFlareSerializer"
     />
 
-  <plone:static
-    directory="static"
-    type="plone"
-    name="collective.solr"
+  <browser:resourceDirectory
+    name="collective.solr.static"
+    directory="static" 
     />
 
 </configure>
