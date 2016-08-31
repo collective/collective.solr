@@ -62,6 +62,7 @@
       class=".suggest.AutocompleteView"
       permission="zope2.View"/>
 
+  <!-- Plone 5 -->
   <browser:page
       name="search"
       class="Products.CMFPlone.browser.search.Search"
@@ -72,6 +73,7 @@
       zcml:condition="have plone-5"
       />
 
+  <!-- Plone 4.3 -->
   <browser:page
       name="search"
       class=".p4_search.Search"
@@ -79,7 +81,7 @@
       for="plone.app.layout.navigation.interfaces.INavigationRoot"
       template="search.pt"
       layer=".interfaces.IThemeSpecific"
-      zcml:condition="have plone-4"
+      zcml:condition="not-have plone-5"
       />
 
 </configure>
