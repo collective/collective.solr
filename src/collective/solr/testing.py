@@ -224,6 +224,7 @@ class CollectiveSolrMockRegistry(object):
         self.exclude_user = False
         self.field_list = []
         self.atomic_updates = False
+        self.boost_script = u''
 
     def __getitem__(self, name):
         name_parts = name.split('.')
