@@ -146,7 +146,7 @@ class CollectiveSolrLayer(PloneSandboxLayer):
 
     def setUpPloneSite(self, portal):
         self.solr_layer.setUp()
-        applyProfile(portal, 'collective.solr:search')
+        applyProfile(portal, 'collective.solr:default')
         set_registry_record('collective.solr.active', self.solr_active)
         set_registry_record('collective.solr.port', self.solr_port)
         set_registry_record('collective.solr.base', self.solr_base)

@@ -152,10 +152,6 @@ class SiteSearchTests(TestCase):
         # actual solr search...
         queryUtility(ISolrConnectionManager).setHost(active=False)
 
-    def testSkinSetup(self):
-        skins = self.portal.portal_skins.objectIds()
-        self.assertTrue('solr_site_search' in skins, 'no solr skin?')
-
     def testInactiveException(self):
         search = queryUtility(ISearch)
         self.assertRaises(SolrInactiveException, search, 'foo')
