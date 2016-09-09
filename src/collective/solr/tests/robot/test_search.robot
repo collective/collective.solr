@@ -183,7 +183,7 @@ an anonymous user
 
 I search for '${searchterm}'
   Go to  ${PLONE_URL}/@@search
-  Input text  xpath=//main//input[@name='SearchableText']  ${searchterm}
+  Input text  xpath=//div[@id='searchform']//input[@name='SearchableText']  ${searchterm}
 
 I filter the search by portal type '${portal_type}'
   Click Button  xpath=//button[@id='search-filter-toggle']
