@@ -8,7 +8,7 @@ try:
     from plone.app.contenttypes.testing import PLONE_APP_CONTENTTYPES_FIXTURE as PLONE_FIXTURE  # noqa
     HAS_PAC = True
 except ImportError:
-    from plone.app.testing import PLONE_FIXTURE
+    from plone.app.testing.bbb import PTC_FIXTURE as PLONE_FIXTURE
     HAS_PAC = False
 from plone.app.testing import PloneSandboxLayer
 from plone.app.testing import TEST_USER_ID
