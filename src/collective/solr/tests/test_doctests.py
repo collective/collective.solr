@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from collective.solr.testing import LEGACY_COLLECTIVE_SOLR_FUNCTIONAL_TESTING
-from plone import api
 from plone.testing import layered
 from unittest import TestSuite
 import doctest
@@ -15,7 +14,6 @@ def test_suite():
         'errors.txt',
         'configlet.txt',
         'conflicts.txt',
-        'facets.txt',
         'dependencies.txt',
         'collections.txt',
     ]
