@@ -25,7 +25,7 @@
 
 Resource  plone/app/robotframework/selenium.robot
 Resource  plone/app/robotframework/keywords.robot
-Resource  Products/CMFPlone/tests/robot/keywords.robot
+#Resource  Products/CMFPlone/tests/robot/keywords.robot
 
 Library  Remote  ${PLONE_URL}/RobotRemote
 Library  DateTime
@@ -186,14 +186,14 @@ I search for '${searchterm}'
   Input text  xpath=//main//input[@name='SearchableText']  ${searchterm}
 
 I filter the search by portal type '${portal_type}'
-  Click Element  xpath=//button[@id='search-filter-toggle']
-  Wait until page contains element  xpath=//input[@id='query-portaltype-Collection']
+  Click Button  xpath=//button[@id='search-filter-toggle']
+  Wait until element is visible  xpath=//input[@id='query-portaltype-Collection']
   Unselect Checkbox  xpath=//input[@id='query-portaltype-Collection']
   Unselect Checkbox  xpath=//input[@id='query-portaltype-Document']
 
 I filter the search by creation date '${date_filter}'
-  Click Element  xpath=//button[@id='search-filter-toggle']
-  Wait until page contains element  xpath=//input[@id='query-portaltype-Collection']
+  Click Button  xpath=//button[@id='search-filter-toggle']
+  Wait until element is visible  xpath=//input[@id='query-portaltype-Collection']
   Select Radio Button  created  query-date-${date_filter}
 
 # Then
