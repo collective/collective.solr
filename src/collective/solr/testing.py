@@ -11,11 +11,9 @@ except ImportError:
     from plone.app.testing.bbb import PTC_FIXTURE as PLONE_FIXTURE
     HAS_PAC = False
 from plone.app.testing import PloneSandboxLayer
-from plone.app.testing import TEST_USER_ID
 from plone.app.testing import TEST_USER_NAME
 from plone.app.testing import applyProfile
 from plone.app.testing import login
-from plone.app.testing import setRoles
 from plone.registry.interfaces import IRegistry
 from plone.testing import Layer
 from plone.testing import z2
@@ -167,7 +165,6 @@ class LegacyCollectiveSolrLayer(CollectiveSolrLayer):
         login(portal, 'user1')
         portal.portal_workflow.setDefaultChain('simple_publication_workflow')
         wfAction = portal.portal_workflow.doActionFor
-        portal.invokeFactory('Folder', id='Members', title='Users')
         portal.invokeFactory('Document', id='front-page',
                              title='Welcome to Plone')
         portal.invokeFactory('Folder', id='events', title='EventsFolder')
@@ -175,16 +172,12 @@ class LegacyCollectiveSolrLayer(CollectiveSolrLayer):
         portal.news.invokeFactory('Collection', id='aggregator', title='News')
         portal.events.invokeFactory('Collection', id='aggregator',
                                     title='Events')
-        wfAction(portal.Members, 'publish')
         wfAction(portal['front-page'], 'publish')
         wfAction(portal.events, 'publish')
         wfAction(portal.news, 'publish')
         wfAction(portal.news.aggregator, 'publish')
         wfAction(portal.events.aggregator, 'publish')
         login(portal, TEST_USER_NAME)
-        setRoles(portal, TEST_USER_ID, ['Manager'])
-        portal.Members.invokeFactory('Folder', id='test_user_1_', title='')
-        setRoles(portal, TEST_USER_ID, [])
 
 LEGACY_COLLECTIVE_SOLR_FIXTURE = LegacyCollectiveSolrLayer()
 
