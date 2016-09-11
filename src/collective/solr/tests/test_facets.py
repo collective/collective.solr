@@ -4,6 +4,7 @@ from collective.solr.browser.facets import SearchFacetsView
 from collective.solr.browser.interfaces import IThemeSpecific
 from collective.solr.dispatcher import solrSearchResults
 from collective.solr.exceptions import SolrConnectionException
+from collective.solr.testing import activateAndReindex
 from collective.solr.testing import LEGACY_COLLECTIVE_SOLR_INTEGRATION_TESTING
 from collective.solr.utils import activate
 from plone.app.testing import TEST_USER_ID
@@ -19,21 +20,11 @@ class SolrFacettingTests(TestCase):
     def setUp(self):
         self.portal = self.layer['portal']
         self.app = self.layer['app']
-        self.portal.REQUEST.RESPONSE.write = lambda x: x    # ignore output
-        self.maintenance = \
-            self.portal.unrestrictedTraverse('@@solr-maintenance')
-        activate()
-        self.maintenance.clear()
-        self.maintenance.reindex()
+        activateAndReindex(self.portal)
+        self.maintenance = self.portal.unrestrictedTraverse('solr-maintenance')
 
     def tearDown(self):
         activate(active=False)
-
-    def afterSetUp(self):
-        self.maintenance = self.portal.unrestrictedTraverse('solr-maintenance')
-
-    def beforeTearDown(self):
-        pass
 
     def testFacettedSearchWithKeywordArguments(self):
         setRoles(self.portal, TEST_USER_ID, ['Manager'])

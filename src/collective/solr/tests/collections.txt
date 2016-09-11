@@ -15,30 +15,19 @@ support and reindex the site's content:
   >>> from transaction import commit
   >>> portal = layer['portal']
   >>> setRoles(portal, TEST_USER_ID, ['Manager'])
-  >>> browser = Browser(portal)
-
-  >>> activateAndReindex(portal)
-  >>> commit()
-
-  >>> browser.open('http://nohost/plone/login_form')
-  >>> browser.getControl(name='__ac_name').value = TEST_USER_NAME
-  >>> browser.getControl(name='__ac_password').value = TEST_USER_PASSWORD
-  >>> browser.getControl(name='submit').click()
-
-  >>> browser.open('http://nohost/plone/')
-  >>> browser.getLink('Collection').click()
-  >>> browser.getControl(name='title').value = 'Foo'
-  >>> browser.handleErrors = False
-  >>> browser.getControl('Save').click()
+  >>> foo = portal.invokeFactory('Collection', id='foo', title='Foo')
   >>> query = [{'i': 'SearchableText',
   ...           'o': 'plone.app.querystring.operation.string.contains',
   ...           'v': 'new'}]
-  >>> portal.foo.setQuery(query)
+  >>> portal[foo].query = query
+  >>> activateAndReindex(portal)
   >>> commit()
 
-  >>> browser.getLink('View').click()
-  >>> browser.url
-  'http://nohost/plone/foo/'
+  >>> browser = Browser(layer['app'])
+  >>> browser.addHeader(
+  ...          'Authorization',
+  ...          'Basic %s:%s' % (TEST_USER_NAME, TEST_USER_PASSWORD))
+  >>> browser.open(portal[foo].absolute_url())
   >>> browser.contents
   '...Foo...
    ...News...NewsFolder...
