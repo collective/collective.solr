@@ -13,7 +13,6 @@ def test_suite():
     testfiles = [
         'errors.txt',
         'configlet.txt',
-        'dependencies.txt',
         'collections.txt',
     ]
     for testfile in testfiles:
