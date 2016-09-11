@@ -26,6 +26,8 @@
 
   <div id="content-core" metal:fill-slot="main">
     <div id="container" class="searchPage" tal:attributes="data-portalUrl string:${context/portal_url}"></div>
+    <noscript>
+    </noscript>
 
     <script type="text/javascript" tal:attributes="src string:${context/portal_url}/++resource++collective.solr.static/dist/search.min.js"></script>
   </div>
