@@ -27,6 +27,22 @@
   <div id="content-core" metal:fill-slot="main">
     <div id="container" class="searchPage" tal:attributes="data-portalUrl string:${context/portal_url}"></div>
     <noscript>
+      <tal:search define="results view/results">
+      <h1 class="documentFirstHeading">
+	  <span i18n:translate="heading_search_results">
+	      Search results
+	  </span>
+	  <span class="discreet">
+	  &mdash;
+	  <span i18n:translate="batch_x_items_matching_your_criteria"
+	  ><span i18n:name="number"
+	  tal:omit-tag=""
+	  tal:content="python:len(results)">234</span> items matching your search terms</span>
+      </h1>
+      <tal:results repeat="item results">
+        <a href="item/getURL" tal:content="item/Title" tal:attributes="href item/getURL"></a>
+      </tal:results>
+      </tal:search>
     </noscript>
 
     <script type="text/javascript" tal:attributes="src string:${context/portal_url}/++resource++collective.solr.static/dist/search.min.js"></script>

@@ -74,8 +74,8 @@ intended error message is returned and we can continue the test:
   >>> transaction.commit()
   >>> browser = Browser(layer['app'])
   >>> browser.open('http://nohost/plone/')
-  >>> browser.getControl('Search Site').value = 'Welcome'
-  >>> browser.getForm(name='searchform').submit()
+  >>> browser.getControl(name='SearchableText', index=0).value = 'Welcome'
+  >>> browser.getControl('Search', index=0).click()
 
 As a last thing we need to activate a monkey patch, which will make the
 publisher check for and render browser views registered for specific
@@ -83,8 +83,11 @@ exceptions. A normal plone instance would apply the patch automatically as
 its part of the `plone.app.linkintegrity` package. However, in a test
 environment that package isn't loaded by default, so we patch manually:
 
-  >>> from plone.app.linkintegrity.monkey import installExceptionHook
-  >>> installExceptionHook()
+  >>> try:
+  ...     from plone.app.linkintegrity.monkey import installExceptionHook
+  ...     installExceptionHook()   # Plone 4.3
+  ... except ImportError:
+  ...     pass   # no longer needed for Plone 5.x
 
 Now we can finally try to search again:
 
@@ -107,9 +110,9 @@ timeout error is provoked:
 
 And try the search again:
 
-  >>> browser.getControl('Search Site').value = 'Welcome'
+  >>> browser.getControl(name='SearchableText', index=0).value = 'Welcome'
   >>> try:
-  ...     browser.getForm(name='searchform').submit()
+  ...     browser.getControl('Search', index=0).click()
   ... except Exception:
   ...     pass
   >>> browser.contents

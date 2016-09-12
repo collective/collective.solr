@@ -41,8 +41,6 @@ from zope.interface import implements
 from zope.schema.interfaces import IVocabularyFactory
 from Products.Archetypes.interfaces import IBaseObject
 
-import unittest
-
 
 DEFAULT_OBJS = [
     {'Title': 'News', 'getId': 'aggregator', 'Type': 'Collection',
@@ -74,6 +72,7 @@ class SolrMaintenanceTests(TestCase):
 
     def setUp(self):
         self.portal = self.layer['portal']
+        self.request = self.layer['request']
         setRoles(self.portal, TEST_USER_ID, ['Manager'])
         self.portal.invokeFactory('Folder', id='folder')
         commit()
@@ -89,9 +88,9 @@ class SolrMaintenanceTests(TestCase):
         result = connection.search(q='+UID:[* TO *]').read()
         self.assertEqual(numFound(result), 0)
         # ignore any generated logging output
-        self.response = self.portal.REQUEST.RESPONSE
+        self.response = self.request.RESPONSE
         self.write = self.response.write
-        self.response.write = lambda x: x
+        self.response.write = lambda x: x  # temporarily ignore output
         self.maintenance = self.portal.unrestrictedTraverse('solr-maintenance')
 
     def tearDown(self):
@@ -1163,7 +1162,7 @@ class SolrServerTests(TestCase):
                         'o': 'plone.app.querystring.operation.string.contains',
                         'v': 'News'}])
         results = news.queryCatalog()
-        self.assertEqual(sorted([(r.Title, r.path_string) for r in results]),
+        self.assertEqual(sorted([(r.Title(), r.getPath()) for r in results]),
                          [('News', '/plone/news/aggregator'),
                           ('NewsFolder', '/plone/news')])
 
@@ -1381,19 +1380,24 @@ class SolrServerTests(TestCase):
         self.assertRaises(Unauthorized, results[0].getObject)
 
     def testExcludeUserFromAllowedRolesAndUsers(self):
+        setRoles(self.portal, TEST_USER_ID, ['Manager'])
+        self.portal.invokeFactory('Folder', id='test_user_1_', title='')
+        setRoles(self.portal, TEST_USER_ID, [])
         self.maintenance.reindex()
         # first test the default of not removing the user
         results = self.portal.portal_catalog(use_solr=True)
-        self.assertEqual(len(results), 6)
+        self.assertEqual(len(results), 7)
         paths = [r.path_string for r in results]
-        self.assertTrue('/plone/Members/test_user_1_' in paths)
+        self.assertTrue('/plone/test_user_1_' in paths)
         # now we have it removed...
         self.config.exclude_user = True
         setRoles(self.portal, TEST_USER_ID, [])
         results = self.portal.portal_catalog(use_solr=True)
-        self.assertEqual(len(results), 7)
+        self.assertEqual(len(results), 6)
         paths = [r.path_string for r in results]
-        self.assertFalse('/plone/Members/test_user_1_' in paths)
+        self.assertFalse('/plone/test_user_1_' in paths)
+        setRoles(self.portal, TEST_USER_ID, ['Manager'])
+        del self.portal['test_user_1_']
 
     def testCleanup_removed(self):
         self.maintenance.reindex()
