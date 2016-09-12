@@ -7,6 +7,7 @@ from collective.solr.exceptions import SolrConnectionException
 from collective.solr.testing import activateAndReindex
 from collective.solr.testing import LEGACY_COLLECTIVE_SOLR_INTEGRATION_TESTING
 from collective.solr.utils import activate
+from plone import api
 from plone.app.testing import TEST_USER_ID
 from plone.app.testing import setRoles
 from unittest import TestCase
@@ -30,6 +31,21 @@ class SolrFacettingTests(TestCase):
         self.request.RESPONSE.write = self.write
         activate(active=False)
 
+    def _create_uf(self):
+        setRoles(self.portal, TEST_USER_ID, ['Manager'])
+        if 'Members' not in self.portal:
+            mf = api.content.create(self.portal, 'Folder', id='Members')
+        else:
+            mf = self.portal['Members']
+        if TEST_USER_ID not in mf:
+            uf = api.content.create(mf, 'Folder', id=TEST_USER_ID)
+        else:
+            uf = mf[TEST_USER_ID]
+            api.content.transition(obj=mf, transition='hide')
+            api.content.transition(obj=uf, transition='hide')
+        self.maintenance.reindex()
+        setRoles(self.portal, TEST_USER_ID, [])
+
     def testFacettedSearchWithKeywordArguments(self):
         setRoles(self.portal, TEST_USER_ID, ['Manager'])
         self.portal.invokeFactory('Event', id='event1', title='Welcome')
@@ -48,10 +64,7 @@ class SolrFacettingTests(TestCase):
         self.assertEqual(types['Event'], 1)
 
     def testFacettedSearchWithRequestArguments(self):
-        setRoles(self.portal, TEST_USER_ID, ['Manager'])
-        self.portal.invokeFactory('Folder', id='test_user_1', title='')
-        self.maintenance.reindex()
-        setRoles(self.portal, TEST_USER_ID, [])
+        self._create_uf()
         self.request = self.layer['request']
         self.request.form['SearchableText'] = 'News'
         self.request.form['facet'] = 'true'
@@ -82,10 +95,7 @@ class SolrFacettingTests(TestCase):
         self.assertEqual(facets['review_state']['published'], 1)
 
     def testFacettedSearchWithFilterQuery(self):
-        setRoles(self.portal, TEST_USER_ID, ['Manager'])
-        self.portal.invokeFactory('Folder', id='test_user_1', title='')
-        self.maintenance.reindex()
-        setRoles(self.portal, TEST_USER_ID, [])
+        self._create_uf()
         self.request = self.layer['request']
         self.request.form['SearchableText'] = 'News'
         self.request.form['fq'] = 'portal_type:Collection'

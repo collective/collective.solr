@@ -19,6 +19,7 @@ from collective.solr.search import Search
 from collective.solr.solr import logger as logger_solr
 from collective.solr.testing import activateAndReindex
 from collective.solr.testing import HAS_LINGUAPLONE
+from collective.solr.testing import HAS_PAC
 from collective.solr.testing import LEGACY_COLLECTIVE_SOLR_FUNCTIONAL_TESTING
 from collective.solr.testing import set_attributes
 from collective.solr.tests.utils import numFound
@@ -55,6 +56,12 @@ DEFAULT_OBJS = [
      'portal_type': 'Folder', 'depth': 0},
     {'Title': 'NewsFolder', 'getId': 'news', 'Type': 'Folder',
      'portal_type': 'Folder', 'depth': 0}]
+if not HAS_PAC:
+    DEFAULT_OBJS.extend([
+        {'Title': 'test_user_1_', 'getId': 'test_user_1_', 'Type': 'Folder',
+         'portal_type': 'Folder', 'depth': 1},
+        {'Title': '', 'getId': 'Members', 'Type': 'Folder',
+         'portal_type': 'Folder', 'depth': 0}])
 
 
 class RaisingAdder(DefaultAdder):
@@ -169,17 +176,17 @@ class SolrMaintenanceTests(TestCase):
         self.maintenance.clear()
 
         self.maintenance.reindex(only_portal_types=['Folder'])
-        self.assertEqual(numFound(self.search()), 3)
+        self.assertEqual(numFound(self.search()), len(DEFAULT_OBJS)-3)
         self.maintenance.clear()
 
         self.maintenance.reindex(only_portal_types=['Folder', 'Collection'])
-        self.assertEqual(numFound(self.search()), 5)
+        self.assertEqual(numFound(self.search()), len(DEFAULT_OBJS)-1)
         self.maintenance.clear()
 
         self.maintenance.reindex(
             only_portal_types=['Folder', 'Collection', 'NotExistingPortalType']
         )
-        self.assertEqual(numFound(self.search()), 5)
+        self.assertEqual(numFound(self.search()), len(DEFAULT_OBJS)-1)
         self.maintenance.clear()
 
         # then the ignore_portal_types
@@ -363,21 +370,21 @@ class SolrMaintenanceTests(TestCase):
         self.assertEqual(log, [])
         # let's also reset the timeout and check the results...
         config.index_timeout = None
-        self.assertEqual(numFound(self.search()), 6)
+        self.assertEqual(numFound(self.search()), len(DEFAULT_OBJS))
 
     def test_sync(self):
         search = self.portal.portal_catalog.unrestrictedSearchResults
         items = dict([(b.UID, b.modified) for b in search()])
-        self.assertEqual(len(items), 6)
+        self.assertEqual(len(items), len(DEFAULT_OBJS))
         self.assertEqual(numFound(self.search()), 0)
         self.maintenance.sync()
         found, counts = self.counts()
-        self.assertEqual(found, 6)
+        self.assertEqual(found, len(DEFAULT_OBJS))
 
     def test_sync_update(self):
         self.maintenance.sync()
         found, counts = self.counts()
-        self.assertEqual(found, 6)
+        self.assertEqual(found, len(DEFAULT_OBJS))
         # after a network outage some items might need (re|un)indexing...
         activate(active=False)
         setRoles(self.portal, TEST_USER_ID, ['Manager'])
@@ -390,7 +397,7 @@ class SolrMaintenanceTests(TestCase):
         activate(active=True)
         self.maintenance.sync()
         response = SolrResponse(self.search())
-        self.assertEqual(len(response), 4)
+        self.assertEqual(len(response), len(DEFAULT_OBJS)-2)
         results = response.results()
         news_uid = self.portal.news.UID()
         news_result = [r for r in results if r['UID'] == news_uid][0]
@@ -514,7 +521,7 @@ class SolrServerTests(TestCase):
         fields.remove('getRemoteUrl')
         # remove _version_ field
         fields.remove('_version_')
-        if api.env.plone_version() >= '5.0':
+        if HAS_PAC:
             # remove getIcon which is defined for Plone 5 only
             fields.remove('getIcon')
             # remove searchwords which is defined for Plone 5 only
@@ -818,8 +825,14 @@ class SolrServerTests(TestCase):
                           '/plone/news/folder'])
         self.assertEqual(search(path={'query': '/plone/news', 'depth': 0}),
                          ['/plone/news'])
+
+        expected = ['/plone/events',
+                    '/plone/front-page',
+                    '/plone/news']
+        if not HAS_PAC:
+            expected.insert(0, '/plone/Members')
         self.assertEqual(search(path={'query': '/plone', 'depth': 1}),
-                         ['/plone/events', '/plone/front-page', '/plone/news'])
+                         expected)
 
     def testMultiplePathSearches(self):
         self.maintenance.reindex()
@@ -862,13 +875,16 @@ class SolrServerTests(TestCase):
         # depth 1 doesn't return level 0 objs, see ZCatalog
         self.assertEqual(search(path, depth=1), ['/plone/news/aggregator',
                                                  '/plone/news/folder'])
+        expected = ['/plone/events',
+                    '/plone/front-page',
+                    '/plone/news',
+                    '/plone/news/aggregator',
+                    '/plone/news/folder']
+        if not HAS_PAC:
+            expected.insert(0, '/plone/Members')
         self.assertEqual(search(['/plone/news',
                                  '/plone'],
-                                depth=1), ['/plone/events',
-                                           '/plone/front-page',
-                                           '/plone/news',
-                                           '/plone/news/aggregator',
-                                           '/plone/news/folder'])
+                                depth=1), expected)
 
     def testLogicalOperators(self):
         self.portal.news.setSubject(['News'])
@@ -894,7 +910,7 @@ class SolrServerTests(TestCase):
         self.maintenance.reindex()
         request = dict(SearchableText='[* TO *]')
         results = solrSearchResults(request, is_folderish=True)
-        self.assertEqual(len(results), 3)
+        self.assertEqual(len(results), len(DEFAULT_OBJS)-3)
         self.assertFalse('/plone/front-page' in [r.path_string
                                                  for r in results])
         results = solrSearchResults(request, is_folderish=False)
@@ -904,21 +920,29 @@ class SolrServerTests(TestCase):
                           '/plone/news/aggregator'])
 
     def testSearchSecurity(self):
+        wf_tool = api.portal.get_tool('portal_workflow')
         setRoles(self.portal, TEST_USER_ID, ['Manager'])
-        wfAction = self.portal.portal_workflow.doActionFor
-        wfAction(self.portal.news, 'retract')
-        wfAction(self.portal.news.folder, 'retract')
+        wfAction = wf_tool.doActionFor
+        wf_tool.setChainForPortalTypes(('Folder', 'Collection'),
+                                       'simple_publication_workflow')
+        if HAS_PAC:
+            wfAction(self.portal.news, 'retract')
+            wfAction(self.portal.news.folder, 'retract')
+            wfAction(self.portal.events, 'retract')
         wfAction(self.portal.news.aggregator, 'retract')
-        wfAction(self.portal.events, 'retract')
         wfAction(self.portal.events.aggregator, 'retract')
+        wf_tool.updateRoleMappings()
         self.maintenance.reindex()
         request = dict(SearchableText='[* TO *]')
         results = self.portal.portal_catalog(request)
         self.assertEqual(len(results), len(DEFAULT_OBJS))
         setRoles(self.portal, TEST_USER_ID, [])
         results = self.portal.portal_catalog(request)
-        self.assertEqual(sorted([r.path_string for r in results]),
-                         ['/plone/front-page'])
+        expected = ['/plone/front-page']
+        if not HAS_PAC:
+            expected.insert(0, '/plone/Members')
+            expected.insert(1, '/plone/Members/' + TEST_USER_ID)
+        self.assertEqual(sorted([r.path_string for r in results]), expected)
 
     def testEffectiveRange(self):
         setRoles(self.portal, TEST_USER_ID, ['Manager'])
@@ -955,21 +979,21 @@ class SolrServerTests(TestCase):
         paths = [r.path_string for r in results]
         self.assertTrue('/plone/news' in paths)
         self.assertFalse('/plone/events' in paths)
-        self.assertEqual(len(results), 5)
+        self.assertEqual(len(results), len(DEFAULT_OBJS)-1)
         # with a granularity of 5 minutes the news item isn't effective yet
         self.config.effective_steps = 300
         results = self.portal.portal_catalog(request)
         paths = [r.path_string for r in results]
         self.assertFalse('/plone/news' in paths)
         self.assertFalse('/plone/events' in paths)
-        self.assertEqual(len(results), 4)
+        self.assertEqual(len(results), len(DEFAULT_OBJS)-2)
         # with 15 minutes the event hasn't expired yet, though
         self.config.effective_steps = 900
         results = self.portal.portal_catalog(request)
         paths = [r.path_string for r in results]
         self.assertFalse('/plone/news' in paths)
         self.assertTrue('/plone/events' in paths)
-        self.assertEqual(len(results), 5)
+        self.assertEqual(len(results), len(DEFAULT_OBJS)-1)
 
     def testNoAutoCommitIndexing(self):
         connection = getUtility(ISolrConnectionManager).getConnection()
@@ -1162,9 +1186,11 @@ class SolrServerTests(TestCase):
                         'o': 'plone.app.querystring.operation.string.contains',
                         'v': 'News'}])
         results = news.queryCatalog()
-        self.assertEqual(sorted([(r.Title(), r.getPath()) for r in results]),
-                         [('News', '/plone/news/aggregator'),
-                          ('NewsFolder', '/plone/news')])
+        self.assertEqual(sorted([
+            (callable(r.Title) and r.Title() or r.Title, r.getPath())
+            for r in results]),
+            [('News', '/plone/news/aggregator'),
+             ('NewsFolder', '/plone/news')])
 
     def testSearchDateRange(self):
         self.maintenance.reindex()
@@ -1380,24 +1406,24 @@ class SolrServerTests(TestCase):
         self.assertRaises(Unauthorized, results[0].getObject)
 
     def testExcludeUserFromAllowedRolesAndUsers(self):
-        setRoles(self.portal, TEST_USER_ID, ['Manager'])
-        self.portal.invokeFactory('Folder', id='test_user_1_', title='')
-        setRoles(self.portal, TEST_USER_ID, [])
+        login(self.portal, 'user1')
+        self.portal.invokeFactory('Document', id='doc', title='Foo')
+        login(self.portal, TEST_USER_NAME)
         self.maintenance.reindex()
         # first test the default of not removing the user
         results = self.portal.portal_catalog(use_solr=True)
-        self.assertEqual(len(results), 7)
+        self.assertEqual(len(results), len(DEFAULT_OBJS)+1)
         paths = [r.path_string for r in results]
-        self.assertTrue('/plone/test_user_1_' in paths)
+        self.assertTrue('/plone/doc' in paths)
         # now we have it removed...
         self.config.exclude_user = True
         setRoles(self.portal, TEST_USER_ID, [])
         results = self.portal.portal_catalog(use_solr=True)
-        self.assertEqual(len(results), 6)
+        self.assertEqual(len(results), len(DEFAULT_OBJS))
         paths = [r.path_string for r in results]
-        self.assertFalse('/plone/test_user_1_' in paths)
+        self.assertFalse('/plone/doc' in paths)
         setRoles(self.portal, TEST_USER_ID, ['Manager'])
-        del self.portal['test_user_1_']
+        del self.portal['doc']
 
     def testCleanup_removed(self):
         self.maintenance.reindex()

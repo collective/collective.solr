@@ -37,8 +37,9 @@ content:
 Then we start searching: the first time around things are fine:
 
   >>> browser.open('http://nohost/plone')
+  >>> form = browser.getForm(name='searchform', index=0)
   >>> browser.getControl(name='SearchableText', index=0).value = 'Welcome'
-  >>> browser.getControl('Search', index=0).click()
+  >>> form.submit()
   >>> browser.contents
   '...Search results...1...items matching your search terms...
    ...http://nohost/plone/front-page...Welcome to Plone...'
@@ -74,8 +75,9 @@ intended error message is returned and we can continue the test:
   >>> transaction.commit()
   >>> browser = Browser(layer['app'])
   >>> browser.open('http://nohost/plone/')
+  >>> form = browser.getForm(name='searchform', index=0)
   >>> browser.getControl(name='SearchableText', index=0).value = 'Welcome'
-  >>> browser.getControl('Search', index=0).click()
+  >>> form.submit()
 
 As a last thing we need to activate a monkey patch, which will make the
 publisher check for and render browser views registered for specific
@@ -110,9 +112,10 @@ timeout error is provoked:
 
 And try the search again:
 
-  >>> browser.getControl(name='SearchableText', index=0).value = 'Welcome'
+  >>> form = browser.getForm(name='searchform', index=0)
   >>> try:
-  ...     browser.getControl('Search', index=0).click()
+  ...     browser.getControl(name='SearchableText', index=0).value = 'Welcome'
+  ...     form.submit()
   ... except Exception:
   ...     pass
   >>> browser.contents
