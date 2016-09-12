@@ -325,7 +325,7 @@ class SolrMaintenanceTests(TestCase):
         # The object causing the exception will not be indexed
         maintenance = self.portal.unrestrictedTraverse('solr-maintenance')
         maintenance.reindex(ignore_exceptions=True)
-        self.assertEqual(numFound(self.search()), 8)
+        self.assertEqual(numFound(self.search()), len(DEFAULT_OBJS))
         # restore defaults
         if api.env.plone_version() >= '5.0':
             sm.unregisterAdapter(
