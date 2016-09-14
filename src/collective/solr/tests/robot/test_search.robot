@@ -127,6 +127,7 @@ Scenario: As anonymous user I can filter the test results by creation date
 # AND concatenation
 # OR concatenation
 # NOT expression
+# Wildcard search
 
 
 *** Keywords *****************************************************************
