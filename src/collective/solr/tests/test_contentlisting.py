@@ -8,6 +8,8 @@ from collective.solr.contentlisting import FlareContentListingObject
 from collective.solr.flare import PloneFlare
 from collective.solr.testing import LEGACY_COLLECTIVE_SOLR_INTEGRATION_TESTING
 
+from DateTime import DateTime
+
 
 class ContentListingTests(TestCase):
 
@@ -26,9 +28,9 @@ class ContentListingTests(TestCase):
             'Description': 'Flare Description',
             'Subject': 'Flare Subject',
             'Date': 'Flare Date',
-            'expires': '1.1.2099',
-            'created': '31.12.1969',
-            'modified': '27.07.2016',
+            'expires': DateTime('1.1.2099'),
+            'created': DateTime('31.12.1969'),
+            'modified': DateTime('27.07.2016'),
             'Language': 'de',
             'portal_type': 'NewsItem',
             'Type': 'Flare NewsItem',
@@ -90,17 +92,20 @@ class ContentListingTests(TestCase):
         self.assertEqual(self.flare.Date(), 'Flare Date')
 
     def test_CreationDate(self):
-        self.assertEqual(self.flare.CreationDate(), '31.12.1969')
+        self.assertEqual(self.flare.CreationDate().ISO(),
+                         '1969-12-31T00:00:00')
 
     def test_EffectiveDate(self):
         self.assertEqual(self.flare.EffectiveDate(),
                          self.layer['portal']['news'].EffectiveDate())
 
     def test_ExpirationDate(self):
-        self.assertEqual(self.flare.ExpirationDate(), '1.1.2099')
+        self.assertEqual(self.flare.ExpirationDate().ISO(),
+                         '2099-01-01T00:00:00')
 
     def test_ModificationDate(self):
-        self.assertEqual(self.flare.ModificationDate(), '27.07.2016')
+        self.assertEqual(self.flare.ModificationDate().ISO(),
+                         '2016-07-27T00:00:00')
 
     def test_Format(self):
         self.assertRaises(NotImplementedError, self.flare.Format)
@@ -141,3 +146,11 @@ class ContentListingTests(TestCase):
 
     def test_CroppedDescription(self):
         self.assertEqual(self.flare.CroppedDescription(), 'Flare Description')
+
+    def test_pretty_title(self):
+        self.assertEqual(self.flare.flare.pretty_title_or_id(),
+                         'Flare Title')
+
+    def test_creation_date(self):
+        self.assertTrue(
+            self.flare.flare.CreationDate.startswith('1969-12-31T'))

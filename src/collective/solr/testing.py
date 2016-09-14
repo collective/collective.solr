@@ -4,10 +4,10 @@ from collective.solr.utils import activate
 from plone.app.robotframework.testing import REMOTE_LIBRARY_BUNDLE_FIXTURE
 from plone.app.testing import FunctionalTesting
 from plone.app.testing import IntegrationTesting
-try:
+try:  # pragma: no cover
     from plone.app.contenttypes.testing import PLONE_APP_CONTENTTYPES_FIXTURE as PLONE_FIXTURE  # noqa
     HAS_PAC = True
-except ImportError:
+except ImportError:  # pragma: no cover
     from plone.app.testing.bbb import PTC_FIXTURE as PLONE_FIXTURE
     HAS_PAC = False
 from plone.app.testing import PloneSandboxLayer
@@ -31,10 +31,10 @@ import pkg_resources
 
 BIN_DIR = os.path.dirname(os.path.realpath(sys.argv[0]))
 
-try:
+try:   # pragma: no cover
     pkg_resources.get_distribution('Products.LinguaPlone')
     HAS_LINGUAPLONE = True
-except pkg_resources.DistributionNotFound:
+except pkg_resources.DistributionNotFound:  # pragma: no cover
     HAS_LINGUAPLONE = False
 
 
@@ -270,7 +270,7 @@ class CollectiveSolrMockRegistryLayer(Layer):
         pass
 
 
-def set_attributes(context, values):
+def set_attributes(context, values):  # pragma: no cover
     if HAS_PAC:
         for key, value in values.iteritems():
             setattr(context, key, value)
