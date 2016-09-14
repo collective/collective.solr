@@ -149,6 +149,24 @@ class SuggestTermsViewIntegrationTest(unittest.TestCase):
         )
 
 
+class AutoCompleteTest(unittest.TestCase):
+
+    layer = LEGACY_COLLECTIVE_SOLR_INTEGRATION_TESTING
+
+    def setUp(self):
+        self.portal = self.layer['portal']
+        self.request = self.layer['request']
+
+    def test_autocomplete_noterm(self):
+        ac = self.portal.restrictedTraverse('solr-autocomplete')
+        self.assertEqual(json.loads(ac()), [])
+
+    def test_autocomplete_emptyterm(self):
+        self.request.form['term'] = ''
+        ac = self.portal.restrictedTraverse('solr-autocomplete')
+        self.assertEqual(json.loads(ac()), [])
+
+
 class TestErrorView(unittest.TestCase):
 
     def test_error_view(self):
