@@ -1,13 +1,21 @@
 Changelog
 =========
 
-5.0.4 (unreleased)
+6.0 (unreleased)
 ------------------
 
 - New flag: Ignore exceptions that occur during reindexing. 
   Ignoring exceptions becomes the default when running solr_reindex.
   [tschorr]
 
+- Boost script now available via control panel
+  [tomgross]
+
+- Plone 5 compatibility
+  [timo,gforcada,tomgross]
+
+- New ReactJS based search UI
+  [timo]
 
 5.0.3 (2016-06-05)
 ------------------
