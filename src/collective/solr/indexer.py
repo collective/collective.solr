@@ -13,9 +13,9 @@ from ZODB.POSException import ConflictError
 from Products.CMFCore.utils import getToolByName
 from Products.CMFCore.CMFCatalogAware import CMFCatalogAware
 from Products.Archetypes.CatalogMultiplex import CatalogMultiplex
-try:
+try:   # pragma: no cover
     from plone.app.content.interfaces import IIndexableObjectWrapper
-except ImportError:
+except ImportError:  # pragma: no cover
     # Plone 5
     from plone.indexer.interfaces import IIndexableObjectWrapper
 from plone.indexer.interfaces import IIndexableObject
