@@ -31,6 +31,7 @@ from plone.app.testing import TEST_USER_ID
 from plone.app.testing import TEST_USER_NAME
 from plone.app.testing import login
 from plone.app.testing import setRoles
+from plone.namedfile.file import NamedBlobFile
 from re import split
 from time import sleep
 from transaction import abort
@@ -265,58 +266,31 @@ class SolrMaintenanceTests(TestCase):
         """
         self.folder.invokeFactory('Image', id='dull', title='foo',
                                   description='the bar is missing here')
-        # XXX results for Plone 4.x and Plone 5.0.x maybe should be the same
-        if api.env.plone_version() >= '5.0':
-            self.assertEqual(
-                queryAdapter(
-                    self.folder,
-                    ISolrAddHandler,
-                    name='Folder'),
-                None)
-            self.assertEqual(
-                queryAdapter(
-                    self.portal['front-page'],
-                    ISolrAddHandler,
-                    name='Document'),
-                None)
-            self.assertEqual(
-                queryAdapter(
-                    self.folder.dull,
-                    ISolrAddHandler,
-                    name='Image'),
-                None)
-        else:
-            self.assertEqual(
-                queryAdapter(self.folder, ISolrAddHandler, name='Folder'),
-                None)
-            self.assertEqual(
-                queryAdapter(
-                    self.portal['front-page'],
-                    ISolrAddHandler,
-                    name='Document'),
-                None)
-            self.assertEqual(
-                type(
-                    queryAdapter(
-                        self.folder.dull,
-                        ISolrAddHandler,
-                        name='Image')),
-                BinaryAdder)
+        self.assertEqual(
+            queryAdapter(self.folder, ISolrAddHandler, name='Folder'),
+            None)
+        self.assertEqual(
+            queryAdapter(self.portal['front-page'], ISolrAddHandler,
+                         name='Document'),
+            None)
+        self.assertTrue(isinstance(
+            queryAdapter(self.folder.dull, ISolrAddHandler, name='Image'),
+            BinaryAdder))
 
     def testReindexIgnoreExceptions(self):
+        self.folder.invokeFactory('Image', id='dull', title='foo',
+                                  description='the bar is missing here')
         sm = self.portal.getSiteManager()
         if api.env.plone_version() >= '5.0':
             from plone.app.contenttypes.interfaces import IImage
-            sm.registerAdapter(RaisingAdder, required=(IImage,), name='Image')
+            iface = IImage
         else:
-            sm.registerAdapter(
-                RaisingAdder,
-                required=(IBaseObject,),
-                name='Image')
+            iface = IBaseObject
+        sm.registerAdapter(RaisingAdder,
+                           required=(iface,),
+                           name='Image')
         # ignore_exceptions=False should raise the handler's exception,
         # thereby aborting the reindex tx
-        self.folder.invokeFactory('Image', id='dull', title='foo',
-                                  description='the bar is missing here')
         maintenance = self.portal.unrestrictedTraverse('solr-maintenance')
         self.assertRaises(Exception,
                           maintenance.reindex,
@@ -327,16 +301,9 @@ class SolrMaintenanceTests(TestCase):
         maintenance.reindex(ignore_exceptions=True)
         self.assertEqual(numFound(self.search()), len(DEFAULT_OBJS))
         # restore defaults
-        if api.env.plone_version() >= '5.0':
-            sm.unregisterAdapter(
-                RaisingAdder,
-                required=(IImage,),
-                name='Image')
-        else:
-            sm.registerAdapter(
-                BinaryAdder,
-                required=(IBaseObject,),
-                name='Image')
+        sm.unregisterAdapter(RaisingAdder,
+                             required=(iface,),
+                             name='Image')
 
     def testDisabledTimeoutDuringReindex(self):
         log = []
@@ -619,8 +586,13 @@ class SolrServerTests(TestCase):
         logger_indexer.exception = logger
         logger_solr.exception = logger
         # some control characters make solr choke, for example a form feed
-        self.folder.invokeFactory('File', 'foo', title='some text',
-                                  file='page 1 \f page 2 \a')
+        self.folder.invokeFactory('File', 'foo', title='some text')
+        data = 'page 1 \f page 2 \a'
+        if api.env.plone_version() >= '5.0':
+            self.folder.foo.file = NamedBlobFile(data=data,
+                                                 filename=u'file.pdf')
+        else:
+            self.folder.foo.file = data
         commit()                        # indexing happens on commit
         # make sure the file was indexed okay...
         self.assertEqual(log, [])

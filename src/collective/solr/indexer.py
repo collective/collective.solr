@@ -13,7 +13,6 @@ from ZODB.POSException import ConflictError
 from Products.CMFCore.utils import getToolByName
 from Products.CMFCore.CMFCatalogAware import CMFCatalogAware
 from Products.Archetypes.CatalogMultiplex import CatalogMultiplex
-from Products.Archetypes.interfaces import IBaseObject
 try:
     from plone.app.content.interfaces import IIndexableObjectWrapper
 except ImportError:
@@ -101,7 +100,6 @@ class DefaultAdder(object):
     """
 
     implements(ISolrAddHandler)
-    adapts(IBaseObject)
 
     def __init__(self, context):
         self.context = context
@@ -117,9 +115,12 @@ class BinaryAdder(DefaultAdder):
     """ Add binary content to index via tika
     """
 
-    def getpath(self):
+    def getblob(self):
         field = self.context.getPrimaryField()
-        blob = field.get(self.context).blob
+        return field.get(self.context).blob
+
+    def getpath(self):
+        blob = self.getblob()
         try:
             path = blob.committed()
         except BlobError:
@@ -147,6 +148,20 @@ class BinaryAdder(DefaultAdder):
             logger.warn('Error %s @ %s', e, data['path_string'])
             data['SearchableText'] = ''
         super(BinaryAdder, self).__call__(conn, **data)
+
+
+class DXFileBinaryAdder(BinaryAdder):
+
+    fieldname = 'file'
+
+    def getblob(self):
+        field = getattr(self.context, self.fieldname, None)
+        return field._blob
+
+
+class DXImageBinaryAdder(DXFileBinaryAdder):
+
+    fieldname = 'image'
 
 
 def boost_values(obj, data):
