@@ -121,6 +121,8 @@ class BinaryAdder(DefaultAdder):
 
     def getpath(self):
         blob = self.getblob()
+        if blob is None:
+            return None
         try:
             path = blob.committed()
         except BlobError:
@@ -130,6 +132,9 @@ class BinaryAdder(DefaultAdder):
 
     def __call__(self, conn, **data):
         postdata = {}
+        path = self.getpath()
+        if path is None:
+            super(BinaryAdder, self).__call__(conn, **data)
         postdata['stream.file'] = self.getpath()
         postdata['stream.contentType'] = data.get(
             'content_type',
@@ -156,7 +161,7 @@ class DXFileBinaryAdder(BinaryAdder):
 
     def getblob(self):
         field = getattr(self.context, self.fieldname, None)
-        return field._blob
+        return getattr(field, '_blob', None)
 
 
 class DXImageBinaryAdder(DXFileBinaryAdder):
