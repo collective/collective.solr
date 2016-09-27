@@ -26,7 +26,6 @@
 Resource  plone/app/robotframework/selenium.robot
 Resource  plone/app/robotframework/keywords.robot
 #Resource  Products/CMFPlone/tests/robot/keywords.robot
-Variables  variables.py
 
 Library  Remote  ${PLONE_URL}/RobotRemote
 Library  DateTime
@@ -98,7 +97,6 @@ Scenario: As anonymous user I can filter the test results by portal type
     and a public folder with the title 'Colorless Green Folders'
     and an anonymous user
    When I search for 'colorless green'
-    and We are not on Plone 4
     and I filter the search by portal type 'Folder'
     Then the search returns '1' results
     and the search results should include 'Colorless Green Folders'
@@ -110,7 +108,6 @@ Scenario: As anonymous user I can filter the test results by creation date
     and a public document with the title 'Colorless Green Old Ideas' created last week
     and an anonymous user
    When I search for 'colorless green'
-    and We are not on Plone 4
     and I filter the search by creation date 'yesterday'
     Then the search returns '1' results
     and the search results should not include 'Colorless Green Old Ideas'
@@ -188,9 +185,6 @@ an anonymous user
 I search for '${searchterm}'
   Go to  ${PLONE_URL}/@@search
   Input text  xpath=//div[@id='searchform']//input[@name='SearchableText']  ${searchterm}
-
-We are not on Plone 4
-  Pass Execution If  ${IS_PLONE4}  Skipping Test in Plone 4.3
 
 I filter the search by portal type '${portal_type}'
   Click Button  xpath=//button[@id='search-filter-toggle']
