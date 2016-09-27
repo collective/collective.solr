@@ -1,6 +1,5 @@
 <configure
     xmlns="http://namespaces.zope.org/zope"
-    xmlns:cmf="http://namespaces.zope.org/cmf"
     xmlns:five="http://namespaces.zope.org/five"
     xmlns:zcml="http://namespaces.zope.org/zcml"
     xmlns:browser="http://namespaces.zope.org/browser"
@@ -24,8 +23,6 @@
   <include file="profiles.zcml" />
   <include file="upgrades.zcml" />
 
-  <cmf:registerDirectory name="solr_site_search" />
-
   <utility
     factory=".search.Search"
     provides=".interfaces.ISearch" />
@@ -42,20 +39,44 @@
         factory=".dispatcher.SearchDispatcher" />
 
 
-    <adapter
-        factory=".indexer.DefaultAdder"
-        name="default"
-        />
+    <configure zcml:condition="installed Products.Archetypes">
+      <adapter
+	  factory=".indexer.DefaultAdder"
+	  for="Products.Archetypes.interfaces.IBaseObject"
+	  name="default"
+	  />
 
-    <adapter
-        factory=".indexer.BinaryAdder"
-        name="File"
-        />
+      <adapter
+	  factory=".indexer.BinaryAdder"
+	  for="Products.Archetypes.interfaces.IBaseObject"
+	  name="File"
+	  />
 
-    <adapter
-        factory=".indexer.BinaryAdder"
-        name="Image"
-        />
+      <adapter
+	  factory=".indexer.BinaryAdder"
+	  for="Products.Archetypes.interfaces.IBaseObject"
+	  name="Image"
+	  />
+    </configure>
+    <configure zcml:condition="installed plone.dexterity">
+      <adapter
+	  factory=".indexer.DefaultAdder"
+	  for="plone.dexterity.interfaces.IDexterityContent"
+	  name="default"
+	  />
+
+      <adapter
+	  factory=".indexer.DXFileBinaryAdder"
+	  for="plone.dexterity.interfaces.IDexterityContent"
+	  name="File"
+	  />
+
+      <adapter
+	  factory=".indexer.DXImageBinaryAdder"
+	  for="plone.dexterity.interfaces.IDexterityContent"
+	  name="Image"
+	  />
+    </configure>
 
     <adapter
         factory=".indexer.BaseIndexable" />
@@ -115,10 +136,9 @@
     factory="collective.solr.serializer.SolrFlareSerializer"
     />
 
-  <plone:static
-    directory="static"
-    type="plone"
-    name="collective.solr"
+  <browser:resourceDirectory
+    name="collective.solr.static"
+    directory="static" 
     />
 
 </configure>

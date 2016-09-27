@@ -4,18 +4,16 @@ from collective.solr.utils import activate
 from plone.app.robotframework.testing import REMOTE_LIBRARY_BUNDLE_FIXTURE
 from plone.app.testing import FunctionalTesting
 from plone.app.testing import IntegrationTesting
-try:
+try:  # pragma: no cover
     from plone.app.contenttypes.testing import PLONE_APP_CONTENTTYPES_FIXTURE as PLONE_FIXTURE  # noqa
     HAS_PAC = True
-except ImportError:
-    from plone.app.testing import PLONE_FIXTURE
+except ImportError:  # pragma: no cover
+    from plone.app.testing.bbb import PTC_FIXTURE as PLONE_FIXTURE
     HAS_PAC = False
 from plone.app.testing import PloneSandboxLayer
-from plone.app.testing import TEST_USER_ID
 from plone.app.testing import TEST_USER_NAME
 from plone.app.testing import applyProfile
 from plone.app.testing import login
-from plone.app.testing import setRoles
 from plone.registry.interfaces import IRegistry
 from plone.testing import Layer
 from plone.testing import z2
@@ -33,10 +31,10 @@ import pkg_resources
 
 BIN_DIR = os.path.dirname(os.path.realpath(sys.argv[0]))
 
-try:
+try:   # pragma: no cover
     pkg_resources.get_distribution('Products.LinguaPlone')
     HAS_LINGUAPLONE = True
-except pkg_resources.DistributionNotFound:
+except pkg_resources.DistributionNotFound:  # pragma: no cover
     HAS_LINGUAPLONE = False
 
 
@@ -146,7 +144,7 @@ class CollectiveSolrLayer(PloneSandboxLayer):
 
     def setUpPloneSite(self, portal):
         self.solr_layer.setUp()
-        applyProfile(portal, 'collective.solr:search')
+        applyProfile(portal, 'collective.solr:default')
         set_registry_record('collective.solr.active', self.solr_active)
         set_registry_record('collective.solr.port', self.solr_port)
         set_registry_record('collective.solr.base', self.solr_base)
@@ -167,7 +165,6 @@ class LegacyCollectiveSolrLayer(CollectiveSolrLayer):
         login(portal, 'user1')
         portal.portal_workflow.setDefaultChain('simple_publication_workflow')
         wfAction = portal.portal_workflow.doActionFor
-        portal.invokeFactory('Folder', id='Members', title='Users')
         portal.invokeFactory('Document', id='front-page',
                              title='Welcome to Plone')
         portal.invokeFactory('Folder', id='events', title='EventsFolder')
@@ -175,16 +172,12 @@ class LegacyCollectiveSolrLayer(CollectiveSolrLayer):
         portal.news.invokeFactory('Collection', id='aggregator', title='News')
         portal.events.invokeFactory('Collection', id='aggregator',
                                     title='Events')
-        wfAction(portal.Members, 'publish')
         wfAction(portal['front-page'], 'publish')
         wfAction(portal.events, 'publish')
         wfAction(portal.news, 'publish')
         wfAction(portal.news.aggregator, 'publish')
         wfAction(portal.events.aggregator, 'publish')
         login(portal, TEST_USER_NAME)
-        setRoles(portal, TEST_USER_ID, ['Manager'])
-        portal.Members.invokeFactory('Folder', id='test_user_1_', title='')
-        setRoles(portal, TEST_USER_ID, [])
 
 LEGACY_COLLECTIVE_SOLR_FIXTURE = LegacyCollectiveSolrLayer()
 
@@ -224,6 +217,7 @@ class CollectiveSolrMockRegistry(object):
         self.exclude_user = False
         self.field_list = []
         self.atomic_updates = False
+        self.boost_script = u''
 
     def __getitem__(self, name):
         name_parts = name.split('.')
@@ -276,7 +270,7 @@ class CollectiveSolrMockRegistryLayer(Layer):
         pass
 
 
-def set_attributes(context, values):
+def set_attributes(context, values):  # pragma: no cover
     if HAS_PAC:
         for key, value in values.iteritems():
             setattr(context, key, value)

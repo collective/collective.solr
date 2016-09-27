@@ -7,14 +7,13 @@ from collective.solr.interfaces import ISolrConnectionManager
 from collective.solr.interfaces import ISolrIndexQueueProcessor
 from collective.solr.interfaces import IZCMLSolrConnectionConfig
 from collective.solr.mangler import mangleQuery
+from collective.solr.testing import HAS_PAC
 from collective.solr.testing import LEGACY_COLLECTIVE_SOLR_FUNCTIONAL_TESTING
 from collective.solr.tests.utils import fakehttp
 from collective.solr.tests.utils import getData
 from collective.solr.utils import getConfig
-from plone import api
 from plone.app.testing import TEST_USER_ID
 from plone.app.testing import setRoles
-# from plone import api
 # from socket import error
 # from socket import timeout
 # from time import sleep
@@ -152,10 +151,6 @@ class SiteSearchTests(TestCase):
         # actual solr search...
         queryUtility(ISolrConnectionManager).setHost(active=False)
 
-    def testSkinSetup(self):
-        skins = self.portal.portal_skins.objectIds()
-        self.assertTrue('solr_site_search' in skins, 'no solr skin?')
-
     def testInactiveException(self):
         search = queryUtility(ISearch)
         self.assertRaises(SolrInactiveException, search, 'foo')
@@ -238,7 +233,7 @@ class SiteSetupTests(TestCase):
     def setUp(self):
         self.portal = self.layer['portal']
 
-    @unittest.skipIf(api.env.plone_version() >= '5.0', 'Plone 4 Only')
+    @unittest.skipIf(HAS_PAC, 'Plone 4 Only')
     def testBrowserResourcesPlone4(self):
         cssreg = getToolByName(self.portal, "portal_css")
         self.assertTrue(

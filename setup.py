@@ -76,6 +76,7 @@ setup(
         ],
         'test4': [
             'Products.LinguaPlone >=3.1a1',
+            'plone.app.robotframework[debug]',
             'plone.app.testing[robot]',
         ]
     },

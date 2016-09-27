@@ -93,6 +93,8 @@ def mangleSearchableText(value, config):
 def quotePath(path):
     """ quote overlap of solr reserved characters and those allowed
         in zope ids (see OFS.ObjectManager.bad_id) """
+    if path.endswith('/'):
+        path = path[:-1]
     for reserved in '/-~()':
         path = path.replace(reserved, '\\%s' % reserved)
     return '"%s"' % path

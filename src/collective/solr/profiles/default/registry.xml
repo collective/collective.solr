@@ -23,26 +23,7 @@
     <value key="filter_queries">
       <element>portal_type</element>
     </value>
+    <value key="boost_script"></value>
   </records>
-
-<!-- Disable the integration with the Plone RR
-  <records prefix="plone.resources/collective.solr"
-            interface='Products.CMFPlone.interfaces.IResourceRegistry'>
-      <value key="js">++plone++collective.solr/search.js</value>
-  </records>
-
-  <records prefix="plone.bundles/collective.solr"
-            interface='Products.CMFPlone.interfaces.IBundleRegistry'>
-    <value key="merge_with">default</value>
-    <value key="resources">
-      <element>collective.solr</element>
-    </value>
-    <value key="enabled">True</value>
-    <value key="jscompilation">++plone++collective.solr/search.min.js</value>
-    <value key="csscompilation">++plone++collective.solr/search.min.css</value>
-    <value key="last_compilation">2016-04-15 00:00:00</value>
-    <value key="compile">True</value>
-  </records>
- -->
 
 </registry>

@@ -4,8 +4,10 @@ from collective.solr.browser.facets import SearchFacetsView
 from collective.solr.browser.interfaces import IThemeSpecific
 from collective.solr.dispatcher import solrSearchResults
 from collective.solr.exceptions import SolrConnectionException
+from collective.solr.testing import activateAndReindex
 from collective.solr.testing import LEGACY_COLLECTIVE_SOLR_INTEGRATION_TESTING
 from collective.solr.utils import activate
+from plone import api
 from plone.app.testing import TEST_USER_ID
 from plone.app.testing import setRoles
 from unittest import TestCase
@@ -18,22 +20,31 @@ class SolrFacettingTests(TestCase):
 
     def setUp(self):
         self.portal = self.layer['portal']
-        self.app = self.layer['app']
-        self.portal.REQUEST.RESPONSE.write = lambda x: x    # ignore output
-        self.maintenance = \
-            self.portal.unrestrictedTraverse('@@solr-maintenance')
-        activate()
-        self.maintenance.clear()
-        self.maintenance.reindex()
-
-    def tearDown(self):
-        activate(active=False)
-
-    def afterSetUp(self):
+        self.request = self.layer['request']
+        activateAndReindex(self.portal)
+        response = self.request.RESPONSE
+        self.write = response.write
+        response.write = lambda x: x  # temporarily ignore output
         self.maintenance = self.portal.unrestrictedTraverse('solr-maintenance')
 
-    def beforeTearDown(self):
-        pass
+    def tearDown(self):
+        self.request.RESPONSE.write = self.write
+        activate(active=False)
+
+    def _create_uf(self):
+        setRoles(self.portal, TEST_USER_ID, ['Manager'])
+        if 'Members' not in self.portal:
+            mf = api.content.create(self.portal, 'Folder', id='Members')
+        else:
+            mf = self.portal['Members']
+        if TEST_USER_ID not in mf:
+            uf = api.content.create(mf, 'Folder', id=TEST_USER_ID)
+        else:
+            uf = mf[TEST_USER_ID]
+            api.content.transition(obj=mf, transition='hide')
+            api.content.transition(obj=uf, transition='hide')
+        self.maintenance.reindex()
+        setRoles(self.portal, TEST_USER_ID, [])
 
     def testFacettedSearchWithKeywordArguments(self):
         setRoles(self.portal, TEST_USER_ID, ['Manager'])
@@ -53,11 +64,12 @@ class SolrFacettingTests(TestCase):
         self.assertEqual(types['Event'], 1)
 
     def testFacettedSearchWithRequestArguments(self):
-        request = self.app.REQUEST
-        request.form['SearchableText'] = 'News'
-        request.form['facet'] = 'true'
-        request.form['facet_field'] = 'review_state'
-        results = solrSearchResults(request)
+        self._create_uf()
+        self.request = self.layer['request']
+        self.request.form['SearchableText'] = 'News'
+        self.request.form['facet'] = 'true'
+        self.request.form['facet_field'] = 'review_state'
+        results = solrSearchResults(self.request)
         self.assertEqual(
             sorted([r.path_string for r in results]),
             ['/plone/news', '/plone/news/aggregator']
@@ -83,12 +95,13 @@ class SolrFacettingTests(TestCase):
         self.assertEqual(facets['review_state']['published'], 1)
 
     def testFacettedSearchWithFilterQuery(self):
-        request = self.app.REQUEST
-        request.form['SearchableText'] = 'News'
-        request.form['fq'] = 'portal_type:Collection'
-        request.form['facet'] = 'true'
-        request.form['facet_field'] = 'review_state'
-        results = solrSearchResults(request)
+        self._create_uf()
+        self.request = self.layer['request']
+        self.request.form['SearchableText'] = 'News'
+        self.request.form['fq'] = 'portal_type:Collection'
+        self.request.form['facet'] = 'true'
+        self.request.form['facet_field'] = 'review_state'
+        results = solrSearchResults(self.request)
         self.assertEqual(
             [r.path_string for r in results],
             ['/plone/news/aggregator']
@@ -98,32 +111,30 @@ class SolrFacettingTests(TestCase):
 
     def testFacettedSearchWithDependencies(self):
         # facets depending on others should not show up initially
-        request = self.app.REQUEST
-        request.form['SearchableText'] = 'News'
-        request.form['facet'] = 'true'
-        request.form['facet_field'] = [
+        self.request.form['SearchableText'] = 'News'
+        self.request.form['facet'] = 'true'
+        self.request.form['facet_field'] = [
             'portal_type',
             'review_state:portal_type'
         ]
-        view = SearchFacetsView(self.portal, request)
-        view.kw = dict(results=solrSearchResults(request))
+        view = SearchFacetsView(self.portal, self.request)
+        view.kw = dict(results=solrSearchResults(self.request))
         facets = [facet['title'] for facet in view.facets()]
         self.assertEqual(facets, ['portal_type'])
         # now again with the required facet selected
-        request.form['fq'] = 'portal_type:Collection'
-        view.kw = dict(results=solrSearchResults(request))
+        self.request.form['fq'] = 'portal_type:Collection'
+        view.kw = dict(results=solrSearchResults(self.request))
         facets = [facet['title'] for facet in view.facets()]
         self.assertEqual(facets, ['portal_type', 'review_state'])
 
     def testFacettedSearchWithUnicodeFilterQuery(self):
         self.portal.news.portal_type = u'Føø'.encode('utf-8')
         self.maintenance.reindex()
-        request = self.app.REQUEST
-        request.form['SearchableText'] = 'News'
-        request.form['facet'] = 'true'
-        request.form['facet_field'] = 'portal_type'
-        view = SearchFacetsView(self.portal, request)
-        view.kw = dict(results=solrSearchResults(request))
+        self.request.form['SearchableText'] = 'News'
+        self.request.form['facet'] = 'true'
+        self.request.form['facet_field'] = 'portal_type'
+        view = SearchFacetsView(self.portal, self.request)
+        view.kw = dict(results=solrSearchResults(self.request))
         facets = view.facets()
         self.assertEqual(
             sorted([c['name'] for c in facets[0]['counts']]),
@@ -143,14 +154,14 @@ class SolrFacettingTests(TestCase):
         setRoles(self.portal, TEST_USER_ID, ['Manager'])
         self.portal.invokeFactory('Event', id='event1', title='Welcome')
         self.maintenance.reindex()
-        request = self.app.REQUEST
-        request.form['SearchableText'] = 'Welcome'
-        request.form['facet'] = 'true'
-        request.form['facet_field'] = 'portal_type'
-        alsoProvides(request, IThemeSpecific)
-        view = getMultiAdapter((self.portal, request), name='search-facets')
+        self.request.form['SearchableText'] = 'Welcome'
+        self.request.form['facet'] = 'true'
+        self.request.form['facet_field'] = 'portal_type'
+        alsoProvides(self.request, IThemeSpecific)
+        view = getMultiAdapter((self.portal, self.request),
+                               name='search-facets')
         view = view.__of__(self.portal)     # needed to traverse `view/`
-        results = solrSearchResults(request)
+        results = solrSearchResults(self.request)
         output = view(results=results)
         self.checkOrder(
             output,
@@ -163,8 +174,8 @@ class SolrFacettingTests(TestCase):
         )
 
     def testFacetFieldsInSearchBox(self):
-        request = self.portal.REQUEST
-        viewlet = SearchBox(self.portal, request, None, None)
+        self.request = self.portal.REQUEST
+        viewlet = SearchBox(self.portal, self.request, None, None)
         viewlet = viewlet.__of__(self.portal)   # needed to get security right
         viewlet.update()
         output = viewlet.render()
@@ -174,8 +185,8 @@ class SolrFacettingTests(TestCase):
             '<input', 'value="portal_type"',
             '<input', 'value="review_state"',
             '</form>')
-        # try overriding the desired facets in the request
-        request.form['facet.field'] = ['foo']
+        # try overriding the desired facets in the self.request
+        self.request.form['facet.field'] = ['foo']
         output = viewlet.render()
         self.checkOrder(
             output,
@@ -185,22 +196,22 @@ class SolrFacettingTests(TestCase):
         self.assertFalse('portal_type' in output)
 
     def testUnknownFacetField(self):
-        request = self.app.REQUEST
-        request.form['SearchableText'] = 'News'
-        request.form['facet'] = 'true'
-        request.form['facet_field'] = 'foo'
-        alsoProvides(request, IThemeSpecific)
-        self.assertRaises(SolrConnectionException, solrSearchResults, request)
+        self.request.form['SearchableText'] = 'News'
+        self.request.form['facet'] = 'true'
+        self.request.form['facet_field'] = 'foo'
+        alsoProvides(self.request, IThemeSpecific)
+        self.assertRaises(SolrConnectionException, solrSearchResults,
+                          self.request)
 
     def testNoFacetFields(self):
-        request = self.app.REQUEST
-        request.form['SearchableText'] = 'News'
-        request.form['facet'] = 'true'
-        request.form['facet_field'] = []
-        alsoProvides(request, IThemeSpecific)
-        view = getMultiAdapter((self.portal, request), name='search-facets')
+        self.request.form['SearchableText'] = 'News'
+        self.request.form['facet'] = 'true'
+        self.request.form['facet_field'] = []
+        alsoProvides(self.request, IThemeSpecific)
+        view = getMultiAdapter((self.portal, self.request),
+                               name='search-facets')
         view = view.__of__(self.portal)     # needed to traverse `view/`
-        output = view(results=solrSearchResults(request))
+        output = view(results=solrSearchResults(self.request))
         self.assertFalse('portal-searchfacets' in output, output)
 
     def testEmptyFacetValue(self):
@@ -210,14 +221,14 @@ class SolrFacettingTests(TestCase):
         self.portal.news.portal_type = ''
         self.maintenance.reindex()
         # after updating the solr index the view can be checked...
-        request = self.app.REQUEST
-        request.form['SearchableText'] = 'News'
-        request.form['facet'] = 'true'
-        request.form['facet_field'] = 'portal_type'
-        alsoProvides(request, IThemeSpecific)
-        view = getMultiAdapter((self.portal, request), name='search-facets')
+        self.request.form['SearchableText'] = 'News'
+        self.request.form['facet'] = 'true'
+        self.request.form['facet_field'] = 'portal_type'
+        alsoProvides(self.request, IThemeSpecific)
+        view = getMultiAdapter((self.portal, self.request),
+                               name='search-facets')
         view = view.__of__(self.portal)     # needed to traverse `view/`
-        results = solrSearchResults(request)
+        results = solrSearchResults(self.request)
         output = view(results=results)
         # the empty facet value should be displayed resulting in
         # only one list item (`<dd>`)
@@ -226,14 +237,14 @@ class SolrFacettingTests(TestCase):
         self.assertFalse('fq=portal_type%3A&amp;' in output)
 
     def testFacetOrder(self):
-        request = self.app.REQUEST
-        request.form['SearchableText'] = 'News'
-        request.form['facet'] = 'true'
-        request.form['facet_field'] = ['portal_type', 'review_state']
-        alsoProvides(request, IThemeSpecific)
-        view = getMultiAdapter((self.portal, request), name='search-facets')
+        self.request.form['SearchableText'] = 'News'
+        self.request.form['facet'] = 'true'
+        self.request.form['facet_field'] = ['portal_type', 'review_state']
+        alsoProvides(self.request, IThemeSpecific)
+        view = getMultiAdapter((self.portal, self.request),
+                               name='search-facets')
         view = view.__of__(self.portal)     # needed to traverse `view/`
-        results = solrSearchResults(request)
+        results = solrSearchResults(self.request)
         output = view(results=results)
         # the displayed facets should match the given order...
         self.checkOrder(
@@ -243,8 +254,8 @@ class SolrFacettingTests(TestCase):
             'Review state'
         )
         # let's also try the other way round...
-        request.form['facet_field'] = ['review_state', 'portal_type']
-        results = solrSearchResults(request)
+        self.request.form['facet_field'] = ['review_state', 'portal_type']
+        results = solrSearchResults(self.request)
         output = view(results=results)
         self.checkOrder(
             output,

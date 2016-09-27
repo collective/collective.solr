@@ -3,6 +3,7 @@ omit =
     /home/travis/buildout-cache/eggs/*
     lib/*
     src/collective/solr/tests/*
+    src/collective/solr/browser/p4_search.py
     /home/*/.buildout/eggs/*
     /usr/*
     bin/test
