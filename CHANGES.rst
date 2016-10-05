@@ -1,6 +1,12 @@
 Changelog
 =========
 
+6.0a1 (unreleased)
+------------------
+
+- Nothing changed yet.
+
+
 6.0.alpha0 (2016-10-05)
 -----------------------
 
