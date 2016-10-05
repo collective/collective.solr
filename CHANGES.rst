@@ -1,8 +1,8 @@
 Changelog
 =========
 
-6.0 (unreleased)
-------------------
+6.0.alpha0 (2016-10-05)
+-----------------------
 
 - New flag: Ignore exceptions that occur during reindexing. 
   Ignoring exceptions becomes the default when running solr_reindex.
