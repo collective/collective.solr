@@ -13,8 +13,8 @@ Changelog
 - Boost script now available via control panel
   [tomgross]
 
-- New flag: Ignore exceptions that occur during reindexing.
-  Ignoring exceptions becomes the default when running solr_reindex.
+- Add ignore_exceptions option for Solr reindex. This option is true by
+  default when running solr_reindex from the command line.
   [tschorr]
 
 
