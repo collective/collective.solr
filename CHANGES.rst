@@ -4,24 +4,19 @@ Changelog
 6.0a1 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Plone 5 compatibility
+  [timo, tomgross, sneridagh, gforcada]
 
-
-6.0.alpha0 (2016-10-05)
------------------------
-
-- New flag: Ignore exceptions that occur during reindexing. 
-  Ignoring exceptions becomes the default when running solr_reindex.
-  [tschorr]
+- New ReactJS based search UI
+  [timo, sneridagh]
 
 - Boost script now available via control panel
   [tomgross]
 
-- Plone 5 compatibility
-  [timo,gforcada,tomgross]
+- New flag: Ignore exceptions that occur during reindexing.
+  Ignoring exceptions becomes the default when running solr_reindex.
+  [tschorr]
 
-- New ReactJS based search UI
-  [timo]
 
 5.0.3 (2016-06-05)
 ------------------
