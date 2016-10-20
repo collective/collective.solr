@@ -4,7 +4,9 @@ Changelog
 6.0a2 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Remove experimental.lazycatalog monkey patch and let
+  SolrResponse inherit from ZCatalog Lazy class.
+  [tomgross]
 
 
 6.0a1 (2016-10-11)

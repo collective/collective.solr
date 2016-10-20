@@ -7,7 +7,6 @@ from collective.solr.interfaces import IFlare
 from collective.solr.interfaces import ISearch
 from collective.solr.interfaces import ISearchDispatcher
 from collective.solr.monkey import patchCatalogTool
-from collective.solr.monkey import patchLazy
 from collective.solr.parser import SolrResponse
 from collective.solr.utils import isActive
 from collective.solr.utils import padResults
@@ -22,7 +21,6 @@ from zope.component import getUtility
 from plone.registry.interfaces import IRegistry
 
 patchCatalogTool()  # patch catalog tool to use the dispatcher...
-patchLazy()  # ...as well as ZCatalog's Lazy class
 
 
 logger = getLogger('collective.solr.dispatcher')
