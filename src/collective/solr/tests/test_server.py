@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from Acquisition import aq_base
+from Acquisition import aq_parent
 from DateTime import DateTime
 from Missing import MV
 from Products.CMFCore.utils import getToolByName
@@ -552,6 +554,41 @@ class SolrServerTests(TestCase):
         commit()
         self.assertEqual(log, [])
         self.assertEqual(self.search('+Title:Foo').results().numFound, '1')
+
+    def testReindexPathIndex(self):
+        manager = getUtility(ISolrConnectionManager)
+        connection = manager.getConnection()
+        proc = SolrIndexProcessor(manager)
+        proc.reindex(self.folder)
+        proc.commit()
+        search = lambda query: numFound(connection.search(q=query).read())
+
+        self.assertEqual(search('+path_parents:\/plone\/news\/folder'), 1)
+
+        # Rename obj, without triggering any events.
+        parent = aq_parent(self.folder)
+        parent._delObject('folder', suppress_events=True)
+        ob = aq_base(self.folder)
+        ob._setId('new_id')
+        commit()
+
+        # No change in solr so far
+        self.assertEqual(search('+path_parents:\/plone\/news\/folder'), 1)
+
+        proc.reindex(self.folder, attributes=['path', ])
+        proc.commit()
+
+        # Crosscheck
+        self.assertEqual(search('+path_parents:\/plone\/news\/folder'), 0)
+
+        self.assertEqual(search('+path_parents:\/plone\/news\/new_id'), 1)
+
+        # Check path_string is also up to date
+        response = SolrResponse(
+            connection.search(q='+path_parents:\/plone\/news\/new_id'))
+
+        self.assertEquals('/plone/news/new_id',
+                          response.results()[0]['path_string'])
 
     def testDateBefore1000AD(self):
         # AT's default "floor date" of `DateTime(1000, 1)` is converted
