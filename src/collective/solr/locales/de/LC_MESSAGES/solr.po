@@ -19,7 +19,7 @@ msgid "Default fields to be returned"
 msgstr ""
 
 #: ../interfaces.py:205
-msgid "Fields that should be used for highlighting. Snippets of text will be generated from the contents  of these fields, with the search keywords thatmatched highlighted inside the text."
+msgid "Fields that should be used for highlighting. Snippets of text will be generated from the contents of these fields, with the search keywords that matched highlighted inside the text."
 msgstr ""
 
 #: ../interfaces.py:230
