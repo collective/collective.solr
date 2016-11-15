@@ -139,6 +139,14 @@ The code is used in production in many sites and considered stable. This add-on 
 In large sites with 100000 content objects and more, searches using ``ZCTextIndex`` often taken 10 seconds or more and require a good deal of memory from ZODB caches. Solr will typically answer these requests in 10ms to 50ms at which point network latency and the rendering speed of Plone's page templates are a more dominant factor.
 
 
+Solr Compatibility
+==================
+
+The code works with Solr 3 or 4.
+Solr 5 is not yet supported.  See https://github.com/collective/collective.solr/issues/66
+Recommended is the latest in the Solr 4 series, currently 4.10.4.
+
+
 Bug Reporting & Development
 ===========================
 
