@@ -4,6 +4,17 @@ Changelog
 6.0a2 (unreleased)
 ------------------
 
+- Added upgrade step for registry to upgrade from version 5.0.3.
+  Otherwise you get KeyError: ``collective.solr.facets`` in the search viewlet.
+  And on the control panel you get another KeyError: 'Interface
+  ``collective.solr.interfaces.ISolrSchema`` defines a field
+  ``index_timeout``, for which there is no record.'
+  Note that this resets your configuration.
+  You may want to make a screen shot of your previous configuration
+  before you update your buildout to collective.solr 6.
+  See https://github.com/collective/collective.solr/issues/155
+  [maurits]
+
 - Implement reindexing the path indexes in solr. This means in solr path_string, path_parents and path_depth are updated on `obj.reindexObject(idxs=['path'])`.
   [mathias.leimgruber]
 
