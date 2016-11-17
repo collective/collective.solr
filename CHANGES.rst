@@ -4,6 +4,8 @@ Changelog
 6.0a2 (unreleased)
 ------------------
 
+- solr.cfg: configure JMX host and port separately.  [maurits]
+
 - Added link to Solr sync in our control panel.  Added titles to all
   four maintenance links that briefly explain what they do.  [maurits]
 
