@@ -4,6 +4,9 @@ Changelog
 6.0a2 (unreleased)
 ------------------
 
+- Added link to Solr sync in our control panel.  Added titles to all
+  four maintenance links that briefly explain what they do.  [maurits]
+
 - Added upgrade step for registry to upgrade from version 5.0.3.
   Otherwise you get KeyError: ``collective.solr.facets`` in the search viewlet.
   And on the control panel you get another KeyError: 'Interface
