@@ -7,7 +7,6 @@ from Products.CMFCore.utils import _checkPermission
 from Products.CMFPlone.CatalogTool import CatalogTool
 
 from collective.solr.interfaces import ISearchDispatcher
-from collective.solr.parser import SolrResponse
 
 
 def searchResults(self, REQUEST=None, **kw):
