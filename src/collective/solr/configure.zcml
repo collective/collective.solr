@@ -141,4 +141,13 @@
     directory="static" 
     />
 
+  <include package="plone.behavior" file="meta.zcml" />
+
+  <plone:behavior
+      title="Solr extension"
+      description="Extra fields for Solr indexing"
+      provides=".behaviors.ISolrFields"
+      for="plone.dexterity.interfaces.IDexterityContent"
+      />
+
 </configure>
