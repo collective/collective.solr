@@ -27,6 +27,11 @@ Changelog
   SolrResponse inherit from ZCatalog Lazy class.
   [tomgross]
 
+- Remove hard dependency on Archetypes
+  [tomgross]
+
+- Implement ``searchwords`` and ``showinsearch`` as Dexterity behavior.
+  [tomgross]
 
 6.0a1 (2016-10-11)
 ------------------

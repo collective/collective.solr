@@ -1,18 +1,30 @@
 # -*- coding: utf-8 -*-
+import pkg_resources
 import unittest
+
 from collective.solr.testing import LEGACY_COLLECTIVE_SOLR_INTEGRATION_TESTING
 from collective.solr.behaviors import ISolrFields
 from plone.app.testing import setRoles
 from plone.app.testing import TEST_USER_ID
-from plone.dexterity.fti import DexterityFTI
+from collective.solr.testing import activateAndReindex
 
 
+try:
+    pkg_resources.get_distribution('plone.dexterity')
+    from plone.dexterity.fti import DexterityFTI
+    HAS_DX = True
+except pkg_resources.DistributionNotFound:
+    HAS_DX = False
+
+
+@unittest.skipUnless(HAS_DX, 'Dexterity not found! Skipping behavior tests.')
 class BehaviorsTestCase(unittest.TestCase):
 
     layer = LEGACY_COLLECTIVE_SOLR_INTEGRATION_TESTING
 
     def setUp(self):
         self.portal = self.layer['portal']
+        activateAndReindex(self.portal)
         setRoles(self.portal, TEST_USER_ID, ['Manager'])
 
         fti = DexterityFTI('My Dexterity Container')

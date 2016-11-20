@@ -12,7 +12,10 @@ class ISolrFields(model.Schema):
     """ Social Media integration.
     """
 
-    directives.fieldset('categorization',)
+    directives.fieldset(
+        'categorization',
+        fields=['showinsearch', 'searchwords']
+    )
 
     showinsearch = schema.Bool(
         required=False,
@@ -23,6 +26,7 @@ class ISolrFields(model.Schema):
     )
 
     searchwords = schema.List(
+        required=False,
         default=[],
         missing_value=[],
         title=_('label_searchwords', default=u"Search words"),
