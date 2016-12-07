@@ -19,7 +19,7 @@ from zope.publisher.browser import BrowserView
 
 import json
 
-_ = MessageFactory('plone')
+_pmf = MessageFactory('plone')
 
 # We should accept both a simple space, unicode u'\u0020 but also a
 # multi-space, so called 'waji-kankaku', unicode u'\u3000'
@@ -142,12 +142,12 @@ class Search(BrowserView):
     def sort_options(self):
         """ Sorting options for search results view. """
         return (
-            SortOption(self.request, _(u'relevance'), ''),
+            SortOption(self.request, _pmf(u'relevance'), ''),
             SortOption(
-                self.request, _(u'date (newest first)'),
+                self.request, _pmf(u'date (newest first)'),
                 'Date', reverse=True
             ),
-            SortOption(self.request, _(u'alphabetically'), 'sortable_title'),
+            SortOption(self.request, _pmf(u'alphabetically'), 'sortable_title'),  # noqa
         )
 
     def show_advanced_search(self):

@@ -43,13 +43,11 @@ setup(
     install_requires=[
         'Acquisition',
         'DateTime',
-        'Products.Archetypes',
         'Products.CMFCore',
         'Products.CMFPlone >= 4.3.7',
         'Products.GenericSetup',
         'ZODB3',
         'Zope2 >= 2.13',
-        'archetypes.schemaextender',
         'collective.indexing >= 2.0a2',
         'collective.js.showmore',
         'lxml',

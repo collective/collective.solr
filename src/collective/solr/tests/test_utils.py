@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from collective.solr.exceptions import SolrConnectionException
 from collective.solr.parser import SolrResponse
 from collective.solr.testing import LEGACY_COLLECTIVE_SOLR_INTEGRATION_TESTING
 from collective.solr.tests.utils import getData
@@ -151,6 +152,20 @@ class UtilsTests(TestCase):
                          "foo OR NOT bar")
         self.assertEqual(prepare_wildcard("FOO AND BAR OR FOO AND NOT BAR"),
                          "foo AND bar OR foo AND NOT bar")
+
+    def test_solr_exception(self):
+        e = SolrConnectionException(503, 'Error happend', '<xml></xml>')
+
+        def test_raise():
+            raise e
+
+        self.assertRaisesRegexp(
+            SolrConnectionException, 'HTTP code=503, reason=Error happend',
+            test_raise
+        )
+        self.assertEqual(
+            repr(e), 'HTTP code=503, Reason=Error happend, body=<xml></xml>'
+        )
 
 
 class TranslationTests(TestCase):
