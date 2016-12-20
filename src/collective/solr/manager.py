@@ -52,7 +52,7 @@ class SolrConnectionManager(object):
         logger.debug('closing connection')
         if core is None:
             connection_key = 'connection'
-            schema_key = None
+            schema_key = 'schema'
         else:
             connection_key = 'connection_{0}'.format(core)
             schema_key = 'schema_{0}'.format(core)
