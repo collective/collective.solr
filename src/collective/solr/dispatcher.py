@@ -103,13 +103,9 @@ def solrSearchResults(request=None, core=None, **keywords):
 
     schema = search.getManager().getSchema(core) or {}
     results = response.results()
-    if 'fl' in keywords:
-        filter_list = keywords['fl'].split(',')
     for idx, flare in enumerate(results):
         flare = wrap(flare)
         for missing in set(schema.stored).difference(flare):
-            if missing not in filter_list:
-                continue
             flare[missing] = MV
         results[idx] = wrap(flare)
     padResults(results, **params)           # pad the batch
