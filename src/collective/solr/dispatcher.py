@@ -46,7 +46,7 @@ class SearchDispatcher(object):
         return ZCatalog.searchResults(self.context, request, **keywords)
 
 
-def solrSearchResults(request=None, **keywords):
+def solrSearchResults(request=None, core=None, **keywords):
     """ perform a query using solr after translating the passed in
         parameters with portal catalog semantics """
     site = getSite()
@@ -101,11 +101,15 @@ def solrSearchResults(request=None, **keywords):
         adapter = queryMultiAdapter((flare, request), IFlare)
         return adapter is not None and adapter or flare
 
-    schema = search.getManager().getSchema() or {}
+    schema = search.getManager().getSchema(core) or {}
     results = response.results()
+    if 'fl' in keywords:
+        filter_list = keywords['fl'].split(',')
     for idx, flare in enumerate(results):
         flare = wrap(flare)
         for missing in set(schema.stored).difference(flare):
+            if missing not in filter_list:
+                continue
             flare[missing] = MV
         results[idx] = wrap(flare)
     padResults(results, **params)           # pad the batch
