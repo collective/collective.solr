@@ -46,13 +46,13 @@ class Search(object):
             self.config = getConfig()
         return self.config
 
-    def search(self, query, **parameters):
+    def search(self, query, core='', **parameters):
         """ perform a search with the given querystring and parameters """
         start = time()
         config = self.getConfig()
         manager = self.getManager()
         manager.setSearchTimeout()
-        connection = manager.getConnection()
+        connection = manager.getConnection(core=core)
         if connection is None:
             raise SolrInactiveException
         if 'rows' not in parameters:
