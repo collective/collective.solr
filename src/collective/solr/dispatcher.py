@@ -99,6 +99,7 @@ def solrSearchResults(request=None, core=None, **keywords):
     def wrap(flare):
         """ wrap a flare object with a helper class """
         # 1. try a named adapter according to the core
+        adapter = None
         if core:
             adapter = queryMultiAdapter((flare, request), IFlare, name=core)
         # 2. try an unnamed adapter
