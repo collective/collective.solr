@@ -27,6 +27,7 @@ class ContentListingTests(TestCase):
             'Title': 'Flare Title',
             'Description': 'Flare Description',
             'Subject': 'Flare Subject',
+            'getRemoteUrl': 'https://example.org',
             'Date': 'Flare Date',
             'expires': DateTime('1.1.2099'),
             'created': DateTime('31.12.1969'),
@@ -154,3 +155,10 @@ class ContentListingTests(TestCase):
     def test_creation_date(self):
         self.assertTrue(
             self.flare.flare.CreationDate.startswith('1969-12-31T'))
+
+    def test_schema_attribute(self):
+        self.assertEqual(self.flare.getRemoteUrl, 'https://example.org')
+
+    def test_nonexisiting_schema_attribute(self):
+        self.assertRaises(AttributeError,
+                          getattr, self.flare, 'getBogusAttribute')
