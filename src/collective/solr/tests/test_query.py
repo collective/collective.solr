@@ -178,7 +178,7 @@ class QueryTests(TestCase):
         conn = self.mngr.getConnection()
         fakehttp(conn, getData('schema.xml'))   # fake schema response
         self.mngr.getSchema()                   # read and cache the schema
-        self.search = Search()
+        self.search = Search
         self.search.manager = self.mngr
 
     def tearDown(self):
@@ -322,7 +322,7 @@ class QueryTests(TestCase):
 class InactiveQueryTests(TestCase):
 
     def testUnavailableSchema(self):
-        search = Search()
+        search = Search
         search.manager = SolrConnectionManager()
         self.assertEqual(search.buildQueryAndParameters('foo'), ({}, {}))
         self.assertEqual(search.buildQueryAndParameters(name='foo'), ({}, {}))
@@ -336,7 +336,7 @@ class SearchTests(TestCase):
         self.mngr = SolrConnectionManager()
         self.mngr.setHost(active=True)
         self.conn = self.mngr.getConnection()
-        self.search = Search()
+        self.search = Search
         self.search.manager = self.mngr
 
     def tearDown(self):
