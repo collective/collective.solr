@@ -18,7 +18,7 @@ from collective.solr.interfaces import ISolrConnectionManager
 from collective.solr.interfaces import ISolrAddHandler
 from collective.solr.manager import logger as logger_manager
 from collective.solr.parser import SolrResponse
-from collective.solr.search import Search
+from collective.solr.search import SearchComponent
 from collective.solr.solr import logger as logger_solr
 from collective.solr.testing import activateAndReindex
 from collective.solr.testing import HAS_LINGUAPLONE
@@ -1221,12 +1221,12 @@ class SolrServerTests(TestCase):
         self.maintenance.reindex()
         # first set up a logger to be able to test the query parameters
         log = []
-        original = Search.search
+        original = SearchComponent.search
 
         def logger(*args, **parameters):
             log.append((args, parameters))
             return original(*args, **parameters)
-        Search.__call__ = logger
+        SearchComponent.__call__ = logger
         # a filter query should be used for `portal_type`;  like plone itself
         # we inject the "friendly types" into the query (in `queryCatalog.py`)
         # by using a keyword parameter...
@@ -1245,7 +1245,7 @@ class SolrServerTests(TestCase):
         self.assertEqual(sorted(log[-1][1]['fq']),
                          ['+portal_type:Collection',
                           '+review_state:published'], log)
-        Search.__call__ = original
+        SearchComponent.__call__ = original
 
     def testDefaultOperatorIsOR(self):
         schema = self.search.getManager().getSchema()
@@ -1488,8 +1488,7 @@ class SolrServerTests(TestCase):
         local_util = self.search
         self.failUnless(getUtility(ISearch) == local_util)
         self.failUnless(getUtility(ISearch) == sm.getUtility(ISearch))
-        # XXX invert the next line once this issue is fixed
-        self.failUnless(getUtility(ISearch) != gsm.getUtility(ISearch))
+        self.failUnless(getUtility(ISearch) == gsm.getUtility(ISearch))
         result = {'utilities_are_the_same': True, }
         lock = thread.allocate_lock()
         lock.acquire()

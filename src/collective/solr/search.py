@@ -28,7 +28,7 @@ except ImportError:
 logger = getLogger('collective.solr.search')
 
 
-class Search(object):
+class SearchComponent(object):
     """ a search utility for solr """
     implements(ISearch)
 
@@ -197,3 +197,5 @@ class Search(object):
         if query:
             optimizeQueryParameters(query, params)
         return query, params
+
+Search = SearchComponent()

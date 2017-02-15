@@ -21,9 +21,7 @@
   <include file="profiles.zcml" />
   <include file="upgrades.zcml" />
 
-  <utility
-    factory=".search.Search"
-    provides=".interfaces.ISearch" />
+  <utility component=".search.Search"/>
 
   <class class="Products.CMFPlone.CatalogTool.CatalogTool">
     <implements interface=".interfaces.ICatalogTool" />
@@ -155,7 +153,7 @@
 
   <browser:resourceDirectory
     name="collective.solr.static"
-    directory="static" 
+    directory="static"
     />
 
   <include package="plone.behavior" file="meta.zcml" />
