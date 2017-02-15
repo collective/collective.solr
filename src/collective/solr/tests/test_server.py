@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import thread
 from Acquisition import aq_base
 from Acquisition import aq_parent
 from DateTime import DateTime
@@ -41,6 +42,7 @@ from transaction import commit
 from unittest import TestCase
 from zExceptions import Unauthorized
 from zope.component import getUtility, queryAdapter
+from zope.component import getSiteManager, getGlobalSiteManager
 from zope.interface import implements
 from zope.schema.interfaces import IVocabularyFactory
 from Products.Archetypes.interfaces import IBaseObject
@@ -1475,3 +1477,36 @@ class SolrServerTests(TestCase):
         self.maintenance.reindex()
         self.maintenance.optimize()
         self.assertTrue(True)
+
+    def test_get_search_util_in_second_thread(self):
+        """ ISearch is registered both as a global and a
+        local utility. There is a suspicion that the lookup is
+        different depending on the context
+        """
+        sm = self.portal.getSiteManager()
+        gsm = getGlobalSiteManager()
+        local_util = self.search
+        self.failUnless(getUtility(ISearch) == local_util)
+        self.failUnless(getUtility(ISearch) == sm.getUtility(ISearch))
+        # XXX invert the next line once this issue is fixed
+        self.failUnless(getUtility(ISearch) != gsm.getUtility(ISearch))
+        result = {'utilities_are_the_same': True, }
+        lock = thread.allocate_lock()
+        lock.acquire()
+
+        def fn():
+            u = getUtility(ISearch)
+            sm = getSiteManager()
+            gsm = getGlobalSiteManager()
+            lu = sm.getUtility(ISearch)
+            gu = gsm.getUtility(ISearch)
+            self.failUnless(lu == gu)
+            self.failUnless(lu == u)
+            self.failUnless(gu == u)
+            result['utilities_are_the_same'] = local_util == u
+            lock.release()
+        thread.start_new_thread(fn, ())
+        lock.acquire()
+        self.failUnless(result['utilities_are_the_same'])
+        self.failUnless(getUtility(ISearch) == local_util)
+        lock.release()
