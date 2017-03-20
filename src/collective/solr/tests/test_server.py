@@ -1475,3 +1475,6 @@ class SolrServerTests(TestCase):
         self.maintenance.reindex()
         self.maintenance.optimize()
         self.assertTrue(True)
+
+    def test_umlaut(self):
+        print(self.search({'effective': '+effective:[* TO 2017-03-20T10:23:31.325Z]', 'expires': '+expires:[2017-03-20T10:23:31.325Z TO *]', u'SearchableText': '+(Title:(ru*)^5 OR Description:(ru*)^2 OR SearchableText:(ru*) OR SearchableText:((r\xc3\xbc)) OR searchwords:((r\xc3\xbc))^1000) +showinsearch:True', 'allowedRolesAndUsers': '+allowedRolesAndUsers:(user$13259@fhnw.ch OR Authenticated OR Member OR Editor OR Reader OR Contributor OR Reviewer OR user$AuthenticatedUsers OR user$Affiliates OR user$PowerUsers OR Anonymous)', u'path_parents': u'+path_parents:("\\/Plone\\/de")', 'review_state': '+review_state:(published)'}))
