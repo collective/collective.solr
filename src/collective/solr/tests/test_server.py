@@ -1478,7 +1478,7 @@ class SolrServerTests(TestCase):
         self.assertTrue(True)
 
     def test_umlaut(self):
-        """ We don't need a result. We just don't want an error being raised """
+        """ We just don't want an error being raised """
         try:
             self.search({
                 'effective': '+effective:[* TO 2017-03-20T10:23:31.325Z]',
@@ -1490,7 +1490,8 @@ class SolrServerTests(TestCase):
             self.fail('Failed mixing unicode and strings')
 
     def test_space_query(self):
+        """ We just don't want an error being raised """
         try:
-            resp = self.portal.portal_catalog(SearchableText={'query': u'beat *'})
+            self.portal.portal_catalog(SearchableText={'query': u'beat *'})
         except SolrConnectionException:
             self.fail('Solf exception was raised')
