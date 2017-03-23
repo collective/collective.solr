@@ -91,6 +91,7 @@ class SolrConnectionManager(object):
             config_base = registry['collective.solr.base']
             if core is not None:
                 config_base = '/'.join([config_base, core])
+            config_base = config_base.rstrip('/')
             host = '%s:%d' % (config_host, config_port)
             logger.debug('opening connection to %s', host)
             conn = SolrConnection(host=host, solrBase=config_base,

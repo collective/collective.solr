@@ -8,6 +8,7 @@ from collective.indexing.queue import getQueue
 from collective.indexing.queue import processQueue
 from collective.solr.dispatcher import FallBackException
 from collective.solr.dispatcher import solrSearchResults
+from collective.solr.exceptions import SolrConnectionException
 from collective.solr.flare import PloneFlare
 from collective.solr.indexer import SolrIndexProcessor
 from collective.solr.indexer import DefaultAdder, BinaryAdder
@@ -1477,4 +1478,19 @@ class SolrServerTests(TestCase):
         self.assertTrue(True)
 
     def test_umlaut(self):
-        print(self.search({'effective': '+effective:[* TO 2017-03-20T10:23:31.325Z]', 'expires': '+expires:[2017-03-20T10:23:31.325Z TO *]', u'SearchableText': '+(Title:(ru*)^5 OR Description:(ru*)^2 OR SearchableText:(ru*) OR SearchableText:((r\xc3\xbc)) OR searchwords:((r\xc3\xbc))^1000) +showinsearch:True', 'allowedRolesAndUsers': '+allowedRolesAndUsers:(user$13259@fhnw.ch OR Authenticated OR Member OR Editor OR Reader OR Contributor OR Reviewer OR user$AuthenticatedUsers OR user$Affiliates OR user$PowerUsers OR Anonymous)', u'path_parents': u'+path_parents:("\\/Plone\\/de")', 'review_state': '+review_state:(published)'}))
+        """ We don't need a result. We just don't want an error being raised """
+        try:
+            self.search({
+                'effective': '+effective:[* TO 2017-03-20T10:23:31.325Z]',
+                u'SearchableText': '+(Title:(ru*)^5 OR Description:(ru*)^2 OR SearchableText:(ru*) OR SearchableText:((r\xc3\xbc)) OR searchwords:((r\xc3\xbc))^1000)',  # noqa
+                'allowedRolesAndUsers': '+allowedRolesAndUsers:(user$@bc@example.com OR Anonymous)',  # noqa
+                u'path_parents': u'+path_parents:("\\/Plone\\/de")',
+                'review_state': '+review_state:(published)'})
+        except UnicodeError:
+            self.fail('Failed mixing unicode and strings')
+
+    def test_space_query(self):
+        try:
+            resp = self.portal.portal_catalog(SearchableText={'query': u'beat *'})
+        except SolrConnectionException:
+            self.fail('Solf exception was raised')
