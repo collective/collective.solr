@@ -159,7 +159,8 @@ class SolrMaintenanceView(BrowserView):
         for path, obj in findObjects(self.context):
             if ICheckIndexable(obj)():
 
-                if HAS_C_INDEXING and getOwnIndexMethod(obj, 'indexObject') is not None:
+                if HAS_C_INDEXING and \
+                        getOwnIndexMethod(obj, 'indexObject') is not None:
                     log('skipping indexing of %r via private method.\n' % obj)
                     continue
 
