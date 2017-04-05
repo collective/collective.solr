@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from Products.CMFCore.utils import getToolByName
-from collective.indexing.interfaces import IIndexQueueProcessor
 from collective.solr.exceptions import SolrInactiveException
 from collective.solr.interfaces import ISearch
 from collective.solr.interfaces import ISolrConnectionManager
@@ -26,7 +25,15 @@ from zope.configuration import xmlconfig
 from zope.event import notify
 from zope.lifecycleevent import ObjectModifiedEvent
 
+import pkg_resources
 import unittest
+
+
+try:   # pragma: no cover
+    pkg_resources.get_distribution('collective.indexing')
+    from collective.indexing.interfaces import IIndexQueueProcessor
+except pkg_resources.DistributionNotFound:  # pragma: no cover
+    from Products.CMFCore.interfaces import IIndexQueueProcessor
 
 
 class UtilityTests(TestCase):

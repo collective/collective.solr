@@ -136,11 +136,17 @@ class CollectiveSolrLayer(PloneSandboxLayer):
 
     def setUpZope(self, app, configurationContext):
         # Load ZCML
-        import collective.indexing
-        self.loadZCML(package=collective.indexing)
+        try:   # pragma: no cover
+            pkg_resources.get_distribution('collective.indexing')
+            import collective.indexing
+            self.loadZCML(package=collective.indexing)
+            HAS_C_INDEXING = True
+        except pkg_resources.DistributionNotFound:  # pragma: no cover
+            HAS_C_INDEXING = False
         import collective.solr
         self.loadZCML(package=collective.solr)
-        installProduct(app, 'collective.indexing')
+        if HAS_C_INDEXING:  # pragma: no cover
+            installProduct(app, 'collective.indexing')
 
     def setUpPloneSite(self, portal):
         self.solr_layer.setUp()
