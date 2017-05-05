@@ -21,7 +21,7 @@ before_install:
   - sh -e /etc/init.d/xvfb start
   - mkdir -p $HOME/buildout-cache/{eggs,downloads}
   - virtualenv .
-  - bin/pip install --upgrade pip setuptools zc.buildout zest.pocompile
+  - bin/pip install --upgrade -r requirements.txt
   - bin/pocompile src
 install:
   - sed -ie "s#plone-x.x.x.cfg#plone-$PLONE_VERSION.cfg#" travis.cfg
