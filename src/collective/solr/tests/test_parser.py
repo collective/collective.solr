@@ -129,7 +129,7 @@ class ParserTests(TestCase):
         self.assertEqual(schema['defaultSearchField'], 'text')
         self.assertEqual(schema['uniqueKey'], 'id')
         self.assertEqual(schema['solrQueryParser'].defaultOperator, 'OR')
-        self.assertEqual(schema['requiredFields'], ['id', 'name'])
+        self.assertEqual(schema['requiredFields'], ['id'])
         self.assertEqual(schema['id'].type, 'string')
         self.assertEqual(schema['id'].class_, 'solr.StrField')
         self.assertEqual(schema['id'].required, True)
@@ -151,7 +151,7 @@ class ParserTests(TestCase):
         self.assertEqual(schema.word.indexed, False)
         fields = schema.values()
         self.assertEqual(len([f for f in fields if
-                              getattr(f, 'required', False)]), 2)
+                              getattr(f, 'required', False)]), 1)
         self.assertEqual(len([f for f in fields if
                               getattr(f, 'multiValued', False)]), 3)
 

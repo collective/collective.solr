@@ -2,7 +2,6 @@
 from Acquisition import aq_base
 from Acquisition import aq_parent
 from DateTime import DateTime
-from Missing import MV
 from Products.CMFCore.utils import getToolByName
 from collective.indexing.queue import getQueue
 from collective.indexing.queue import processQueue
@@ -1215,7 +1214,7 @@ class SolrServerTests(TestCase):
         self.maintenance.reindex()
         results = solrSearchResults(SearchableText='Welcome')
         self.assertEqual(len(results), 1)
-        self.assertEqual(results[0].get('Subject'), MV)
+        self.assertEqual(results[0].get('Subject'), [''])
         schema = self.search.getManager().getSchema()
         expected = set(list(schema.stored) + ['score'])     # score gets added
         self.assertEqual(set(results[0].keys()), expected)

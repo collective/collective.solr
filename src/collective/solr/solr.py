@@ -257,8 +257,14 @@ class SolrConnection:
                 tmpl = tmpl.replace(' update="set"', '')
 
             if isinstance(v, (list, tuple)):  # multi-valued
-                for value in v:
-                    lst.append(tmpl % self.escapeVal(value))
+                if v:
+                    for value in v:
+                        lst.append(tmpl % self.escapeVal(value))
+                else:
+                    # Add an empty element for empty lists/tuples.
+                    # Otherwise all indexes gets removed if you update an empty
+                    # multivalued attribute.
+                    lst.append(tmpl % '')
             else:
                 lst.append(tmpl % self.escapeVal(v))
         lst.append('</doc>')

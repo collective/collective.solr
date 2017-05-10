@@ -4,6 +4,11 @@ Changelog
 5.0.4 (unreleased)
 ------------------
 
+- Fix: Reindexing solr-objects with specific attributes (atomic-update) will remove
+  all indexed attributes on an object if it does not provide this index or if the
+  field is multivalued and the value is empty. (fixes #171)
+  [elioschmutz]
+
 - Use unittest instead unittest2 in test_browser_suggest.py to fix tests.
   [elioschmutz]
 
