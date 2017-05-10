@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from collective.indexing.interfaces import IIndexQueueProcessor
 from zope.interface import Interface
 from zope.schema import Bool
 from zope.schema import Float
@@ -10,6 +9,15 @@ from zope.schema import TextLine
 from zope.schema.interfaces import IVocabularyFactory
 
 from collective.solr import SolrMessageFactory as _
+
+import pkg_resources
+
+
+try:   # pragma: no cover
+    pkg_resources.get_distribution('collective.indexing')
+    from collective.indexing.interfaces import IIndexQueueProcessor
+except pkg_resources.DistributionNotFound:  # pragma: no cover
+    from Products.CMFCore.interfaces import IIndexQueueProcessor
 
 
 class ISolrSchema(Interface):

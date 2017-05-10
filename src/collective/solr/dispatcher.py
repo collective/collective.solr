@@ -46,7 +46,7 @@ class SearchDispatcher(object):
         return ZCatalog.searchResults(self.context, request, **keywords)
 
 
-def solrSearchResults(request=None, **keywords):
+def solrSearchResults(request=None, core=None, **keywords):
     """ perform a query using solr after translating the passed in
         parameters with portal catalog semantics """
     site = getSite()
@@ -92,16 +92,22 @@ def solrSearchResults(request=None, **keywords):
 
     if query != {}:
         __traceback_info__ = (query, params, args)
-        response = search(query, **params)
+        response = search(query, core=core, **params)
     else:
         return SolrResponse()
 
     def wrap(flare):
         """ wrap a flare object with a helper class """
-        adapter = queryMultiAdapter((flare, request), IFlare)
+        # 1. try a named adapter according to the core
+        adapter = None
+        if core:
+            adapter = queryMultiAdapter((flare, request), IFlare, name=core)
+        # 2. try an unnamed adapter
+        if adapter is None:
+            adapter = queryMultiAdapter((flare, request), IFlare)
         return adapter is not None and adapter or flare
 
-    schema = search.getManager().getSchema() or {}
+    schema = search.getManager().getSchema(core) or {}
     results = response.results()
     for idx, flare in enumerate(results):
         flare = wrap(flare)

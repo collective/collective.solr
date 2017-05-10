@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from plone import api
+from plone.app.contentlisting.contentlisting import BaseContentListingObject
 from plone.app.contentlisting.interfaces import IContentListingObject
 from plone.app.layout.icons.interfaces import IContentIcon
 from plone.i18n.normalizer.interfaces import IIDNormalizer
@@ -11,11 +12,20 @@ from zope.globalrequest import getRequest
 from zope.interface import implements
 
 
-class FlareContentListingObject(object):
+class FlareContentListingObject(BaseContentListingObject):
     implements(IContentListingObject)
 
     def __init__(self, flare):
         self.flare = flare
+
+    def __getattr__(self, name):
+        """We'll override getattr so that we can defer name lookups to the real
+        underlying objects without knowing the names of all attributes.
+        """
+        if name in self.flare:
+            return self.flare[name]
+        else:
+            raise AttributeError(name)
 
     def getId(self):
         return self.flare.getId

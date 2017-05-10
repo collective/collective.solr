@@ -12,10 +12,11 @@
 
   <i18n:registerTranslations directory="locales" />
 
-  <include package="collective.indexing" />
+  <include package="collective.indexing" 
+       zcml:condition="installed collective.indexing" />
+
   <include package="plone.browserlayer" />
   <include package="plone.app.registry" />
-  <include package="collective.js.showmore" />
   <include package="plone.restapi" />
 
   <include file="profiles.zcml" />

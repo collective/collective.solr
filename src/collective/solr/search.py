@@ -18,6 +18,7 @@ from logging import getLogger
 from time import time
 from zope.component import queryUtility
 from zope.interface import implements
+from Products.CMFPlone.utils import safe_unicode
 
 try:
     from Products.LinguaPlone.catalog import languageFilter
@@ -46,13 +47,13 @@ class Search(object):
             self.config = getConfig()
         return self.config
 
-    def search(self, query, **parameters):
+    def search(self, query, core='', **parameters):
         """ perform a search with the given querystring and parameters """
         start = time()
         config = self.getConfig()
         manager = self.getManager()
         manager.setSearchTimeout()
-        connection = manager.getConnection()
+        connection = manager.getConnection(core=core)
         if connection is None:
             raise SolrInactiveException
         if 'rows' not in parameters:
@@ -84,7 +85,8 @@ class Search(object):
             else:
                 parameters['fl'] = '* score'
         if isinstance(query, dict):
-            query = ' '.join(query.values())
+            query = u' '.join([safe_unicode(item)
+                               for item in query.values()]).encode('utf-8')
         logger.debug('searching for %r (%r)', query, parameters)
         if 'sort' in parameters:    # issue warning for unknown sort indices
             index, order = parameters['sort'].split()

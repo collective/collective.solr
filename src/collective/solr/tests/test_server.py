@@ -4,10 +4,9 @@ from Acquisition import aq_parent
 from DateTime import DateTime
 from Missing import MV
 from Products.CMFCore.utils import getToolByName
-from collective.indexing.queue import getQueue
-from collective.indexing.queue import processQueue
 from collective.solr.dispatcher import FallBackException
 from collective.solr.dispatcher import solrSearchResults
+from collective.solr.exceptions import SolrConnectionException
 from collective.solr.flare import PloneFlare
 from collective.solr.indexer import SolrIndexProcessor
 from collective.solr.indexer import DefaultAdder, BinaryAdder
@@ -44,6 +43,17 @@ from zope.component import getUtility, queryAdapter
 from zope.interface import implements
 from zope.schema.interfaces import IVocabularyFactory
 from Products.Archetypes.interfaces import IBaseObject
+
+import pkg_resources
+
+
+try:   # pragma: no cover
+    pkg_resources.get_distribution('collective.indexing')
+    from collective.indexing.queue import getQueue
+    from collective.indexing.queue import processQueue
+except pkg_resources.DistributionNotFound:  # pragma: no cover
+    from Products.CMFCore.indexing import getQueue
+    from Products.CMFCore.indexing import processQueue
 
 
 DEFAULT_OBJS = [
@@ -1475,3 +1485,22 @@ class SolrServerTests(TestCase):
         self.maintenance.reindex()
         self.maintenance.optimize()
         self.assertTrue(True)
+
+    def test_umlaut(self):
+        """ We just don't want an error being raised """
+        try:
+            self.search({
+                'effective': '+effective:[* TO 2017-03-20T10:23:31.325Z]',
+                u'SearchableText': '+(Title:(ru*)^5 OR Description:(ru*)^2 OR SearchableText:(ru*) OR SearchableText:((r\xc3\xbc)) OR searchwords:((r\xc3\xbc))^1000)',  # noqa
+                'allowedRolesAndUsers': '+allowedRolesAndUsers:(user$@bc@example.com OR Anonymous)',  # noqa
+                u'path_parents': u'+path_parents:("\\/Plone\\/de")',
+                'review_state': '+review_state:(published)'})
+        except UnicodeError:
+            self.fail('Failed mixing unicode and strings')
+
+    def test_space_query(self):
+        """ We just don't want an error being raised """
+        try:
+            self.portal.portal_catalog(SearchableText={'query': u'beat *'})
+        except SolrConnectionException:
+            self.fail('Solf exception was raised')
