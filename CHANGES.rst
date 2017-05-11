@@ -4,6 +4,9 @@ Changelog
 5.0.4 (unreleased)
 ------------------
 
+- Use unittest instead unittest2 in test_browser_suggest.py to fix tests.
+  [elioschmutz]
+
 - Implement reindexing the path indexes in solr. This means in solr path_string, path_parents and path_depth are updated on `obj.reindexObject(idxs=['path'])`.
   [mathias.leimgruber]
 

@@ -9,7 +9,7 @@ from plone.app.testing import TEST_USER_ID
 from zope.component import getMultiAdapter
 
 import json
-import unittest2 as unittest
+import unittest
 
 
 class MockResponse():
