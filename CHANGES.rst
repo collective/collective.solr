@@ -39,6 +39,7 @@ Changelog
 - Updated german translation
   [tomgross]
 
+
 6.0a1 (2016-10-11)
 ------------------
 
