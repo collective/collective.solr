@@ -4,6 +4,9 @@ Changelog
 6.0a2 (unreleased)
 ------------------
 
+- Fixed React widget to add cookies while fetching @search endpoint
+  [sneridagh]
+
 - solr.cfg: configure JMX host and port separately.  [maurits]
 
 - Added link to Solr sync in our control panel.  Added titles to all

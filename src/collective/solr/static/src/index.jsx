@@ -80,7 +80,9 @@ class SearchApp extends React.Component {
     let requestHeaders = new Headers();
     requestHeaders.append("Accept", "application/json");
     fetch(`${this.state.portalUrl}/@search?metadata_fields=Creator&metadata_fields=modified${sortonQuery}${filterQuery}&SearchableText=${searchOptions.searchText}`,
-          { headers: requestHeaders, mode: 'cors' })
+          { headers: requestHeaders,
+            mode: 'cors',
+            credentials: 'same-origin' })
       .then((response) => response.json())
       .then((responseData) => {
         this.setState({ results: responseData });
