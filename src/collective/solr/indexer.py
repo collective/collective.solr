@@ -199,7 +199,7 @@ class SolrIndexProcessor(object):
                     attributes.add(uniqueKey)
 
             data, missing = self.getData(obj, attributes=attributes)
-            if not data:
+            if not data or not set(data.keys()) - set([uniqueKey]):
                 return          # don't index with no data...
             prepareData(data)
             if data.get(uniqueKey, None) is not None and not missing:

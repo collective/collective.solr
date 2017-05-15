@@ -186,8 +186,35 @@ class QueueIndexerTests(TestCase):
         # fake add response
         output = fakehttp(self.mngr.getConnection(), response)
         # indexing sends data
+        self.proc.index(Foo(text='lorem ipsum'))  # required id is missing
+        self.assertEqual(str(output), '')
+
+    def testNoIndexingWithOnlyUniqueKeyField(self):
+        response = getData('dummy_response.txt')
+        # fake add response
+        output = fakehttp(self.mngr.getConnection(), response)
+        # indexing sends data
         self.proc.index(Foo(id='500'))
         self.assertEqual(str(output), '')
+
+    def testNoIndexingWithOnlyUniqueKeyFieldAndNotExistingIndex(self):
+        response = getData('dummy_response.txt')
+        # fake add response
+        output = fakehttp(self.mngr.getConnection(), response)
+        # indexing sends data
+        self.proc.index(Foo(id='500', notexisting='some data'))
+        self.assertEqual(str(output), '')
+
+    def testIndexingEmptyMultiValuedFieldWillAddFieldAsWell(self):
+        response = getData('dummy_response.txt')
+        # fake add response
+        output = fakehttp(self.mngr.getConnection(), response)
+        # indexing sends data
+        self.proc.index(Foo(id='500', features=()))
+        self.assertIn(
+            '<field name="features" update="set"></field>',
+            str(output),
+            "The empty multivalued field have to be in the output neverless")
 
     def testIndexerMethods(self):
         class Bar(Foo):
