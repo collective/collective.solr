@@ -6,6 +6,7 @@ Changelog
 
 - Fixed React widget to add cookies while fetching @search endpoint
   [sneridagh]
+- Handle non-ascii values in the query. [reinhardt]
 
 - solr.cfg: configure JMX host and port separately.  [maurits]
 
