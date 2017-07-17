@@ -6,12 +6,16 @@ Changelog
 
 - Fixed React widget to add cookies while fetching @search endpoint
   [sneridagh]
-- Handle non-ascii values in the query. [reinhardt]
 
-- solr.cfg: configure JMX host and port separately.  [maurits]
+- Handle non-ascii values in the query.
+  [reinhardt]
+
+- solr.cfg: configure JMX host and port separately.
+  [maurits]
 
 - Added link to Solr sync in our control panel.  Added titles to all
-  four maintenance links that briefly explain what they do.  [maurits]
+  four maintenance links that briefly explain what they do.
+  [maurits]
 
 - Added upgrade step for registry to upgrade from version 5.0.3.
   Otherwise you get KeyError: ``collective.solr.facets`` in the search viewlet.
