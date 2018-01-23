@@ -19,6 +19,7 @@ setup(
         'Framework :: Plone',
         'Framework :: Plone :: 4.3',
         'Framework :: Plone :: 5.0',
+        'Framework :: Plone :: 5.1',
         'Intended Audience :: Developers',
         'Intended Audience :: System Administrators',
         'Intended Audience :: Other Audience',
