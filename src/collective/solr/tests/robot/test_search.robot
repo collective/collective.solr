@@ -135,7 +135,7 @@ Scenario: As anonymous user I can filter the test results by creation date
 # Test Setup/Teardown
 
 TestSetup
-  Open test browser
+  Open headless browser
   a logged in Manager
   Go to  ${PLONE_URL}/@@solr-maintenance/clear
   Wait until page contains  solr index cleared
@@ -145,6 +145,12 @@ TestTeardown
   Go to  ${PLONE_URL}/@@solr-maintenance/clear
   Run keywords  Close all browsers
 
+Open headless browser
+  ${options}=  Evaluate  sys.modules['selenium.webdriver'].ChromeOptions()  sys, selenium.webdriver
+  Call Method  ${options}  add_argument  headless
+  Call Method  ${options}  add_argument  disable-extensions
+  Call Method  ${options}  add_argument  start-maximized
+  Create WebDriver  Chrome  chrome_options=${options}
 
 # Given
 
