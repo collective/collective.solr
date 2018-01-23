@@ -7,6 +7,10 @@ Changelog
 - Fix tests to work with latest collective.indexing.
   [gforcada]
 
+- Plone 5.1 compatibility.
+  [timo]
+
+
 6.0a2 (2017-07-17)
 ------------------
 
