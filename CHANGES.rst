@@ -4,7 +4,8 @@ Changelog
 6.0a3 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Plone 5.1 compatibility.
+  [timo]
 
 
 6.0a2 (2017-07-17)
