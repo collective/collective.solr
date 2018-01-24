@@ -7,12 +7,13 @@ from urllib import urlencode
 from plone.app.layout.viewlets.common import SearchBoxViewlet
 from Products.Five import BrowserView
 from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
-from zope.component import getUtility, queryUtility
+from zope.component import getUtility
+from zope.component import queryUtility
 from zope.i18n import translate
 from zope.i18nmessageid import Message
 
 from collective.solr.interfaces import IFacetTitleVocabularyFactory
-from collective.solr.interfaces import ISolrConnectionConfig
+from plone.registry.interfaces import IRegistry
 
 
 def param(view, name):
@@ -37,9 +38,8 @@ def facetParameters(view):
     if fields is marker:
         fields = getattr(view.context, 'facet_fields', marker)
     if fields is marker:
-        config = queryUtility(ISolrConnectionConfig)
-        if config is not None:
-            fields = config.facets
+        registry = getUtility(IRegistry)
+        fields = registry['collective.solr.facets']
     dependencies = {}
     for idx, field in enumerate(fields):
         if ':' in field:

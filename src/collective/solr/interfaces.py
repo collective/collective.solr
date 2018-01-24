@@ -15,12 +15,13 @@ from collective.solr import SolrMessageFactory as _
 class ISolrSchema(Interface):
 
     active = Bool(
-        title=_('label_active', default=u'Active'), default=False,
+        title=_('label_active', default=u'Active'),
         description=_(
             'help_active',
             default=u'Check this to enable the Solr integration, i.e. '
                     u'indexing and searching using the below settings.'
-        )
+        ),
+        default=False,
     )
 
     host = TextLine(
@@ -114,7 +115,8 @@ class ISolrSchema(Interface):
                     u'when searching. Set to "10000000" or some other '
                     u'ridiculously large value that is higher than the '
                     u'possible number of rows that are expected.'
-        )
+        ),
+        default=1000000,
     )
 
     required = List(
@@ -128,6 +130,7 @@ class ISolrSchema(Interface):
         ),
         value_type=TextLine(),
         default=[],
+        missing_value=[],
         required=False
     )
 
@@ -180,7 +183,8 @@ class ISolrSchema(Interface):
             default=u'Specify a threshold (in milliseconds) after which '
                     u'queries are considered to be slow causing them to '
                     u'be logged. Set to "0" to prevent any logging.'
-        )
+        ),
+        default=0,
     )
 
     effective_steps = Int(
@@ -206,12 +210,15 @@ class ISolrSchema(Interface):
     )
 
     highlight_fields = List(
-        title=_(u'Highlighting fields'),
+        title=_('label_highlight_fields', u'Highlighting fields'),
         description=_(
-            u'Fields that should be used for highlighting. '
-            u'Snippets of text will be generated from the contents '
-            u' of these fields, with the search keywords that'
-            u'matched highlighted inside the text.'
+            'help_highlight_fields',
+            default=(
+                u'Fields that should be used for highlighting. '
+                u'Snippets of text will be generated from the contents '
+                u'of these fields, with the search keywords that '
+                u'matched highlighted inside the text.'
+            )
         ),
         value_type=TextLine(),
         default=[],
@@ -219,31 +226,52 @@ class ISolrSchema(Interface):
     )
 
     highlight_formatter_pre = TextLine(
-        title=_(u'Highlight formatter: pre'),
-        description=_(u'The text to insert before the highlighted keyword.'),
+        title=_(
+            'label_highlight_formatter_pre',
+            default=u'Highlight formatter: pre'
+        ),
+        description=_(
+            'help_highlight_formatter_pre',
+            default=u'The text to insert before the highlighted keyword.'
+        ),
         default=u'[', required=False
     )
 
     highlight_formatter_post = TextLine(
-        title=_(u'Highlight formatter: post'),
-        description=_(u'The text to insert after the highlighted keyword.'),
+        title=_(
+            'label_highlight_formatter_post',
+            default=u'Highlight formatter: post'
+        ),
+        description=_(
+            'help_highlight_formatter_post',
+            default=u'The text to insert after the highlighted keyword.'
+        ),
         default=u']',
         required=False
     )
 
     highlight_fragsize = Int(
-        title=_(u'Highlight Fragment Size'), default=100,
+        title=_(
+            'label_highlight_fragsize',
+            default=u'Highlight Fragment Size'
+        ),
         description=_(
-            u'The size, in characters, of the snippets (aka '
-            U'fragments) created by the highlighter.'
-        )
+            'help_highlight_fragsize',
+            default=(
+                u'The size, in characters, of the snippets (aka '
+                u'fragments) created by the highlighter.')
+        ),
+        default=100,
     )
 
     field_list = List(
-        title=_(u'Default fields to be returned'),
-        description=_(u'Specify metadata fields that should be returned for '
-                      u'items in the result set, one per line. Defaults to '
-                      u'all available plus ranking score.'),
+        title=_('label_field_list', default=u'Default fields to be returned'),
+        description=_(
+            'help_field_list',
+            default=(u'Specify metadata fields that should be returned for '
+                     u'items in the result set, one per line. Defaults to '
+                     u'all available plus ranking score.')
+        ),
         value_type=TextLine(),
         default=[],
         required=False
@@ -260,6 +288,7 @@ class ISolrSchema(Interface):
                     u'between 0 and 1.'
         ),
         required=False,
+        default=0.0,
     )
 
     atomic_updates = Bool(
@@ -274,6 +303,29 @@ class ISolrSchema(Interface):
                     u'index time boosting no longer works.'),
         default=True,
         required=False,
+    )
+
+    boost_script = Text(
+        title=_('label_boost_script',
+                default=u'Python script for custom index boosting'),
+        required=False,
+        default=u'',
+        missing_value=u'',
+        description=_(
+            'help_boost_script',
+            default=u'This script is meant to be customized according to '
+                    u'site-specific search requirements, e.g. boosting '
+                    u'certain content types like "news items", ranking older '
+                    u'content lower, consider special important content items,'
+                    u' content rating etc.'
+                    u' the indexing data that will be sent to Solr is passed '
+                    u'in as the `data` parameter, the indexable object is '
+                    u'available via the `context` binding. The return value '
+                    u'should be a dictionary consisting of field names and '
+                    u'their respecitive boost values.  use an empty string '
+                    u'as the key to set a boost value for the entire '
+                    u'document/content item.'
+        )
     )
 
 

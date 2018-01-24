@@ -1,9 +1,9 @@
 <configure
     xmlns="http://namespaces.zope.org/zope"
-    xmlns:cmf="http://namespaces.zope.org/cmf"
     xmlns:five="http://namespaces.zope.org/five"
     xmlns:zcml="http://namespaces.zope.org/zcml"
     xmlns:browser="http://namespaces.zope.org/browser"
+    xmlns:plone="http://namespaces.plone.org/plone"
     xmlns:genericsetup="http://namespaces.zope.org/genericsetup"
     xmlns:i18n="http://namespaces.zope.org/i18n"
     i18n_domain="solr">
@@ -14,13 +14,12 @@
 
   <include package="archetypes.schemaextender" />
   <include package="plone.browserlayer" />
+  <include package="plone.app.registry" />
   <include package="collective.js.showmore" />
+  <include package="plone.restapi" />
 
-  <include file="extender.zcml" />
   <include file="profiles.zcml" />
   <include file="upgrades.zcml" />
-
-  <cmf:registerDirectory name="solr_site_search" />
 
   <utility
     factory=".search.Search"
@@ -38,20 +37,63 @@
         factory=".dispatcher.SearchDispatcher" />
 
 
-    <adapter
-        factory=".indexer.DefaultAdder"
-        name="default"
-        />
+    <configure zcml:condition="installed Products.Archetypes">
 
-    <adapter
-        factory=".indexer.BinaryAdder"
-        name="File"
-        />
+      <!-- Schema extender -->
+      <include file="extender.zcml" />
 
-    <adapter
-        factory=".indexer.BinaryAdder"
-        name="Image"
-        />
+      <!-- Adder adapter for Archetypes-->
+      <adapter
+	  factory=".indexer.DefaultAdder"
+	  for="Products.Archetypes.interfaces.IBaseObject"
+	  name="default"
+	  />
+
+      <adapter
+	  factory=".indexer.BinaryAdder"
+	  for="Products.Archetypes.interfaces.IBaseObject"
+	  name="File"
+	  />
+
+      <adapter
+	  factory=".indexer.BinaryAdder"
+	  for="Products.Archetypes.interfaces.IBaseObject"
+	  name="Image"
+	  />
+    </configure>
+    <configure zcml:condition="installed plone.dexterity">
+
+      <include package="plone.dexterity" file="meta.zcml" />
+      <include package="plone.dexterity"  />
+
+      <!-- Schema extender as behavior -->
+      <plone:behavior
+	  title="Solr extension"
+	  description="Extra fields for Solr indexing"
+	  provides=".behaviors.ISolrFields"
+	  for="plone.dexterity.interfaces.IDexterityContent"
+	  zcml:condition="installed plone.app.dexterity"
+	  />
+
+      <!-- Adder adapter for Dexterity -->
+      <adapter
+	  factory=".indexer.DefaultAdder"
+	  for="plone.dexterity.interfaces.IDexterityContent"
+	  name="default"
+	  />
+
+      <adapter
+	  factory=".indexer.DXFileBinaryAdder"
+	  for="plone.dexterity.interfaces.IDexterityContent"
+	  name="File"
+	  />
+
+      <adapter
+	  factory=".indexer.DXImageBinaryAdder"
+	  for="plone.dexterity.interfaces.IDexterityContent"
+	  name="Image"
+	  />
+    </configure>
 
     <adapter
         factory=".indexer.BaseIndexable" />
@@ -65,14 +107,6 @@
            .flare.PloneFlare"
          factory="plone.app.layout.icons.icons.CatalogBrainContentIcon"
          provides="plone.app.layout.icons.interfaces.IContentIcon" />
-
-  <adapter factory=".configlet.SolrControlPanelAdapter" />
-
-  <browser:page
-      name="solr-controlpanel"
-      for="Products.CMFPlone.interfaces.IPloneSiteRoot"
-      class=".configlet.SolrControlPanel"
-      permission="cmf.ManagePortal" />
 
   <utility
       factory=".vocabularies.SolrIndexes"
@@ -98,12 +132,6 @@
   <adapter name="path_parents" factory=".attributes.path_parents" />
 
   <adapter
-      factory=".exportimport.SolrConfigXMLAdapter"
-      provides="Products.GenericSetup.interfaces.IBody"
-      for=".interfaces.ISolrConnectionConfig
-           Products.GenericSetup.interfaces.ISetupEnviron" />
-
-  <adapter
       zcml:condition="installed plone.app.contentlisting"
       factory="plone.app.contentlisting.contentlisting.ContentListing"
       for="collective.solr.parser.SolrResponse"
@@ -115,21 +143,21 @@
       for="collective.solr.flare.PloneFlare"
       />
 
-<!--  <subscriber for="Products.CMFPlone.interfaces.IReorderedEvent"
-              handler=".events.reorderedEvent" />-->
+  <adapter
+    zcml:condition="installed plone.restapi"
+    factory="collective.solr.serializer.LazySolrCatalogResultSerializer"
+    />
 
-  <genericsetup:exportStep
-      name="solr"
-      title="Solr configuration"
-      description="Export settings for Solr integration."
-      handler="collective.solr.exportimport.exportSolrSettings" />
+  <adapter
+    zcml:condition="installed plone.restapi"
+    factory="collective.solr.serializer.SolrFlareSerializer"
+    />
 
-  <genericsetup:importStep
-      name="solr"
-      title="Solr configuration"
-      description="Import settings for Solr integration."
-      handler="collective.solr.exportimport.importSolrSettings">
-    <depends name="componentregistry"/>
-  </genericsetup:importStep>
+  <browser:resourceDirectory
+    name="collective.solr.static"
+    directory="static"
+    />
+
+  <include package="plone.behavior" file="meta.zcml" />
 
 </configure>

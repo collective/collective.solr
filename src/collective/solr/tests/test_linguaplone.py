@@ -1,22 +1,25 @@
 # -*- coding: utf-8 -*-
+import unittest
 
 from Products.CMFCore.utils import getToolByName
 from collective.solr.dispatcher import solrSearchResults
 from collective.solr.interfaces import ISearch
 from collective.solr.interfaces import ISolrConnectionConfig
-from collective.solr.testing import COLLECTIVE_SOLR_FUNCTIONAL_TESTING
+from collective.solr.testing import HAS_LINGUAPLONE
+from collective.solr.testing import LEGACY_COLLECTIVE_SOLR_FUNCTIONAL_TESTING
 from collective.solr.utils import activate
 from plone.app.testing import TEST_USER_ID
 from plone.app.testing import setRoles
 from transaction import abort
 from transaction import commit
-from unittest import TestCase
 from zope.component import getUtility
 
 
-class LinguaTests(TestCase):
+@unittest.skipUnless(HAS_LINGUAPLONE,
+                     "LinguaPlone not installed. skipping")
+class LinguaTests(unittest.TestCase):
 
-    layer = COLLECTIVE_SOLR_FUNCTIONAL_TESTING
+    layer = LEGACY_COLLECTIVE_SOLR_FUNCTIONAL_TESTING
 
     def setUp(self):
         activate()

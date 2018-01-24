@@ -1,6 +1,7 @@
 <configure
     xmlns="http://namespaces.zope.org/zope"
     xmlns:browser="http://namespaces.zope.org/browser"
+    xmlns:zcml="http://namespaces.zope.org/zcml"
     i18n_domain="solr">
 
   <include package="Products.CMFCore" file="permissions.zcml"
@@ -14,6 +15,12 @@
   <browser:resourceDirectory
       name="collective.solr.resources"
       directory="resources" />
+
+  <browser:page
+      name="solr-controlpanel"
+      for="Products.CMFPlone.interfaces.IPloneSiteRoot"
+      class=".controlpanel.SolrControlPanel"
+      permission="cmf.ManagePortal" />
 
   <browser:page
       for="*"
@@ -54,5 +61,27 @@
       name="solr-autocomplete"
       class=".suggest.AutocompleteView"
       permission="zope2.View"/>
+
+  <!-- Plone 5 -->
+  <browser:page
+      name="search"
+      class="Products.CMFPlone.browser.search.Search"
+      permission="zope2.View"
+      for="plone.app.layout.navigation.interfaces.INavigationRoot"
+      template="search.pt"
+      layer=".interfaces.IThemeSpecific"
+      zcml:condition="have plone-5"
+      />
+
+  <!-- Plone 4.3 -->
+  <browser:page
+      name="search"
+      class=".p4_search.Search"
+      permission="zope2.View"
+      for="plone.app.layout.navigation.interfaces.INavigationRoot"
+      template="search.pt"
+      layer=".interfaces.IThemeSpecific"
+      zcml:condition="not-have plone-5"
+      />
 
 </configure>

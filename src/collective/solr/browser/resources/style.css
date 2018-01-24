@@ -63,3 +63,7 @@ body.template-search #content-core {
   display: block;
   clear: both;
 }
+
+.searchPage .actionMenuContent {
+  z-index: 1;
+}

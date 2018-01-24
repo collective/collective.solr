@@ -2,10 +2,10 @@
 collective.solr - Solr integration for the Plone CMS
 ====================================================
 
-.. image:: https://secure.travis-ci.org/collective/collective.solr.png?branch=master
+.. image:: https://secure.travis-ci.org/collective/collective.solr.svg?branch=master
     :target: http://travis-ci.org/collective/collective.solr
 
-.. image:: https://coveralls.io/repos/collective/collective.solr/badge.png?branch=master
+.. image:: https://coveralls.io/repos/collective/collective.solr/badge.svg?branch=master
     :target: https://coveralls.io/r/collective/collective.solr
 
 .. image:: https://img.shields.io/pypi/dm/collective.solr.svg
@@ -62,38 +62,51 @@ Search Enhancements
 * Exclude from search
 * Elevation
 
-ZCTextIndex Replacement
-***********************
-
-
 
 Detailed Documentation
 ======================
 
-A full Documentation of the Solr integration of Plone could be found in `docs.plone.org collective.solr`_.
+A full Documentation of the Solr integration of Plone could be found on `collectivesolr.readthedocs.org`_.
 
-.. _`docs.plone.org collective.solr`: http://docs.plone.org/external/collective.solr/docs/index.html
+.. _`collectivesolr.readthedocs.org`: http://collectivesolr.readthedocs.org/en/latest/
 
 
 Installation & Configuration
 ============================
 
-The following buildout configuration may be used to get started quickly::
+Download the latest default Solr configuration from github::
+
+  $ wget https://github.com/collective/collective.solr/raw/master/solr.cfg
+  $ wget https://raw.githubusercontent.com/collective/collective.solr/master/solr-4.10.x.cfg
+
+.. note: Please do not extend your buildout directly with those files since they are likely to change over time. Always fetch the files via wget to have a stable local copy. In general you should never rely on extending buildout config files from servers that aren't under your control.
+
+Extend your buildout to use those files and make sure collective.solr is added
+to the eggs in your instance section. Your full buildout file should look
+something like this::
 
   [buildout]
+  parts += instance
   extends =
-    buildout.cfg
-    https://github.com/collective/collective.solr/raw/master/solr.cfg
-    https://github.com/collective/collective.solr/raw/master/solr-5.2.x.cfg # or any other version of Solr 
+      http://dist.plone.org/release/4.3.8/versions.cfg
+      solr.cfg
+      solr-4.10.x.cfg
 
   [instance]
-  eggs += collective.solr
+  recipe = plone.recipe.zope2instance
+  http-address = 8080
+  user = admin:admin
+  eggs =
+      Plone
+      collective.solr
 
+  [versions]
+  collective.recipe.solrinstance = 5.3.2
 
-After saving this to let's say ``solr.cfg`` the buildout can be run and the `Solr`_ server and `Plone`_ instance started::
+After saving this to let's say ``buildout.cfg`` the buildout can be run and the `Solr`_ server and `Plone`_ instance started::
 
   $ python bootstrap-buildout.py
-  $ bin/buildout -c solr.cfg
+  $ bin/buildout
   ...
   $ bin/solr-instance start
   $ bin/instance start
@@ -103,8 +116,6 @@ After activation you should review the settings in the new ``Solr Settings`` con
 To index all your content in Solr you can call the provided maintenance view::
 
   http://localhost:8080/plone/@@solr-maintenance/reindex
-
-Note that the example ``solr.cfg`` is bound to change. Always copy the file to your local buildout. In general you should never rely on extending buildout config files from servers that aren't under your control.
 
 
 Solr connection configuration in ZCML
@@ -120,12 +131,20 @@ Example::
        </configure>
 
 
-
 Current Project Status
 ======================
 
-The code is used in production in many sites and considered stable. This add-on can be installed in a `Plone`_ 4.1 (or later) site to enable indexing operations as well as searching (site and live search) using `Solr`_. Doing so will not only significantly improve search quality and performance - especially for a large number of indexed objects, but also reduce the memory footprint of your `Plone`_ instance by allowing you to remove the ``SearchableText``, ``Description`` and ``Title`` indexes from the catalog.
+The code is used in production in many sites and considered stable. This add-on can be installed in a `Plone`_ 4.1 (or later) site to enable indexing operations as well as searching (site and live search) using `Solr`_. Doing so will not only significantly improve search quality and performance - especially for a large number of indexed objects, but also reduce the memory footprint of your `Plone`_ instance by allowing you to remove the ``SearchableText``, ``Description`` and ``Title`` indexes from the catalog as well as the lexicons if no other indexes are using them.
+
 In large sites with 100000 content objects and more, searches using ``ZCTextIndex`` often taken 10 seconds or more and require a good deal of memory from ZODB caches. Solr will typically answer these requests in 10ms to 50ms at which point network latency and the rendering speed of Plone's page templates are a more dominant factor.
+
+
+Solr Compatibility
+==================
+
+The code works with Solr 3 or 4.
+Solr 5 is not yet supported.  See https://github.com/collective/collective.solr/issues/66
+Recommended is the latest in the Solr 4 series, currently 4.10.4.
 
 
 Bug Reporting & Development

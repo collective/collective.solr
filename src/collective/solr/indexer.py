@@ -1,33 +1,34 @@
 # -*- coding: utf-8 -*-
-import os
-
 from logging import getLogger
+from lxml import etree
 from Acquisition import aq_get
 from DateTime import DateTime
 from datetime import date, datetime
-from zope.component import getUtility, queryUtility, queryMultiAdapter
+from zope.component import queryUtility, queryMultiAdapter
 from zope.component import queryAdapter, adapts
 from zope.interface import implements
 from zope.interface import Interface
+from ZODB.interfaces import BlobError
 from ZODB.POSException import ConflictError
 from Products.CMFCore.utils import getToolByName
 from Products.CMFCore.CMFCatalogAware import CMFCatalogAware
 from Products.Archetypes.CatalogMultiplex import CatalogMultiplex
-from Products.Archetypes.interfaces import IBaseObject
-try:
+try:   # pragma: no cover
     from plone.app.content.interfaces import IIndexableObjectWrapper
-except ImportError:
+except ImportError:  # pragma: no cover
     # Plone 5
     from plone.indexer.interfaces import IIndexableObjectWrapper
 from plone.indexer.interfaces import IIndexableObject
+from zope.component import getUtility
+from plone.registry.interfaces import IRegistry
 
-from collective.solr.interfaces import ISolrConnectionConfig
 from collective.solr.interfaces import ISolrConnectionManager
 from collective.solr.interfaces import ISolrIndexQueueProcessor
 from collective.solr.interfaces import ICheckIndexable
 from collective.solr.interfaces import ISolrAddHandler
 from collective.solr.exceptions import SolrConnectionException
 from collective.solr.utils import prepareData
+from collective.solr.utils import getConfig
 from socket import error
 from urllib import urlencode
 
@@ -99,7 +100,6 @@ class DefaultAdder(object):
     """
 
     implements(ISolrAddHandler)
-    adapts(IBaseObject)
 
     def __init__(self, context):
         self.context = context
@@ -115,46 +115,58 @@ class BinaryAdder(DefaultAdder):
     """ Add binary content to index via tika
     """
 
-    def getpath(self):
+    def getblob(self):
         field = self.context.getPrimaryField()
-        blob = field.get(self.context).blob
-        return blob.committed() or blob._p_blob_committed or \
-            blob._p_blob_uncommitted
+        return field.get(self.context).blob
+
+    def getpath(self):
+        blob = self.getblob()
+        if blob is None:
+            return None
+        try:
+            path = blob.committed()
+        except BlobError:
+            path = blob._p_blob_committed or blob._p_blob_uncommitted
+        logger.debug('Indexing BLOB from path %s', path)
+        return path
 
     def __call__(self, conn, **data):
-        if 'ZOPETESTCASE' in os.environ:
-            return super(BinaryAdder, self).__call__(conn, **data)
-        ignore = ('SearchableText', 'created', 'Type', 'links',
-                  'description', 'Date')
         postdata = {}
-        for key, val in data.iteritems():
-            if key in ignore:
-                continue
-            if isinstance(val, list) or isinstance(val, tuple):
-                newvalue = []
-                for item in val:
-                    if isinstance(item, unicode):
-                        item = item.encode('utf-8')
-                    newvalue.append(item)
-            else:
-                newvalue = val
-            postdata['literal.%s' % key] = newvalue
+        path = self.getpath()
+        if path is None:
+            super(BinaryAdder, self).__call__(conn, **data)
         postdata['stream.file'] = self.getpath()
         postdata['stream.contentType'] = data.get(
             'content_type',
             'application/octet-stream'
         )
-        postdata['fmap.content'] = 'SearchableText'
         postdata['extractFormat'] = 'text'
+        postdata['extractOnly'] = 'true'
 
         url = '%s/update/extract' % conn.solrBase
-
         try:
-            conn.doPost(url, urlencode(postdata, doseq=True), conn.formheaders)
-            conn.flush()
+            response = conn.doPost(
+                url, urlencode(postdata, doseq=True), conn.formheaders)
+            root = etree.parse(response)
+            data['SearchableText'] = root.find('.//str').text.strip()
         except SolrConnectionException, e:
             logger.warn('Error %s @ %s', e, data['path_string'])
-            conn.reset()
+            data['SearchableText'] = ''
+        super(BinaryAdder, self).__call__(conn, **data)
+
+
+class DXFileBinaryAdder(BinaryAdder):
+
+    fieldname = 'file'
+
+    def getblob(self):
+        field = getattr(self.context, self.fieldname, None)
+        return getattr(field, '_blob', None)
+
+
+class DXImageBinaryAdder(DXFileBinaryAdder):
+
+    fieldname = 'image'
 
 
 def boost_values(obj, data):
@@ -191,7 +203,14 @@ class SolrIndexProcessor(object):
                 msg = 'schema is missing unique key, skipping indexing of %r'
                 logger.warning(msg, obj)
                 return
+
             if attributes is not None:
+
+                if 'path' in attributes:
+                    attributes = list(attributes)
+                    attributes.extend(['path_string', 'path_parents',
+                                       'path_depth'])
+
                 attributes = set(schema.keys()).intersection(attributes)
                 if not attributes:
                     return
@@ -206,9 +225,10 @@ class SolrIndexProcessor(object):
                 return          # don't index with no data...
             prepareData(data)
             if data.get(uniqueKey, None) is not None and not missing:
-                config = getUtility(ISolrConnectionConfig)
-                if config.commit_within:
-                    data['commitWithin'] = config.commit_within
+                registry = getUtility(IRegistry)
+                config_commit_within = registry['collective.solr.commit_within']   # noqa
+                if config_commit_within:
+                    data['commitWithin'] = config_commit_within
                 try:
                     logger.debug('indexing %r (%r)', obj, data)
                     pt = data.get('portal_type', 'default')
@@ -270,7 +290,7 @@ class SolrIndexProcessor(object):
     def commit(self, wait=None):
         conn = self.getConnection()
         if conn is not None:
-            config = getUtility(ISolrConnectionConfig)
+            config = getConfig()
             if not isinstance(wait, bool):
                 wait = not config.async
             try:

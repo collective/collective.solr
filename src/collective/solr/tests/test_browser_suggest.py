@@ -1,15 +1,17 @@
 # -*- coding: UTF-8 -*-
 from zope.component import getUtility
+from collective.solr.browser.errors import ErrorView
 from collective.solr.interfaces import ISolrConnectionManager
 from collective.solr.testing import (
-    COLLECTIVE_SOLR_INTEGRATION_TESTING
+    LEGACY_COLLECTIVE_SOLR_INTEGRATION_TESTING
 )
 from plone.app.testing import setRoles
 from plone.app.testing import TEST_USER_ID
 from zope.component import getMultiAdapter
 
 import json
-import unittest2 as unittest
+import socket
+import unittest
 
 
 class MockResponse():
@@ -70,7 +72,7 @@ class MockSolrConnectionManager():
 
 class SuggestTermsViewIntegrationTest(unittest.TestCase):
 
-    layer = COLLECTIVE_SOLR_INTEGRATION_TESTING
+    layer = LEGACY_COLLECTIVE_SOLR_INTEGRATION_TESTING
 
     def setUp(self):
         self.portal = self.layer['portal']
@@ -145,3 +147,34 @@ class SuggestTermsViewIntegrationTest(unittest.TestCase):
                 "label": {"freq": 13, "word": "Plone"}
             }])
         )
+
+
+class AutoCompleteTest(unittest.TestCase):
+
+    layer = LEGACY_COLLECTIVE_SOLR_INTEGRATION_TESTING
+
+    def setUp(self):
+        self.portal = self.layer['portal']
+        self.request = self.layer['request']
+
+    def test_autocomplete_noterm(self):
+        ac = self.portal.restrictedTraverse('solr-autocomplete')
+        self.assertEqual(json.loads(ac()), [])
+
+    def test_autocomplete_emptyterm(self):
+        self.request.form['term'] = ''
+        ac = self.portal.restrictedTraverse('solr-autocomplete')
+        self.assertEqual(json.loads(ac()), [])
+
+
+class TestErrorView(unittest.TestCase):
+
+    def test_error_view(self):
+        request = {}
+        try:
+            raise socket.error('Test Exception')
+        except Exception, e:
+            view = ErrorView(e, request)
+        self.assertEqual(
+            view.errorInfo(),
+            {'type': 'socket.error', 'value': ('Test Exception',)})

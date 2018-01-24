@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 from Missing import MV
+from Products.CMFPlone.utils import safe_unicode
 from collective.solr.exceptions import SolrInactiveException
 from collective.solr.interfaces import ISearch
-from collective.solr.interfaces import ISolrConnectionConfig
 from collective.solr.interfaces import ISolrConnectionManager
 from collective.solr.mangler import cleanupQueryParameters
 from collective.solr.mangler import mangleQuery
@@ -14,6 +14,7 @@ from collective.solr.queryparser import quote_iterable_item
 from collective.solr.utils import isWildCard
 from collective.solr.utils import prepareData
 from collective.solr.utils import prepare_wildcard
+from collective.solr.utils import getConfig
 from logging import getLogger
 from time import time
 from zope.component import queryUtility
@@ -43,13 +44,13 @@ class Search(object):
 
     def getConfig(self):
         if self.config is None:
-            self.config = queryUtility(ISolrConnectionConfig)
+            self.config = getConfig()
         return self.config
 
     def search(self, query, **parameters):
         """ perform a search with the given querystring and parameters """
         start = time()
-        config = queryUtility(ISolrConnectionConfig)
+        config = self.getConfig()
         manager = self.getManager()
         manager.setSearchTimeout()
         connection = manager.getConnection()
@@ -84,7 +85,8 @@ class Search(object):
             else:
                 parameters['fl'] = '* score'
         if isinstance(query, dict):
-            query = ' '.join(query.values())
+            query = u' '.join([
+                safe_unicode(val) for val in query.values()]).encode('utf-8')
         logger.debug('searching for %r (%r)', query, parameters)
         if 'sort' in parameters:    # issue warning for unknown sort indices
             index, order = parameters['sort'].split()
@@ -113,10 +115,10 @@ class Search(object):
     def buildQueryAndParameters(self, default=None, **args):
         """ helper to build a querystring for simple use-cases """
         schema = self.getManager().getSchema() or {}
-        config = self.getConfig()
 
         params = subtractQueryParameters(args)
         params = cleanupQueryParameters(params, schema)
+        config = self.getConfig()
 
         languageFilter(args)
         prepareData(args)

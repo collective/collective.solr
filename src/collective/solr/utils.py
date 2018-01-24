@@ -1,26 +1,33 @@
-# -*- coding: utf-8 -*-
 from string import maketrans
 from re import compile, UNICODE
 
 from Acquisition import aq_base
 from unidecode import unidecode
-from zope.component import queryUtility
 
-from collective.solr.interfaces import ISolrConnectionConfig
+from collective.solr.interfaces import ISolrSchema
+from zope.component import getUtility
+from plone.registry.interfaces import IRegistry
+
+
+def getConfig():
+    registry = getUtility(IRegistry)
+    return registry.forInterface(ISolrSchema, prefix='collective.solr')
 
 
 def isActive():
     """ indicate if the solr connection should/can be used """
-    config = queryUtility(ISolrConnectionConfig)
-    if config is not None:
-        return config.active
-    return False
+    try:
+        registry = getUtility(IRegistry)
+        active = registry['collective.solr.active']
+    except KeyError:
+        return False
+    return active
 
 
 def activate(active=True):
     """ (de)activate the solr integration """
-    config = queryUtility(ISolrConnectionConfig)
-    config.active = active
+    registry = getUtility(IRegistry)
+    registry['collective.solr.active'] = active
 
 
 def setupTranslationMap():
@@ -151,7 +158,18 @@ def prepare_wildcard(value):
     # unidecode will produce the same results
     if not isinstance(value, unicode):
         value = unicode(value, 'utf-8', 'ignore')
-    return str(unidecode(value).lower())
+
+    value = str(unidecode(value))
+
+    # boolean operators must not be lowercased, otherwise Solr will interpret
+    # them as search terms. So we split the search term into tokens and
+    # lowercase only the non-operator parts.
+    parts = []
+    for item in value.split():
+        parts.append(item.lower()
+                     if item not in ("AND", "OR", "NOT")
+                     else item)
+    return " ".join(parts)
 
 
 def findObjects(origin):

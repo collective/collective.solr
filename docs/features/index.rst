@@ -6,25 +6,14 @@ Once installed and configured, this add-on introduces a number of end-user featu
 Solr Features
 -------------
 
-
-
 Features of Solr Integration into Plone
 ---------------------------------------
-
 
 Search Enhancements
 *******************
 
-
-
-
 ZCTextIndex Replacement
 ***********************
-
-
-
-
-
 
 Old full description of Features
 --------------------------------

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
+from collective.solr.exceptions import SolrConnectionException
 from collective.solr.parser import SolrResponse
-from collective.solr.testing import COLLECTIVE_SOLR_INTEGRATION_TESTING
+from collective.solr.testing import LEGACY_COLLECTIVE_SOLR_INTEGRATION_TESTING
 from collective.solr.tests.utils import getData
 from collective.solr.utils import findObjects
 from collective.solr.utils import isSimpleSearch
@@ -8,6 +9,7 @@ from collective.solr.utils import isSimpleTerm
 from collective.solr.utils import isWildCard
 from collective.solr.utils import padResults
 from collective.solr.utils import prepareData
+from collective.solr.utils import prepare_wildcard
 from collective.solr.utils import setupTranslationMap
 from collective.solr.utils import splitSimpleSearch
 from unittest import TestCase
@@ -15,7 +17,7 @@ from unittest import TestCase
 
 class UtilsTests(TestCase):
 
-    layer = COLLECTIVE_SOLR_INTEGRATION_TESTING
+    layer = LEGACY_COLLECTIVE_SOLR_INTEGRATION_TESTING
 
     def setUp(self):
         self.app = self.layer['app']
@@ -134,6 +136,36 @@ class UtilsTests(TestCase):
         # other characters might be meaningful in solr, but we don't
         # distinguish them properly (yet)
         self.assertFalse(isWildCard('foo#?'))
+
+    def testPrepareWildcard(self):
+        self.assertEqual(prepare_wildcard("Foo"), "foo")
+        self.assertEqual(prepare_wildcard("and"), "and")
+        self.assertEqual(prepare_wildcard("or"), "or")
+        self.assertEqual(prepare_wildcard("not"), "not")
+        self.assertEqual(prepare_wildcard("Foo and bar"), "foo and bar")
+        self.assertEqual(prepare_wildcard("Foo AND Bar"), "foo AND bar")
+        self.assertEqual(prepare_wildcard("FOO AND NOT BAR"),
+                         "foo AND NOT bar")
+        self.assertEqual(prepare_wildcard("Foo OR Bar"),
+                         "foo OR bar")
+        self.assertEqual(prepare_wildcard("FOO OR NOT BAR"),
+                         "foo OR NOT bar")
+        self.assertEqual(prepare_wildcard("FOO AND BAR OR FOO AND NOT BAR"),
+                         "foo AND bar OR foo AND NOT bar")
+
+    def test_solr_exception(self):
+        e = SolrConnectionException(503, 'Error happend', '<xml></xml>')
+
+        def test_raise():
+            raise e
+
+        self.assertRaisesRegexp(
+            SolrConnectionException, 'HTTP code=503, reason=Error happend',
+            test_raise
+        )
+        self.assertEqual(
+            repr(e), 'HTTP code=503, Reason=Error happend, body=<xml></xml>'
+        )
 
 
 class TranslationTests(TestCase):
