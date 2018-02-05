@@ -30,7 +30,6 @@ Variables  variables.py
 
 Library  Remote  ${PLONE_URL}/RobotRemote
 Library  String
-Library  OperatingSystem
 Library  DateTime
 
 Test Setup  TestSetup
@@ -137,10 +136,9 @@ Scenario: As anonymous user I can filter the test results by creation date
 # Test Setup/Teardown
 
 Open chrome browser
-  ${NODE_ENV}=  Get Environment Variable  NODE_ENV  default=dev
-  ${NODE_ENV}=  Convert To Lowercase  ${NODE_ENV}
   # set desired capabilities
   ${options}=  Evaluate  sys.modules['selenium.webdriver'].ChromeOptions()  sys, selenium.webdriver
+  Call Method  ${options}  add_argument  headless
   Call Method  ${options}  add_argument  disable-extensions
   Call Method  ${options}  add_argument  disable-web-security
   Call Method  ${options}  add_argument  window-size\=1280,1024
