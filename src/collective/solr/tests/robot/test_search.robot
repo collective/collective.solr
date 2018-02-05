@@ -29,6 +29,8 @@ Resource  plone/app/robotframework/keywords.robot
 Variables  variables.py
 
 Library  Remote  ${PLONE_URL}/RobotRemote
+Library  String
+Library  OperatingSystem
 Library  DateTime
 
 Test Setup  TestSetup
@@ -134,8 +136,21 @@ Scenario: As anonymous user I can filter the test results by creation date
 
 # Test Setup/Teardown
 
+Open chrome browser
+  ${NODE_ENV}=  Get Environment Variable  NODE_ENV  default=dev
+  ${NODE_ENV}=  Convert To Lowercase  ${NODE_ENV}
+  # set desired capabilities
+  ${options}=  Evaluate  sys.modules['selenium.webdriver'].ChromeOptions()  sys, selenium.webdriver
+  Call Method  ${options}  add_argument  disable-extensions
+  Call Method  ${options}  add_argument  disable-web-security
+  Call Method  ${options}  add_argument  window-size\=1280,1024
+  # Call Method  ${options}  add_argument  remote-debugging-port\=9223
+  Create WebDriver  Chrome  chrome_options=${options}
+  # ${s2l}=  Get Library Instance  Selenium2Library
+  # Log Dictionary  ${s2l._current_browser().capabilities}  WARN
+
 TestSetup
-  Open test browser
+  Open chrome browser
   a logged in Manager
   Go to  ${PLONE_URL}/@@solr-maintenance/clear
   Wait until page contains  solr index cleared
