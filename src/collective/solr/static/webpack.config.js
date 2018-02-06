@@ -1,29 +1,30 @@
-var webpack = require('webpack');
-var HtmlWebpackPlugin = require('html-webpack-plugin');
+var webpack = require("webpack");
+var HtmlWebpackPlugin = require("html-webpack-plugin");
 
 var config = {
-  entry: './src/index.jsx',
+  entry: "./src/index.jsx",
   output: {
-    path: __dirname + '/dist',
-    filename: 'search.min.js'
+    path: __dirname + "/dist",
+    filename: "search.min.js"
   },
   module: {
     loaders: [
       {
         test: /\.jsx$/,
-        loader: 'babel',
+        loader: "babel",
         exclude: /node_modules/,
         query: {
-          presets: ['es2015','react']
+          presets: ["env", "react"],
+          plugins: ["transform-class-properties"]
         }
       },
-      { test: /\.css$/, loaders: ["style", "css"] },
+      { test: /\.css$/, loaders: ["style", "css"] }
     ]
   },
   plugins: [
     new HtmlWebpackPlugin({
-      title: 'Webpack Starter React',
-      template: 'src/index.html',
+      title: "Webpack Starter React",
+      template: "src/index.html",
       minify: {
         collapseWhitespace: true,
         removeComments: true,
@@ -40,22 +41,21 @@ var config = {
     historyApiFallback: true,
     inline: true
   },
-  devtool: 'eval-source-map'
+  devtool: "eval-source-map"
 };
-
 
 /*
  * If bundling for production, optimize output
  */
-if (process.env.NODE_ENV === 'production') {
+if (process.env.NODE_ENV === "production") {
   config.devtool = false;
   config.plugins = [
     new webpack.optimize.OccurenceOrderPlugin(),
-    new webpack.optimize.UglifyJsPlugin({comments: false}),
+    new webpack.optimize.UglifyJsPlugin({ comments: false }),
     new webpack.DefinePlugin({
-      'process.env': {NODE_ENV: JSON.stringify('production')}
+      "process.env": { NODE_ENV: JSON.stringify("production") }
     })
   ];
-};
+}
 
 module.exports = config;
