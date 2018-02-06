@@ -43,7 +43,6 @@ Scenario: As anonymous user I can search on the front page
   Given a public document with the title 'Colorless Green Ideas'
     and an anonymous user
    When I search for 'Colorless Green Ideas' on the front page
-   Debug
    Then the search returns '1' results
     and the search results should include 'Colorless Green Ideas'
 
