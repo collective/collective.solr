@@ -1,21 +1,72 @@
 Changelog
 =========
 
-6.0 (unreleased)
+6.0a3 (unreleased)
 ------------------
 
-- New flag: Ignore exceptions that occur during reindexing. 
-  Ignoring exceptions becomes the default when running solr_reindex.
-  [tschorr]
+- Nothing changed yet.
+
+
+6.0a2 (2017-07-17)
+------------------
+
+- Fixed React widget to add cookies while fetching @search endpoint
+  [sneridagh]
+
+- Handle non-ascii values in the query.
+  [reinhardt]
+
+- solr.cfg: configure JMX host and port separately.
+  [maurits]
+
+- Added link to Solr sync in our control panel.  Added titles to all
+  four maintenance links that briefly explain what they do.
+  [maurits]
+
+- Added upgrade step for registry to upgrade from version 5.0.3.
+  Otherwise you get KeyError: ``collective.solr.facets`` in the search viewlet.
+  And on the control panel you get another KeyError: 'Interface
+  ``collective.solr.interfaces.ISolrSchema`` defines a field
+  ``index_timeout``, for which there is no record.'
+  Note that this resets your configuration.
+  You may want to make a screen shot of your previous configuration
+  before you update your buildout to collective.solr 6.
+  See https://github.com/collective/collective.solr/issues/155
+  [maurits]
+
+- Implement reindexing the path indexes in solr. This means in solr path_string, path_parents and path_depth are updated on `obj.reindexObject(idxs=['path'])`.
+  [mathias.leimgruber]
+
+- Remove experimental.lazycatalog monkey patch and let
+  SolrResponse inherit from ZCatalog Lazy class.
+  [tomgross]
+
+- Remove hard dependency on Archetypes
+  [tomgross]
+
+- Implement ``searchwords`` and ``showinsearch`` as Dexterity behavior.
+  [tomgross]
+
+- Updated german translation
+  [tomgross]
+
+
+6.0a1 (2016-10-11)
+------------------
+
+- Plone 5 compatibility
+  [timo, tomgross, sneridagh, gforcada]
+
+- New ReactJS based search UI
+  [timo, sneridagh]
 
 - Boost script now available via control panel
   [tomgross]
 
-- Plone 5 compatibility
-  [timo,gforcada,tomgross]
+- Add ignore_exceptions option for Solr reindex. This option is true by
+  default when running solr_reindex from the command line.
+  [tschorr]
 
-- New ReactJS based search UI
-  [timo]
 
 5.0.3 (2016-06-05)
 ------------------

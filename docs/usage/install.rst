@@ -10,7 +10,8 @@ The following buildout configuration may be used to get started quickly::
   [buildout]
   extends =
     buildout.cfg
-    https://github.com/collective/collective.solr/raw/master/buildout/solr.cfg
+    https://raw.githubusercontent.com/collective/collective.solr/master/solr.cfg
+    https://raw.githubusercontent.com/collective/collective.solr/master/solr-4.10.x.cfg
 
   [instance]
   eggs += collective.solr
@@ -42,12 +43,6 @@ You can also use this approach when making changes to the index structure or cha
 Note that the example ``solr.cfg`` is bound to change.
 Always copy the file to your local buildout.
 In general you should never rely on extending buildout config files from servers that aren't under your control.
-
-
-Installing Solr
-***************
-
-
 
 
 .. _Solr: http://lucene.apache.org/solr/

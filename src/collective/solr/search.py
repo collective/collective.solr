@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from Missing import MV
+from Products.CMFPlone.utils import safe_unicode
 from collective.solr.exceptions import SolrInactiveException
 from collective.solr.interfaces import ISearch
 from collective.solr.interfaces import ISolrConnectionManager
@@ -84,7 +85,8 @@ class Search(object):
             else:
                 parameters['fl'] = '* score'
         if isinstance(query, dict):
-            query = ' '.join(query.values())
+            query = u' '.join([
+                safe_unicode(val) for val in query.values()]).encode('utf-8')
         logger.debug('searching for %r (%r)', query, parameters)
         if 'sort' in parameters:    # issue warning for unknown sort indices
             index, order = parameters['sort'].split()

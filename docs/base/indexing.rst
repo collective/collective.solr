@@ -1,8 +1,8 @@
 Indexing
 ********
 
-Solr is not transactional aware or supports any kind of rollback or undo.
-We therefor only sent data to Solr at the end of any successful request.
+Solr is not transactional aware and does not support any kind of rollback or undo.
+We therefor only send data to Solr at the end of any successful request.
 This is done via collective.indexing,
 a transaction manager and an end request transaction hook.
 This means you won't see any changes done to content inside a request when doing Solr searches later on in the same request.

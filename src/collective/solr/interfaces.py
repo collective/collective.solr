@@ -210,12 +210,15 @@ class ISolrSchema(Interface):
     )
 
     highlight_fields = List(
-        title=_(u'Highlighting fields'),
+        title=_('label_highlight_fields', u'Highlighting fields'),
         description=_(
-            u'Fields that should be used for highlighting. '
-            u'Snippets of text will be generated from the contents '
-            u' of these fields, with the search keywords that'
-            u'matched highlighted inside the text.'
+            'help_highlight_fields',
+            default=(
+                u'Fields that should be used for highlighting. '
+                u'Snippets of text will be generated from the contents '
+                u'of these fields, with the search keywords that '
+                u'matched highlighted inside the text.'
+            )
         ),
         value_type=TextLine(),
         default=[],
@@ -223,31 +226,52 @@ class ISolrSchema(Interface):
     )
 
     highlight_formatter_pre = TextLine(
-        title=_(u'Highlight formatter: pre'),
-        description=_(u'The text to insert before the highlighted keyword.'),
+        title=_(
+            'label_highlight_formatter_pre',
+            default=u'Highlight formatter: pre'
+        ),
+        description=_(
+            'help_highlight_formatter_pre',
+            default=u'The text to insert before the highlighted keyword.'
+        ),
         default=u'[', required=False
     )
 
     highlight_formatter_post = TextLine(
-        title=_(u'Highlight formatter: post'),
-        description=_(u'The text to insert after the highlighted keyword.'),
+        title=_(
+            'label_highlight_formatter_post',
+            default=u'Highlight formatter: post'
+        ),
+        description=_(
+            'help_highlight_formatter_post',
+            default=u'The text to insert after the highlighted keyword.'
+        ),
         default=u']',
         required=False
     )
 
     highlight_fragsize = Int(
-        title=_(u'Highlight Fragment Size'), default=100,
+        title=_(
+            'label_highlight_fragsize',
+            default=u'Highlight Fragment Size'
+        ),
         description=_(
-            u'The size, in characters, of the snippets (aka '
-            U'fragments) created by the highlighter.'
-        )
+            'help_highlight_fragsize',
+            default=(
+                u'The size, in characters, of the snippets (aka '
+                u'fragments) created by the highlighter.')
+        ),
+        default=100,
     )
 
     field_list = List(
-        title=_(u'Default fields to be returned'),
-        description=_(u'Specify metadata fields that should be returned for '
-                      u'items in the result set, one per line. Defaults to '
-                      u'all available plus ranking score.'),
+        title=_('label_field_list', default=u'Default fields to be returned'),
+        description=_(
+            'help_field_list',
+            default=(u'Specify metadata fields that should be returned for '
+                     u'items in the result set, one per line. Defaults to '
+                     u'all available plus ranking score.')
+        ),
         value_type=TextLine(),
         default=[],
         required=False
@@ -288,7 +312,7 @@ class ISolrSchema(Interface):
         default=u'',
         missing_value=u'',
         description=_(
-            'help_search_pattern',
+            'help_boost_script',
             default=u'This script is meant to be customized according to '
                     u'site-specific search requirements, e.g. boosting '
                     u'certain content types like "news items", ranking older '

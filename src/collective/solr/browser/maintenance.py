@@ -391,7 +391,7 @@ class SolrMaintenanceView(BrowserView):
                             reindexed += 1
                         else:
                             log('  missing data, cannot index.\n')
-            log('handled batch of %d items, commiting\n' % len(res))
+            log('handled batch of %d items, committing\n' % len(res))
             conn.commit()
             start += batch
             resp = SolrResponse(conn.search(q='*:*', rows=batch, start=start))

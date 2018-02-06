@@ -12,11 +12,12 @@ from plone.app.testing import TEST_USER_ID
 from plone.app.testing import setRoles
 from transaction import abort
 from transaction import commit
-from unittest import TestCase
 from zope.component import getUtility
 
 
-class LinguaTests(TestCase):
+@unittest.skipUnless(HAS_LINGUAPLONE,
+                     "LinguaPlone not installed. skipping")
+class LinguaTests(unittest.TestCase):
 
     layer = LEGACY_COLLECTIVE_SOLR_FUNCTIONAL_TESTING
 
@@ -43,8 +44,6 @@ class LinguaTests(TestCase):
         self.config.async = False
         commit()
 
-    @unittest.skipIf(not HAS_LINGUAPLONE,
-                     "LinguaPlone not installed. skipping")
     def testLanguageSearch(self):
         en = self.portal[self.portal.invokeFactory('Document', 'doc')]
         en.update(title='some document', language='en')

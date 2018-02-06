@@ -3,6 +3,8 @@ from datetime import datetime
 from StringIO import StringIO
 
 from DateTime import DateTime
+from Products.ZCatalog.Lazy import Lazy
+from Products.ZCatalog.Lazy import _marker
 from zope.interface import implements
 
 from collective.solr.interfaces import ISolrFlare
@@ -85,7 +87,7 @@ def setter(item, name, value):
         setattr(item, name, value)
 
 
-class SolrResponse(object):
+class SolrResponse(Lazy):
     """ a solr search response; TODO: this should get an interface!! """
 
     __allow_access_to_unprotected_subobjects__ = True
@@ -133,7 +135,10 @@ class SolrResponse(object):
         return 0
 
     def __len__(self):
-        return len(self.results())
+        if self._len is not _marker:
+            return self._len
+        self._len = len(self.results())
+        return self._len
 
     def __getitem__(self, index):
         return self.results()[index]

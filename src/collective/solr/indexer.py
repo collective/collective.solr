@@ -203,7 +203,14 @@ class SolrIndexProcessor(object):
                 msg = 'schema is missing unique key, skipping indexing of %r'
                 logger.warning(msg, obj)
                 return
+
             if attributes is not None:
+
+                if 'path' in attributes:
+                    attributes = list(attributes)
+                    attributes.extend(['path_string', 'path_parents',
+                                       'path_depth'])
+
                 attributes = set(schema.keys()).intersection(attributes)
                 if not attributes:
                     return

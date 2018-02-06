@@ -23,18 +23,31 @@
 
     <a class="link-parent"
        tal:attributes="href string:@@solr-maintenance/reindex"
+       title="Find all objects in Plone and reindex them in Solr"
+       i18n:attributes="title"
        i18n:translate="">
         Solr Reindex
     </a>
     <a class="link-parent"
        tal:attributes="href string:@@solr-maintenance/clear"
+       title="Clear all data from Solr"
+       i18n:attributes="title"
        i18n:translate="">
         Clear Solr Index
     </a>
     <a class="link-parent"
        tal:attributes="href string:@@solr-maintenance/cleanup"
+       title="Remove no longer existing objects from Solr"
+       i18n:attributes="title"
        i18n:translate="">
         Cleanup Solr Index
+    </a>
+    <a class="link-parent"
+       tal:attributes="href string:@@solr-maintenance/sync;"
+       title="Index missing objects and remove no longer existing objects from Solr"
+       i18n:attributes="title"
+       i18n:translate="">
+        Sync Solr Index
     </a>
 
     <div id="content-core">

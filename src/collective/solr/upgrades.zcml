@@ -13,5 +13,14 @@
     profile="collective.solr:default"
     />
 
+  <genericsetup:upgradeStep
+    title="Upgrade to collective.solr 3"
+    description="Add our interface to the registry and remove old config util."
+    source="2"
+    destination="3"
+    handler=".setuphandlers.update_registry"
+    sortkey="1"
+    profile="collective.solr:default"
+    />
 
 </configure>

@@ -28,13 +28,22 @@ Resource  plone/app/robotframework/keywords.robot
 #Resource  Products/CMFPlone/tests/robot/keywords.robot
 
 Library  Remote  ${PLONE_URL}/RobotRemote
+Library  String
 Library  DateTime
+Library  DebugLibrary
 
 Test Setup  TestSetup
 Test Teardown  TestTeardown
 
 
 *** Test Cases ***************************************************************
+
+Scenario: As anonymous user I can search on the front page
+  Given a public document with the title 'Colorless Green Ideas'
+    and an anonymous user
+   When I search for 'Colorless Green Ideas' on the front page
+   Then the search returns '1' results
+    and the search results should include 'Colorless Green Ideas'
 
 Scenario: As anonymous user I can search for a document title
   Given a public document with the title 'Colorless Green Ideas'
@@ -131,8 +140,20 @@ Scenario: As anonymous user I can filter the test results by creation date
 
 # Test Setup/Teardown
 
+Open chrome browser
+  # set desired capabilities
+  ${options}=  Evaluate  sys.modules['selenium.webdriver'].ChromeOptions()  sys, selenium.webdriver
+  # Call Method  ${options}  add_argument  headless
+  Call Method  ${options}  add_argument  disable-extensions
+  Call Method  ${options}  add_argument  disable-web-security
+  Call Method  ${options}  add_argument  window-size\=1280,1024
+  # Call Method  ${options}  add_argument  remote-debugging-port\=9223
+  Create WebDriver  Chrome  chrome_options=${options}
+  # ${s2l}=  Get Library Instance  Selenium2Library
+  # Log Dictionary  ${s2l._current_browser().capabilities}  WARN
+
 TestSetup
-  Open test browser
+  Open chrome browser
   a logged in Manager
   Go to  ${PLONE_URL}/@@solr-maintenance/clear
   Wait until page contains  solr index cleared
@@ -185,6 +206,15 @@ an anonymous user
 I search for '${searchterm}'
   Go to  ${PLONE_URL}/@@search
   Input text  xpath=//div[@id='searchform']//input[@name='SearchableText']  ${searchterm}
+
+
+I search for '${searchterm}' on the front page
+  Go to  ${PLONE_URL}
+  Input text  css=input[name='SearchableText']  ${searchterm}
+  Click button  css=*[value='Search']
+
+We are not on Plone 4
+  Pass Execution If  ${IS_PLONE4}  Skipping Test in Plone 4.3
 
 I filter the search by portal type '${portal_type}'
   Click Button  xpath=//button[@id='search-filter-toggle']
