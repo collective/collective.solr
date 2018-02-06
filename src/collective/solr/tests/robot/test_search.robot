@@ -213,9 +213,6 @@ I search for '${searchterm}' on the front page
   Input text  css=input[name='SearchableText']  ${searchterm}
   Click button  css=*[value='Search']
 
-We are not on Plone 4
-  Pass Execution If  ${IS_PLONE4}  Skipping Test in Plone 4.3
-
 I filter the search by portal type '${portal_type}'
   Click Button  xpath=//button[@id='search-filter-toggle']
   Wait until element is visible  xpath=//input[@id='query-portaltype-Collection']
