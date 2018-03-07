@@ -23,3 +23,7 @@ docs/Makefile
 docs/make.bat
 !src/collective/solr/static/dist
 src/collective/solr/static/node_modules
+.coverage
+.vscode/
+local/
+share/
