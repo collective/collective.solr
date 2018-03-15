@@ -7,7 +7,7 @@ import defaults from 'lodash-es/defaults';
 export default defaults(
   {},
   {
-    apiPath: process.env.API_PATH,
+    apiPath: process.env.REACT_APP_API_PATH,
   },
   {
     apiPath: document.getElementById('container')
