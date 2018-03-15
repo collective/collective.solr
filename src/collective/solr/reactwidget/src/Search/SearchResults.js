@@ -13,11 +13,6 @@ class SearchResults extends Component {
 
   render() {
     const { results } = this.props;
-    const isEmpty = results.length === 0;
-    console.log(isEmpty);
-    if (isEmpty) {
-      return <h2>No results</h2>;
-    }
 
     return (
       <ol className="list-sections list-events">
