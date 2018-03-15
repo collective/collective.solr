@@ -2,6 +2,7 @@
   "name": "reactwidget",
   "version": "0.1.0",
   "private": true,
+  "homepage": "https://plonedemo.kitconcept.com/solrdemo",
   "dependencies": {
     "lodash-es": "^4.17.7",
     "react": "^16.2.0",
