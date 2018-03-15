@@ -5,6 +5,20 @@ import types from './types';
 const initialState = {
   error: null,
   items: [],
+  subjects: [],
+  types: [
+    { title: 'Folder', token: 'Folder' },
+    { title: 'Document', token: 'Document' },
+    { title: 'Collection', token: 'Collection' },
+    { title: 'News Item', token: 'News Item' },
+    { title: 'Event', token: 'Event' },
+  ],
+  sorting: [
+    { title: 'Relevanz', token: 'relevance' },
+    { title: 'Datum', token: 'date' },
+    { title: 'Alphabetisch', token: 'sortable_title' },
+  ],
+  options: {},
   total: 0,
   loaded: false,
   loading: false,
@@ -56,6 +70,26 @@ const reducer = (state = initialState, action = {}) => {
         total: 0,
         loading: false,
         loaded: false,
+      };
+    case `${types.GET_SUBJECTS}_PENDING`:
+      return {
+        ...state,
+        error: null,
+        loading: true,
+        loaded: false,
+      };
+    case `${types.GET_SUBJECTS}_FAIL`:
+      return {
+        ...state,
+        error: action.error,
+        subjects: [],
+        loading: false,
+        loaded: false,
+      };
+    case `${types.GET_SUBJECTS}_SUCCESS`:
+      return {
+        ...state,
+        subjects: action.result.terms,
       };
     default:
       return state;
