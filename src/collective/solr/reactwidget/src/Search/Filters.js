@@ -22,16 +22,20 @@ class Filters extends Component {
   }
 
   resetCheckboxes = () => {
-    this.setState({ selectedSubjectsCheckboxes: new Set() });
-    // dispatch(
-    //   refreshEvents({
-    //     items: this.selectedSubjectsCheckboxes,
-    //     locations: this.selectedLocationCheckboxes,
-    //   }),
-    // );
+    this.setState(() => ({
+      selectedSubjectsCheckboxes: new Set(),
+    }));
+    this.setState(() => ({
+      selectedTypesCheckboxes: new Set(),
+    }));
+    this.setState(() => ({
+      selectedSortingCheckboxes: ['relevance'],
+    }));
+    this.props.resetResults();
   };
 
   handleChangeFilter = (item, type) => {
+    debugger;
     let currentFilterSelection;
     switch (type) {
       case 'subjects':
@@ -125,5 +129,6 @@ export default connect(
   {
     getSubjects: searchActions.getSubjects,
     updateResults: searchActions.updateResults,
+    resetResults: searchActions.resetResults,
   },
 )(Filters);

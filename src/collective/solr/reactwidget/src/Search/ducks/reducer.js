@@ -67,6 +67,7 @@ const reducer = (state = initialState, action = {}) => {
         ...state,
         error: null,
         items: [],
+        options: {},
         total: 0,
         loading: false,
         loaded: false,
