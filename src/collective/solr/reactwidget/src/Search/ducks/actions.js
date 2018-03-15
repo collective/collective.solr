@@ -2,7 +2,7 @@ import types from './types';
 import { join, head, map, toPairs, pickBy } from 'lodash-es';
 
 export const getResults = (url, options) => {
-  let querystring;
+  let querystring = '';
   const simplequerystring = options
     ? join(
         map(
