@@ -67,7 +67,7 @@ class SolrLayer(Layer):
         """Start Solr and poll until it is up and running.
         """
         self.proc = subprocess.call(
-            './solr-instance start',
+            './solr-start',
             shell=True,
             close_fds=True,
             cwd=BIN_DIR
@@ -85,7 +85,7 @@ class SolrLayer(Layer):
                 sys.stdout.write('.')
             if i == 9:
                 subprocess.call(
-                    './solr-instance stop',
+                    './solr-stop',
                     shell=True,
                     close_fds=True,
                     cwd=BIN_DIR
@@ -96,7 +96,7 @@ class SolrLayer(Layer):
         """Stop Solr.
         """
         subprocess.check_call(
-            './solr-instance stop',
+            './solr-stop',
             shell=True,
             close_fds=True,
             cwd=BIN_DIR
