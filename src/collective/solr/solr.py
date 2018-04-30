@@ -307,7 +307,8 @@ class SolrConnection:
         return response
 
     def getSchema(self):
-        schema_url = '%s/admin/file/?file=schema.xml'
+        # schema_url = '%s/admin/file/?file=schema.xml'
+        schema_url = '%s/admin/file/?file=managed-schema'
         logger.debug('getting schema from: %s', schema_url % self.solrBase)
         try:
             self.conn.request('GET', schema_url % self.solrBase)
@@ -323,4 +324,5 @@ class SolrConnection:
         if response.status == 200:
             xml = response.read()
             return SolrSchema(xml.strip())
+
         self.__errcheck(response)       # raise a SolrConnectionException
