@@ -5,7 +5,7 @@ Changelog
 ------------------
 
 - Plone 5.1 compatibility.
-  [timo]
+  [timo, jaroel]
 
 
 6.0a2 (2017-07-17)
