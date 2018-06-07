@@ -154,3 +154,21 @@ class ContentListingTests(TestCase):
     def test_creation_date(self):
         self.assertTrue(
             self.flare.flare.CreationDate.startswith('1969-12-31T'))
+
+    def test_UID(self):
+        self.assertEqual(
+            self.flare.UID,
+            self.flare.flare.UID
+        )
+
+    def test_portal_type(self):
+        self.assertEqual(
+            self.flare.portal_type,
+            self.flare.PortalType()
+        )
+
+    def test_modified(self):
+        self.assertEqual(
+            self.flare.modified,
+            self.flare.ModificationDate()
+        )
