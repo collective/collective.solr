@@ -147,3 +147,5 @@ class FlareContentListingObject(object):
             # fallback if registry key is None
             length = 160
         return plone_view.cropText(self.flare.Description, length)
+    def MimeTypeIcon(self):
+        raise NotImplementedError
