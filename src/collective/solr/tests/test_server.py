@@ -627,8 +627,10 @@ class SolrServerTests(TestCase):
         self.assertTrue(isinstance(response.responseHeader, dict))
         headers = response.responseHeader
         self.assertEqual(sorted(headers), ['QTime', 'params', 'status'])
-        self.assertEqual(headers['params']['q'],
-                         '+SearchableText:(news* OR News)')
+        self.assertEqual(
+            headers['params']['q'],
+            '+path_parents:"\\/plone" +SearchableText:(news* OR News)'
+        )
 
     def testSolrSearchResultsInformationForCustomSearchPattern(self):
         self.maintenance.reindex()
@@ -636,31 +638,50 @@ class SolrServerTests(TestCase):
         # for single-word searches we get both, wildcards & the custom pattern
         response = solrSearchResults(SearchableText='news', Language='all')
         query = response.responseHeader['params']['q']
-        self.assertEqual(query, '(Title:(news* OR news)^5 '
-                         'OR getId:(news* OR news))')
+        self.assertEqual(
+            query,
+            '+path_parents:"\\/plone" (Title:(news* OR news)^5 '
+            'OR getId:(news* OR news))'
+        )
         # the pattern is applied for multi-word searches
         response = solrSearchResults(SearchableText='foo bar', Language='all')
         query = response.responseHeader['params']['q']
-        self.assertEqual(query,
-                         '(Title:((foo* OR foo) (bar* OR bar))^5 OR '
-                         'getId:((foo* OR foo) (bar* OR bar)))')
+        self.assertEqual(
+            query,
+            '+path_parents:"\\/plone" '
+            '(Title:((foo* OR foo) (bar* OR bar))^5 OR '
+            'getId:((foo* OR foo) (bar* OR bar)))'
+        )
         # extra parameters should be unaffected
         response = solrSearchResults(SearchableText='"news"', Type='xy',
                                      Language='all')
         query = response.responseHeader['params']['q']
-        self.assertEqual(query, '+Type:xy (Title:"news"^5 OR getId:"news")')
+        self.assertEqual(
+            query,
+            '+path_parents:"\\/plone" +Type:xy '
+            '(Title:"news"^5 OR getId:"news")'
+        )
         # both value and base_value work
         self.config.search_pattern = '(Title:{value} OR getId:{base_value})'
         response = solrSearchResults(SearchableText='news', Language='all')
         query = response.responseHeader['params']['q']
-        self.assertEqual(query, '(Title:(news* OR news) OR getId:(news))')
+        self.assertEqual(
+            query,
+            '+path_parents:"\\/plone" (Title:(news* OR news) OR getId:(news))'
+        )
         # and they handle wildcards as advertised
         response = solrSearchResults(SearchableText='news*', Language='all')
         query = response.responseHeader['params']['q']
-        self.assertEqual(query, '(Title:(news*) OR getId:(news))')
+        self.assertEqual(
+            query,
+            '+path_parents:"\\/plone" (Title:(news*) OR getId:(news))'
+        )
         response = solrSearchResults(SearchableText='*news*', Language='all')
         query = response.responseHeader['params']['q']
-        self.assertEqual(query, '(Title:(news*) OR getId:(news))')
+        self.assertEqual(
+            query,
+            '+path_parents:"\\/plone" (Title:(news*) OR getId:(news))'
+        )
 
     def testSolrSearchResultsWithDictRequest(self):
         self.maintenance.reindex()

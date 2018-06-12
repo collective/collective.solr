@@ -15,6 +15,8 @@ Changelog
 - Implement reindexing the path indexes in solr. This means in solr path_string, path_parents and path_depth are updated on `obj.reindexObject(idxs=['path'])`.
   [mathias.leimgruber]
 
+- Isolate Solr query to allow multiple Plone sites in one ZODB  #163
+  [tomgross]
 
 5.0.3 (2016-06-05)
 ------------------

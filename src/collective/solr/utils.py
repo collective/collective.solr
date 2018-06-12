@@ -4,6 +4,7 @@ from re import compile, UNICODE
 from Acquisition import aq_base
 from unidecode import unidecode
 from zope.component import queryUtility
+from zope.component.hooks import getSite
 
 from collective.solr.interfaces import ISolrConnectionConfig
 
@@ -38,7 +39,7 @@ def setupTranslationMap():
 translation_map = setupTranslationMap()
 
 
-def prepareData(data):
+def prepareData(data, on_search=False):
     """ modify data according to solr specifics, i.e. replace ':' by '$'
         for "allowedRolesAndUsers" etc;  please note that this function
         is also used while indexing, so no query-specific modification
@@ -63,6 +64,11 @@ def prepareData(data):
     path = data.get('path')
     if isinstance(path, dict) and not path.get('query'):
         data.pop('path')
+    if not data.get('path') and on_search:
+        site = getSite()
+        if site is not None:
+            site_path = '/'.join(site.getPhysicalPath())
+            data['path'] = {'query': site_path}
 
 
 simpleTerm = compile(r'^[\w\d]+$', UNICODE)
