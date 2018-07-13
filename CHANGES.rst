@@ -4,8 +4,15 @@ Changelog
 6.0a3 (unreleased)
 ------------------
 
+New Features:
+
 - Plone 5.1 compatibility.
   [timo, jaroel]
+
+Bugfixes:
+
+- Make plone.protect dependency optional.
+  [timo]
 
 
 6.0a2 (2017-07-17)
