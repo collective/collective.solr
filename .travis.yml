@@ -17,6 +17,7 @@ env:
 #  allow_failures:
 #    - env: PLONE_VERSION=4.3.x SOLR_VERSION=5.1.x
 #    - env: PLONE_VERSION=5.0.x SOLR_VERSION=5.1.x
+dist: trusty
 addons:
   apt:
     sources:

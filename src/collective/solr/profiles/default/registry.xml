@@ -5,7 +5,7 @@
     <value key="active">False</value>
     <value key="host">127.0.0.1</value>
     <value key="port">8983</value>
-    <value key="base">/solr</value>
+    <value key="base">/solr/plone</value>
     <value key="index_timeout">0.0</value>
     <value key="search_timeout">0.0</value>
     <value key="max_results">10000000</value>
