@@ -126,6 +126,14 @@ Scenario: As anonymous user I can filter the test results by creation date
     and the search results should include 'Colorless Green Ideas'
   Capture screenshot  search_document_filter_by_creation_date.png
 
+Scenario: As logged in user I can find a private document
+  Given a private document with the title 'Colorless Green Ideas'
+    and a logged in user
+   When I search for 'Colorless Green Ideas'
+   Then the search returns '1' results
+    and the search results should include 'Colorless Green Ideas'
+  Capture screenshot  search_document_title.png
+
 # Todo:
 # Synonyms
 # Phrase Search
