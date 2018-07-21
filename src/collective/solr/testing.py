@@ -73,7 +73,7 @@ class SolrLayer(Layer):
             cwd=BIN_DIR
         )
         # Poll Solr until it is up and running
-        solr_ping_url = '{0}/admin/ping'.format(self.solr_url)
+        solr_ping_url = '{0}/admin/ping?wt=xml'.format(self.solr_url)
         for i in range(1, 10):
             try:
                 result = urllib2.urlopen(solr_ping_url)
