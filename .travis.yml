@@ -7,10 +7,10 @@ cache:
   pip: true
   directories:
     - $HOME/buildout-cache
-env:
-  - PLONE_VERSION=4.3.x SOLR_VERSION=4.10.x
-  - PLONE_VERSION=5.0.x SOLR_VERSION=4.10.x
-  - PLONE_VERSION=5.1.x SOLR_VERSION=4.10.x
+# env:
+#  - PLONE_VERSION=4.3.x SOLR_VERSION=4.10.x
+#  - PLONE_VERSION=5.0.x SOLR_VERSION=4.10.x
+#  - PLONE_VERSION=5.1.x SOLR_VERSION=4.10.x
 #  - PLONE_VERSION=4.3.x SOLR_VERSION=5.1.x
 #  - PLONE_VERSION=5.0.x SOLR_VERSION=5.1.x
 #matrix:
@@ -36,9 +36,9 @@ before_install:
   - bin/pip install zest.pocompile
   - bin/pocompile src
 install:
-  - sed -ie "s#plone-x.x.x.cfg#plone-$PLONE_VERSION.cfg#" travis.cfg
-  - sed -ie "s#solr-x.x.x.cfg#solr-$SOLR_VERSION.cfg#" travis.cfg
-  - bin/buildout -N -t 20 -c travis.cfg
+  # - sed -ie "s#plone-x.x.x.cfg#plone-$PLONE_VERSION.cfg#" travis.cfg
+  # - sed -ie "s#solr-x.x.x.cfg#solr-$SOLR_VERSION.cfg#" travis.cfg
+  - bin/buildout -N -t 20
 script:
   - bin/code-analysis
   - bin/coverage run bin/test
