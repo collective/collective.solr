@@ -321,6 +321,7 @@ class SolrConnection:
             self.__reconnect()
             self.conn.request('GET', schema_url % self.solrBase)
             response = self.conn.getresponse()
+
         if response.status == 200:
             xml = response.read()
             return SolrSchema(xml.strip())

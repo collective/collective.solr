@@ -19,7 +19,7 @@ active without *having* it active.
     >>> config.port
     8983
     >>> str(config.base)
-    '/solr'
+    '/solr/plone'
     >>> config.async
     False
     >>> config.auto_commit
@@ -143,7 +143,7 @@ Make sure the changes have been applied correctly to the tool:
     >>> config.port
     1234
     >>> config.base
-    u'/solr'
+    u'/solr/plone'
     >>> config.async
     True
     >>> config.auto_commit

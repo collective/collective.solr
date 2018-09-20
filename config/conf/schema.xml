@@ -1,142 +1,144 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<schema name="solr-core-plone" version="1.6">
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<schema name="plone" version="1.5">
+
   <uniqueKey>id</uniqueKey>
 
-  <!-- Default Field Types -->
-  <fieldType name="long" class="solr.TrieLongField" positionIncrementGap="0" precisionStep="0"/>
-  <fieldType name="booleans" class="solr.BoolField" sortMissingLast="true" multiValued="true"/>
-  <fieldType name="date" class="solr.TrieDateField" positionIncrementGap="0" precisionStep="0"/>
-  <fieldType name="tfloat" class="solr.TrieFloatField" positionIncrementGap="0" precisionStep="8"/>
-  <fieldType name="tfloats" class="solr.TrieFloatField" positionIncrementGap="0" multiValued="true" precisionStep="8"/>
-  <fieldType name="tint" class="solr.TrieIntField" positionIncrementGap="0" precisionStep="8"/>
-  <fieldType name="tints" class="solr.TrieIntField" positionIncrementGap="0" multiValued="true" precisionStep="8"/>
-  <fieldType name="tlong" class="solr.TrieLongField" positionIncrementGap="0" precisionStep="8"/>
-  <fieldType name="tlongs" class="solr.TrieLongField" positionIncrementGap="0" multiValued="true" precisionStep="8"/>
-  <fieldType name="point" class="solr.PointType" subFieldSuffix="_d" dimension="2"/>
-  <fieldType name="random" class="solr.RandomSortField" indexed="true"/>
-  <fieldType name="string" class="solr.StrField" sortMissingLast="true"/>
-  <fieldType name="strings" class="solr.StrField" sortMissingLast="true" multiValued="true"/>
-  <fieldType name="tdate" class="solr.TrieDateField" positionIncrementGap="0" precisionStep="6"/>
-  <fieldType name="tdates" class="solr.TrieDateField" positionIncrementGap="0" multiValued="true" precisionStep="6"/>
-  <fieldType name="tdouble" class="solr.TrieDoubleField" positionIncrementGap="0" precisionStep="8"/>
-  <fieldType name="tdoubles" class="solr.TrieDoubleField" positionIncrementGap="0" multiValued="true" precisionStep="8"/>
+  <types>
+    <!-- Default Field Types -->
+    <fieldType name="long" class="solr.TrieLongField" positionIncrementGap="0" precisionStep="0"/>
+    <fieldType name="boolean" class="solr.BoolField" sortMissingLast="true" multiValued="true"/>
+    <fieldType name="date" class="solr.TrieDateField" positionIncrementGap="0" precisionStep="0"/>
+    <fieldType name="tfloat" class="solr.TrieFloatField" positionIncrementGap="0" precisionStep="8"/>
+    <fieldType name="tfloats" class="solr.TrieFloatField" positionIncrementGap="0" multiValued="true" precisionStep="8"/>
+    <fieldType name="tint" class="solr.TrieIntField" positionIncrementGap="0" precisionStep="8"/>
+    <fieldType name="tints" class="solr.TrieIntField" positionIncrementGap="0" multiValued="true" precisionStep="8"/>
+    <fieldType name="tlong" class="solr.TrieLongField" positionIncrementGap="0" precisionStep="8"/>
+    <fieldType name="tlongs" class="solr.TrieLongField" positionIncrementGap="0" multiValued="true" precisionStep="8"/>
+    <fieldType name="point" class="solr.PointType" subFieldSuffix="_d" dimension="2"/>
+    <fieldType name="random" class="solr.RandomSortField" indexed="true"/>
+    <fieldType name="string" class="solr.StrField" sortMissingLast="true"/>
+    <fieldType name="strings" class="solr.StrField" sortMissingLast="true" multiValued="true"/>
+    <fieldType name="tdate" class="solr.TrieDateField" positionIncrementGap="0" precisionStep="6"/>
+    <fieldType name="tdates" class="solr.TrieDateField" positionIncrementGap="0" multiValued="true" precisionStep="6"/>
+    <fieldType name="tdouble" class="solr.TrieDoubleField" positionIncrementGap="0" precisionStep="8"/>
+    <fieldType name="tdoubles" class="solr.TrieDoubleField" positionIncrementGap="0" multiValued="true" precisionStep="8"/>
 
-  <fieldType name="substring_match" class="solr.TextField">
-    <analyzer type="index">
+    <!-- A general text field that has reasonable, generic
+         cross-language defaults: it tokenizes with StandardTokenizer,
+	       removes stop words from case-insensitive "stopwords.txt"
+	       (empty by default), and down cases.  At query time only, it
+	       also applies synonyms.
+	  -->
+    <fieldType name="text_general" class="solr.TextField" positionIncrementGap="100" multiValued="true">
+      <analyzer type="index">
+        <tokenizer class="solr.StandardTokenizerFactory"/>
+        <filter class="solr.StopFilterFactory" ignoreCase="true" words="stopwords.txt" />
+        <!-- in this example, we will only use synonyms at query time
+        <filter class="solr.SynonymGraphFilterFactory" synonyms="index_synonyms.txt" ignoreCase="true" expand="false"/>
+        <filter class="solr.FlattenGraphFilterFactory"/>
+        -->
+        <filter class="solr.LowerCaseFilterFactory"/>
+      </analyzer>
+      <analyzer type="query">
+        <tokenizer class="solr.StandardTokenizerFactory"/>
+        <filter class="solr.StopFilterFactory" ignoreCase="true" words="stopwords.txt" />
+        <filter class="solr.SynonymGraphFilterFactory" synonyms="synonyms.txt" ignoreCase="true" expand="true"/>
+        <filter class="solr.LowerCaseFilterFactory"/>
+      </analyzer>
+    </fieldType>
 
-      <!-- Replace non-ascii characters into ascii equivalent.
-            A later filter won't work since the KeywordTokenizer treats the
-            entire field as a single keyword.
-      -->
-      <charFilter class="solr.MappingCharFilterFactory"
-                  mapping="mapping-FoldToASCII.txt"
-                  />
+    <fieldType name="text" class="solr.TextField" positionIncrementGap="100">
+      <analyzer type="index">
+        <charFilter class="solr.MappingCharFilterFactory" mapping="mapping-FoldToASCII.txt"/>
+        <tokenizer class="solr.StandardTokenizerFactory"/>
+        <filter class="solr.SynonymGraphFilterFactory" synonyms="synonyms.txt" ignoreCase="true" expand="false"/>
+        <filter class="solr.StopFilterFactory" ignoreCase="true" words="stopwords.txt" />
+        <filter class="solr.WordDelimiterGraphFilterFactory"
+              splitOnCaseChange="1"
+              splitOnNumerics="1"
+              stemEnglishPossessive="1"
+              generateWordParts="1"
+              generateNumberParts="1"
+              catenateWords="1"
+              catenateNumbers="1"
+              catenateAll="0"
+              preserveOriginal="0"/>
+        <filter class="solr.LowerCaseFilterFactory"/>
+        <filter class="solr.ReversedWildcardFilterFactory" withOriginal="true"
+                maxPosAsterisk="2" maxPosQuestion="1" minTrailing="2" maxFractionAsterisk="0"/>
+        <filter class="solr.FlattenGraphFilterFactory" />
+      </analyzer>
+      <analyzer type="query">
+        <charFilter class="solr.MappingCharFilterFactory" mapping="mapping-FoldToASCII.txt"/>
+        <tokenizer class="solr.StandardTokenizerFactory"/>
+        <filter class="solr.SynonymGraphFilterFactory" synonyms="synonyms.txt" ignoreCase="true" expand="true"/>
+        <filter class="solr.StopFilterFactory" ignoreCase="true" words="stopwords.txt" />
+        <filter class="solr.WordDelimiterGraphFilterFactory"
+              splitOnCaseChange="1"
+              splitOnNumerics="1"
+              stemEnglishPossessive="1"
+              generateWordParts="1"
+              generateNumberParts="1"
+              catenateWords="0"
+              catenateNumbers="0"
+              catenateAll="0"
+              preserveOriginal="0"/>
+        <filter class="solr.LowerCaseFilterFactory"/>
+      </analyzer>
+    </fieldType>
 
-      <!-- Splits the text field into tokens, treating whitespace and
-            punctuation as delimiters. -->
-      <tokenizer class="solr.StandardTokenizerFactory"/>
+    <!-- lowercases the entire field value, keeping it as a single token.  -->
+    <fieldType name="lowercase" class="solr.TextField" positionIncrementGap="100">
+      <analyzer>
+        <tokenizer class="solr.KeywordTokenizerFactory"/>
+        <filter class="solr.LowerCaseFilterFactory" />
+      </analyzer>
+    </fieldType>
+  </types>
 
-      <!-- Lowercases the letters in each token. -->
-      <filter class="solr.LowerCaseFilterFactory" />
+  <fields>
+    <field name="id" type="string" indexed="true" stored="true" required="true" />
+    <field name="_version_" type="long" indexed="true" stored="true"/>
 
-      <!-- Create Ngrams to find prefix substrings. -->
-      <filter class="solr.EdgeNGramFilterFactory" maxGramSize="20" minGramSize="2" />
+    <!-- Plone Core Fields -->
+    <field name="allowedRolesAndUsers" type="string" stored="false" indexed="true" multiValued="true" />
+    <field name="created" type="date" stored="true" />
+    <field name="Creator" type="string" stored="true" />
+    <field name="Date" type="date" stored="true" />
+    <field name="default" type="string" indexed="true" stored="false" multiValued="true" />
 
-      <!-- Trims whitespace at either end of a token. -->
-      <filter class="solr.TrimFilterFactory" />
+    <field name="Description" type="text" stored="true" />
+    <field name="effective" type="date" indexed="true" stored="true" />
+    <field name="exclude_from_nav" type="boolean" indexed="false" stored="true" />
+    <field name="expires" type="date" indexed="true" stored="true" />
+    <field name="getIcon" type="string" indexed="false" stored="true" />
+    <field name="getId" type="string" indexed="false" stored="true" />
+    <field name="getRemoteUrl" type="string" indexed="false" stored="true" />
+    <field name="is_folderish" type="boolean" indexed="false" stored="true" />
+    <field name="Language" type="string" indexed="false" stored="true" />
+    <field name="modified" type="date" indexed="true" stored="true" />
+    <field name="object_provides" type="string" indexed="false" stored="false" multiValued="true" />
+    <field name="path_depth" type="tint" indexed="true" stored="false" />
+    <field name="path_parents" type="string" indexed="true" stored="false" multiValued="true" />
+    <field name="path_string" type="string" indexed="false" stored="true" />
+    <field name="portal_type" type="string" stored="true" indexed="true" />
+    <field name="review_state" type="string" stored="true" indexed="true" />
+    <field name="SearchableText" type="text" stored="true" indexed="true" />
+    <field name="searchwords" type="string" indexed="false" stored="false" multiValued="true" />
+    <field name="showinsearch" type="boolean" indexed="true" stored="false" />
+    <field name="Subject" type="string" indexed="true" stored="true" multiValued="true" />
+    <field name="Title" type="text" indexed="true" stored="true" />
+    <field name="Type" type="string" indexed="true" stored="true" />
+    <field name="UID" type="string" indexed="true" stored="true" required="false" />
 
-    </analyzer>
-    <analyzer type="query">
+    <copyField source="Title" dest="default"/>
+    <copyField source="Description" dest="default"/>
+    <!--<copyField source="Subject" dest="default"/>-->
 
-      <!-- Replace non-ascii characters into ascii equivalent.
-           A later filter won't work since the KeywordTokenizer treats the
-           entire field as a single keyword.
-      -->
-      <charFilter class="solr.MappingCharFilterFactory"
-                  mapping="mapping-FoldToASCII.txt"
-                  />
+    <copyField source="default" dest="SearchableText"/>
 
-      <!-- Splits the text field into tokens, treating whitespace and
-           punctuation as delimiters. -->
-      <tokenizer class="solr.StandardTokenizerFactory"/>
-
-      <!-- Synonyms -->
-      <filter class="solr.SynonymFilterFactory"
-              synonyms="synonyms.txt"
-              format="solr"
-              ignoreCase="true"
-              expand="false"
-              />
-
-      <!-- Lowercases the letters in each token. -->
-      <filter class="solr.LowerCaseFilterFactory" />
-
-      <!-- Stopwords -->
-      <filter class="solr.StopFilterFactory"
-              ignoreCase="true"
-              words="stopwords.txt" />
-
-      <!-- Trims whitespace at either end of a token. -->
-      <filter class="solr.TrimFilterFactory" />
-
-    </analyzer>
-  </fieldType>
-
-  <!-- Suggest -->
-  <fieldType name="text_suggest" class="solr.TextField" positionIncrementGap="100">
-    <analyzer>
-      <tokenizer class="solr.UAX29URLEmailTokenizerFactory"/>
-      <filter class="solr.StopFilterFactory" ignoreCase="true" words="stopwords.txt" />
-      <filter class="solr.LowerCaseFilterFactory"/>
-      <filter class="solr.ASCIIFoldingFilterFactory"/>
-      <filter class="solr.EnglishPossessiveFilterFactory"/>
-    </analyzer>
-  </fieldType>
-
-  <!-- Required _version_ field -->
-  <field name="_version_" type="long" indexed="true" stored="true"/>
-
-  <field name="id" type="string" multiValued="false" indexed="true" required="true" stored="true"/>
-  <field name="title" type="substring_match" multiValued="false" indexed="true" stored="true"/>
-  <field name="description" type="substring_match" multiValued="false" indexed="true" stored="true"/>
-
-  <!-- Suggest -->
-  <field name="suggest" type="text_suggest" multiValued="true" indexed="true" stored="true"/>
-  <copyField source="title" dest="suggest" />
-
-  <!-- Plone Core Fields -->
-  <field name="allowedRolesAndUsers" type="string" stored="false" indexed="true" multiValued="true" />
-  <field name="created" type="date" stored="true" />
-  <field name="Creator" type="string" stored="true" />
-  <field name="Date" type="date" stored="true" />
-  <field name="default" type="text_general" indexed="true" stored="false" multiValued="true" />
-  <field name="Description" type="text_general" stored="true" />
-  <field name="effective" type="date" indexed="true" stored="true" />
-  <field name="exclude_from_nav" type="boolean" indexed="false" stored="true" />
-  <field name="expires" type="date" indexed="true" stored="true" />
-  <field name="getIcon" type="string" indexed="false" stored="true" />
-  <field name="getId" type="string" indexed="false" stored="true" />
-  <field name="getRemoteUrl" type="string" indexed="false" stored="true" />
-  <field name="is_folderish" type="boolean" indexed="false" stored="true" />
-  <field name="Language" type="string" indexed="false" stored="true" />
-  <field name="modified" type="date" indexed="true" stored="true" />
-  <field name="object_provides" type="string" indexed="false" stored="false" multiValued="true" />
-  <field name="path_depth" type="int" indexed="true" stored="false" />
-  <field name="path_parents" type="string" indexed="true" stored="false" multiValued="true" />
-  <field name="path_string" type="string" indexed="false" stored="true" />
-  <field name="portal_type" type="string" stored="true" indexed="true" />
-  <field name="review_state" type="string" stored="true" indexed="true" />
-  <field name="SearchableText" type="text_general" stored="true" indexed="true" />
-  <field name="searchwords" type="string" indexed="false" stored="false" multiValued="true" />
-  <field name="showinsearch" type="boolean" indexed="true" stored="false" />
-  <field name="Subject" type="string" indexed="true" stored="true" multiValued="true" />
-  <field name="Title" type="text_general" indexed="true" stored="true" />
-  <field name="Type" type="string" indexed="true" stored="true" />
-  <field name="UID" type="string" indexed="true" stored="true" required="true" />
-
-  <copyField source="Title" dest="default" />
-  <copyField source="Description" dest="default" />
-  <copyField source="Subject" dest="default" />
-  <copyField source="SearchableText" dest="default" />
+    <dynamicField name="*"  type="string"  indexed="true" stored="true" />
+  </fields>
 
 </schema>
