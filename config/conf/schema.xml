@@ -2,7 +2,7 @@
 
 <schema name="plone" version="1.5">
 
-  <uniqueKey>id</uniqueKey>
+  <uniqueKey>UID</uniqueKey>
 
   <types>
     <!-- Default Field Types -->
