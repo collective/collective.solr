@@ -131,7 +131,11 @@ class Search(object):
         logger.debug('building query for "%r", %r', default, args)
         schema = self.getManager().getSchema() or {}
         # no default search field in Solr 7
-        defaultSearchField = getattr(schema, 'defaultSearchField', 'SearchableText')
+        defaultSearchField = getattr(
+            schema,
+            'defaultSearchField',
+            'SearchableText'
+        )
         args[None] = default
         query = {}
 
