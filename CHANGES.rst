@@ -1,8 +1,8 @@
 Changelog
 =========
 
-6.0a3 (unreleased)
-------------------
+7.0.0a1 (unreleased)
+--------------------
 
 New Features:
 
