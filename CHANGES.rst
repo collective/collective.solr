@@ -9,6 +9,9 @@ New Features:
 - Plone 5.1 compatibility.
   [timo, jaroel]
 
+- Solr 7 compatibility.
+  [timo]
+
 Bugfixes:
 
 - Make plone.protect dependency optional.
