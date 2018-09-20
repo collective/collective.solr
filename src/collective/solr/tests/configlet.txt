@@ -101,7 +101,7 @@ Make some changes
     >>> browser.getControl(name='form.widgets.active:list').value = True
     >>> browser.getControl(name='form.widgets.host').value = 'foo.bar'
     >>> browser.getControl(name='form.widgets.port').value = '1234'
-    >>> browser.getControl(name='form.widgets.base').value = '/solr'
+    >>> browser.getControl(name='form.widgets.base').value = '/solr/plone'
     >>> browser.getControl(name='form.widgets.async:list').value = True
     >>> browser.getControl(name='form.widgets.auto_commit:list').value = False
     >>> browser.getControl(name='form.widgets.commit_within').value = '10000'
