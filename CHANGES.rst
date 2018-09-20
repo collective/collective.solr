@@ -17,6 +17,9 @@ Bugfixes:
 - Make plone.protect dependency optional.
   [timo]
 
+- Fix tests to work with latest collective.indexing.
+  [gforcada]
+
 
 6.0a2 (2017-07-17)
 ------------------
