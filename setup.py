@@ -49,7 +49,7 @@ setup(
         'Products.GenericSetup',
         'ZODB3',
         'Zope2 >= 2.13',
-        'collective.indexing >= 2.0a2',
+        'collective.indexing >= 2.1',
         'collective.js.showmore',
         'lxml',
         'plone.app.content',
