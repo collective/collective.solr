@@ -119,7 +119,7 @@ class Search(object):
         params = cleanupQueryParameters(params, schema)
 
         languageFilter(args)
-        prepareData(args)
+        prepareData(args, on_search=True)
         mangleQuery(args, config, schema)
 
         logger.debug('building query for "%r", %r', default, args)

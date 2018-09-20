@@ -2,7 +2,7 @@ language: python
 # with next we get on container based infrastructure, this enables caching
 sudo: false
 python:
-  - 2.7
+  - 2.7.13
 cache:
   pip: true
   directories:
@@ -17,8 +17,8 @@ env:
 #    - env: PLONE_VERSION=4.3.x SOLR_VERSION=5.1.x
 before_install:
   - mkdir -p $HOME/buildout-cache/{eggs,downloads}
-  - virtualenv .
-  - bin/pip install --upgrade pip setuptools zc.buildout
+  - virtualenv -p `which python` .
+  - bin/pip install -r requirements.txt
 install:
   - sed -ie "s#plone-x.x.x.cfg#plone-$PLONE_VERSION.cfg#" travis.cfg
   - sed -ie "s#solr-x.x.x.cfg#solr-$SOLR_VERSION.cfg#" travis.cfg
