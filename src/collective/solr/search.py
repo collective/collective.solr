@@ -141,7 +141,7 @@ class Search(object):
 
         for name, value in sorted(args.items()):
             field = schema.get(name or defaultSearchField, None)
-            if field is None or not field.indexed:
+            if field is None or not field.get('indexed'):
                 logger.info(
                     'dropping unknown search attribute "%s" '
                     ' (%r) for query: %r', name, value, args
