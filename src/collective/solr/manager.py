@@ -38,7 +38,7 @@ class SolrConnectionManager(object):
         if isinstance(active, bool):
             self.setHost(active=active)
 
-    def setHost(self, active=False, host='localhost', port=8983, base='/solr'):
+    def setHost(self, active=False, host='localhost', port=8983, base='/solr/plone'):
         """ set connection parameters """
         config = getConfig()
         config.active = active
@@ -88,19 +88,21 @@ class SolrConnectionManager(object):
 
     def getSchema(self):
         """ returns the currently used schema or fetches it """
-        schema = getLocal('schema')
-        if schema is None:
-            conn = self.getConnection()
-            if conn is not None:
-                logger.debug('getting schema from solr')
-                self.setSearchTimeout()
-                try:
-                    schema = conn.get_schema()
-                    setLocal('schema', schema)
-                except (error, CannotSendRequest, ResponseNotReady):
-                    logger.exception('exception while getting schema')
-        return schema
-
+        try:
+            schema = getLocal('schema')
+            if schema is None:
+                conn = self.getConnection()
+                if conn is not None:
+                    logger.debug('getting schema from solr')
+                    self.setSearchTimeout()
+                    try:
+                        schema = conn.get_schema()
+                        setLocal('schema', schema)
+                    except (error, CannotSendRequest, ResponseNotReady):
+                        logger.exception('exception while getting schema')
+            return schema
+        except:
+            import pdb; pdb.set_trace()
     def setTimeout(self, timeout, lock=marker):
         """ set the timeout on the current (or to be opened) connection
             to the given value """

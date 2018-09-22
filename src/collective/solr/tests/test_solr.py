@@ -27,7 +27,10 @@ class TestSolr(TestCase):
         res = c.flush()
         self.assertEqual(len(res), 1)   # one request was sent
         res = res[0]
-        self.failUnlessEqual(str(output), add_request)
+        self.failUnlessEqual(
+            str(output),
+            add_request.strip('\n')
+        )
         # Status
         node = res.findall(".//int")[0]
         self.failUnlessEqual(node.attrib['name'], 'status')
@@ -58,13 +61,16 @@ class TestSolr(TestCase):
 
         res = c.flush()
         self.assertEqual(len(res), 1)   # one request was sent
-        self.failUnlessEqual(str(output), add_request)
+        self.failUnlessEqual(
+            str(output),
+            add_request.strip('\n')
+        )
 
     def test_connection_str(self):
         c = SolrConnection(host='localhost:8983', persistent=True)
         self.assertEqual(
             str(c),
-            "SolrConnection{host=localhost:8983, solrBase=/solr, "
+            "SolrConnection{host=localhost:8983, solrBase=/solr/plone, "
             "persistent=True, postHeaders={'Content-Type': 'text/xml; "
             "charset=utf-8'}, reconnects=0}")
 
@@ -76,7 +82,10 @@ class TestSolr(TestCase):
         res = c.commit()
         self.assertEqual(len(res), 1)   # one request was sent
         res = res[0]
-        self.failUnlessEqual(str(output), commit_request)
+        self.failUnlessEqual(
+            str(output),
+            commit_request.strip('\n')
+        )
         # Status
         node = res.findall(".//int")[0]
         self.failUnlessEqual(node.attrib['name'], 'status')
@@ -93,7 +102,10 @@ class TestSolr(TestCase):
         c = SolrConnection(host='localhost:8983', persistent=True)
         output = fakehttp(c, commit_response)
         c.commit(optimize=True)
-        self.failUnlessEqual(str(output), commit_request)
+        self.failUnlessEqual(
+            str(output),
+            commit_request.strip('\n')
+        )
 
     def test_commit_no_wait_flush(self):
         commit_request = getData('commit_request.txt')
@@ -101,7 +113,10 @@ class TestSolr(TestCase):
         c = SolrConnection(host='localhost:8983', persistent=True)
         output = fakehttp(c, commit_response)
         c.commit()
-        self.failUnlessEqual(str(output), commit_request)
+        self.failUnlessEqual(
+            str(output),
+            commit_request.strip('\n')
+        )
 
     def test_commit_no_wait_searcher(self):
         commit_request = getData('commit_request_no_wait_searcher.txt')
@@ -109,7 +124,10 @@ class TestSolr(TestCase):
         c = SolrConnection(host='localhost:8983', persistent=True)
         output = fakehttp(c, commit_response)
         c.commit(waitSearcher=False)
-        self.failUnlessEqual(str(output), commit_request)
+        self.failUnlessEqual(
+            str(output),
+            commit_request.strip('\n')
+        )
 
     def test_search(self):
         search_request = getData('search_request.txt')
@@ -120,7 +138,10 @@ class TestSolr(TestCase):
             q='+id:[* TO *]', fl='* score', wt='xml', rows='10', indent='on')
         res = fromstring(res.read())
         normalize = lambda x: sorted(x.split('&'))      # sort request params
-        self.assertEqual(normalize(output.get()), normalize(search_request))
+        self.assertEqual(
+            normalize(output.get()),
+            normalize(search_request.strip('\n'))
+        )
         self.failUnless(res.find(('.//doc')))
 
     def test_search_with_default_request_handler(self):
@@ -128,14 +149,14 @@ class TestSolr(TestCase):
         c = SolrConnection(host='localhost:8983', persistent=True)
         fakehttp(c, search_response)
         c.search(q='+id:[* TO *]')
-        self.assertEqual('/solr/select', c.conn.url)
+        self.assertEqual('/solr/plone/select', c.conn.url)
 
     def test_search_with_custom_request_handler(self):
         search_response = getData('search_response.txt')
         c = SolrConnection(host='localhost:8983', persistent=True)
         fakehttp(c, search_response)
         c.search(request_handler='custom', q='+id:[* TO *]')
-        self.assertEqual('/solr/custom', c.conn.url)
+        self.assertEqual('/solr/plone/custom', c.conn.url)
 
     def test_delete(self):
         delete_request = getData('delete_request.txt')
@@ -146,7 +167,10 @@ class TestSolr(TestCase):
         res = c.flush()
         self.assertEqual(len(res), 1)   # one request was sent
         res = res[0]
-        self.failUnlessEqual(str(output), delete_request)
+        self.failUnlessEqual(
+            str(output),
+            delete_request.strip('\n')
+        )
         # Status
         node = res.findall(".//int")[0]
         self.failUnlessEqual(node.attrib['name'], 'status')

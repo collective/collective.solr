@@ -55,7 +55,7 @@ class MockResponse():
 
 class MockConnection():
 
-    solrBase = '/solr'
+    solrBase = '/solr/plone'
 
     def doPost(self, url, foo, bar):
         return MockResponse()

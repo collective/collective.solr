@@ -45,7 +45,7 @@ logger = getLogger(__name__)
 
 class SolrConnection:
 
-    def __init__(self, host='localhost:8983', solrBase='/solr',
+    def __init__(self, host='localhost:8983', solrBase='/solr/plone',
                  persistent=True, postHeaders={}, timeout=None):
         self.host = host
         self.solrBase = str(solrBase)
@@ -326,4 +326,7 @@ class SolrConnection:
             xml = response.read()
             return SolrSchema(xml.strip())
 
-        self.__errcheck(response)       # raise a SolrConnectionException
+        try:
+            self.__errcheck(response)       # raise a SolrConnectionException
+        except:
+            import pdb; pdb.set_trace()
