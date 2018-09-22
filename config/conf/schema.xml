@@ -98,7 +98,7 @@
   </types>
 
   <fields>
-    <field name="id" type="string" indexed="true" stored="true" required="true" />
+    <field name="id" type="string" indexed="true" stored="true" required="false" />
     <field name="_version_" type="long" indexed="true" stored="true"/>
 
     <!-- Plone Core Fields -->
