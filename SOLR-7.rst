@@ -13,3 +13,16 @@ Though, the Solr developers made an argument that the operator is specific to ea
 
 https://issues.apache.org/jira/browse/SOLR-2724
 https://lucene.apache.org/solr/guide/7_0/major-changes-in-solr-7.html
+
+
+Solr Core
+---------
+
+Calls to solr now always require a core.
+Before Solr 7 it was possible to call http://localhost:8983/solr/admin/ping.
+Those call are no longer possible and will fail with a 404.
+Solr 7 requires to use a core:
+
+http://localhost:8983/solr/plone/admin/ping.
+
+The default core in collective.solr is called "/plone".
