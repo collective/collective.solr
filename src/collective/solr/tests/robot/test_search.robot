@@ -183,6 +183,12 @@ Open headless browser
 
 # Given
 
+a private document with the title '${title}'
+  Enable autologin as  Manager
+  ${uid}=  Create content  type=Document  title=${title}
+  Go to  ${PLONE_URL}/@@solr-maintenance/reindex
+  Wait until page contains  solr index rebuilt
+
 a public document with the title '${title}'
   Enable autologin as  Manager
   ${uid}=  Create content  type=Document  title=${title}
@@ -216,6 +222,9 @@ a public document with the title '${title}' created last week
 
 an anonymous user
   Disable Autologin
+
+a logged in user
+  Enable autologin as  Manager
 
 
 # When
