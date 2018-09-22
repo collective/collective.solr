@@ -59,7 +59,7 @@ class Search(object):
         parameters['wt'] = 'xml'
         parameters['sow'] = 'true'  # split on whitespace
         parameters['lowercaseOperators'] = 'true'
-        parameters['q.op'] = 'OR'
+        parameters['q.op'] = 'AND'
         if 'rows' not in parameters:
             parameters['rows'] = config.max_results or 10000000
             # Check if rows param is 0 for backwards compatibility. Before
