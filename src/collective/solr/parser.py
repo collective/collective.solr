@@ -214,5 +214,5 @@ class SolrSchema(AttrDict):
     def stored(self):
         """ return names of all stored fields, a.k.a. metadata """
         for field in self.fields:
-            if field.get('stored', False):
+            if field.stored:
                 yield field.name

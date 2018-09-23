@@ -69,3 +69,11 @@ OLD:
     'rows=10',
     'wt=xml'
   ]
+
+
+New params for search method (lowercase_operator, default_operator, sow):
+
+    def search(self, query, wt='xml', sow='true', lowercase_operator='true',
+               default_operator='AND', **parameters):
+
+There is no default search field in Solr 7 any longer.
