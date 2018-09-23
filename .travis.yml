@@ -47,7 +47,7 @@ install:
   # - sed -ie "s#plone-x.x.x.cfg#plone-$PLONE_VERSION.cfg#" travis.cfg
   # - sed -ie "s#solr-x.x.x.cfg#solr-$SOLR_VERSION.cfg#" travis.cfg
   - sed -ie "s#7.4.0#$SOLR_VERSION#" base.cfg
-  - sed -ie "s#solr-7.4.0#solr-$SOLRs_VERSION#" base.cfg
+  - sed -ie "s#solr-7.4.0#solr-$SOLR_VERSION#" base.cfg
   - bin/buildout -N -t 20
 script:
   - bin/code-analysis
