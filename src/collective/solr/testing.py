@@ -152,7 +152,7 @@ class CollectiveSolrLayer(PloneSandboxLayer):
     def tearDownPloneSite(self, portal):
         set_registry_record('collective.solr.active', False)
         set_registry_record('collective.solr.port', 8983)
-        set_registry_record('collective.solr.base', u'/solr')
+        set_registry_record('collective.solr.base', u'/solr/plone')
         self.solr_layer.tearDown()
 
 

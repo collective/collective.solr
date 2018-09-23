@@ -153,7 +153,7 @@ def pingSolr():
         return status
     conn = HTTPConnection('localhost', 8983)
     try:
-        conn.request('GET', '/solr/admin/ping')
+        conn.request('GET', '/solr/plone/admin/ping')
         response = conn.getresponse()
         status = response.status == 200
         msg = "INFO: solr return status '%s'" % response.status

@@ -13,7 +13,7 @@ Example::
 
     zcml-additional =
         <configure xmlns:solr="http://namespaces.plone.org/solr">
-            <solr:connection host="localhost" port="8983" base="/solr"/>
+            <solr:connection host="localhost" port="8983" base="/solr/plone"/>
        </configure>
 
 TTW Configuration
