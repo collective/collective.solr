@@ -98,38 +98,38 @@
   </types>
 
   <fields>
-    <field name="id" type="string" indexed="true" stored="true" required="false" />
-    <field name="_version_" type="long" indexed="true" stored="true"/>
+    <field name="id"                    type="string"   indexed="true"  stored="true" required="false" />
+    <field name="_version_"             type="long"     indexed="true"  stored="true"/>
 
     <!-- Plone Core Fields -->
-    <field name="allowedRolesAndUsers" type="string" stored="false" indexed="true" multiValued="true" />
-    <field name="created" type="date" stored="true" />
-    <field name="Creator" type="string" stored="true" />
-    <field name="Date" type="date" stored="true" />
-    <field name="default" type="string" indexed="true" stored="false" multiValued="true" />
-    <field name="Description" type="text" indexed="true" stored="true" />
-    <field name="effective" type="date" indexed="true" stored="true" />
-    <field name="exclude_from_nav" type="boolean" indexed="false" stored="true" />
-    <field name="expires" type="date" indexed="true" stored="true" />
-    <field name="getIcon" type="string" indexed="false" stored="true" />
-    <field name="getId" type="string" indexed="false" stored="true" />
-    <field name="getRemoteUrl" type="string" indexed="false" stored="true" />
-    <field name="is_folderish" type="boolean" indexed="true" stored="true" />
-    <field name="Language" type="string" indexed="true" stored="true" />
-    <field name="modified" type="date" indexed="true" stored="true" />
-    <field name="object_provides" type="string" indexed="true" stored="false" multiValued="true" />
-    <field name="path_depth" type="tint" indexed="true" stored="false" />
-    <field name="path_parents" type="string" indexed="true" stored="false" multiValued="true" />
-    <field name="path_string" type="string" indexed="false" stored="true" />
-    <field name="portal_type" type="string" stored="true" indexed="true" />
-    <field name="review_state" type="string" stored="true" indexed="true" />
-    <field name="SearchableText" type="text" stored="true" indexed="true" />
-    <field name="searchwords" type="string" indexed="true" stored="false" multiValued="true" />
-    <field name="showinsearch" type="boolean" indexed="true" stored="false" />
-    <field name="Subject" type="string" indexed="true" stored="true" multiValued="true" />
-    <field name="Title" type="text" indexed="true" stored="true" />
-    <field name="Type" type="string" indexed="true" stored="true" />
-    <field name="UID" type="string" indexed="true" stored="true" required="false" />
+    <field name="allowedRolesAndUsers"  type="string"   indexed="true"  stored="false"  multiValued="true" />
+    <field name="created"               type="date"                     stored="true" />
+    <field name="Creator"               type="string"                   stored="true" />
+    <field name="Date"                  type="date"                     stored="true" />
+    <field name="default"               type="string"   indexed="true"  stored="false"  multiValued="true" />
+    <field name="Description"           type="text"     indexed="true"  stored="true" />
+    <field name="effective"             type="date"     indexed="true"  stored="true" />
+    <field name="exclude_from_nav"      type="boolean"  indexed="false" stored="true" />
+    <field name="expires"               type="date"     indexed="true"  stored="true" />
+    <field name="getIcon"               type="string"   indexed="false" stored="true" />
+    <field name="getId"                 type="string"   indexed="false" stored="true" />
+    <field name="getRemoteUrl"          type="string"   indexed="false" stored="true" />
+    <field name="is_folderish"          type="boolean"  indexed="true"  stored="true" />
+    <field name="Language"              type="string"   indexed="true"  stored="true" />
+    <field name="modified"              type="date"     indexed="true"  stored="true" />
+    <field name="object_provides"       type="string"   indexed="true"  stored="false"  multiValued="true" />
+    <field name="path_depth"            type="tint"     indexed="true"  stored="false" />
+    <field name="path_parents"          type="string"   indexed="true"  stored="false"  multiValued="true" />
+    <field name="path_string"           type="string"   indexed="false" stored="true" />
+    <field name="portal_type"           type="string"   indexed="true"  stored="true" />
+    <field name="review_state"          type="string"   indexed="true"  stored="true" />
+    <field name="SearchableText"        type="text"     indexed="true"  stored="true" />
+    <field name="searchwords"           type="string"   indexed="true"  stored="false"  multiValued="true" />
+    <field name="showinsearch"          type="boolean"  indexed="true"  stored="false" />
+    <field name="Subject"               type="string"   indexed="true"  stored="true"   multiValued="true" />
+    <field name="Title"                 type="text"     indexed="true"  stored="true" />
+    <field name="Type"                  type="string"   indexed="true"  stored="true" />
+    <field name="UID"                   type="string"   indexed="true"  stored="true"   required="false" />
 
     <copyField source="Title" dest="default"/>
     <copyField source="Description" dest="default"/>
