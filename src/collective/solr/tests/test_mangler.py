@@ -13,8 +13,6 @@ from unittest import TestCase
 from zope.component import getGlobalSiteManager
 from zope.component import provideUtility
 
-import unittest
-
 
 def mangle(**keywords):
     mangleQuery(keywords, None, {})
@@ -321,7 +319,6 @@ class QueryParameterTests(TestCase):
         params = extract({'request_handler': 'custom'})
         self.assertEqual(params, {'request_handler': 'custom'})
 
-    @unittest.skipIf(True, 'Temporary skip for c.solr 7')
     def testSortIndexCleanup(self):
         cleanup = cleanupQueryParameters
         schema = SolrSchema()
