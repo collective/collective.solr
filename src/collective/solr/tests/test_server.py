@@ -1403,7 +1403,6 @@ class SolrServerTests(TestCase):
         results = solrSearchResults(SearchableText='(foo/ OR boo)')
         self.assertEqual(sorted([r.Title for r in results]), ['foo/bar'])
 
-    @unittest.skipIf(True, 'Temporary skip for c.solr 7')
     def testBatchedSearchResults(self):
         self.portal.invokeFactory('Document', id='one', title='Aaa A')
         self.portal.invokeFactory('Document', id='two', title='Aaa B')
