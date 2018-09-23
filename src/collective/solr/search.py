@@ -96,7 +96,7 @@ class Search(object):
             index, order = parameters['sort'].split()
             schema = manager.getSchema() or {}
             field = schema.get(index, None)
-            if field is None or not field.stored:
+            if field is None or not field.get('stored', False):
                 logger.warning('sorting on non-stored attribute "%s"', index)
         response = connection.search(q=query, **parameters)
         results = SolrResponse(response)
@@ -141,7 +141,7 @@ class Search(object):
 
         for name, value in sorted(args.items()):
             field = schema.get(name or defaultSearchField, None)
-            if field is None or not field.get('indexed'):
+            if field is None or not field.get('indexed', False):
                 logger.info(
                     'dropping unknown search attribute "%s" '
                     ' (%r) for query: %r', name, value, args
