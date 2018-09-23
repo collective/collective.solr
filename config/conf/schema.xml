@@ -103,9 +103,9 @@
 
     <!-- Plone Core Fields -->
     <field name="allowedRolesAndUsers"  type="string"   indexed="true"  stored="false"  multiValued="true" />
-    <field name="created"               type="date"                     stored="true" />
-    <field name="Creator"               type="string"                   stored="true" />
-    <field name="Date"                  type="date"                     stored="true" />
+    <field name="created"               type="date"     indexed="true"  stored="true" />
+    <field name="Creator"               type="string"   indexed="true"  stored="true" />
+    <field name="Date"                  type="date"     indexed="true"  stored="true" />
     <field name="default"               type="string"   indexed="true"  stored="false"  multiValued="true" />
     <field name="Description"           type="text"     indexed="true"  stored="true" />
     <field name="effective"             type="date"     indexed="true"  stored="true" />
