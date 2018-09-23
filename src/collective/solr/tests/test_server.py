@@ -783,13 +783,23 @@ class SolrServerTests(TestCase):
         config = getConfig()
         config.required = []
         results = solrSearchResults(Title='News')
-        self.assertEqual(sorted([(r.Title, r.path_string) for r in results]),
-                         [('News', '/plone/news/aggregator')])
+        self.assertEqual(
+            sorted([(r.Title, r.path_string) for r in results]),
+            [
+                ('News', '/plone/news/aggregator'),
+                ('NewsFolder', '/plone/news')
+            ]
+        )
         # specifying multiple values should required only one of them...
         config.required = [u'Title', u'foo']
         results = solrSearchResults(Title='News')
-        self.assertEqual(sorted([(r.Title, r.path_string) for r in results]),
-                         [('News', '/plone/news/aggregator')])
+        self.assertEqual(
+            sorted([(r.Title, r.path_string) for r in results]),
+            [
+                ('News', '/plone/news/aggregator'),
+                ('NewsFolder', '/plone/news')
+            ]
+        )
         # but solr won't be used if none of them is present...
         config.required = [u'foo', u'bar']
         self.assertRaises(FallBackException, solrSearchResults,
@@ -797,13 +807,23 @@ class SolrServerTests(TestCase):
         # except if you force it via `use_solr`...
         config.required = [u'foo', u'bar']
         results = solrSearchResults(Title='News', use_solr=True)
-        self.assertEqual(sorted([(r.Title, r.path_string) for r in results]),
-                         [('News', '/plone/news/aggregator')])
+        self.assertEqual(
+            sorted([(r.Title, r.path_string) for r in results]),
+            [
+                ('News', '/plone/news/aggregator'),
+                ('NewsFolder', '/plone/news')
+            ]
+        )
         # which also works if nothing is required...
         config.required = []
         results = solrSearchResults(Title='News', use_solr=True)
-        self.assertEqual(sorted([(r.Title, r.path_string) for r in results]),
-                         [('News', '/plone/news/aggregator')])
+        self.assertEqual(
+            sorted([(r.Title, r.path_string) for r in results]),
+            [
+                ('News', '/plone/news/aggregator'),
+                ('NewsFolder', '/plone/news')
+            ]
+        )
         # it does respect a `False` though...
         config.required = [u'foo', u'bar']
         self.assertRaises(FallBackException, solrSearchResults,
