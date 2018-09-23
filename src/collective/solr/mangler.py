@@ -261,7 +261,7 @@ def cleanupQueryParameters(args, schema):
         if field not in schema:
             field = sort_aliases.get(field, None)
         fld = schema.get(field, None)
-        if fld is not None and fld.indexed:
+        if fld is not None and fld.get('indexed'):
             args['sort'] = '%s %s' % (field, order)
         else:
             del args['sort']
