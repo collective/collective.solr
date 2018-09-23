@@ -346,7 +346,7 @@ class SearchTests(TestCase):
     def testSimpleSearch(self):
         schema = getData('schema.xml')
         search = getData('search_response.txt')
-        request = getData('search_request.txt')
+        request = getData('search_request.txt').rstrip('\n')
         output = fakehttp(self.conn, schema, search)    # fake responses
         query, ignore = self.search.buildQueryAndParameters(id='[* TO *]')
         results = self.search(query, rows=10, wt='xml', indent='on').results()
