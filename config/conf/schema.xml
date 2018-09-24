@@ -111,7 +111,7 @@
     <!-- name:Date                   type:date stored:true -->
     <field name="Date"                  type="date"     indexed="true"  stored="true" />
     <!-- name:default                type:text indexed:true stored:false multivalued:true -->
-    <field name="default"               type="string"   indexed="true"  stored="false"  multiValued="true" />
+    <field name="default"               type="text"     indexed="true"  stored="false"  multiValued="true" />
     <!-- name:Description            type:text copyfield:default stored:true -->
     <field name="Description"           type="text"     indexed="true"  stored="true" />
     <!-- name:effective              type:date stored:true -->
