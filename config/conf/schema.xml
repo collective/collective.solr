@@ -103,7 +103,7 @@
 
     <!-- Plone Core Fields -->
     <!-- name:allowedRolesAndUsers   type:string stored:true multivalued:true -->
-    <field name="allowedRolesAndUsers"  type="string"   indexed="true"  stored="false"  multiValued="true" />
+    <field name="allowedRolesAndUsers"  type="string"   indexed="true"  stored="true"  multiValued="true" />
     <!-- name:created                type:date stored:true -->
     <field name="created"               type="date"     indexed="true"  stored="true" />
     <!-- name:Creator                type:string stored:true -->
@@ -133,11 +133,11 @@
     <!-- name:modified               type:date stored:true -->
     <field name="modified"              type="date"     indexed="true"  stored="true" />
     <!-- name:object_provides        type:string stored:true multivalued:true -->
-    <field name="object_provides"       type="string"   indexed="true"  stored="false"  multiValued="true" />
+    <field name="object_provides"       type="string"   indexed="true"  stored="true"  multiValued="true" />
     <!-- name:path_depth             type:integer indexed:true stored:true -->
-    <field name="path_depth"            type="tint"     indexed="true"  stored="false" />
+    <field name="path_depth"            type="tint"     indexed="true"  stored="true" />
     <!-- name:path_parents           type:string indexed:true stored:true multivalued:true -->
-    <field name="path_parents"          type="string"   indexed="true"  stored="false"  multiValued="true" />
+    <field name="path_parents"          type="string"   indexed="true"  stored="true"  multiValued="true" />
     <!-- name:path_string            type:string indexed:false stored:true -->
     <field name="path_string"           type="string"   indexed="false" stored="true" />
     <!-- name:portal_type            type:string stored:true -->
@@ -147,9 +147,9 @@
     <!-- name:SearchableText         type:text copyfield:default stored:true -->
     <field name="SearchableText"        type="text"     indexed="true"  stored="true" />
     <!-- name:searchwords            type:string stored:true multivalued:true -->
-    <field name="searchwords"           type="string"   indexed="true"  stored="false"  multiValued="true" />
+    <field name="searchwords"           type="string"   indexed="true"  stored="true"  multiValued="true" />
     <!-- name:showinsearch           type:boolean stored:true -->
-    <field name="showinsearch"          type="boolean"  indexed="true"  stored="false" />
+    <field name="showinsearch"          type="boolean"  indexed="true"  stored="true" />
     <!-- name:Subject                type:string copyfield:default stored:true multivalued:true -->
     <field name="Subject"               type="string"   indexed="true"  stored="true"   multiValued="true" />
     <!-- name:Title                  type:text copyfield:default stored:true -->
