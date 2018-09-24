@@ -133,7 +133,7 @@
 
     <copyField source="Title" dest="default"/>
     <copyField source="Description" dest="default"/>
-    <!--<copyField source="Subject" dest="default"/>-->
+    <copyField source="Subject" dest="default"/>
 
     <copyField source="default" dest="SearchableText"/>
 
