@@ -1408,6 +1408,7 @@ class SolrServerTests(TestCase):
         self.portal.invokeFactory('Document', id='two', title='Aaa B')
         self.portal.invokeFactory('Document', id='three', title='Aaa C')
         self.maintenance.reindex()
+        sleep(10)
         search = lambda **kw: [getattr(i, 'Title', None) for i in
                                solrSearchResults(SearchableText='A*',
                                                  portal_type='Document',
