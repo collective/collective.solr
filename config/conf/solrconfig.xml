@@ -98,4 +98,6 @@
     </lst>
   </requestHandler>
 
+  <queryParser name="lucenePlusSort" class="solr.OldLuceneQParserPlugin"/>
+
 </config>
