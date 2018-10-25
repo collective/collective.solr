@@ -1,6 +1,10 @@
 # -*- coding: utf-8 -*-
 from plone.app.registry.browser import controlpanel
-from plone.protect.interfaces import IDisableCSRFProtection
+try:
+    from plone.protect.interfaces import IDisableCSRFProtection
+    PLONE_PROTECT_INSTALLED = True
+except ImportError:
+    PLONE_PROTECT_INSTALLED = False
 from collective.solr.interfaces import ISolrSchema, _
 from Products.CMFPlone.utils import safe_unicode
 from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
@@ -27,7 +31,8 @@ class SolrControlPanelForm(controlpanel.RegistryEditForm):
             content.boost_script = '\n'.join(
                 [l for l in boost_script.splitlines()
                  if not l.startswith('##')])
-            alsoProvides(self.request, IDisableCSRFProtection)
+            if PLONE_PROTECT_INSTALLED:
+                alsoProvides(self.request, IDisableCSRFProtection)
         return content
 
     def applyChanges(self, data):
@@ -41,7 +46,8 @@ class SolrControlPanelForm(controlpanel.RegistryEditForm):
             portal[self.boost_script_id] = PythonScript(self.boost_script_id)
         # since we create a PythonScript in ZODB we need to
         # disable CSRF protection
-        alsoProvides(self.request, IDisableCSRFProtection)
+        if PLONE_PROTECT_INSTALLED:
+            alsoProvides(self.request, IDisableCSRFProtection)
         portal[self.boost_script_id].write(boost_script)
         return changes
 

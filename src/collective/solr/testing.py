@@ -52,7 +52,7 @@ class SolrLayer(Layer):
             module=None,
             solr_host='localhost',
             solr_port=8983,
-            solr_base='/solr'):
+            solr_base='/solr/plone'):
         super(SolrLayer, self).__init__(bases, name, module)
         self.solr_host = solr_host
         self.solr_port = solr_port
@@ -67,13 +67,13 @@ class SolrLayer(Layer):
         """Start Solr and poll until it is up and running.
         """
         self.proc = subprocess.call(
-            './solr-instance start',
+            './solr-start',
             shell=True,
             close_fds=True,
             cwd=BIN_DIR
         )
         # Poll Solr until it is up and running
-        solr_ping_url = '{0}/admin/ping'.format(self.solr_url)
+        solr_ping_url = '{0}/admin/ping?wt=xml'.format(self.solr_url)
         for i in range(1, 10):
             try:
                 result = urllib2.urlopen(solr_ping_url)
@@ -85,7 +85,7 @@ class SolrLayer(Layer):
                 sys.stdout.write('.')
             if i == 9:
                 subprocess.call(
-                    './solr-instance stop',
+                    './solr-stop',
                     shell=True,
                     close_fds=True,
                     cwd=BIN_DIR
@@ -96,7 +96,7 @@ class SolrLayer(Layer):
         """Stop Solr.
         """
         subprocess.check_call(
-            './solr-instance stop',
+            './solr-stop',
             shell=True,
             close_fds=True,
             cwd=BIN_DIR
@@ -117,7 +117,7 @@ class CollectiveSolrLayer(PloneSandboxLayer):
             module=None,
             solr_host=u'localhost',
             solr_port=8983,
-            solr_base=u'/solr',
+            solr_base=u'/solr/plone',
             solr_active=False):
         super(PloneSandboxLayer, self).__init__(bases, name, module)
         self.solr_active = solr_active
@@ -152,7 +152,7 @@ class CollectiveSolrLayer(PloneSandboxLayer):
     def tearDownPloneSite(self, portal):
         set_registry_record('collective.solr.active', False)
         set_registry_record('collective.solr.port', 8983)
-        set_registry_record('collective.solr.base', u'/solr')
+        set_registry_record('collective.solr.base', u'/solr/plone')
         self.solr_layer.tearDown()
 
 
@@ -178,6 +178,7 @@ class LegacyCollectiveSolrLayer(CollectiveSolrLayer):
         wfAction(portal.news.aggregator, 'publish')
         wfAction(portal.events.aggregator, 'publish')
         login(portal, TEST_USER_NAME)
+
 
 LEGACY_COLLECTIVE_SOLR_FIXTURE = LegacyCollectiveSolrLayer()
 

@@ -13,7 +13,6 @@ def test_suite():
     testfiles = [
         'errors.txt',
         'configlet.txt',
-        'collections.txt',
     ]
     for testfile in testfiles:
         doc_suite = doctest.DocFileSuite(testfile,

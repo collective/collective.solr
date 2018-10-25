@@ -1,11 +1,25 @@
 Changelog
 =========
 
-6.0a3 (unreleased)
-------------------
+7.0.0a1 (unreleased)
+--------------------
+
+New Features:
+
+- Plone 5.1 compatibility.
+  [timo, jaroel]
+
+- Solr 7 compatibility.
+  [timo]
+
+Bugfixes:
+
+- Make plone.protect dependency optional.
+  [timo]
 
 - Fix tests to work with latest collective.indexing.
   [gforcada]
+
 
 6.0a2 (2017-07-17)
 ------------------

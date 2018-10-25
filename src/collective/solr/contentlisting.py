@@ -147,3 +147,21 @@ class FlareContentListingObject(object):
             # fallback if registry key is None
             length = 160
         return plone_view.cropText(self.flare.Description, length)
+
+    @property
+    def UID(self):
+        # Alias for when this is used like a brain
+        return self.flare.UID
+
+    @property
+    def modified(self):
+        # Alias for when this is used like a brain
+        return self.ModificationDate()
+
+    @property
+    def portal_type(self):
+        # Alias for when this is used like a brain
+        return self.PortalType()
+
+    def MimeTypeIcon(self):
+        raise NotImplementedError

@@ -47,7 +47,8 @@ class Search(object):
             self.config = getConfig()
         return self.config
 
-    def search(self, query, **parameters):
+    def search(self, query, wt='xml', sow='true', lowercase_operator='true',
+               default_operator='AND', **parameters):
         """ perform a search with the given querystring and parameters """
         start = time()
         config = self.getConfig()
@@ -56,6 +57,10 @@ class Search(object):
         connection = manager.getConnection()
         if connection is None:
             raise SolrInactiveException
+        parameters['wt'] = wt
+        parameters['sow'] = sow  # split on whitespace
+        parameters['lowercaseOperators'] = lowercase_operator
+        parameters['q.op'] = default_operator
         if 'rows' not in parameters:
             parameters['rows'] = config.max_results or 10000000
             # Check if rows param is 0 for backwards compatibility. Before
@@ -126,7 +131,12 @@ class Search(object):
 
         logger.debug('building query for "%r", %r', default, args)
         schema = self.getManager().getSchema() or {}
-        defaultSearchField = getattr(schema, 'defaultSearchField', None)
+        # no default search field in Solr 7
+        defaultSearchField = getattr(
+            schema,
+            'defaultSearchField',
+            'SearchableText'
+        )
         args[None] = default
         query = {}
 

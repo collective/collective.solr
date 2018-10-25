@@ -38,7 +38,8 @@ class SolrConnectionManager(object):
         if isinstance(active, bool):
             self.setHost(active=active)
 
-    def setHost(self, active=False, host='localhost', port=8983, base='/solr'):
+    def setHost(self, active=False, host='localhost', port=8983,
+                base='/solr/plone'):
         """ set connection parameters """
         config = getConfig()
         config.active = active

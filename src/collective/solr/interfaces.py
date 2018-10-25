@@ -341,7 +341,8 @@ class IZCMLSolrConnectionConfig(Interface):
 class ISolrConnectionManager(Interface):
     """ a thread-local connection manager for solr """
 
-    def setHost(active=False, host='localhost', port=8983, base='/solr'):
+    def setHost(active=False, host='localhost', port=8983,
+                base='/solr/plone'):
         """ set connection parameters """
 
     def closeConnection(clearSchema=False):

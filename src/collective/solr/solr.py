@@ -45,7 +45,7 @@ logger = getLogger(__name__)
 
 class SolrConnection:
 
-    def __init__(self, host='localhost:8983', solrBase='/solr',
+    def __init__(self, host='localhost:8983', solrBase='/solr/plone',
                  persistent=True, postHeaders={}, timeout=None):
         self.host = host
         self.solrBase = str(solrBase)
@@ -308,6 +308,7 @@ class SolrConnection:
 
     def getSchema(self):
         schema_url = '%s/admin/file/?file=schema.xml'
+        # schema_url = '%s/admin/file/?file=managed-schema'
         logger.debug('getting schema from: %s', schema_url % self.solrBase)
         try:
             self.conn.request('GET', schema_url % self.solrBase)
@@ -320,7 +321,9 @@ class SolrConnection:
             self.__reconnect()
             self.conn.request('GET', schema_url % self.solrBase)
             response = self.conn.getresponse()
+
         if response.status == 200:
             xml = response.read()
             return SolrSchema(xml.strip())
+
         self.__errcheck(response)       # raise a SolrConnectionException

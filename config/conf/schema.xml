@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<schema name="plone" version="1.5">
+
+  <uniqueKey>UID</uniqueKey>
+
+  <types>
+    <!-- Default Field Types -->
+    <fieldType name="long" class="solr.TrieLongField" positionIncrementGap="0" precisionStep="0"/>
+    <fieldType name="boolean" class="solr.BoolField" sortMissingLast="true" multiValued="true"/>
+    <fieldType name="date" class="solr.TrieDateField" positionIncrementGap="0" precisionStep="0"/>
+    <fieldType name="tfloat" class="solr.TrieFloatField" positionIncrementGap="0" precisionStep="8"/>
+    <fieldType name="tfloats" class="solr.TrieFloatField" positionIncrementGap="0" multiValued="true" precisionStep="8"/>
+    <fieldType name="tint" class="solr.TrieIntField" positionIncrementGap="0" precisionStep="8"/>
+    <fieldType name="tints" class="solr.TrieIntField" positionIncrementGap="0" multiValued="true" precisionStep="8"/>
+    <fieldType name="tlong" class="solr.TrieLongField" positionIncrementGap="0" precisionStep="8"/>
+    <fieldType name="tlongs" class="solr.TrieLongField" positionIncrementGap="0" multiValued="true" precisionStep="8"/>
+    <fieldType name="point" class="solr.PointType" subFieldSuffix="_d" dimension="2"/>
+    <fieldType name="random" class="solr.RandomSortField" indexed="true"/>
+    <fieldType name="string" class="solr.StrField" sortMissingLast="true"/>
+    <fieldType name="strings" class="solr.StrField" sortMissingLast="true" multiValued="true"/>
+    <fieldType name="tdate" class="solr.TrieDateField" positionIncrementGap="0" precisionStep="6"/>
+    <fieldType name="tdates" class="solr.TrieDateField" positionIncrementGap="0" multiValued="true" precisionStep="6"/>
+    <fieldType name="tdouble" class="solr.TrieDoubleField" positionIncrementGap="0" precisionStep="8"/>
+    <fieldType name="tdoubles" class="solr.TrieDoubleField" positionIncrementGap="0" multiValued="true" precisionStep="8"/>
+
+    <!-- A general text field that has reasonable, generic
+         cross-language defaults: it tokenizes with StandardTokenizer,
+	       removes stop words from case-insensitive "stopwords.txt"
+	       (empty by default), and down cases.  At query time only, it
+	       also applies synonyms.
+	  -->
+    <fieldType name="text_general" class="solr.TextField" positionIncrementGap="100" multiValued="true">
+      <analyzer type="index">
+        <tokenizer class="solr.StandardTokenizerFactory"/>
+        <filter class="solr.StopFilterFactory" ignoreCase="true" words="stopwords.txt" />
+        <!-- in this example, we will only use synonyms at query time
+        <filter class="solr.SynonymGraphFilterFactory" synonyms="index_synonyms.txt" ignoreCase="true" expand="false"/>
+        <filter class="solr.FlattenGraphFilterFactory"/>
+        -->
+        <filter class="solr.LowerCaseFilterFactory"/>
+      </analyzer>
+      <analyzer type="query">
+        <tokenizer class="solr.StandardTokenizerFactory"/>
+        <filter class="solr.StopFilterFactory" ignoreCase="true" words="stopwords.txt" />
+        <filter class="solr.SynonymGraphFilterFactory" synonyms="synonyms.txt" ignoreCase="true" expand="true"/>
+        <filter class="solr.LowerCaseFilterFactory"/>
+      </analyzer>
+    </fieldType>
+
+    <fieldType name="text" class="solr.TextField" positionIncrementGap="100">
+      <analyzer type="index">
+        <charFilter class="solr.MappingCharFilterFactory" mapping="mapping-FoldToASCII.txt"/>
+        <tokenizer class="solr.StandardTokenizerFactory"/>
+        <filter class="solr.SynonymGraphFilterFactory" synonyms="synonyms.txt" ignoreCase="true" expand="false"/>
+        <filter class="solr.StopFilterFactory" ignoreCase="true" words="stopwords.txt" />
+        <filter class="solr.WordDelimiterGraphFilterFactory"
+              splitOnCaseChange="1"
+              splitOnNumerics="1"
+              stemEnglishPossessive="1"
+              generateWordParts="1"
+              generateNumberParts="1"
+              catenateWords="1"
+              catenateNumbers="1"
+              catenateAll="0"
+              preserveOriginal="0"/>
+        <filter class="solr.LowerCaseFilterFactory"/>
+        <filter class="solr.ReversedWildcardFilterFactory" withOriginal="true"
+                maxPosAsterisk="2" maxPosQuestion="1" minTrailing="2" maxFractionAsterisk="0"/>
+        <filter class="solr.FlattenGraphFilterFactory" />
+      </analyzer>
+      <analyzer type="query">
+        <charFilter class="solr.MappingCharFilterFactory" mapping="mapping-FoldToASCII.txt"/>
+        <tokenizer class="solr.StandardTokenizerFactory"/>
+        <filter class="solr.SynonymGraphFilterFactory" synonyms="synonyms.txt" ignoreCase="true" expand="true"/>
+        <filter class="solr.StopFilterFactory" ignoreCase="true" words="stopwords.txt" />
+        <filter class="solr.WordDelimiterGraphFilterFactory"
+              splitOnCaseChange="1"
+              splitOnNumerics="1"
+              stemEnglishPossessive="1"
+              generateWordParts="1"
+              generateNumberParts="1"
+              catenateWords="0"
+              catenateNumbers="0"
+              catenateAll="0"
+              preserveOriginal="0"/>
+        <filter class="solr.LowerCaseFilterFactory"/>
+      </analyzer>
+    </fieldType>
+
+    <!-- lowercases the entire field value, keeping it as a single token.  -->
+    <fieldType name="lowercase" class="solr.TextField" positionIncrementGap="100">
+      <analyzer>
+        <tokenizer class="solr.KeywordTokenizerFactory"/>
+        <filter class="solr.LowerCaseFilterFactory" />
+      </analyzer>
+    </fieldType>
+  </types>
+
+  <fields>
+    <field name="id"                    type="string"   indexed="true"  stored="true" required="false" />
+    <field name="_version_"             type="long"     indexed="true"  stored="true"/>
+
+    <!-- Plone Core Fields -->
+    <!-- name:allowedRolesAndUsers   type:string stored:true multivalued:true -->
+    <field name="allowedRolesAndUsers"  type="string"   indexed="true"  stored="true"  multiValued="true" />
+    <!-- name:created                type:date stored:true -->
+    <field name="created"               type="date"     indexed="true"  stored="true" />
+    <!-- name:Creator                type:string stored:true -->
+    <field name="Creator"               type="string"   indexed="true"  stored="true" />
+    <!-- name:Date                   type:date stored:true -->
+    <field name="Date"                  type="date"     indexed="true"  stored="true" />
+    <!-- name:default                type:text indexed:true stored:false multivalued:true -->
+    <field name="default"               type="text"     indexed="true"  stored="false"  multiValued="true" />
+    <!-- name:Description            type:text copyfield:default stored:true -->
+    <field name="Description"           type="text"     indexed="true"  stored="true" />
+    <!-- name:effective              type:date stored:true -->
+    <field name="effective"             type="date"     indexed="true"  stored="true" />
+    <!-- name:exclude_from_nav       type:boolean indexed:false stored:true -->
+    <field name="exclude_from_nav"      type="boolean"  indexed="false" stored="true" />
+    <!-- name:expires                type:date stored:true -->
+    <field name="expires"               type="date"     indexed="true"  stored="true" />
+    <!-- name:getIcon                type:string indexed:false stored:true -->
+    <field name="getIcon"               type="string"   indexed="false" stored="true" />
+    <!-- name:getId                  type:string indexed:false stored:true -->
+    <field name="getId"                 type="string"   indexed="false" stored="true" />
+    <!-- name:getRemoteUrl           type:string indexed:false stored:true -->
+    <field name="getRemoteUrl"          type="string"   indexed="false" stored="true" />
+    <!-- name:is_folderish           type:boolean stored:true -->
+    <field name="is_folderish"          type="boolean"  indexed="true"  stored="true" />
+    <!-- name:Language               type:string stored:true -->
+    <field name="Language"              type="string"   indexed="true"  stored="true" />
+    <!-- name:modified               type:date stored:true -->
+    <field name="modified"              type="date"     indexed="true"  stored="true" />
+    <!-- name:object_provides        type:string stored:true multivalued:true -->
+    <field name="object_provides"       type="string"   indexed="true"  stored="true"  multiValued="true" />
+    <!-- name:path_depth             type:integer indexed:true stored:true -->
+    <field name="path_depth"            type="tint"     indexed="true"  stored="true" />
+    <!-- name:path_parents           type:string indexed:true stored:true multivalued:true -->
+    <field name="path_parents"          type="string"   indexed="true"  stored="true"  multiValued="true" />
+    <!-- name:path_string            type:string indexed:false stored:true -->
+    <field name="path_string"           type="string"   indexed="false" stored="true" />
+    <!-- name:portal_type            type:string stored:true -->
+    <field name="portal_type"           type="string"   indexed="true"  stored="true" />
+    <!-- name:review_state           type:string stored:true -->
+    <field name="review_state"          type="string"   indexed="true"  stored="true" />
+    <!-- name:SearchableText         type:text copyfield:default stored:true -->
+    <field name="SearchableText"        type="text"     indexed="true"  stored="true" />
+    <!-- name:searchwords            type:string stored:true multivalued:true -->
+    <field name="searchwords"           type="string"   indexed="true"  stored="true"  multiValued="true" />
+    <!-- name:showinsearch           type:boolean stored:true -->
+    <field name="showinsearch"          type="boolean"  indexed="true"  stored="true" />
+    <!-- name:Subject                type:string copyfield:default stored:true multivalued:true -->
+    <field name="Subject"               type="string"   indexed="true"  stored="true"   multiValued="true" />
+    <!-- name:Title                  type:text copyfield:default stored:true -->
+    <field name="Title"                 type="text"     indexed="true"  stored="true" />
+    <!-- name:Type                   type:string stored:true -->
+    <field name="Type"                  type="string"   indexed="true"  stored="true" />
+    <!-- name:UID                    type:string stored:true required:true -->
+    <field name="UID"                   type="string"   indexed="true"  stored="true"   required="false" />
+
+    <copyField source="Title" dest="default"/>
+    <copyField source="Description" dest="default"/>
+    <copyField source="Subject" dest="default"/>
+
+    <copyField source="default" dest="SearchableText"/>
+
+    <dynamicField name="*"  type="string"  indexed="true" stored="true" />
+  </fields>
+
+</schema>
