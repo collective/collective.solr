@@ -8,10 +8,6 @@ collective.solr - Solr integration for the Plone CMS
 .. image:: https://coveralls.io/repos/collective/collective.solr/badge.svg?branch=master
     :target: https://coveralls.io/r/collective/collective.solr
 
-.. image:: https://img.shields.io/pypi/dm/collective.solr.svg
-    :target: https://pypi.python.org/pypi/collective.solr/
-    :alt: Downloads
-
 .. image:: https://img.shields.io/pypi/v/collective.solr.svg
     :target: https://pypi.python.org/pypi/collective.solr/
     :alt: Latest Version
