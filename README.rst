@@ -31,10 +31,9 @@ Apache Solr is based on Lucene and is *the* enterprise open source search engine
 It powers the search of sites like Twitter,
 the Apple and iTunes Stores, Wikipedia, Netflix and many more.
 
-Solr does not only scale to any level of content,
-but provides rich search functionality,
-like faceting, geospatial search, suggestions, spelling corrections, indexing of binary formats and a whole variety of powerful tools to configure custom search solutions.
-It has integrated clustering and load-balancing to provide a high level of robustness.
+For the wide range of functionality provided by Solr, see `Solr features`_.
+
+.. _`Solr features`: http://lucene.apache.org/solr/features.html
 
 ``collective.solr`` comes with a default configuration and setup of Solr that makes it extremely easy to get started,
 yet provides a vastly superior search quality compared to Plone's integrated text search based on ``ZCTextIndex``.
@@ -68,9 +67,9 @@ Search Enhancements
 Detailed Documentation
 ======================
 
-A full Documentation of the Solr integration of Plone could be found on `collectivesolr.readthedocs.org`_.
+The full documentation of Plone integration with Solr can be found at `read the docs`_.
 
-.. _`collectivesolr.readthedocs.org`: http://collectivesolr.readthedocs.org/en/latest/
+.. _`read the docs`: https://collectivesolr.readthedocs.io/en/latest/
 
 
 Installation & Configuration
@@ -78,42 +77,45 @@ Installation & Configuration
 
 Download the latest default Solr configuration from github::
 
-  $ wget https://github.com/collective/collective.solr/raw/master/solr.cfg
-  $ wget https://raw.githubusercontent.com/collective/collective.solr/master/solr-4.10.x.cfg
+  $ mkdir -p config/conf
+  $ wget https://github.com/collective/collective.solr/raw/master/base.cfg -O solr.cfg
+  $ wget https://github.com/collective/collective.solr/raw/master/config/conf/mapping-FoldToASCII.txt -O config/conf/mapping-FoldToASCII.txt
+  $ wget https://github.com/collective/collective.solr/raw/master/config/conf/schema.xml -O config/conf/schema.xml
+  $ wget https://github.com/collective/collective.solr/raw/master/config/conf/solrconfig.xml -O config/conf/solrconfig.xml
+  $ wget https://github.com/collective/collective.solr/raw/master/config/conf/stopwords.txt -O config/conf/stopwords.txt
+  $ wget https://github.com/collective/collective.solr/raw/master/config/conf/synonyms.txt -O config/conf/synonyms.txt
 
-.. note: Please do not extend your buildout directly with those files since they are likely to change over time.
+.. note: Please do not extend your buildout directly with these files since they are likely to change over time.
    Always fetch the files via wget to have a stable local copy.
    In general you should never rely on extending buildout config files from servers that aren't under your control.
 
-Extend your buildout to use those files
+Extend your buildout to use these files
 and make sure collective.solr is added to the eggs in your instance section.
 Your full buildout file should look something like this::
 
   [buildout]
   parts += instance
   extends =
-      http://dist.plone.org/release/4.3.8/versions.cfg
+      http://dist.plone.org/release/5.0.8/versions.cfg
       solr.cfg
-      solr-4.10.x.cfg
 
   [instance]
   recipe = plone.recipe.zope2instance
   http-address = 8080
   user = admin:admin
   eggs =
-      Plone
+      Products.CMFPlone
       collective.solr
-
-  [versions]
-  collective.recipe.solrinstance = 5.3.2
 
 After saving this to let's say ``buildout.cfg``,
 the buildout can be run and the `Solr`_ server and `Plone`_ instance started::
 
-  $ python bootstrap-buildout.py
-  $ bin/buildout
+  $ virtualenv .
+  $ . bin/activate
+  $ pip install setuptools==26.1.1 zc.buildout==2.5.3
+  $ buildout
   ...
-  $ bin/solr-instance start
+  $ bin/solr-start
   $ bin/instance start
 
 Next you should activate the ``collective.solr (site search)`` add-on in the add-on control panel of Plone.
@@ -141,7 +143,7 @@ Current Project Status
 ======================
 
 The code is used in production in many sites and considered stable.
-This add-on can be installed in a `Plone`_ 4.1 (or later) site to enable indexing operations
+This add-on can be installed in a `Plone`_ site to enable indexing operations
 as well as searching (site and live search) using `Solr`_.
 Doing so will not only significantly improve search quality and performance -
 especially for a large number of indexed objects,
@@ -155,13 +157,17 @@ and require a good deal of memory from ZODB caches.
 Solr will typically answer these requests in 10ms to 50ms
 at which point network latency and the rendering speed of Plone's page templates are a more dominant factor.
 
+Plone Compatibility
+==================
+
+The code works with Plone 5.0.
+Recommended is the latest in the Plone 5.0 series, currently 5.0.8.
 
 Solr Compatibility
 ==================
 
-The code works with Solr 3 or 4.
-Solr 5 is not yet supported.  See https://github.com/collective/collective.solr/issues/66
-Recommended is the latest in the Solr 4 series, currently 4.10.4.
+The code works with Solr 7.
+Recommended is the latest in the Solr 7 series, currently 7.4 and 7.5.
 
 
 Bug Reporting & Development
