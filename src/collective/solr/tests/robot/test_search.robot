@@ -146,6 +146,19 @@ Scenario: As logged in user I can find a private document
 # NOT expression
 # Wildcard search
 
+Scenario: As anonymous user I can sort the search results alphabetically
+  Given a public document with the title 'Colorless Gamma'
+    and a public document with the title 'Colorless Beta'
+    and a public document with the title 'Colorless Alpha'
+    and a logged in user
+    and the search result page for 'Colorless'
+   When I sort the search results alphabetically
+   Then the search returns '3' results
+    and 'Colorless Alpha' is the first search result
+    and 'Colorless Beta' is the second search result
+    and 'Colorless Gamma' is the third search result
+  Capture screenshot  search_sort_alphabetically.png
+
 
 *** Keywords *****************************************************************
 
@@ -226,6 +239,10 @@ an anonymous user
 a logged in user
   Enable autologin as  Manager
 
+the search result page for '${searchterm}'
+  Go to  ${PLONE_URL}/@@search
+  Input text  xpath=//div[@id='searchform']//input[@name='SearchableText']  ${searchterm}
+
 
 # When
 
@@ -252,7 +269,11 @@ I filter the search by creation date '${date_filter}'
   Wait until element is visible  xpath=//input[@id='query-portaltype-Collection']
   Select Radio Button  created  query-date-${date_filter}
 
-# Then
+I sort the search results alphabetically
+  Click link  //a[@data-sort='sortable_title']
+
+
+### Then #####################################################################
 
 the search returns '${result_count}' results
   Wait until keyword succeeds  5s  1s  XPath Should Match X Times  //strong[@id='search-results-number' and contains(.,'${result_count}')]  1  The search should have returned '${result_count}' results.
@@ -266,8 +287,17 @@ the search results should not include '${term}'
   Wait until page contains  Search results
   Page should not contain element  xpath=//*[@class='searchResults']/a[contains(text(), '${term}')]
 
+'${title}' is the first search result
+  Page Should Contain Element  //*[@id='search-results']/ol/li[1]/span[contains(., '${title}')]
 
-# Misc
+'${title}' is the second search result
+  Page Should Contain Element  //*[@id='search-results']/ol/li[2]/span[contains(., '${title}')]
+
+'${title}' is the third search result
+  Page Should Contain Element  //*[@id='search-results']/ol/li[3]/span[contains(., '${title}')]
+
+
+### Misc #####################################################################
 
 Capture screenshot
   [Arguments]  ${filename}
