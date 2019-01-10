@@ -152,6 +152,9 @@ class BinaryAdder(DefaultAdder):
         except SolrConnectionException, e:
             logger.warn('Error %s @ %s', e, data['path_string'])
             data['SearchableText'] = ''
+        except etree.XMLSyntaxError, e:
+            logger.warn('Parsing error %s @ %s.', e, data['path_string'])
+            data['SearchableText'] = ''
         super(BinaryAdder, self).__call__(conn, **data)
 
 
@@ -337,7 +340,8 @@ class SolrIndexProcessor(object):
             if portal is None:
                 return obj
             portal = portal.getPortalObject()
-            adapter = queryMultiAdapter((obj, portal), IIndexableObjectWrapper)
+            adapter = queryMultiAdapter(
+                (obj, portal), IIndexableObjectWrapper)
             if adapter is not None:
                 wrapper = adapter
             wft = getToolByName(obj, 'portal_workflow', None)
