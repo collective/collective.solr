@@ -429,6 +429,7 @@ class SearchResults extends React.Component {
   handleChangeSortOn(event) {
     this.setState({ active_tab: event.target.dataset.sort });
     this.props.onUserChangeSortOn(event.target.dataset.sort);
+    event.preventDefault();
   }
 
   render() {
