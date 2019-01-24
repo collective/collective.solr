@@ -9,6 +9,8 @@ Changelog
 
   [sauzher]
 
+- Drop collective.indexing dependency, Products.CMFCore provides all its functionality.
+  [gforcada]
 
 7.0.0a1 (unreleased)
 --------------------
