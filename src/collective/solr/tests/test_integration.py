@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from Products.CMFCore.utils import getToolByName
-from collective.indexing.interfaces import IIndexQueueProcessor
+from Products.CMFCore.interfaces import IIndexQueueProcessor
 from collective.solr.exceptions import SolrInactiveException
 from collective.solr.interfaces import ISearch
 from collective.solr.interfaces import ISolrConnectionManager
