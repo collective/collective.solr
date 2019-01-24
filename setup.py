@@ -44,7 +44,7 @@ setup(
     install_requires=[
         'Acquisition',
         'DateTime',
-        'Products.CMFCore',
+        'Products.CMFCore >= 2.2.11',
         'Products.CMFPlone >= 4.3.7',
         'Products.GenericSetup',
         'ZODB3',
