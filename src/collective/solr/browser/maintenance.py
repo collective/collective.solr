@@ -8,7 +8,6 @@ from Products.Five.browser import BrowserView
 from plone.uuid.interfaces import IUUID, IUUIDAware
 from zope.interface import implements
 from zope.component import queryUtility, queryAdapter
-from collective.indexing.indexer import getOwnIndexMethod
 from collective.solr.indexer import DefaultAdder
 from collective.solr.flare import PloneFlare
 from collective.solr.interfaces import ISolrConnectionManager
@@ -148,10 +147,6 @@ class SolrMaintenanceView(BrowserView):
 
         for path, obj in findObjects(self.context):
             if ICheckIndexable(obj)():
-
-                if getOwnIndexMethod(obj, 'indexObject') is not None:
-                    log('skipping indexing of %r via private method.\n' % obj)
-                    continue
 
                 count += 1
                 if count <= skip:
