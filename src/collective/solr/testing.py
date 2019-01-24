@@ -17,7 +17,6 @@ from plone.app.testing import login
 from plone.registry.interfaces import IRegistry
 from plone.testing import Layer
 from plone.testing import z2
-from plone.testing.z2 import installProduct
 from plone.api.portal import set_registry_record
 from zope.interface import implementer
 from zope.component import provideUtility
@@ -136,11 +135,8 @@ class CollectiveSolrLayer(PloneSandboxLayer):
 
     def setUpZope(self, app, configurationContext):
         # Load ZCML
-        import collective.indexing
-        self.loadZCML(package=collective.indexing)
         import collective.solr
         self.loadZCML(package=collective.solr)
-        installProduct(app, 'collective.indexing')
 
     def setUpPloneSite(self, portal):
         self.solr_layer.setUp()
