@@ -207,7 +207,7 @@ class SolrIndexProcessor(object):
                 logger.warning(msg, obj)
                 return
 
-            if attributes is not None:
+            if attributes:
 
                 if 'path' in attributes:
                     attributes = list(attributes)
@@ -248,6 +248,8 @@ class SolrIndexProcessor(object):
                     logger.exception('exception during indexing %r', obj)
 
     def reindex(self, obj, attributes=None, update_metadata=False):
+        if not attributes:
+            attributes = None
         self.index(obj, attributes)
 
     def unindex(self, obj):
