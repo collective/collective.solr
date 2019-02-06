@@ -42,7 +42,7 @@ install:
   # - sed -ie "s#solr-x.x.x.cfg#solr-$SOLR_VERSION.cfg#" travis.cfg
   - sed -ie "s#7.4.0#$SOLR_VERSION#" base.cfg
   - sed -ie "s#solr-7.4.0#solr-$SOLR_VERSION#" base.cfg
-  - bin/buildout -N -t 20 travis.cfg
+  - bin/buildout -N -t 20 -c travis.cfg
 script:
   - bin/code-analysis
   - bin/coverage run bin/test
