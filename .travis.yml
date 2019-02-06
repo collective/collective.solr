@@ -8,17 +8,11 @@ cache:
   directories:
     - $HOME/buildout-cache
 env:
-  - PLONE_VERSION=4.3.x SOLR_VERSION=7.6.0
-  - PLONE_VERSION=5.1.x SOLR_VERSION=7.6.0
-#matrix:
-#  allow_failures:
-#    - env: PLONE_VERSION=4.3.x SOLR_VERSION=5.1.x
-#    - env: PLONE_VERSION=5.0.x SOLR_VERSION=5.1.x
-env:
   matrix:
-    - SOLR_VERSION=7.4.0
-    - SOLR_VERSION=7.5.0
-    - SOLR_VERSION=7.6.0
+    - PLONE_VERSION=4.3.x SOLR_VERSION=7.4.0
+    - PLONE_VERSION=4.3.x SOLR_VERSION=7.5.0
+    - PLONE_VERSION=4.3.x SOLR_VERSION=7.6.0
+    - PLONE_VERSION=5.1.x SOLR_VERSION=7.6.0
 dist: trusty
 addons:
   apt:
