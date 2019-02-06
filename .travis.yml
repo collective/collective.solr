@@ -34,11 +34,10 @@ before_install:
   - bin/pip install zest.pocompile
   - bin/pocompile src
 install:
-  - sed -ie "s#plone-x.x.x.cfg#plone-$PLONE_VERSION.cfg#" travis.cfg
-  # - sed -ie "s#solr-x.x.x.cfg#solr-$SOLR_VERSION.cfg#" travis.cfg
+  - sed -ie "s#plone-5.1.x.cfg#plone-$PLONE_VERSION.cfg#" buildout.cfg
   - sed -ie "s#7.4.0#$SOLR_VERSION#" base.cfg
   - sed -ie "s#solr-7.4.0#solr-$SOLR_VERSION#" base.cfg
-  - bin/buildout -N -t 20 -c travis.cfg
+  - bin/buildout -N -t 20
 script:
   - bin/code-analysis
   - bin/coverage run bin/test
