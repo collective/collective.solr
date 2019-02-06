@@ -161,7 +161,6 @@
     <field name="UID"                   type="string"   indexed="true"  stored="true"   required="false" />
 
     <copyField source="Title" dest="default"/>
-    <copyField source="Title" dest="sortable_title"/>
     <copyField source="Description" dest="default"/>
     <copyField source="Subject" dest="default"/>
 
