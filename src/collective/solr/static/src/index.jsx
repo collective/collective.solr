@@ -4,6 +4,7 @@ import "whatwg-fetch";
 import "babel-polyfill";
 import update from "react-addons-update";
 import moment from "moment";
+import {DebounceInput} from 'react-debounce-input';
 
 class SearchApp extends React.Component {
   constructor() {
@@ -155,7 +156,9 @@ class SearchBox extends React.Component {
     return (
       <div id="searchform">
         <div className="input-group">
-          <input
+          <DebounceInput
+            minLength={3}
+            debounceTimeout={400}
             className="searchPage form-control"
             name="SearchableText"
             type="text"
@@ -419,13 +422,14 @@ class SearchResults extends React.Component {
   constructor() {
     super();
     this.state = {
-      active_tab: "relevance"
+      active_tab: "relevance",
     };
   }
 
   handleChangeSortOn(event) {
     this.setState({ active_tab: event.target.dataset.sort });
     this.props.onUserChangeSortOn(event.target.dataset.sort);
+    event.preventDefault();
   }
 
   render() {
