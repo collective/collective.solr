@@ -5,8 +5,6 @@ from collective.solr.tests.utils import getData, fakehttp
 from collective.solr.testing import COLLECTIVE_SOLR_MOCK_REGISTRY_FIXTURE
 from collective.solr.utils import getConfig
 
-import unittest
-
 
 class TestSolr(TestCase):
 

@@ -14,8 +14,6 @@ from unittest import TestCase
 from zope.component import getMultiAdapter
 from zope.interface import alsoProvides
 
-import unittest
-
 
 class SolrFacettingTests(TestCase):
     layer = LEGACY_COLLECTIVE_SOLR_INTEGRATION_TESTING
