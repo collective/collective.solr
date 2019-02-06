@@ -5,8 +5,6 @@ from collective.solr.tests.utils import getData, fakehttp
 from collective.solr.testing import COLLECTIVE_SOLR_MOCK_REGISTRY_FIXTURE
 from collective.solr.utils import getConfig
 
-import unittest
-
 
 class TestSolr(TestCase):
 
@@ -114,7 +112,6 @@ class TestSolr(TestCase):
         c.commit(waitSearcher=False)
         self.failUnlessEqual(str(output), commit_request)
 
-    @unittest.skipIf(True, 'New query param q.op in Solr 7')
     def test_search(self):
         # XXX: Solr 7 has a new query param 'q.op' which can not be passed to
         # the search method in Python.
@@ -123,8 +120,16 @@ class TestSolr(TestCase):
         search_response = getData('search_response.txt')
         c = SolrConnection(host='localhost:8983', persistent=True)
         output = fakehttp(c, search_response)
-        res = c.search(
-            q='+id:[* TO *]', fl='* score', wt='xml', rows='10', indent='on')
+        parameters = {'q': '+id:[* TO *]',
+                      'fl': '* score',
+                      'wt': 'xml',
+                      'rows': '10',
+                      'indent': 'on',
+                      'q.op': 'AND',
+                      'lowercaseOperators': 'true',
+                      'sow': 'true'}
+
+        res = c.search(**parameters)
         res = fromstring(res.read())
         normalize = lambda x: sorted(x.split('&'))      # sort request params
         self.assertEqual(normalize(output.get()), normalize(search_request))
