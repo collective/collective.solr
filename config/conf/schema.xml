@@ -150,6 +150,7 @@
     <field name="searchwords"           type="string"   indexed="true"  stored="true"  multiValued="true" />
     <!-- name:showinsearch           type:boolean stored:true -->
     <field name="showinsearch"          type="boolean"  indexed="true"  stored="true" />
+    <field name="sortable_title"         type="string"     indexed="true"  stored="true" />
     <!-- name:Subject                type:string copyfield:default stored:true multivalued:true -->
     <field name="Subject"               type="string"   indexed="true"  stored="true"   multiValued="true" />
     <!-- name:Title                  type:text copyfield:default stored:true -->
@@ -160,12 +161,12 @@
     <field name="UID"                   type="string"   indexed="true"  stored="true"   required="false" />
 
     <copyField source="Title" dest="default"/>
+    <copyField source="Title" dest="sortable_title"/>
     <copyField source="Description" dest="default"/>
     <copyField source="Subject" dest="default"/>
 
     <copyField source="default" dest="SearchableText"/>
 
-    <dynamicField name="*"  type="string"  indexed="true" stored="true" />
   </fields>
 
 </schema>

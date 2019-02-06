@@ -197,7 +197,6 @@ class SolrFacettingTests(TestCase):
             '</form>')
         self.assertFalse('portal_type' in output)
 
-    @unittest.skipIf(True, 'Temporary skip for c.solr 7')
     def testUnknownFacetField(self):
         self.request.form['SearchableText'] = 'News'
         self.request.form['facet'] = 'true'
