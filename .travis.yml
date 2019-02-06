@@ -37,6 +37,8 @@ install:
   - sed -ie "s#plone-5.1.x.cfg#plone-$PLONE_VERSION.cfg#" buildout.cfg
   - sed -ie "s#7.4.0#$SOLR_VERSION#" base.cfg
   - sed -ie "s#solr-7.4.0#solr-$SOLR_VERSION#" base.cfg
+  - cat base.cfg
+  - cat buildout.cfg
   - bin/buildout -N -t 20
 script:
   - bin/code-analysis
