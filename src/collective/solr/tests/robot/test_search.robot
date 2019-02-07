@@ -159,6 +159,17 @@ Scenario: As anonymous user I can sort the search results alphabetically
     and 'Colorless Gamma' is the third search result
   Capture screenshot  search_sort_alphabetically.png
 
+Scenario: As anonymous user I can sort the search results by creation date
+  Given a public document with the title 'Colorless Green Ideas' created today
+    and a public document with the title 'Colorless Colorless Green Old Ideas' created last week
+    and a logged in user
+    and the search result page for 'Colorless'
+   When I sort the search results by creation date
+   Then the search returns '2' results
+   Debug
+    and 'Colorless Green Ideas' is the first search result
+    and 'Colorless Green Old Ideas' is the second search result
+  Capture screenshot  search_sort_by_creation_date.png
 
 *** Keywords *****************************************************************
 
@@ -219,7 +230,7 @@ a public folder with the title '${title}'
 a public document with the title '${title}' created today
   Enable autologin as  Manager
   ${date}=  Get Current Date
-  ${uid}=  Create content  type=Document  title=${title}  created=${date}
+  ${uid}=  Create content  type=Document  title=${title}  creation_date=${date}
   Fire transition  ${uid}  publish
   Go to  ${PLONE_URL}/@@solr-maintenance/reindex
   Wait until page contains  solr index rebuilt
@@ -228,7 +239,7 @@ a public document with the title '${title}' created last week
   Enable autologin as  Manager
   ${current_date}=  Get Current Date
   ${date}=  Subtract Time From Date  ${current_date}  7 days
-  ${uid}=  Create content  type=Document  title=${title}  created=${date}
+  ${uid}=  Create content  type=Document  title=${title}  creation_date=${date}
   Fire transition  ${uid}  publish
   Go to  ${PLONE_URL}/@@solr-maintenance/reindex
   Wait until page contains  solr index rebuilt
@@ -272,6 +283,9 @@ I filter the search by creation date '${date_filter}'
 I sort the search results alphabetically
   Click link  //a[@data-sort='sortable_title']
 
+I sort the search results by creation date
+  Click link  //a[@data-sort='date']
+
 
 ### Then #####################################################################
 
@@ -288,13 +302,13 @@ the search results should not include '${term}'
   Page should not contain element  xpath=//*[@class='searchResults']/a[contains(text(), '${term}')]
 
 '${title}' is the first search result
-  Page Should Contain Element  //*[@id='search-results']/ol/li[1]/span[contains(., '${title}')]
+  Page Should Contain Element  //*[@id='search-results']/ol/li[1]/span[contains(., '${title}')]  message='${title}' should be the first search result but was not
 
 '${title}' is the second search result
-  Page Should Contain Element  //*[@id='search-results']/ol/li[2]/span[contains(., '${title}')]
+  Page Should Contain Element  //*[@id='search-results']/ol/li[2]/span[contains(., '${title}')]  message='${title}' should be the second search result but was not
 
 '${title}' is the third search result
-  Page Should Contain Element  //*[@id='search-results']/ol/li[3]/span[contains(., '${title}')]
+  Page Should Contain Element  //*[@id='search-results']/ol/li[3]/span[contains(., '${title}')]    message='${title}' should be the third search result but was not
 
 
 ### Misc #####################################################################
