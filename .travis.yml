@@ -7,26 +7,14 @@ cache:
   pip: true
   directories:
     - $HOME/buildout-cache
-# env:
-#  - PLONE_VERSION=4.3.x SOLR_VERSION=4.10.x
-#  - PLONE_VERSION=5.0.x SOLR_VERSION=4.10.x
-#  - PLONE_VERSION=5.1.x SOLR_VERSION=4.10.x
-#  - PLONE_VERSION=4.3.x SOLR_VERSION=5.1.x
-#  - PLONE_VERSION=5.0.x SOLR_VERSION=5.1.x
-#matrix:
-#  allow_failures:
-#    - env: PLONE_VERSION=4.3.x SOLR_VERSION=5.1.x
-#    - env: PLONE_VERSION=5.0.x SOLR_VERSION=5.1.x
 env:
   matrix:
-    # - SOLR_VERSION=4.10.4
-    # - SOLR_VERSION=5.2.1
-    # - SOLR_VERSION=6.6.5
-    # - SOLR_VERSION=7.2.1
-    # - SOLR_VERSION=7.3.0
-    - SOLR_VERSION=7.4.0
-    - SOLR_VERSION=7.5.0
-    - SOLR_VERSION=7.6.0
+    - PLONE_VERSION=4.3.x SOLR_VERSION=7.4.0
+    - PLONE_VERSION=4.3.x SOLR_VERSION=7.5.0
+    - PLONE_VERSION=4.3.x SOLR_VERSION=7.6.0
+    - PLONE_VERSION=5.1.x SOLR_VERSION=7.4.0
+    - PLONE_VERSION=5.1.x SOLR_VERSION=7.5.0
+    - PLONE_VERSION=5.1.x SOLR_VERSION=7.6.0
 dist: trusty
 addons:
   apt:
@@ -46,10 +34,11 @@ before_install:
   - bin/pip install zest.pocompile
   - bin/pocompile src
 install:
-  # - sed -ie "s#plone-x.x.x.cfg#plone-$PLONE_VERSION.cfg#" travis.cfg
-  # - sed -ie "s#solr-x.x.x.cfg#solr-$SOLR_VERSION.cfg#" travis.cfg
+  - sed -ie "s#plone-5.1.x.cfg#plone-$PLONE_VERSION.cfg#" buildout.cfg
   - sed -ie "s#7.4.0#$SOLR_VERSION#" base.cfg
   - sed -ie "s#solr-7.4.0#solr-$SOLR_VERSION#" base.cfg
+  - cat base.cfg
+  - cat buildout.cfg
   - bin/buildout -N -t 20
 script:
   - bin/code-analysis
