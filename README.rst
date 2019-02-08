@@ -1,4 +1,3 @@
-====================================================
 collective.solr - Solr integration for the Plone CMS
 ====================================================
 
@@ -141,7 +140,7 @@ Current Project Status
 ======================
 
 The code is used in production in many sites and considered stable.
-This add-on can be installed in a `Plone`_ 4.1 (or later) site to enable indexing operations
+This add-on can be installed in a `Plone`_ 4.3 (or later) site to enable indexing operations
 as well as searching (site and live search) using `Solr`_.
 Doing so will not only significantly improve search quality and performance -
 especially for a large number of indexed objects,
@@ -159,9 +158,7 @@ at which point network latency and the rendering speed of Plone's page templates
 Solr Compatibility
 ==================
 
-The code works with Solr 3 or 4.
-Solr 5 is not yet supported.  See https://github.com/collective/collective.solr/issues/66
-Recommended is the latest in the Solr 4 series, currently 4.10.4.
+The code works with Solr 7. Older versions might work as well but we don't test them.
 
 
 Bug Reporting & Development
