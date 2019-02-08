@@ -1,7 +1,7 @@
 Changelog
 =========
 
-7.0.0a1 (unreleased)
+7.0.0a1 (2019-02-08)
 --------------------
 
 New Features:
