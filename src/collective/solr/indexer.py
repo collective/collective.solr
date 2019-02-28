@@ -13,6 +13,7 @@ from ZODB.POSException import ConflictError
 from Products.CMFCore.utils import getToolByName
 from Products.CMFCore.CMFCatalogAware import CMFCatalogAware
 from Products.Archetypes.CatalogMultiplex import CatalogMultiplex
+import six
 try:   # pragma: no cover
     from plone.app.content.interfaces import IIndexableObjectWrapper
 except ImportError:  # pragma: no cover
@@ -30,7 +31,7 @@ from collective.solr.exceptions import SolrConnectionException
 from collective.solr.utils import prepareData
 from collective.solr.utils import getConfig
 from socket import error
-from urllib import urlencode
+from six.moves.urllib.parse import urlencode
 
 
 logger = getLogger('collective.solr.indexer')
@@ -149,10 +150,10 @@ class BinaryAdder(DefaultAdder):
                 url, urlencode(postdata, doseq=True), conn.formheaders)
             root = etree.parse(response)
             data['SearchableText'] = root.find('.//str').text.strip()
-        except SolrConnectionException, e:
+        except SolrConnectionException as e:
             logger.warn('Error %s @ %s', e, data['path_string'])
             data['SearchableText'] = ''
-        except etree.XMLSyntaxError, e:
+        except etree.XMLSyntaxError as e:
             logger.warn('Parsing error %s @ %s.', e, data['path_string'])
             data['SearchableText'] = ''
         super(BinaryAdder, self).__call__(conn, **data)
@@ -356,7 +357,7 @@ class SolrIndexProcessor(object):
         if schema is None:
             return {}, ()
         if attributes is None:
-            attributes = schema.keys()
+            attributes = list(schema.keys())
         obj = self.wrapObject(obj)
         data = {}
         for name in attributes:
@@ -383,7 +384,7 @@ class SolrIndexProcessor(object):
                 separator = getattr(field, 'separator', ' ')
                 value = separator.join(value)
             if isinstance(value, str):
-                value = unicode(value, 'utf-8', 'ignore').encode('utf-8')
+                value = six.text_type(value, 'utf-8', 'ignore').encode('utf-8')
             data[name] = value
         missing = set(schema.requiredFields) - set(data.keys())
         return data, missing

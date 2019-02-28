@@ -173,7 +173,7 @@ class TestErrorView(unittest.TestCase):
         request = {}
         try:
             raise socket.error('Test Exception')
-        except Exception, e:
+        except Exception as e:
             view = ErrorView(e, request)
         self.assertEqual(
             view.errorInfo(),

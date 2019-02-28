@@ -141,7 +141,7 @@ class QueueIndexerTests(TestCase):
 
     def testDateIndexingWithPythonDateTime(self):
         foo = Foo(id='gerken', name='patrick', cat='nerd',
-                  timestamp=datetime(1980, 9, 29, 14, 02))
+                  timestamp=datetime(1980, 9, 29, 14, 0o2))
         response = getData('add_response.txt')
         # fake add response
         output = fakehttp(self.mngr.getConnection(), response)
@@ -152,7 +152,7 @@ class QueueIndexerTests(TestCase):
 
     def testDateIndexingWithPythonDate(self):
         foo = Foo(id='brand', name='jan-carel',
-                  cat='nerd', timestamp=date(1982, 8, 05))
+                  cat='nerd', timestamp=date(1982, 8, 0o5))
         response = getData('add_response.txt')
         # fake add response
         output = fakehttp(self.mngr.getConnection(), response)

@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
-from StringIO import StringIO
-
 from DateTime import DateTime
 from Products.ZCatalog.Lazy import Lazy
 from Products.ZCatalog.Lazy import _marker
@@ -9,6 +7,7 @@ from zope.interface import implements
 
 from collective.solr.interfaces import ISolrFlare
 from xml.etree.cElementTree import iterparse
+import six
 
 
 class AttrDict(dict):
@@ -62,7 +61,7 @@ unmarshallers = {
     'int': int,
     'float': float,
     'double': float,
-    'long': long,
+    'long': int,
     'bool': lambda x: x == 'true',
     'str': lambda x: x or '',
     'date': parseDate,
@@ -99,8 +98,8 @@ class SolrResponse(Lazy):
 
     def parse(self, data):
         """ parse a solr response contained in a string or file-like object """
-        if isinstance(data, basestring):
-            data = StringIO(data)
+        if isinstance(data, six.string_types):
+            data = six.StringIO(data)
         stack = [self]      # the response object is the outmost container
         elements = iterparse(data, events=('start', 'end'))
         for action, elem in elements:
@@ -180,8 +179,8 @@ class SolrSchema(AttrDict):
     def parse(self, data):
         """ parse a solr schema to collect information for building
             search and indexing queries later on """
-        if isinstance(data, basestring):
-            data = StringIO(data)
+        if isinstance(data, six.string_types):
+            data = six.StringIO(data)
         self['requiredFields'] = required = []
         types = {}
         for action, elem in iterparse(data):

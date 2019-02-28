@@ -6,6 +6,7 @@ from Missing import MV
 from Products.CMFCore.utils import getToolByName
 
 from plone import api
+from six.moves import range
 USE_COLLECTIVE_INDEXING = api.env.plone_version() < '5.1'
 if USE_COLLECTIVE_INDEXING:
     from collective.indexing.queue import getQueue

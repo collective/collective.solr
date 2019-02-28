@@ -38,7 +38,7 @@ class PloneFlare(AttrDict):
 
     def getRID(self):
         """Return a record id"""
-        return int(int(self['UID'], 16) % sys.maxint)
+        return int(int(self['UID'], 16) % sys.maxsize)
 
     def getObject(self, REQUEST=None, restricted=True):
         """ return the actual object corresponding to this flare while

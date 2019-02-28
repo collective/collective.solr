@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from copy import deepcopy
 from operator import itemgetter
-from urllib import urlencode
+from six.moves.urllib.parse import urlencode
 
 from plone.app.layout.viewlets.common import SearchBoxViewlet
 from Products.Five import BrowserView
@@ -13,12 +13,13 @@ from zope.i18nmessageid import Message
 
 from collective.solr.interfaces import IFacetTitleVocabularyFactory
 from plone.registry.interfaces import IRegistry
+import six
 
 
 def param(view, name):
     """ return a request parameter as a list """
     value = view.request.form.get(name, [])
-    if isinstance(value, basestring):
+    if isinstance(value, six.string_types):
         value = [value]
     return value
 
@@ -30,7 +31,7 @@ def facetParameters(view):
         'facet.field',
         view.request.get('facet_field', marker)
     )
-    if isinstance(fields, basestring):
+    if isinstance(fields, six.string_types):
         fields = [fields]
     if fields is marker:
         fields = getattr(view, 'facet_fields', marker)
@@ -56,7 +57,7 @@ def convertFacets(fields, view, filter=None):
     facets, dependencies = list(facetParameters(view))
     params['facet.field'] = facets = list(facets)
     fq = params.get('fq', [])
-    if isinstance(fq, basestring):
+    if isinstance(fq, six.string_types):
         fq = params['fq'] = [fq]
     selected = set([facet.split(':', 1)[0] for facet in fq])
     for field, values in fields.items():
@@ -67,7 +68,7 @@ def convertFacets(fields, view, filter=None):
             vfactory = getUtility(IFacetTitleVocabularyFactory)
         vocabulary = vfactory(view.context)
 
-        sorted_values = sorted(values.items(), key=itemgetter(1), reverse=True)
+        sorted_values = sorted(list(values.items()), key=itemgetter(1), reverse=True)
         for name, count in sorted_values:
             p = deepcopy(params)
             p.setdefault('fq', []).append(

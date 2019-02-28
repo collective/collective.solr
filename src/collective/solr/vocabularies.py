@@ -11,6 +11,7 @@ from collective.solr.interfaces import ISolrConnectionManager
 
 from zope.component import getUtility
 from plone.registry.interfaces import IRegistry
+import six
 
 
 class SolrIndexes(object):
@@ -44,7 +45,7 @@ class I18NFacetTitles(object):
     def getTerm(self, term):
         value = term
         title = SolrMessageFactory(term)
-        if isinstance(term, unicode):
+        if isinstance(term, six.text_type):
             # Terms must be byte strings
             term = term.encode('utf8')
         return SimpleTerm(value, term, title)

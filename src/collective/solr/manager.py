@@ -6,14 +6,15 @@ from collective.solr.local import setLocal
 from collective.solr.solr import SolrConnection
 from collective.solr.utils import getConfig
 from collective.solr.utils import isActive
-from httplib import CannotSendRequest
-from httplib import ResponseNotReady
+from six.moves.http_client import CannotSendRequest
+from six.moves.http_client import ResponseNotReady
 from logging import getLogger
 from socket import error
 from zope.component import queryUtility
 from zope.interface import implements
 from plone.registry.interfaces import IRegistry
 from zope.component import getUtility
+import six
 
 logger = getLogger('collective.solr.manager')
 marker = object()
@@ -43,9 +44,9 @@ class SolrConnectionManager(object):
         """ set connection parameters """
         config = getConfig()
         config.active = active
-        config.host = unicode(host)
+        config.host = six.text_type(host)
         config.port = port
-        config.base = unicode(base)
+        config.base = six.text_type(base)
         self.closeConnection(clearSchema=True)
 
     def closeConnection(self, clearSchema=False):

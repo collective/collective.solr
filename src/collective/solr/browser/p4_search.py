@@ -18,6 +18,7 @@ from zope.i18nmessageid import MessageFactory
 from zope.publisher.browser import BrowserView
 
 import json
+import six
 
 _pmf = MessageFactory('plone')
 
@@ -91,8 +92,8 @@ class Search(BrowserView):
             text = request.form.get('SearchableText', '')
         if not text:
             # Without text, must provide a meaningful non-empty search
-            valid = set(valid_indexes).intersection(request.form.keys()) or \
-                set(valid_indexes).intersection(query.keys())
+            valid = set(valid_indexes).intersection(list(request.form.keys())) or \
+                set(valid_indexes).intersection(list(query.keys()))
             if not valid:
                 return
 
@@ -182,7 +183,7 @@ class Search(BrowserView):
             return None
         if len(breadcrumbs) > 3:
             # if we have too long breadcrumbs, emit the middle elements
-            empty = {'absolute_url': '', 'Title': unicode('…', 'utf-8')}
+            empty = {'absolute_url': '', 'Title': six.text_type('…', 'utf-8')}
             breadcrumbs = [breadcrumbs[0], empty] + breadcrumbs[-2:]
         return breadcrumbs
 
@@ -248,9 +249,9 @@ class SortOption(object):
     def url(self):
         q = {}
         q.update(self.request.form)
-        if 'sort_on' in q.keys():
+        if 'sort_on' in list(q.keys()):
             del q['sort_on']
-        if 'sort_order' in q.keys():
+        if 'sort_order' in list(q.keys()):
             del q['sort_order']
         q['sort_on'] = self.sortkey
         if self.reverse:
