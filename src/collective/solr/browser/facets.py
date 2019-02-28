@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from copy import deepcopy
 from operator import itemgetter
-from string import strip
 from urllib import urlencode
 
 from plone.app.layout.viewlets.common import SearchBoxViewlet
@@ -43,8 +42,8 @@ def facetParameters(view):
     dependencies = {}
     for idx, field in enumerate(fields):
         if ':' in field:
-            facet, dep = map(strip, field.split(':', 1))
-            dependencies[facet] = map(strip, dep.split(','))
+            facet, dep = [f.strip() for f in field.split(':', 1)]
+            dependencies[facet] = [d.strip() for d in dep.split(',')]
     return fields, dependencies
 
 
