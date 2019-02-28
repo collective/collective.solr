@@ -4,8 +4,16 @@ from Acquisition import aq_parent
 from DateTime import DateTime
 from Missing import MV
 from Products.CMFCore.utils import getToolByName
-from collective.indexing.queue import getQueue
-from collective.indexing.queue import processQueue
+
+from plone import api
+USE_COLLECTIVE_INDEXING = api.env.plone_version() < '5.1'
+if USE_COLLECTIVE_INDEXING:
+    from collective.indexing.queue import getQueue
+    from collective.indexing.queue import processQueue
+else:
+    from Products.CMFCore.indexing import getQueue
+    from Products.CMFCore.indexing import processQueue
+
 from collective.solr.dispatcher import FallBackException
 from collective.solr.dispatcher import solrSearchResults
 from collective.solr.flare import PloneFlare
@@ -28,7 +36,6 @@ from collective.solr.tests.utils import numFound
 from collective.solr.utils import activate
 from collective.solr.utils import getConfig
 from operator import itemgetter
-from plone import api
 from plone.app.testing import TEST_USER_ID
 from plone.app.testing import TEST_USER_NAME
 from plone.app.testing import login
