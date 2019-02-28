@@ -6,6 +6,8 @@ Changelog
 
 - Nothing changed yet.
 
+- Don't use collective.indexing if Plone>=5.1, Products.CMFCore provides all its functionality.
+  [jnns]
 
 7.0.0a1 (2019-02-08)
 --------------------
