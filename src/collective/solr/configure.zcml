@@ -12,7 +12,9 @@
 
   <i18n:registerTranslations directory="locales" />
 
-  <include package="collective.indexing" />
+  <!-- collective.indexing is part of Products.CMFPlone since 5.1 -->
+  <include zcml:condition="have plone-51" package="collective.indexing" />
+
   <include package="plone.browserlayer" />
   <include package="plone.app.registry" />
   <include package="collective.js.showmore" />

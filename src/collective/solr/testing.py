@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from Products.CMFCore.utils import getToolByName
 from collective.solr.utils import activate
+from plone import api
 from plone.app.robotframework.testing import REMOTE_LIBRARY_BUNDLE_FIXTURE
 from plone.app.testing import FunctionalTesting
 from plone.app.testing import IntegrationTesting
@@ -22,6 +23,10 @@ from plone.api.portal import set_registry_record
 from zope.interface import implementer
 from zope.component import provideUtility
 from time import sleep
+
+USE_COLLECTIVE_INDEXING = api.env.plone_version() < '5.1'
+if USE_COLLECTIVE_INDEXING:
+    from plone.testing.z2 import installProduct
 
 import os
 import sys
@@ -135,12 +140,14 @@ class CollectiveSolrLayer(PloneSandboxLayer):
         )
 
     def setUpZope(self, app, configurationContext):
-        # Load ZCML
-        import collective.indexing
-        self.loadZCML(package=collective.indexing)
+        if USE_COLLECTIVE_INDEXING:
+            # Load ZCML
+            import collective.indexing
+            self.loadZCML(package=collective.indexing)
         import collective.solr
         self.loadZCML(package=collective.solr)
-        installProduct(app, 'collective.indexing')
+        if USE_COLLECTIVE_INDEXING:
+            installProduct(app, 'collective.indexing')
 
     def setUpPloneSite(self, portal):
         self.solr_layer.setUp()
