@@ -54,7 +54,7 @@ class ISolrSchema(Interface):
         )
     )
 
-    async = Bool(
+    async_indexing = Bool(
         title=_('label_async', default=u'Asynchronous indexing'),
         default=False,
         description=_(

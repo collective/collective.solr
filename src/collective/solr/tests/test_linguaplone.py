@@ -41,7 +41,7 @@ class LinguaTests(unittest.TestCase):
         # but first all uncommitted changes made in the tests are aborted...
         abort()
         self.config.active = False
-        self.config.async = False
+        self.config.async_indexing = False
         commit()
 
     def testLanguageSearch(self):

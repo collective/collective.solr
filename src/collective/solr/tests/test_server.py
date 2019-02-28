@@ -487,7 +487,7 @@ class SolrServerTests(TestCase):
         # but first all uncommitted changes made in the tests are aborted...
         abort()
         self.config.active = False
-        self.config.async = False
+        self.config.async_indexing = False
         self.config.auto_commit = True
         if getattr(self.search, 'config', None) is not None:
             self.search.config = None

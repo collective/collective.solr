@@ -212,7 +212,7 @@ class CollectiveSolrMockRegistry(object):
         self.host = u'localhost'
         self.port = None
         self.base = None
-        self.async = False
+        self.async_indexing = False
         self.auto_commit = True
         self.commit_within = 0
         self.index_timeout = 0

@@ -298,7 +298,7 @@ class SolrIndexProcessor(object):
         if conn is not None:
             config = getConfig()
             if not isinstance(wait, bool):
-                wait = not config.async
+                wait = not config.async_indexing
             try:
                 logger.debug('committing')
                 if not config.auto_commit or config.commit_within:
