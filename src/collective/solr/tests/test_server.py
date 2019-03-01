@@ -49,7 +49,7 @@ from transaction import commit
 from unittest import TestCase
 from zExceptions import Unauthorized
 from zope.component import getUtility, queryAdapter
-from zope.interface import implements
+from zope.interface import implementer
 from zope.schema.interfaces import IVocabularyFactory
 from Products.Archetypes.interfaces import IBaseObject
 
@@ -76,11 +76,10 @@ if not HAS_PAC:
          'portal_type': 'Folder', 'depth': 0}])
 
 
+@implementer(ISolrAddHandler)
 class RaisingAdder(DefaultAdder):
     """AddHandler that raises an exception when called
     """
-
-    implements(ISolrAddHandler)
 
     def __call__(self, conn, **data):
         raise Exception('Test')

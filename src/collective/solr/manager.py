@@ -11,7 +11,7 @@ from six.moves.http_client import ResponseNotReady
 from logging import getLogger
 from socket import error
 from zope.component import queryUtility
-from zope.interface import implements
+from zope.interface import implementer
 from plone.registry.interfaces import IRegistry
 from zope.component import getUtility
 import six
@@ -20,18 +20,18 @@ logger = getLogger('collective.solr.manager')
 marker = object()
 
 
+@implementer(IZCMLSolrConnectionConfig)
 class ZCMLSolrConnectionConfig(object):
     '''Connection values that can be configured through zcml'''
-    implements(IZCMLSolrConnectionConfig)
 
     def __init__(self, host, port, base):
         self.host = '%s:%d' % (host, port)
         self.base = base
 
 
+@implementer(ISolrConnectionManager)
 class SolrConnectionManager(object):
     """ a thread-local connection manager for solr """
-    implements(ISolrConnectionManager)
 
     lock = False
 

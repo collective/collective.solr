@@ -6,7 +6,7 @@ from BTrees.IIBTree import IITreeSet
 from Products.CMFCore.utils import getToolByName
 from Products.Five.browser import BrowserView
 from plone.uuid.interfaces import IUUID, IUUIDAware
-from zope.interface import implements
+from zope.interface import implementer
 from zope.component import queryUtility, queryAdapter
 
 from collective.solr.indexer import DefaultAdder
@@ -60,9 +60,9 @@ def notimeout(func):
     return wrapper
 
 
+@implementer(ISolrMaintenanceView)
 class SolrMaintenanceView(BrowserView):
     """ helper view for indexing all portal content in Solr """
-    implements(ISolrMaintenanceView)
 
     def mklog(self, use_std_log=False):
         """ helper to prepend a time stamp to the output """

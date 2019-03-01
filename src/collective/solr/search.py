@@ -18,7 +18,7 @@ from collective.solr.utils import getConfig
 from logging import getLogger
 from time import time
 from zope.component import queryUtility
-from zope.interface import implements
+from zope.interface import implementer
 import six
 from six.moves import map
 
@@ -31,9 +31,9 @@ except ImportError:
 logger = getLogger('collective.solr.search')
 
 
+@implementer(ISearch)
 class Search(object):
     """ a search utility for solr """
-    implements(ISearch)
 
     def __init__(self):
         self.manager = None

@@ -4,7 +4,7 @@ from re import search, findall, DOTALL
 from DateTime import DateTime
 from datetime import datetime
 from datetime import date
-from zope.interface import implements
+from zope.interface import implementer
 from Products.CMFCore.CMFCatalogAware import CMFCatalogAware
 
 from collective.solr.interfaces import ICheckIndexable
@@ -18,11 +18,10 @@ from collective.solr.utils import getConfig
 from collective.solr.utils import prepareData
 
 
+@implementer(ICheckIndexable)
 class Foo(CMFCatalogAware):
 
     """ dummy test object """
-
-    implements(ICheckIndexable)
 
     def __init__(self, **kw):
         for key, value in kw.items():

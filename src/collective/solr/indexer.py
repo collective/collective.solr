@@ -6,7 +6,7 @@ from DateTime import DateTime
 from datetime import date, datetime
 from zope.component import queryUtility, queryMultiAdapter
 from zope.component import queryAdapter, adapts
-from zope.interface import implements
+from zope.interface import implementer
 from zope.interface import Interface
 from ZODB.interfaces import BlobError
 from ZODB.POSException import ConflictError
@@ -37,9 +37,9 @@ from six.moves.urllib.parse import urlencode
 logger = getLogger('collective.solr.indexer')
 
 
+@implementer(ICheckIndexable)
 class BaseIndexable(object):
 
-    implements(ICheckIndexable)
     adapts(Interface)
 
     def __init__(self, context):
@@ -96,11 +96,10 @@ handlers = {
 }
 
 
+@implementer(ISolrAddHandler)
 class DefaultAdder(object):
     """
     """
-
-    implements(ISolrAddHandler)
 
     def __init__(self, context):
         self.context = context
@@ -181,9 +180,9 @@ def boost_values(obj, data):
         return boost_index_getter(data)
 
 
+@implementer(ISolrIndexQueueProcessor)
 class SolrIndexProcessor(object):
     """ a queue processor for solr """
-    implements(ISolrIndexQueueProcessor)
 
     def __init__(self, manager=None):
         self.manager = manager
