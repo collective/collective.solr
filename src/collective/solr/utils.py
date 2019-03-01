@@ -1,4 +1,3 @@
-from string import maketrans
 from re import compile, UNICODE
 
 from Acquisition import aq_base
@@ -35,6 +34,11 @@ def activate(active=True):
 def setupTranslationMap():
     """ prepare translation map to remove all control characters except
         tab, new-line and carriage-return """
+    if six.PY2:
+        from string import maketrans
+    else:
+        maketrans = str.maketrans
+
     ctrls = trans = ''
     for n in range(0, 32):
         char = chr(n)
@@ -44,6 +48,7 @@ def setupTranslationMap():
         else:
             trans += ' '
     return maketrans(ctrls, trans)
+
 
 translation_map = setupTranslationMap()
 
