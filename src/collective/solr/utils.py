@@ -1,5 +1,6 @@
 from string import maketrans
 from re import compile, UNICODE
+from plone.app.discussion.interfaces import IConversation
 
 from Acquisition import aq_base
 from unidecode import unidecode
@@ -185,6 +186,15 @@ def findObjects(origin):
         if hasattr(aq_base(obj), 'objectIds'):
             for id in obj.objectIds():
                 paths.insert(idx + 1, path + '/' + id)
+
+        try:
+            conversation = IConversation(obj)
+        except TypeError:
+            continue
+
+        for comment in conversation.getComments():
+            comment_path = '/'.join(comment.getPhysicalPath()[-2:])
+            paths.insert(idx + 1, path + '/' + comment_path)
 
 
 def padResults(results, start=0, **kw):
