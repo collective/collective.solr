@@ -12,9 +12,7 @@ from collective.solr.utils import prepareData
 from collective.solr.utils import prepare_wildcard
 from collective.solr.utils import setupTranslationMap
 from collective.solr.utils import splitSimpleSearch
-from plone.app.discussion.interfaces import IConversation
 from unittest import TestCase
-from zope.component import createObject
 
 
 class UtilsTests(TestCase):
@@ -41,16 +39,6 @@ class UtilsTests(TestCase):
     def ids(self, results):
         return tuple(sorted([r[0] for r in results]))
 
-    def _add_comment(self, text):
-        """Do not use self.portal as OFS objects can not be adapted to
-        IConversation
-        """
-        news = self.layer['portal'].news
-        conversation = IConversation(news)
-        comment = createObject('plone.Comment')
-        comment.text = text
-        return conversation.addComment(comment)
-
     def testZopeFindAndApply(self):
         found = self.app.ZopeFindAndApply(self.portal, search_sub=True)
         self.assertEqual(self.ids(found), self.good)
@@ -61,15 +49,6 @@ class UtilsTests(TestCase):
         self.assertEqual(found[0], ('', self.portal))
         # but the rest should be the same...
         self.assertEqual(self.ids(found[1:]), self.good)
-
-    def testFindCommentObjects(self):
-        """Check that comments are also found"""
-        comment_id = self._add_comment('lala')
-        found = list(findObjects(self.layer['portal'].news))
-        self.assertIn(
-            '++conversation++default/{0}'.format(comment_id),
-            self.ids(found)
-        )
 
     def testSimpleTerm(self):
         self.assertTrue(isSimpleTerm('foo'))
