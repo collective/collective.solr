@@ -1,7 +1,7 @@
 from setuptools import setup
 from setuptools import find_packages
 
-version = '7.0.0a2'
+version = '7.0.0a3-dev.0'
 
 long_description = '\n\n'.join([
     open('README.rst').read(),
