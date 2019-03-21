@@ -4,7 +4,10 @@ Changelog
 7.0.0a2 (unreleased)
 --------------------
 
-- Nothing changed yet.
+New Features:
+
+- Index comments.
+  [gforcada]
 
 
 7.0.0a1 (2019-02-08)
@@ -17,9 +20,6 @@ New Features:
 
 - Solr 7 compatibility.
   [timo]
-
-- Index comments.
-  [gforcada]
 
 Bugfixes:
 
