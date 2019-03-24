@@ -1,10 +1,19 @@
 Changelog
 =========
 
-7.0.0a2 (unreleased)
+7.0.0a3 (unreleased)
 --------------------
 
 - Nothing changed yet.
+
+
+7.0.0a2 (2019-03-21)
+--------------------
+
+New Features:
+
+- Index comments.
+  [gforcada]
 
 
 7.0.0a1 (2019-02-08)

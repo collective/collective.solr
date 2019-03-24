@@ -25,7 +25,11 @@ env:
     - PLONE_VERSION=5.2.x SOLR_VERSION=7.7.1
     - PLONE_VERSION=5.2.x SOLR_VERSION=8.0.0
   allow_failures:
-    - PLONE_VERSION=5.2.x
+    - env: PLONE_VERSION=5.2.x SOLR_VERSION=7.4.0
+    - env: PLONE_VERSION=5.2.x SOLR_VERSION=7.5.0
+    - env: PLONE_VERSION=5.2.x SOLR_VERSION=7.6.0
+    - env: PLONE_VERSION=5.2.x SOLR_VERSION=7.7.1
+    - env: PLONE_VERSION=5.2.x SOLR_VERSION=8.0.0
 dist: trusty
 addons:
   apt:
