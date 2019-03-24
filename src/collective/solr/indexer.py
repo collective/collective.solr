@@ -12,7 +12,10 @@ from ZODB.interfaces import BlobError
 from ZODB.POSException import ConflictError
 from Products.CMFCore.utils import getToolByName
 from Products.CMFCore.CMFCatalogAware import CMFCatalogAware
-from Products.Archetypes.CatalogMultiplex import CatalogMultiplex
+try:
+    from Products.Archetypes.CatalogMultiplex import CatalogMultiplex
+except ImportError:
+    from Products.CMFCore.CMFCatalogAware import CMFCatalogAware as CatalogMultiplex
 try:   # pragma: no cover
     from plone.app.content.interfaces import IIndexableObjectWrapper
 except ImportError:  # pragma: no cover

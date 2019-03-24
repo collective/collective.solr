@@ -3,8 +3,8 @@ from datetime import datetime
 from StringIO import StringIO
 
 from DateTime import DateTime
-from Products.ZCatalog.Lazy import Lazy
-from Products.ZCatalog.Lazy import _marker
+from ZTUtils.Lazy import Lazy
+from ZTUtils.Lazy import _marker
 from zope.interface import implements
 
 from collective.solr.interfaces import ISolrFlare

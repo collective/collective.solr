@@ -4,8 +4,14 @@ from Acquisition import aq_parent
 from DateTime import DateTime
 from Missing import MV
 from Products.CMFCore.utils import getToolByName
-from collective.indexing.queue import getQueue
-from collective.indexing.queue import processQueue
+try:
+    from Products.CMFCore.indexing import getQueue
+except IndexError:
+    from collective.indexing.queue import getQueue
+try:
+    from Products.CMFCore.indexing import processQueue
+except IndexError:
+    from collective.indexing.queue import processQueue
 from collective.solr.dispatcher import FallBackException
 from collective.solr.dispatcher import solrSearchResults
 from collective.solr.flare import PloneFlare
@@ -43,7 +49,10 @@ from zExceptions import Unauthorized
 from zope.component import getUtility, queryAdapter
 from zope.interface import implements
 from zope.schema.interfaces import IVocabularyFactory
-from Products.Archetypes.interfaces import IBaseObject
+try:
+    from Products.Archetypes.interfaces import IBaseObject
+except ImportError:
+    IBaseObject = None
 
 import unittest
 
@@ -292,9 +301,10 @@ class SolrMaintenanceTests(TestCase):
             iface = IImage
         else:
             iface = IBaseObject
-        sm.registerAdapter(RaisingAdder,
-                           required=(iface,),
-                           name='Image')
+        if iface:
+            sm.registerAdapter(RaisingAdder,
+                            required=(iface,),
+                            name='Image')
         # ignore_exceptions=False should raise the handler's exception,
         # thereby aborting the reindex tx
         maintenance = self.portal.unrestrictedTraverse('solr-maintenance')
