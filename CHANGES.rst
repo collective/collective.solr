@@ -1,18 +1,24 @@
 Changelog
 =========
 
-7.0.0a2 (unreleased)
+7.0.0a3 (unreleased)
 --------------------
 
-- fix full reindex failure in case of malformed content (xml parsing)
-- Implemented delay on searchform to avoid to start a search for every single key stroke
+- Nothing changed yet.
 
-  [sauzher]
+
+7.0.0a2 (2019-03-21)
+--------------------
+
+New Features:
+
+- Index comments.
+  [gforcada]
 
 - Drop collective.indexing dependency, Products.CMFCore provides all its functionality.
   [gforcada]
 
-7.0.0a1 (unreleased)
+7.0.0a1 (2019-02-08)
 --------------------
 
 New Features:
@@ -30,6 +36,16 @@ Bugfixes:
 
 - Fix tests to work with latest collective.indexing.
   [gforcada]
+
+- Fix sorting by title.
+  Sorting does not work on tokenized fields. Add a sortable_title field
+  [csenger]
+
+- Fix full reindex failure in case of malformed content (xml parsing)
+  [sauzher]
+
+- Implemented delay on searchform to avoid to start a search for every single key stroke
+  [sauzher]
 
 
 6.0a2 (2017-07-17)

@@ -232,7 +232,9 @@ class SolrMaintenanceTests(TestCase):
         self.assertEqual(counts['portal_type'], 2)
         self.assertEqual(counts['review_state'], 2)
 
-    @unittest.skipIf(True, 'Temporary skip for c.solr 7')
+    @unittest.skipIf(True,
+                     'Skip c.solr 7. Index time boosting is '
+                     'removed in solr 7.')
     def testReindexKeepsBoostValues(self):
         # Disable atomic updates, in order to test the index time boosting.
         config = getConfig()
@@ -522,7 +524,6 @@ class SolrServerTests(TestCase):
         result = connection.search(q='+Title:Foo').read()
         self.assertEqual(numFound(result), 1)
 
-    @unittest.skipIf(True, 'Temporary skip for c.solr 7')
     def testReindexObjectKeepsExistingData(self):
         manager = getUtility(ISolrConnectionManager)
         connection = manager.getConnection()
@@ -1060,7 +1061,6 @@ class SolrServerTests(TestCase):
         self.assertEqual(results.numFound, str(len(DEFAULT_OBJS)))
         self.assertEqual(len(results), 5)
 
-    @unittest.skipIf(True, 'Temporary skip for c.solr 7')
     def testSortParameters(self):
         self.maintenance.reindex()
 
@@ -1072,23 +1072,24 @@ class SolrServerTests(TestCase):
                                              path=dict(query='/plone',
                                                        depth=1)), **kw)]
         first_level_objs = [i for i in DEFAULT_OBJS if i['depth'] == 0]
-        self.assertEqual(search('Title', sort_on='Title'),
+        self.assertEqual(search('Title', sort_on='sortable_title'),
                          sorted([i['Title'] for i in first_level_objs]))
-        self.assertEqual(search('Title', sort_on='Title',
+        self.assertEqual(search('Title', sort_on='sortable_title',
                                 sort_order='reverse'),
                          sorted([i['Title']
                                  for i in first_level_objs], reverse=True))
         required = [i['getId'] for i in sorted(first_level_objs,
                                                key=itemgetter('Title'),
                                                reverse=True)]
-        self.assertEqual(search('getId', sort_on='Title',
+        self.assertEqual(search('getId', sort_on='sortable_title',
                                 sort_order='descending'), required)
-        self.assertEqual(search('Title', sort_on='Title', sort_limit=4),
+        self.assertEqual(search('Title', sort_on='sortable_title',
+                                sort_limit=4),
                          sorted([i['Title']
                                  for i in first_level_objs])[:4]
                          + ['?' for i in range(len(first_level_objs) - 4)])
         self.assertEqual(search('Title',
-                                sort_on='Title',
+                                sort_on='sortable_title',
                                 sort_order='reverse',
                                 sort_limit='3'),
                          sorted([i['Title']
@@ -1097,7 +1098,7 @@ class SolrServerTests(TestCase):
                          ['?' for i in range(len(first_level_objs) - 3)])
         # test sort index aliases
         schema = self.search.getManager().getSchema()
-        self.assertFalse('sortable_title' in schema)
+        self.assertTrue('sortable_title' in schema)
         self.assertEqual(search('Title', sort_on='sortable_title'),
                          sorted([i['Title'] for i in first_level_objs]))
         # also make sure a non-existing sort index doesn't break things
@@ -1403,7 +1404,6 @@ class SolrServerTests(TestCase):
         results = solrSearchResults(SearchableText='(foo/ OR boo)')
         self.assertEqual(sorted([r.Title for r in results]), ['foo/bar'])
 
-    @unittest.skipIf(True, 'Temporary skip for c.solr 7')
     def testBatchedSearchResults(self):
         self.portal.invokeFactory('Document', id='one', title='Aaa A')
         self.portal.invokeFactory('Document', id='two', title='Aaa B')
@@ -1413,7 +1413,8 @@ class SolrServerTests(TestCase):
         search = lambda **kw: [getattr(i, 'Title', None) for i in
                                solrSearchResults(SearchableText='A*',
                                                  portal_type='Document',
-                                                 sort_on='Title', **kw)]
+                                                 sort_on='sortable_title',
+                                                 **kw)]
         self.assertEqual(search(),
                          ['Aaa A', 'Aaa B', 'Aaa C'])
         # when a batch size is given, the length should remain the same,
