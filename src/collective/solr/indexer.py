@@ -12,7 +12,10 @@ from ZODB.interfaces import BlobError
 from ZODB.POSException import ConflictError
 from Products.CMFCore.utils import getToolByName
 from Products.CMFCore.CMFCatalogAware import CMFCatalogAware
-from Products.Archetypes.CatalogMultiplex import CatalogMultiplex
+try:
+    from Products.Archetypes.CatalogMultiplex import CatalogMultiplex
+except ImportError:
+    CatalogMultipex = None
 try:   # pragma: no cover
     from plone.app.content.interfaces import IIndexableObjectWrapper
 except ImportError:  # pragma: no cover
@@ -45,8 +48,11 @@ class BaseIndexable(object):
         self.context = context
 
     def __call__(self):
-        return isinstance(self.context, CatalogMultiplex) or \
-            isinstance(self.context, CMFCatalogAware)
+        if CatalogMultiplex:
+            return isinstance(self.context, CMFCatalogAware)
+        else:
+            return isinstance(self.context, CatalogMultiplex) or \
+                isinstance(self.context, CMFCatalogAware)
 
 
 def datehandler(value):
@@ -207,7 +213,7 @@ class SolrIndexProcessor(object):
                 logger.warning(msg, obj)
                 return
 
-            if attributes is not None:
+            if attributes:
 
                 if 'path' in attributes:
                     attributes = list(attributes)
@@ -247,7 +253,9 @@ class SolrIndexProcessor(object):
                 except (SolrConnectionException, error):
                     logger.exception('exception during indexing %r', obj)
 
-    def reindex(self, obj, attributes=None):
+    def reindex(self, obj, attributes=None, update_metadata=False):
+        if not attributes:
+            attributes = None
         self.index(obj, attributes)
 
     def unindex(self, obj):

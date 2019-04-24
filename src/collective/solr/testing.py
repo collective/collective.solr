@@ -136,11 +136,11 @@ class CollectiveSolrLayer(PloneSandboxLayer):
 
     def setUpZope(self, app, configurationContext):
         # Load ZCML
-        import collective.indexing
-        self.loadZCML(package=collective.indexing)
+        # import collective.indexing
+        # self.loadZCML(package=collective.indexing)
         import collective.solr
         self.loadZCML(package=collective.solr)
-        installProduct(app, 'collective.indexing')
+        # installProduct(app, 'collective.indexing')
 
     def setUpPloneSite(self, portal):
         self.solr_layer.setUp()

@@ -4,8 +4,14 @@ from Acquisition import aq_parent
 from DateTime import DateTime
 from Missing import MV
 from Products.CMFCore.utils import getToolByName
-from collective.indexing.queue import getQueue
-from collective.indexing.queue import processQueue
+try:
+    from Products.CMFCore.indexing import getQueue
+except ImportError:
+    from collective.indexing.queue import getQueue
+try:
+    from Products.CMFCore.indexing import processQueue
+except ImportError:
+    from collective.indexing.queue import processQueue
 from collective.solr.dispatcher import FallBackException
 from collective.solr.dispatcher import solrSearchResults
 from collective.solr.flare import PloneFlare
