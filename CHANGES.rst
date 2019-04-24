@@ -1,7 +1,7 @@
 Changelog
 =========
 
-5.0.4 (unreleased)
+5.0.4 (2019-04-24)
 ------------------
 
 - Fix: Reindexing solr-objects with specific attributes (atomic-update) will remove
