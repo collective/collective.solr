@@ -18,6 +18,7 @@ Changelog
 - Isolate Solr query to allow multiple Plone sites in one ZODB  #163
   [tomgross]
 
+
 5.0.3 (2016-06-05)
 ------------------
 
