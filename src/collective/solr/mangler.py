@@ -226,11 +226,11 @@ def subtractQueryParameters(args, request_keywords=None):
         params['rows'] = int(limit)
 
     for key, value in args.items():
-        if key in ('fq', 'fl', 'facet', 'hl'):
+        if key in ('fq', 'fl', 'facet', 'hl', 'd', 'pt', 'sfield'):
             params[key] = value
             del args[key]
         elif key.startswith('facet.') or key.startswith('facet_'):
-            name = lambda facet: facet.split(':', 1)[0]
+            def name(facet): return facet.split(':', 1)[0]
             if isinstance(value, list):
                 value = map(name, value)
             elif isinstance(value, tuple):

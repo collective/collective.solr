@@ -492,6 +492,9 @@ class SolrServerTests(TestCase):
         fields.remove('default')
         # remove field not defined for a folder
         fields.remove('getRemoteUrl')
+        # geolocation is an optional field that we have to keep in the
+        # default solr configuration for testing
+        fields.remove('geolocation')
         # remove _version_ field
         fields.remove('_version_')
         if HAS_PAC:
