@@ -213,7 +213,7 @@ class SolrIndexProcessor(object):
                 logger.warning(msg, obj)
                 return
 
-            if attributes:
+            if attributes is not None:
 
                 if 'path' in attributes:
                     attributes = list(attributes)
