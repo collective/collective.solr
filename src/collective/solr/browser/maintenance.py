@@ -8,7 +8,6 @@ from Products.Five.browser import BrowserView
 from plone.uuid.interfaces import IUUID, IUUIDAware
 from zope.interface import implements
 from zope.component import queryUtility, queryAdapter
-#from collective.indexing.indexer import getOwnIndexMethod
 from collective.solr.indexer import DefaultAdder
 from collective.solr.flare import PloneFlare
 from collective.solr.interfaces import ISolrConnectionManager
@@ -122,7 +121,9 @@ class SolrMaintenanceView(BrowserView):
         key = schema.uniqueKey
         updates = {}            # list to hold data to be updated
 
-        def flush(): return conn.commit(soft=True)
+        def flush():
+            return conn.commit(soft=True)
+
         flush = notimeout(flush)
 
         def checkPoint():
@@ -151,7 +152,7 @@ class SolrMaintenanceView(BrowserView):
             if ICheckIndexable(obj)():
 
                 # if getOwnIndexMethod(obj, 'indexObject') is not None:
-                #     log('skipping indexing of %r via private method.\n' % obj)
+                #     log('skipping indexing of %r via private method.\n' % obj) # noqa
                 #     continue
 
                 count += 1
@@ -380,8 +381,8 @@ class SolrMaintenanceView(BrowserView):
                         flare['path_string'])
                     conn.delete(flare[key])
                     deleted += 1
-                    realob_res = SolrResponse(conn.search(q='%s:%s' %
-                                                          (key, uuid))).results()
+                    realob_res = SolrResponse(
+                        conn.search(q='%s:%s' % (key, uuid))).results()
                     if len(realob_res) == 0:
                         log('no sane entry for last object, reindexing\n')
                         data, missing = proc.getData(ob)

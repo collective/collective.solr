@@ -249,5 +249,6 @@ class SiteSetupTests(TestCase):
     def testTranslation(self):
         utrans = getToolByName(self.portal, 'translation_service').utranslate
 
-        def translate(msg): return utrans(msgid=msg, domain='solr')
+        def translate(msg):
+            return utrans(msgid=msg, domain='solr')
         self.assertEqual(translate('portal_type'), u'Content type')
