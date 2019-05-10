@@ -98,12 +98,9 @@ class SolrMaintenanceTests(TestCase):
         self.config = getConfig()
         activateAndReindex(self.portal)
         manager = getUtility(ISolrConnectionManager)
-        self.connection = connection = manager.getConnection()
+        self.connection = manager.getConnection()
         # make sure nothing is indexed
-        connection.deleteByQuery('+UID:[* TO *]')
-        connection.commit()
-        result = connection.search(q='+UID:[* TO *]').read()
-        self.assertEqual(numFound(result), 0)
+        self.clear_solr()
         # ignore any generated logging output
         self.response = self.request.RESPONSE
         self.write = self.response.write
@@ -115,6 +112,11 @@ class SolrMaintenanceTests(TestCase):
         self.response.write = self.write
         if getattr(self.search, 'config', None) is not None:
             self.search.config = None
+
+    def clear_solr(self):
+        self.connection.deleteByQuery('+UID:[* TO *]')
+        self.connection.commit()
+        self.assertEqual(numFound(self.search()), 0)
 
     def search(self, query='+UID:[* TO *]'):
         return self.connection.search(q=query).read()
@@ -292,6 +294,8 @@ class SolrMaintenanceTests(TestCase):
     def testReindexIgnoreExceptions(self):
         self.folder.invokeFactory('Image', id='dull', title='foo',
                                   description='the bar is missing here')
+        commit()
+        self.assertEqual(numFound(self.search()), 2)
         sm = self.portal.getSiteManager()
         if api.env.plone_version() >= '5.0':
             from plone.app.contenttypes.interfaces import IImage
@@ -301,16 +305,23 @@ class SolrMaintenanceTests(TestCase):
         sm.registerAdapter(RaisingAdder,
                            required=(iface,),
                            name='Image')
+        self.clear_solr()
         # ignore_exceptions=False should raise the handler's exception,
         # thereby aborting the reindex tx
         maintenance = self.portal.unrestrictedTraverse('solr-maintenance')
         self.assertRaises(Exception,
                           maintenance.reindex,
                           ignore_exceptions=False)
+        commit()
+        self.assertEqual(numFound(self.search()), 0)
+        # make sure we don't leave update data in the connection
+        self.assertEqual(self.connection.xmlbody, [])
+
         # ignore_exceptions=True should commit the reindex tx.
         # The object causing the exception will not be indexed
         maintenance = self.portal.unrestrictedTraverse('solr-maintenance')
         maintenance.reindex(ignore_exceptions=True)
+
         self.assertEqual(numFound(self.search()), len(DEFAULT_OBJS))
         # restore defaults
         sm.unregisterAdapter(RaisingAdder,

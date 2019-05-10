@@ -51,8 +51,8 @@ class BaseIndexable(object):
         if CatalogMultiplex:
             return isinstance(self.context, CMFCatalogAware)
         else:
-            return isinstance(self.context, CatalogMultiplex) or \
-                isinstance(self.context, CMFCatalogAware)
+            return isinstance(self.context, (CatalogMultiplex,
+                                             CMFCatalogAware))
 
 
 def datehandler(value):
