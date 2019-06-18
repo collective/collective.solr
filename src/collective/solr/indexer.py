@@ -250,7 +250,7 @@ class SolrIndexProcessor(object):
                 except (SolrConnectionException, error):
                     logger.exception('exception during indexing %r', obj)
 
-    def reindex(self, obj, attributes=None):
+    def reindex(self, obj, attributes=None, update_metadata=0):
         self.index(obj, attributes)
 
     def unindex(self, obj):
