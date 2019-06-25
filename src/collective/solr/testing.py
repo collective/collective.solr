@@ -4,6 +4,8 @@ from collective.solr.utils import activate
 from plone.app.robotframework.testing import REMOTE_LIBRARY_BUNDLE_FIXTURE
 from plone.app.testing import FunctionalTesting
 from plone.app.testing import IntegrationTesting
+import six
+from six.moves import range
 try:  # pragma: no cover
     from plone.app.contenttypes.testing import PLONE_APP_CONTENTTYPES_FIXTURE as PLONE_FIXTURE  # noqa
     HAS_PAC = True
@@ -25,7 +27,8 @@ from time import sleep
 
 import os
 import sys
-import urllib2
+import six.moves.urllib.request
+import six.moves.urllib.error
 import subprocess
 import pkg_resources
 
@@ -76,11 +79,11 @@ class SolrLayer(Layer):
         solr_ping_url = '{0}/admin/ping?wt=xml'.format(self.solr_url)
         for i in range(1, 10):
             try:
-                result = urllib2.urlopen(solr_ping_url)
+                result = six.moves.urllib.request.urlopen(solr_ping_url)
                 if result.code == 200:
                     if '<str name="status">OK</str>' in result.read():
                         break
-            except urllib2.URLError:
+            except six.moves.urllib.error.URLError:
                 sleep(3)
                 sys.stdout.write('.')
             if i == 9:
@@ -273,7 +276,7 @@ class CollectiveSolrMockRegistryLayer(Layer):
 
 def set_attributes(context, values):  # pragma: no cover
     if HAS_PAC:
-        for key, value in values.iteritems():
+        for key, value in six.iteritems(values):
             setattr(context, key, value)
     else:
         context.processForm(values=values)

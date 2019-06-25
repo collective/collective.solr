@@ -46,6 +46,7 @@ from zope.schema.interfaces import IVocabularyFactory
 from Products.Archetypes.interfaces import IBaseObject
 
 import unittest
+from six.moves import range
 
 DEFAULT_OBJS = [
     {'Title': 'News', 'getId': 'aggregator', 'Type': 'Collection',

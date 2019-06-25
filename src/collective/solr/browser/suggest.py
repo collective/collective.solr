@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import json
-import urllib
+from six.moves.urllib.parse import urlencode
 
 from collective.solr.interfaces import ISolrConnectionManager
 from Products.Five.browser import BrowserView
@@ -24,7 +24,7 @@ class SuggestView(BrowserView):
         params['q'] = term
         params['wt'] = 'json'
 
-        params = urllib.urlencode(params, doseq=True)
+        params = urlencode(params, doseq=True)
         response = connection.doGet(
             connection.solrBase + '/spell?' + params, {})
         results = json.loads(response.read())
@@ -71,7 +71,7 @@ class AutocompleteView(BrowserView):
         params['q'] = term
         params['wt'] = 'json'
 
-        params = urllib.urlencode(params, doseq=True)
+        params = urlencode(params, doseq=True)
         url = connection.solrBase + '/autocomplete?' + params
         response = connection.doGet(url, {})
         results = json.loads(response.read())

@@ -149,7 +149,7 @@ class ParserTests(TestCase):
         self.assertEqual(schema.timestamp.multiValued, False)
         self.assertEqual(schema.timestamp.indexed, True)
         self.assertEqual(schema.word.indexed, False)
-        fields = schema.values()
+        fields = list(schema.values())
         self.assertEqual(len([f for f in fields if
                               getattr(f, 'required', False)]), 2)
         self.assertEqual(len([f for f in fields if

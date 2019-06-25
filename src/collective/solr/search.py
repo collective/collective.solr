@@ -19,6 +19,8 @@ from logging import getLogger
 from time import time
 from zope.component import queryUtility
 from zope.interface import implements
+import six
+from six.moves import map
 
 try:
     from Products.LinguaPlone.catalog import languageFilter
@@ -180,7 +182,7 @@ class Search(object):
                 else:
                     query[name] = '(%s)' % ' OR '.join(value)
                 continue
-            elif isinstance(value, basestring):
+            elif isinstance(value, six.string_types):
                 if field.class_ == 'solr.TextField':
                     if isWildCard(value):
                         value = prepare_wildcard(value)
