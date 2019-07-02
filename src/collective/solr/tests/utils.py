@@ -53,7 +53,7 @@ def fakehttp(solrconn, *fakedata):
 
         def get(self, skip=0):
             self[:] = self[skip:]
-            return ''.join(self.pop(0)).replace('\r', '')
+            return b''.join(self.pop(0)).replace(b'\r', b'')
 
         def new(self):
             self.current = []
@@ -66,7 +66,8 @@ def fakehttp(solrconn, *fakedata):
         def __str__(self):
             self.conn.flush()   # send out all pending xml
             if self:
-                return ''.join(self[0]).replace('\r', '')
+                return ''.join([chunk.decode('utf-8')
+                                for chunk in self[0]]).replace('\r', '')
             else:
                 return ''
 
@@ -79,18 +80,18 @@ def fakehttp(solrconn, *fakedata):
         def sendall(self, str):
             output.log(str)
 
-        def makefile(self, mode, name):
+        def makefile(self, mode):
             return self
 
         def read(self, amt=None):
             if self.closed:
                 return ''
-            return six.StringIO.read(self, amt)
+            return six.StringIO.read(self, amt).encode('utf-8')
 
         def readline(self, length=None):
             if self.closed:
                 return ''
-            return six.StringIO.readline(self, length)
+            return six.StringIO.readline(self, length).encode('utf-8')
 
     class FakeHTTPConnection(HTTPConnection):
 
