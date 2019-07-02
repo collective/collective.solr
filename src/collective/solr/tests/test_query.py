@@ -133,14 +133,14 @@ class QuoteTests(TestCase):
         self.assertEqual(quote('"(/ OR x)"'), '"\\(\\/ OR x\\)"')
 
     def testUnicode(self):
-        self.assertEqual(quote('foø'), 'fo\xc3\xb8')
-        self.assertEqual(quote('"foø'), '\\"fo\xc3\xb8')
-        self.assertEqual(quote('whät?'), 'wh\xc3\xa4t?')
-        self.assertEqual(quote('"whät?"'), '"wh\xc3\xa4t\?"')
-        self.assertEqual(quote('"[ø]"'), '"\[\xc3\xb8\]"')
-        self.assertEqual(quote('[ø]'), '\\[\xc3\xb8\\]')
-        self.assertEqual(quote('"foø*"'), '"fo\xc3\xb8\*"')
-        self.assertEqual(quote('"foø bar?"'), '"fo\xc3\xb8 bar\?"')
+        self.assertEqual(quote('foø'), b'fo\xc3\xb8'.decode('utf-8'))
+        self.assertEqual(quote('"foø'), b'\\"fo\xc3\xb8'.decode('utf-8'))
+        self.assertEqual(quote('whät?'), b'wh\xc3\xa4t?'.decode('utf-8'))
+        self.assertEqual(quote('"whät?"'), b'"wh\xc3\xa4t\?"'.decode('utf-8'))
+        self.assertEqual(quote('"[ø]"'), b'"\[\xc3\xb8\]"'.decode('utf-8'))
+        self.assertEqual(quote('[ø]'), b'\\[\xc3\xb8\\]'.decode('utf-8'))
+        self.assertEqual(quote('"foø*"'), b'"fo\xc3\xb8\*"'.decode('utf-8'))
+        self.assertEqual(quote('"foø bar?"'), b'"fo\xc3\xb8 bar\?"'.decode('utf-8'))
         self.assertEqual(quote(u'john@foo.com'), 'john@foo.com')
 
     def testSolrSpecifics(self):

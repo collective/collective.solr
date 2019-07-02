@@ -6,6 +6,8 @@ from collective.solr.parser import SolrSchema
 from collective.solr.parser import parseDate
 from collective.solr.tests.utils import getData
 
+import six
+
 
 class ParserTests(TestCase):
 
@@ -44,7 +46,7 @@ class ParserTests(TestCase):
         self.assertEqual(first.cat, ['software', 'search'])
         self.assertEqual(len(first.features), 7)
         self.assertEqual([type(x).__name__ for x in first.features],
-                         ['str'] * 6 + ['unicode'])
+                         ['str'] * 6 + [six.text_type.__name__])
         self.assertEqual(first.id, 'SOLR1000')
         self.assertEqual(first.inStock, True)
         self.assertEqual(first.incubationdate_dt.ISO8601(),

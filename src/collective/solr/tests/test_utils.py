@@ -185,7 +185,7 @@ class TranslationTests(TestCase):
     def testUnicodeSearchableText(self):
         data = {'SearchableText': u'f\xf8\xf8 bar'}
         prepareData(data)
-        self.assertEqual(data, {'SearchableText': 'f\xc3\xb8\xc3\xb8 bar'})
+        self.assertEqual(data, {'SearchableText': u'f\xf8\xf8 bar'})
 
 
 class BatchingHelperTests(TestCase):
