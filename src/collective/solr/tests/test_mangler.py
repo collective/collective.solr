@@ -8,6 +8,7 @@ from collective.solr.mangler import optimizeQueryParameters
 from collective.solr.mangler import subtractQueryParameters
 from collective.solr.parser import SolrField
 from collective.solr.parser import SolrSchema
+from collective.solr.testing import COLLECTIVE_SOLR_MOCK_REGISTRY_FIXTURE
 from collective.solr.utils import getConfig
 from unittest import TestCase
 from zope.component import getGlobalSiteManager
@@ -29,6 +30,8 @@ class Query:
 
 
 class QueryManglerTests(TestCase):
+
+    layer = COLLECTIVE_SOLR_MOCK_REGISTRY_FIXTURE
 
     def setUp(self):
         self.config = getConfig()
@@ -209,6 +212,8 @@ class PathManglerTests(TestCase):
 
 
 class QueryParameterTests(TestCase):
+
+    layer = COLLECTIVE_SOLR_MOCK_REGISTRY_FIXTURE
 
     def testSortIndex(self):
         extract = subtractQueryParameters

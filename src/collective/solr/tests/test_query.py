@@ -321,6 +321,8 @@ class QueryTests(TestCase):
 
 class InactiveQueryTests(TestCase):
 
+    layer = COLLECTIVE_SOLR_MOCK_REGISTRY_FIXTURE
+
     def testUnavailableSchema(self):
         search = Search()
         search.manager = SolrConnectionManager()
