@@ -138,7 +138,7 @@ def mangleQuery(keywords, config, schema):
     else:
         epi_indexes = ['path']
 
-    for key, value in keywords.items():
+    for key, value in keywords.copy().items():
         args = extras.get(key, {})
         if key == 'SearchableText':
             keywords[key] = mangleSearchableText(value, config)
@@ -227,7 +227,7 @@ def subtractQueryParameters(args, request_keywords=None):
     if limit:
         params['rows'] = int(limit)
 
-    for key, value in args.items():
+    for key, value in args.copy().items():
         if key in ('fq', 'fl', 'facet', 'hl'):
             params[key] = value
             del args[key]

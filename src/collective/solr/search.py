@@ -142,7 +142,7 @@ class Search(object):
         args[None] = default
         query = {}
 
-        for name, value in sorted(args.items()):
+        for name, value in args.items():
             field = schema.get(name or defaultSearchField, None)
             if field is None or not field.indexed:
                 logger.info(
