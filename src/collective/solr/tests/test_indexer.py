@@ -284,7 +284,8 @@ class FakeHTTPConnectionTests(TestCase):
         output = fakehttp(mngr.getConnection(), getData('schema.xml'))
         mngr.getSchema()
         mngr.closeConnection()
-        self.failUnless(output.get().decode('utf-8').startswith(self.schema_request))
+        self.failUnless(
+            output.get().decode('utf-8').startswith(self.schema_request))
 
     def testTwoRequests(self):
         mngr = SolrConnectionManager(active=True)
@@ -294,7 +295,8 @@ class FakeHTTPConnectionTests(TestCase):
         proc.index(self.foo)
         mngr.closeConnection()
         self.assertEqual(len(output), 2)
-        self.failUnless(output.get().decode('utf-8').startswith(self.schema_request))
+        self.failUnless(
+            output.get().decode('utf-8').startswith(self.schema_request))
         self.assertEqual(
             sortFields(output.get().decode('utf-8')),
             getData('add_request.txt').rstrip('\n')
@@ -311,7 +313,8 @@ class FakeHTTPConnectionTests(TestCase):
         proc.unindex(self.foo)
         mngr.closeConnection()
         self.assertEqual(len(output), 3)
-        self.failUnless(output.get().decode('utf-8').startswith(self.schema_request))
+        self.failUnless(
+            output.get().decode('utf-8').startswith(self.schema_request))
         self.assertEqual(sortFields(output.get().decode('utf-8')),
                          getData('add_request.txt').rstrip('\n'))
         self.assertEqual(output.get().decode('utf-8'), getData(
@@ -329,7 +332,8 @@ class FakeHTTPConnectionTests(TestCase):
         proc.commit()
         mngr.closeConnection()
         self.assertEqual(len(output), 4)
-        self.failUnless(output.get().decode('utf-8').startswith(self.schema_request))
+        self.failUnless(
+            output.get().decode('utf-8').startswith(self.schema_request))
         self.assertEqual(sortFields(output.get().decode('utf-8')),
                          getData('add_request.txt').rstrip('\n'))
         self.assertEqual(output.get().decode('utf-8'), getData(
