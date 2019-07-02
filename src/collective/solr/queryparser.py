@@ -109,8 +109,8 @@ class Stack(list):
 
 
 def quote(term, textfield=False):
-    if isinstance(term, six.text_type):
-        term = term.encode('utf-8')
+    if isinstance(term, six.binary_type):
+        term = term.decode('utf-8')
     stack = Stack()
     tokens = query_tokenizer.findall(term.strip())
     # Counter enables lookahead
@@ -273,8 +273,6 @@ def quote(term, textfield=False):
 
 
 def quote_iterable_item(term):
-    if isinstance(term, six.text_type):
-        term = term.encode('utf-8')
     quoted = quote(term)
     if not quoted.startswith('"') and not quoted == term:
         quoted = quote('"' + term + '"')

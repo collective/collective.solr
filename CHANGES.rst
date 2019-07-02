@@ -5,7 +5,7 @@ Changelog
 --------------------
 
 - Add support for Python 3.
-  [jnns]
+  [jnns, reinhardt]
 
 - Don't use collective.indexing if Plone>=5.1, Products.CMFCore provides all its functionality.
   [jnns]

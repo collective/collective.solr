@@ -37,7 +37,7 @@ class SolrControlPanelForm(controlpanel.RegistryEditForm):
 
     def applyChanges(self, data):
         changes = super(SolrControlPanelForm, self).applyChanges(data)
-        boost_script = data.get('boost_script', '').encode('utf-8')
+        boost_script = data.get('boost_script', '')
         if "##parameters=data\n" not in boost_script:
             boost_script = "##parameters=data\n" + boost_script
         portal = self.context

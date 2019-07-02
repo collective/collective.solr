@@ -71,7 +71,7 @@ class SolrMaintenanceView(BrowserView):
         def log(msg, timestamp=True):
             if timestamp:
                 msg = strftime('%Y/%m/%d-%H:%M:%S ') + msg
-            write(msg)
+            write(msg.encode('utf-8'))
             if use_std_log:
                 logger.info(msg)
         return log

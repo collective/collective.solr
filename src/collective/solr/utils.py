@@ -34,11 +34,6 @@ def activate(active=True):
 def setupTranslationMap():
     """ prepare translation map to remove all control characters except
         tab, new-line and carriage-return """
-    if six.PY2:
-        from string import maketrans
-    else:
-        maketrans = str.maketrans
-
     ctrls = trans = ''
     for n in range(0, 32):
         char = chr(n)
@@ -47,7 +42,7 @@ def setupTranslationMap():
             trans += char
         else:
             trans += ' '
-    return maketrans(ctrls, trans)
+    return str.maketrans(ctrls, trans)
 
 
 translation_map = setupTranslationMap()
@@ -71,8 +66,6 @@ def prepareData(data):
     if searchable is not None:
         if isinstance(searchable, dict):
             searchable = searchable['query']
-        if isinstance(searchable, six.text_type):
-            searchable = searchable.encode('utf-8')
         data['SearchableText'] = searchable.translate(translation_map)
     # mangle path query from plone.app.collection
     path = data.get('path')
@@ -100,7 +93,7 @@ is_digit = compile('\d', UNICODE)
 
 def isSimpleSearch(term):
     term = term.strip()
-    if isinstance(term, str):
+    if isinstance(term, six.binary_type):
         term = six.text_type(term, 'utf-8', 'ignore')
     if not term:
         return False
@@ -152,7 +145,7 @@ wildCard = compile(r'^[\w\d\s*?]*[*?]+[\w\d\s*?]*$', UNICODE)
 
 
 def isWildCard(term):
-    if isinstance(term, str):
+    if isinstance(term, six.binary_type):
         term = six.text_type(term, 'utf-8', 'ignore')
     return bool(wildCard.match(term))
 
@@ -166,7 +159,7 @@ def prepare_wildcard(value):
     if not isinstance(value, six.text_type):
         value = six.text_type(value, 'utf-8', 'ignore')
 
-    value = str(unidecode(value))
+    value = six.text_type(unidecode(value))
 
     # boolean operators must not be lowercased, otherwise Solr will interpret
     # them as search terms. So we split the search term into tokens and

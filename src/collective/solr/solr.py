@@ -113,6 +113,8 @@ class SolrConnection:
         return self.doGetOrPost('GET', url, '', headers)
 
     def doGetOrPost(self, method, url, body, headers):
+        if not isinstance(body, six.binary_type):
+            body = body.encode('utf-8')
         try:
             self.conn.request(method, url, body, headers)
             return self.__errcheck(self.conn.getresponse())
@@ -174,17 +176,13 @@ class SolrConnection:
         return parsed
 
     def escapeVal(self, val):
-        if isinstance(val, six.text_type):
-            val = val.encode('utf-8')
-        else:
-            val = str(val)
+        if not isinstance(val, six.text_type):
+            val = six.text_type(val)
         return escape(val.translate(translation_map))
 
     def escapeKey(self, key):
-        if isinstance(key, six.text_type):
-            key = key.encode('utf-8')
-        else:
-            key = str(key)
+        if not isinstance(key, six.text_type):
+            key = six.text_type(key)
         key = key.replace("&", "&amp;")
         key = key.replace('"', "&quot;")
         return key
@@ -324,7 +322,7 @@ class SolrConnection:
             response = self.conn.getresponse()
 
         if response.status == 200:
-            xml = response.read()
+            xml = response.read().decode('utf-8')
             return SolrSchema(xml.strip())
 
         self.__errcheck(response)       # raise a SolrConnectionException

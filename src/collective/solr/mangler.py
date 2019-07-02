@@ -67,8 +67,6 @@ def makeSimpleExpressions(term, levenstein_distance):
 def mangleSearchableText(value, config):
     config = config or getConfig()
     pattern = getattr(config, 'search_pattern', u'')
-    if pattern:
-        pattern = pattern.encode('utf-8')
     levenstein_distance = getattr(config, 'levenshtein_distance', 0)
     value_parts = []
     base_value_parts = []
@@ -89,6 +87,8 @@ def mangleSearchableText(value, config):
         value = pattern.format(value=quote(value),
                                base_value=base_value)
         return set([value])    # add literal query parameter
+    if pattern:
+        pattern = pattern.encode('utf-8')
     return value
 
 

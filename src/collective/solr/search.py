@@ -93,7 +93,7 @@ class Search(object):
                 parameters['fl'] = '* score'
         if isinstance(query, dict):
             query = u' '.join([
-                safe_unicode(val) for val in query.values()]).encode('utf-8')
+                safe_unicode(val) for val in query.values()])
         logger.debug('searching for %r (%r)', query, parameters)
         if 'sort' in parameters:    # issue warning for unknown sort indices
             index, order = parameters['sort'].split()

@@ -386,8 +386,8 @@ class SolrIndexProcessor(object):
             elif isinstance(value, (list, tuple)) and not field.multiValued:
                 separator = getattr(field, 'separator', ' ')
                 value = separator.join(value)
-            if isinstance(value, str):
-                value = six.text_type(value, 'utf-8', 'ignore').encode('utf-8')
+            if isinstance(value, six.binary_type):
+                value = value.decode('utf-8')
             data[name] = value
         missing = set(schema.requiredFields) - set(data.keys())
         return data, missing
