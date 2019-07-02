@@ -172,9 +172,9 @@ class TestErrorView(unittest.TestCase):
     def test_error_view(self):
         request = {}
         try:
-            raise socket.error('Test Exception')
+            raise OSError('Test Exception')
         except Exception as e:
             view = ErrorView(e, request)
         self.assertEqual(
             view.errorInfo(),
-            {'type': 'socket.error', 'value': ('Test Exception',)})
+            {'type': 'OSError', 'value': ('Test Exception',)})
