@@ -3,13 +3,14 @@ from os.path import dirname, join
 from six.moves.http_client import HTTPConnection
 from threading import Thread
 from six.moves.BaseHTTPServer import HTTPServer, BaseHTTPRequestHandler
-from StringIO import StringIO
 from socket import error
 from sys import stderr
 from re import search
 
 from collective.solr.local import getLocal, setLocal
 from collective.solr import tests
+
+import six
 
 try:
     from zope.component.hooks import getSite, setSite
@@ -71,7 +72,7 @@ def fakehttp(solrconn, *fakedata):
 
     output = FakeOutput()
 
-    class FakeSocket(StringIO):
+    class FakeSocket(six.StringIO):
 
         """ helper class to fake socket communication """
 
@@ -84,12 +85,12 @@ def fakehttp(solrconn, *fakedata):
         def read(self, amt=None):
             if self.closed:
                 return ''
-            return StringIO.read(self, amt)
+            return six.StringIO.read(self, amt)
 
         def readline(self, length=None):
             if self.closed:
                 return ''
-            return StringIO.readline(self, length)
+            return six.StringIO.readline(self, length)
 
     class FakeHTTPConnection(HTTPConnection):
 
