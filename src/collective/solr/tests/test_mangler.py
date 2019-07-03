@@ -388,9 +388,11 @@ class QueryParameterTests(TestCase):
         )
         # also test substitution of combined filter queries
         config.filter_queries = ['a c']
-        self.assertEqual(
-            optimize(),
-            (dict(b='b:42'), dict(fq=['c:(23 42) a:23']))
+        self.assertTrue(
+            optimize() in [
+                (dict(b='b:42'), dict(fq=['c:(23 42) a:23'])),
+                (dict(b='b:42'), dict(fq=['a:23 c:(23 42)'])),
+            ]
         )
         config.filter_queries = ['a c', 'b']
         self.assertEqual(
