@@ -210,7 +210,7 @@ class QueryTests(TestCase):
         self.assertEqual(bq(('foo', 'bar')), '+(foo OR bar)')
         self.assertEqual(bq(('foo', 'bar*')), '+(foo OR bar*)')
         self.assertEqual(bq(('foo bar', 'hmm')), '+("foo bar" OR hmm)')
-        self.assertEqual(bq(('foø bar', 'hmm')), '+("fo\xc3\xb8 bar" OR hmm)')
+        self.assertEqual(bq(('foø bar', 'hmm')), '+("foø bar" OR hmm)')
         self.assertEqual(bq(('"foo bar"', 'hmm')), '+("foo bar" OR hmm)')
         self.assertEqual(bq(name=['foo', 'bar']), '+name:(foo OR bar)')
         self.assertEqual(bq(name=['foo', 'bar*']), '+name:(foo OR bar*)')
@@ -244,14 +244,14 @@ class QueryTests(TestCase):
     def testUnicodeArguments(self):
         bq = self.bq
         self.assertEqual(bq(u'foo'), '+foo')
-        self.assertEqual(bq(u'foø'), '+fo\xc3\xb8')
+        self.assertEqual(bq(u'foø'), '+foø')
         self.assertEqual(bq(u'john@foo.com'), '+john@foo.com')
         self.assertEqual(bq(name=['foo', u'bar']), '+name:(foo OR bar)')
-        self.assertEqual(bq(name=['foo', u'bär']), '+name:(foo OR b\xc3\xa4r)')
+        self.assertEqual(bq(name=['foo', u'bär']), '+name:(foo OR bär)')
         self.assertEqual(bq(name='foo', cat=(u'bar', 'hmm')),
                          '+cat:(bar OR hmm) +name:foo')
         self.assertEqual(bq(name='foo', cat=(u'bär', 'hmm')),
-                         '+cat:(b\xc3\xa4r OR hmm) +name:foo')
+                         '+cat:(bär OR hmm) +name:foo')
         self.assertEqual(bq(name=u'john@foo.com', cat='spammer'),
                          '+cat:spammer +name:john@foo.com')
 
@@ -283,9 +283,9 @@ class QueryTests(TestCase):
     def testComplexQueries(self):
         bq = self.bq
         self.assertEqual(bq('foo', name='"herb*"', cat=(u'bär', '"-hmm"')),
-                         '+cat:(b\xc3\xa4r OR "\-hmm") +foo +name:"herb\*"')
+                         '+cat:(bär OR "\-hmm") +foo +name:"herb\*"')
         self.assertEqual(bq('foo', name='herb*', cat=(u'bär', '-hmm')),
-                         '+cat:(b\xc3\xa4r OR -hmm) +foo +name:herb*')
+                         '+cat:(bär OR -hmm) +foo +name:herb*')
 
     def testBooleanQueries(self):
         bq = self.bq
