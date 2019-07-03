@@ -351,7 +351,7 @@ class SearchTests(TestCase):
         request = getData('search_request.txt').rstrip(b'\n')
         output = fakehttp(self.conn, schema, search)    # fake responses
         query, ignore = self.search.buildQueryAndParameters(id='[* TO *]')
-        results = self.search(query, rows=10, wt='xml', indent='on').results()
+        results = self.search(query, rows='10', wt='xml', indent='on').results()
         normalize = lambda x: sorted(x.split(b'&'))      # sort request params
         self.assertEqual(normalize(output.get(skip=1)), normalize(request))
         self.assertEqual(results.numFound, '1')
