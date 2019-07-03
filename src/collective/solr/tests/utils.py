@@ -36,7 +36,7 @@ def loadZCMLString(string):
 def getData(filename):
     """ return a file object from the test data folder """
     filename = join(dirname(tests.__file__), 'data', filename)
-    return open(filename, 'r').read()
+    return open(filename, 'rb').read()
 
 
 def fakehttp(solrconn, *fakedata):
@@ -73,7 +73,7 @@ def fakehttp(solrconn, *fakedata):
 
     output = FakeOutput()
 
-    class FakeSocket(six.StringIO):
+    class FakeSocket(six.BytesIO):
 
         """ helper class to fake socket communication """
 
@@ -85,13 +85,13 @@ def fakehttp(solrconn, *fakedata):
 
         def read(self, amt=None):
             if self.closed:
-                return ''
-            return six.StringIO.read(self, amt).encode('utf-8')
+                return b''
+            return six.BytesIO.read(self, amt)
 
         def readline(self, length=None):
             if self.closed:
-                return ''
-            return six.StringIO.readline(self, length).encode('utf-8')
+                return b''
+            return six.BytesIO.readline(self, length)
 
     class FakeHTTPConnection(HTTPConnection):
 

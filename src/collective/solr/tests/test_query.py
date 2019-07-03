@@ -348,11 +348,11 @@ class SearchTests(TestCase):
     def testSimpleSearch(self):
         schema = getData('schema.xml')
         search = getData('search_response.txt')
-        request = getData('search_request.txt').rstrip('\n')
+        request = getData('search_request.txt').rstrip(b'\n')
         output = fakehttp(self.conn, schema, search)    # fake responses
         query, ignore = self.search.buildQueryAndParameters(id='[* TO *]')
         results = self.search(query, rows=10, wt='xml', indent='on').results()
-        normalize = lambda x: sorted(x.split('&'))      # sort request params
+        normalize = lambda x: sorted(x.split(b'&'))      # sort request params
         self.assertEqual(normalize(output.get(skip=1)), normalize(request))
         self.assertEqual(results.numFound, '1')
         self.assertEqual(len(results), 1)

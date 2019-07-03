@@ -12,7 +12,7 @@ import six
 class ParserTests(TestCase):
 
     def testParseSimpleSearchResults(self):
-        search_response = getData('search_response.txt')
+        search_response = getData('search_response.txt').decode('utf-8')
         response = SolrResponse(search_response.split('\n\n', 1)[1])
         results = response.response     # the result set is named 'response'
         self.assertEqual(results.numFound, '1')
@@ -35,7 +35,7 @@ class ParserTests(TestCase):
         self.assertEqual(headers['params']['q'], 'id:[* TO *]')
 
     def testParseComplexSearchResults(self):
-        complex_xml_response = getData('complex_xml_response.txt')
+        complex_xml_response = getData('complex_xml_response.txt').decode('utf-8')
         response = SolrResponse(complex_xml_response)
         results = response.response     # the result set is named 'response'
         self.assertEqual(results.numFound, '2')
@@ -64,7 +64,7 @@ class ParserTests(TestCase):
         self.assertEqual(headers['params']['version'], '2.2')
 
     def testParseFacetSearchResults(self):
-        facet_xml_response = getData('facet_xml_response.txt')
+        facet_xml_response = getData('facet_xml_response.txt').decode('utf-8')
         response = SolrResponse(facet_xml_response)
         results = response.response     # the result set is named 'response'
         self.assertEqual(results.numFound, '1')
@@ -90,7 +90,7 @@ class ParserTests(TestCase):
         self.assertEqual(counts['facet_fields']['inStock']['true'], 1)
 
     def testParseDateFacetSearchResults(self):
-        facet_xml_response = getData('date_facet_xml_response.txt')
+        facet_xml_response = getData('date_facet_xml_response.txt').decode('utf-8')
         response = SolrResponse(facet_xml_response)
         results = response.response     # the result set is named 'response'
         self.assertEqual(results.numFound, '42')
@@ -125,7 +125,7 @@ class ParserTests(TestCase):
                          DateTime('2007-08-17 GMT').ISO8601())
 
     def testParseConfig(self):
-        schema_xml = getData('schema.xml')
+        schema_xml = getData('schema.xml').decode('utf-8')
         schema = SolrSchema(schema_xml.split('\n\n', 1)[1])
         self.assertEqual(len(schema), 21)  # 21 items defined in schema.xml
         self.assertEqual(schema['defaultSearchField'], 'text')
@@ -158,7 +158,7 @@ class ParserTests(TestCase):
                               getattr(f, 'multiValued', False)]), 3)
 
     def testParseQuirkyResponse(self):
-        quirky_response = getData('quirky_response.txt')
+        quirky_response = getData('quirky_response.txt').decode('utf-8')
         response = SolrResponse(quirky_response)
         results = response.response     # the result set is named 'response'
         empty_uid = [r for r in results if r.UID == '']
