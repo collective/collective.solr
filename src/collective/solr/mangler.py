@@ -106,7 +106,7 @@ def mangleQuery(keywords, config, schema):
     """ translate / mangle query parameters to replace zope specifics
         with equivalent constructs for solr """
     extras = {}
-    for key, value in keywords.items():
+    for key, value in keywords.copy().items():
         if key.endswith('_usage'):          # convert old-style parameters
             category, spec = value.split(':', 1)
             extras[key[:-6]] = {category: spec}
