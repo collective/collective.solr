@@ -67,8 +67,6 @@ def makeSimpleExpressions(term, levenstein_distance):
 def mangleSearchableText(value, config):
     config = config or getConfig()
     pattern = getattr(config, 'search_pattern', u'')
-    if pattern:
-        pattern = pattern.encode('utf-8')
     levenstein_distance = getattr(config, 'levenshtein_distance', 0)
     value_parts = []
     base_value_parts = []
@@ -89,6 +87,8 @@ def mangleSearchableText(value, config):
         value = pattern.format(value=quote(value),
                                base_value=base_value)
         return set([value])    # add literal query parameter
+    if pattern:
+        pattern = pattern.encode('utf-8')
     return value
 
 
@@ -106,7 +106,7 @@ def mangleQuery(keywords, config, schema):
     """ translate / mangle query parameters to replace zope specifics
         with equivalent constructs for solr """
     extras = {}
-    for key, value in keywords.items():
+    for key, value in keywords.copy().items():
         if key.endswith('_usage'):          # convert old-style parameters
             category, spec = value.split(':', 1)
             extras[key[:-6]] = {category: spec}
@@ -138,7 +138,7 @@ def mangleQuery(keywords, config, schema):
     else:
         epi_indexes = ['path']
 
-    for key, value in keywords.items():
+    for key, value in keywords.copy().items():
         args = extras.get(key, {})
         if key == 'SearchableText':
             keywords[key] = mangleSearchableText(value, config)
@@ -227,7 +227,7 @@ def subtractQueryParameters(args, request_keywords=None):
     if limit:
         params['rows'] = int(limit)
 
-    for key, value in args.items():
+    for key, value in args.copy().items():
         if key in ('fq', 'fl', 'facet', 'hl'):
             params[key] = value
             del args[key]

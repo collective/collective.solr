@@ -62,12 +62,12 @@ class PloneFlare(AttrDict):
     def getURL(self, relative=False):
         """ convert the physical path into a url, if it was stored """
         path = self.getPath()
-        path = path.encode('utf-8')
+        path = path
         try:
             url = self.request.physicalPathToURL(path, relative)
         except AttributeError:
             url = path2url(path.split('/'))
-        return url
+        return url.encode('utf-8')
 
     def pretty_title_or_id(self):
         context = getSite()

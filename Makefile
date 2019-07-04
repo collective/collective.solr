@@ -1,6 +1,6 @@
 # keep in sync with: https://github.com/kitconcept/buildout/edit/master/Makefile
 
-version = 2.7
+version = 3.7
 
 all: .installed.cfg
 	bin/test
@@ -25,7 +25,7 @@ build-py3:
 	bin/buildout -c plone-5.2.x.cfg
 
 bin/python bin/pip:
-	virtualenv --clear --python=python$(version) .
+	python$(version) -m venv .
 
 release:
 	bin/fullrelease

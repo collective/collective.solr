@@ -33,10 +33,10 @@ class Foo(CMFCatalogAware):
 
 def sortFields(output):
     """ helper to sort `<field>` tags in output for testing """
-    pattern = r'^(.*<doc>)(<field .*</field>)(</doc>.*)'
+    pattern = rb'^(.*<doc>)(<field .*</field>)(</doc>.*)'
     prefix, fields, suffix = search(pattern, output, DOTALL).groups()
-    tags = r'(<field [^>]*>[^<]*</field>)'
-    return prefix + ''.join(sorted(findall(tags, fields))) + suffix
+    tags = rb'(<field [^>]*>[^<]*</field>)'
+    return prefix + b''.join(sorted(findall(tags, fields))) + suffix
 
 
 class QueueIndexerTests(TestCase):
@@ -90,8 +90,10 @@ class QueueIndexerTests(TestCase):
         output = fakehttp(self.mngr.getConnection(), response)
         # indexing sends data
         self.proc.index(Foo(id='500', name='python test doc'))
-        self.assertEqual(sortFields(str(output)), getData(
-            'add_request.txt').rstrip('\n'))
+        self.assertEqual(
+            sortFields(str(output).encode('utf-8')),
+            getData('add_request.txt').rstrip(b'\n'),
+        )
 
     def testIndexAccessorRaises(self):
         response = getData('add_response.txt')
@@ -102,8 +104,10 @@ class QueueIndexerTests(TestCase):
             raise ValueError
         self.proc.index(Foo(id='500', name='python test doc',
                             text=brokenfunc))   # indexing sends data
-        self.assertEqual(sortFields(str(output)), getData(
-            'add_request.txt').rstrip('\n'))
+        self.assertEqual(
+            sortFields(str(output).encode('utf-8')),
+            getData('add_request.txt').rstrip(b'\n'),
+        )
 
     def testPartialIndexObject(self):
         foo = Foo(id='500', name='foo', price=42.0)
@@ -166,8 +170,10 @@ class QueueIndexerTests(TestCase):
         output = fakehttp(self.mngr.getConnection(), response)
         # reindexing sends data
         self.proc.reindex(Foo(id='500', name='python test doc'))
-        self.assertEqual(sortFields(str(output)), getData(
-            'add_request.txt').rstrip('\n'))
+        self.assertEqual(
+            sortFields(str(output).encode('utf-8')),
+            getData('add_request.txt').rstrip(b'\n'),
+        )
 
     def testUnindexObject(self):
         response = getData('delete_response.txt')
@@ -175,8 +181,10 @@ class QueueIndexerTests(TestCase):
         output = fakehttp(self.mngr.getConnection(), response)
         # unindexing sends data
         self.proc.unindex(Foo(id='500', name='python test doc'))
-        self.assertEqual(str(output), getData(
-            'delete_request.txt').rstrip('\n'))
+        self.assertEqual(
+            str(output),
+            getData('delete_request.txt').decode('utf-8').rstrip('\n'),
+        )
 
     def testCommit(self):
         response = getData('commit_response.txt')
@@ -184,8 +192,10 @@ class QueueIndexerTests(TestCase):
         output = fakehttp(self.mngr.getConnection(), response)
         # committing sends data
         self.proc.commit()
-        self.assertEqual(str(output), getData(
-            'commit_request.txt').rstrip('\n'))
+        self.assertEqual(
+            str(output),
+            getData('commit_request.txt').decode('utf-8').rstrip('\n'),
+        )
 
     def testNoIndexingWithoutAllRequiredFields(self):
         response = getData('dummy_response.txt')
@@ -284,7 +294,8 @@ class FakeHTTPConnectionTests(TestCase):
         output = fakehttp(mngr.getConnection(), getData('schema.xml'))
         mngr.getSchema()
         mngr.closeConnection()
-        self.failUnless(output.get().startswith(self.schema_request))
+        self.failUnless(
+            output.get().decode('utf-8').startswith(self.schema_request))
 
     def testTwoRequests(self):
         mngr = SolrConnectionManager(active=True)
@@ -294,10 +305,11 @@ class FakeHTTPConnectionTests(TestCase):
         proc.index(self.foo)
         mngr.closeConnection()
         self.assertEqual(len(output), 2)
-        self.failUnless(output.get().startswith(self.schema_request))
+        self.failUnless(
+            output.get().decode('utf-8').startswith(self.schema_request))
         self.assertEqual(
             sortFields(output.get()),
-            getData('add_request.txt').rstrip('\n')
+            getData('add_request.txt').rstrip(b'\n'),
         )
 
     def testThreeRequests(self):
@@ -311,11 +323,16 @@ class FakeHTTPConnectionTests(TestCase):
         proc.unindex(self.foo)
         mngr.closeConnection()
         self.assertEqual(len(output), 3)
-        self.failUnless(output.get().startswith(self.schema_request))
-        self.assertEqual(sortFields(output.get()),
-                         getData('add_request.txt').rstrip('\n'))
-        self.assertEqual(output.get(), getData(
-            'delete_request.txt').rstrip('\n'))
+        self.failUnless(
+            output.get().decode('utf-8').startswith(self.schema_request))
+        self.assertEqual(
+            sortFields(output.get()),
+            getData('add_request.txt').rstrip(b'\n'),
+        )
+        self.assertEqual(
+            output.get(),
+            getData('delete_request.txt').rstrip(b'\n'),
+        )
 
     def testFourRequests(self):
         mngr = SolrConnectionManager(active=True)
@@ -329,13 +346,20 @@ class FakeHTTPConnectionTests(TestCase):
         proc.commit()
         mngr.closeConnection()
         self.assertEqual(len(output), 4)
-        self.failUnless(output.get().startswith(self.schema_request))
-        self.assertEqual(sortFields(output.get()),
-                         getData('add_request.txt').rstrip('\n'))
-        self.assertEqual(output.get(), getData(
-            'delete_request.txt').rstrip('\n'))
-        self.assertEqual(output.get(), getData(
-            'commit_request.txt').rstrip('\n'))
+        self.failUnless(
+            output.get().decode('utf-8').startswith(self.schema_request))
+        self.assertEqual(
+            sortFields(output.get()),
+            getData('add_request.txt').rstrip(b'\n'),
+        )
+        self.assertEqual(
+            output.get(),
+            getData('delete_request.txt').rstrip(b'\n'),
+        )
+        self.assertEqual(
+            output.get(),
+            getData('commit_request.txt').rstrip(b'\n'),
+        )
 
     def testExtraRequest(self):
         # basically the same as `testThreeRequests`, except it
@@ -350,11 +374,16 @@ class FakeHTTPConnectionTests(TestCase):
         proc.unindex(self.foo)
         mngr.closeConnection()
         self.assertEqual(len(output), 3)
-        self.failUnless(output.get().startswith(self.schema_request))
-        self.assertEqual(sortFields(output.get()),
-                         getData('add_request.txt').rstrip('\n'))
-        self.assertEqual(output.get(), getData(
-            'delete_request.txt').rstrip('\n'))
+        self.failUnless(
+            output.get().decode('utf-8').startswith(self.schema_request))
+        self.assertEqual(
+            sortFields(output.get()),
+            getData('add_request.txt').rstrip(b'\n'),
+        )
+        self.assertEqual(
+            output.get(),
+            getData('delete_request.txt').rstrip(b'\n'),
+        )
 
 
 class ThreadedConnectionTests(TestCase):
@@ -402,8 +431,10 @@ class ThreadedConnectionTests(TestCase):
         mngr.closeConnection()
         mngr.setHost(active=False)
         self.assertEqual(len(log), 3)
-        self.assertEqual(sortFields(log[0]), getData(
-            'add_request.txt').rstrip('\n'))
+        self.assertEqual(
+            sortFields(log[0].encode('utf-8')),
+            getData('add_request.txt').rstrip(b'\n'),
+        )
         self.failUnless(isinstance(log[1], SolrIndexProcessor))
         self.failUnless(isinstance(log[2], SolrConnection))
         self.failUnless(isinstance(proc, SolrIndexProcessor))

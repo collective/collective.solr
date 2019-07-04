@@ -51,7 +51,6 @@ from zExceptions import Unauthorized
 from zope.component import getUtility, queryAdapter
 from zope.interface import implementer
 from zope.schema.interfaces import IVocabularyFactory
-from Products.Archetypes.interfaces import IBaseObject
 
 import unittest
 
@@ -298,6 +297,7 @@ class SolrMaintenanceTests(TestCase):
             from plone.app.contenttypes.interfaces import IImage
             iface = IImage
         else:
+            from Products.Archetypes.interfaces import IBaseObject
             iface = IBaseObject
         sm.registerAdapter(RaisingAdder,
                            required=(iface,),

@@ -12,7 +12,6 @@ from ZODB.interfaces import BlobError
 from ZODB.POSException import ConflictError
 from Products.CMFCore.utils import getToolByName
 from Products.CMFCore.CMFCatalogAware import CMFCatalogAware
-from Products.Archetypes.CatalogMultiplex import CatalogMultiplex
 import six
 try:   # pragma: no cover
     from plone.app.content.interfaces import IIndexableObjectWrapper
@@ -46,8 +45,13 @@ class BaseIndexable(object):
         self.context = context
 
     def __call__(self):
-        return isinstance(self.context, CatalogMultiplex) or \
-            isinstance(self.context, CMFCatalogAware)
+        try:
+            from Products.Archetypes.CatalogMultiplex import CatalogMultiplex
+            if isinstance(self.context, CatalogMultiplex):
+                return True
+        except ImportError:
+            pass
+        return isinstance(self.context, CMFCatalogAware)
 
 
 def datehandler(value):
@@ -382,8 +386,8 @@ class SolrIndexProcessor(object):
             elif isinstance(value, (list, tuple)) and not field.multiValued:
                 separator = getattr(field, 'separator', ' ')
                 value = separator.join(value)
-            if isinstance(value, str):
-                value = six.text_type(value, 'utf-8', 'ignore').encode('utf-8')
+            if isinstance(value, six.binary_type):
+                value = value.decode('utf-8')
             data[name] = value
         missing = set(schema.requiredFields) - set(data.keys())
         return data, missing
