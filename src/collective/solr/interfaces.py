@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from collective.indexing.interfaces import IIndexQueueProcessor
 from zope.interface import Interface
 from zope.schema import Bool
 from zope.schema import Float
@@ -10,6 +9,13 @@ from zope.schema import TextLine
 from zope.schema.interfaces import IVocabularyFactory
 
 from collective.solr import SolrMessageFactory as _
+
+from plone import api
+USE_COLLECTIVE_INDEXING = (api.env.plone_version() < '5.1')
+if USE_COLLECTIVE_INDEXING:
+    from collective.indexing.interfaces import IIndexQueueProcessor
+else:
+    from Products.CMFCore.interfaces import IIndexQueueProcessor
 
 
 class ISolrSchema(Interface):
@@ -48,7 +54,7 @@ class ISolrSchema(Interface):
         )
     )
 
-    async = Bool(
+    async_indexing = Bool(
         title=_('label_async', default=u'Asynchronous indexing'),
         default=False,
         description=_(

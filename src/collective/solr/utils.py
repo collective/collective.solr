@@ -1,4 +1,3 @@
-from string import maketrans
 from re import compile, UNICODE
 
 from Acquisition import aq_base
@@ -7,6 +6,8 @@ from unidecode import unidecode
 from collective.solr.interfaces import ISolrSchema
 from zope.component import getUtility
 from plone.registry.interfaces import IRegistry
+import six
+from six.moves import range
 
 
 def getConfig():
@@ -33,6 +34,11 @@ def activate(active=True):
 def setupTranslationMap():
     """ prepare translation map to remove all control characters except
         tab, new-line and carriage-return """
+    if six.PY2:
+        from string import maketrans
+    else:
+        maketrans = str.maketrans
+
     ctrls = trans = ''
     for n in range(0, 32):
         char = chr(n)
@@ -42,6 +48,7 @@ def setupTranslationMap():
         else:
             trans += ' '
     return maketrans(ctrls, trans)
+
 
 translation_map = setupTranslationMap()
 
@@ -64,7 +71,7 @@ def prepareData(data):
     if searchable is not None:
         if isinstance(searchable, dict):
             searchable = searchable['query']
-        if isinstance(searchable, unicode):
+        if isinstance(searchable, six.text_type):
             searchable = searchable.encode('utf-8')
         data['SearchableText'] = searchable.translate(translation_map)
     # mangle path query from plone.app.collection
@@ -78,7 +85,7 @@ simpleTerm = compile(r'^[\w\d]+$', UNICODE)
 
 def isSimpleTerm(term):
     if isinstance(term, str):
-        term = unicode(term, 'utf-8', 'ignore')
+        term = six.text_type(term, 'utf-8', 'ignore')
     term = term.strip()
     simple = bool(simpleTerm.match(term))
     if simple and is_digit.match(term[-1]):
@@ -94,7 +101,7 @@ is_digit = compile('\d', UNICODE)
 def isSimpleSearch(term):
     term = term.strip()
     if isinstance(term, str):
-        term = unicode(term, 'utf-8', 'ignore')
+        term = six.text_type(term, 'utf-8', 'ignore')
     if not term:
         return False
     num_quotes = term.count('"')
@@ -146,7 +153,7 @@ wildCard = compile(r'^[\w\d\s*?]*[*?]+[\w\d\s*?]*$', UNICODE)
 
 def isWildCard(term):
     if isinstance(term, str):
-        term = unicode(term, 'utf-8', 'ignore')
+        term = six.text_type(term, 'utf-8', 'ignore')
     return bool(wildCard.match(term))
 
 
@@ -156,8 +163,8 @@ def prepare_wildcard(value):
     # Unfortunately we cannot easily inspect the field analyzer and tokenizer,
     # so we assume the default config contains ICUFoldingFilterFactory and hope
     # unidecode will produce the same results
-    if not isinstance(value, unicode):
-        value = unicode(value, 'utf-8', 'ignore')
+    if not isinstance(value, six.text_type):
+        value = six.text_type(value, 'utf-8', 'ignore')
 
     value = str(unidecode(value))
 

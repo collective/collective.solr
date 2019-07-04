@@ -12,7 +12,9 @@
 
   <i18n:registerTranslations directory="locales" />
 
-  <include package="collective.indexing" />
+  <!-- collective.indexing is part of Products.CMFPlone since 5.1 -->
+  <include zcml:condition="have plone-51" package="collective.indexing" />
+
   <include package="plone.browserlayer" />
   <include package="plone.app.registry" />
   <include package="collective.js.showmore" />
@@ -155,7 +157,7 @@
 
   <browser:resourceDirectory
     name="collective.solr.static"
-    directory="static" 
+    directory="static"
     />
 
   <include package="plone.behavior" file="meta.zcml" />

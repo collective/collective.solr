@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import sys
-from zope.interface import implements
+from zope.interface import implementer
 from zope.component import adapts
 from zope.component.hooks import getSite
 from zope.publisher.interfaces.http import IHTTPRequest
@@ -15,9 +15,9 @@ from collective.solr.parser import AttrDict
 timezone = DateTime().timezone()
 
 
+@implementer(IFlare)
 class PloneFlare(AttrDict):
     """ a sol(a)r brain, i.e. a data container for search results """
-    implements(IFlare)
     adapts(ISolrFlare, IHTTPRequest)
 
     __allow_access_to_unprotected_subobjects__ = True
@@ -38,7 +38,7 @@ class PloneFlare(AttrDict):
 
     def getRID(self):
         """Return a record id"""
-        return int(int(self['UID'], 16) % sys.maxint)
+        return int(int(self['UID'], 16) % sys.maxsize)
 
     def getObject(self, REQUEST=None, restricted=True):
         """ return the actual object corresponding to this flare while

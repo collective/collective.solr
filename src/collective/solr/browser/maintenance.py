@@ -6,9 +6,9 @@ from BTrees.IIBTree import IITreeSet
 from Products.CMFCore.utils import getToolByName
 from Products.Five.browser import BrowserView
 from plone.uuid.interfaces import IUUID, IUUIDAware
-from zope.interface import implements
+from zope.interface import implementer
 from zope.component import queryUtility, queryAdapter
-from collective.indexing.indexer import getOwnIndexMethod
+
 from collective.solr.indexer import DefaultAdder
 from collective.solr.flare import PloneFlare
 from collective.solr.interfaces import ISolrConnectionManager
@@ -60,9 +60,9 @@ def notimeout(func):
     return wrapper
 
 
+@implementer(ISolrMaintenanceView)
 class SolrMaintenanceView(BrowserView):
     """ helper view for indexing all portal content in Solr """
-    implements(ISolrMaintenanceView)
 
     def mklog(self, use_std_log=False):
         """ helper to prepend a time stamp to the output """
@@ -129,13 +129,13 @@ class SolrMaintenanceView(BrowserView):
                 adder = data.pop('_solr_adder')
                 try:
                     adder(conn, boost_values=my_boost_values, **data)
-                except Exception, e:
+                except Exception as e:
                     logger.warn('Error %s @ %s', e, data['path_string'])
                     if not ignore_exceptions:
                         raise
             updates.clear()
             msg = 'intermediate commit (%d items processed, ' \
-                  'last batch in %s)...\n' % (processed, lap.next())
+                  'last batch in %s)...\n' % (processed, next(lap))
             log(msg)
             logger.info(msg)
             flush()
@@ -149,9 +149,13 @@ class SolrMaintenanceView(BrowserView):
         for path, obj in findObjects(self.context):
             if ICheckIndexable(obj)():
 
-                if getOwnIndexMethod(obj, 'indexObject') is not None:
-                    log('skipping indexing of %r via private method.\n' % obj)
-                    continue
+                from plone import api
+                USE_COLLECTIVE_INDEXING = (api.env.plone_version() < '5.1')
+                if USE_COLLECTIVE_INDEXING:
+                    from collective.indexing.indexer import getOwnIndexMethod
+                    if getOwnIndexMethod(obj, 'indexObject') is not None:
+                        log('skipping indexing of %r via private method.\n' % obj)
+                        continue
 
                 count += 1
                 if count <= skip:
@@ -188,7 +192,7 @@ class SolrMaintenanceView(BrowserView):
                         data['_solr_adder'] = adder
                         updates[value] = (boost_values(obj, data), data)
                         processed += 1
-                        cpi.next()
+                        next(cpi)
                 else:
                     log('missing data, skipping indexing of %r.\n' % obj)
                 if limit and count >= (skip + limit):
@@ -198,7 +202,7 @@ class SolrMaintenanceView(BrowserView):
         conn.commit()
         log('solr index rebuilt.\n')
         msg = 'processed %d items in %s (%s cpu time).'
-        msg = msg % (processed, real.next(), cpu.next())
+        msg = msg % (processed, next(real), next(cpu))
         log(msg)
         logger.info(msg)
 
@@ -256,7 +260,7 @@ class SolrMaintenanceView(BrowserView):
 
         def checkPoint():
             msg = 'intermediate commit (%d items processed, ' \
-                  'last batch in %s)...\n' % (processed, lap.next())
+                  'last batch in %s)...\n' % (processed, next(lap))
             log(msg)
             logger.info(msg)
             flush()
@@ -291,7 +295,7 @@ class SolrMaintenanceView(BrowserView):
             if obj is None:
                 op(uid)
                 processed += 1
-                cpi.next()
+                next(cpi)
             else:
                 log('not unindexing existing object %r.\n' % uid)
         log('processing %d "index" operations next...\n' % len(index))
@@ -301,7 +305,7 @@ class SolrMaintenanceView(BrowserView):
             if ICheckIndexable(obj)():
                 op(obj)
                 processed += 1
-                cpi.next()
+                next(cpi)
             else:
                 log('not indexing unindexable object %r.\n' % uid)
             if obj is not None:
@@ -315,13 +319,13 @@ class SolrMaintenanceView(BrowserView):
             if uid in done:
                 continue
             if isinstance(rid, IITreeSet):
-                rid = rid.keys()[0]
+                rid = list(rid.keys())[0]
             if cat_mod_get(rid) != solr_mod_get(uid):
                 obj = lookup(uid, rid=rid)
                 if ICheckIndexable(obj)():
                     op(obj)
                     processed += 1
-                    cpi.next()
+                    next(cpi)
                 else:
                     log('not reindexing unindexable object %r.\n' % uid)
                 if obj is not None:
@@ -329,7 +333,7 @@ class SolrMaintenanceView(BrowserView):
         conn.commit()
         log('solr index synced.\n')
         msg = 'processed %d object(s) in %s (%s cpu time).'
-        msg = msg % (processed, real.next(), cpu.next())
+        msg = msg % (processed, next(real), next(cpu))
         log(msg)
         logger.info(msg)
 

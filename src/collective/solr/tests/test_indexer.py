@@ -4,7 +4,7 @@ from re import search, findall, DOTALL
 from DateTime import DateTime
 from datetime import datetime
 from datetime import date
-from zope.interface import implements
+from zope.interface import implementer
 from Products.CMFCore.CMFCatalogAware import CMFCatalogAware
 
 from collective.solr.interfaces import ICheckIndexable
@@ -18,11 +18,10 @@ from collective.solr.utils import getConfig
 from collective.solr.utils import prepareData
 
 
+@implementer(ICheckIndexable)
 class Foo(CMFCatalogAware):
 
     """ dummy test object """
-
-    implements(ICheckIndexable)
 
     def __init__(self, **kw):
         for key, value in kw.items():
@@ -141,7 +140,7 @@ class QueueIndexerTests(TestCase):
 
     def testDateIndexingWithPythonDateTime(self):
         foo = Foo(id='gerken', name='patrick', cat='nerd',
-                  timestamp=datetime(1980, 9, 29, 14, 02))
+                  timestamp=datetime(1980, 9, 29, 14, 0o2))
         response = getData('add_response.txt')
         # fake add response
         output = fakehttp(self.mngr.getConnection(), response)
@@ -152,7 +151,7 @@ class QueueIndexerTests(TestCase):
 
     def testDateIndexingWithPythonDate(self):
         foo = Foo(id='brand', name='jan-carel',
-                  cat='nerd', timestamp=date(1982, 8, 05))
+                  cat='nerd', timestamp=date(1982, 8, 0o5))
         response = getData('add_response.txt')
         # fake add response
         output = fakehttp(self.mngr.getConnection(), response)

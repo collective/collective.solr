@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from unittest import TestCase
-from urllib import unquote
+from six.moves.urllib.parse import unquote
 
 from zope.component import provideUtility
 from zope.publisher.browser import TestRequest
@@ -14,6 +14,7 @@ from collective.solr.testing import COLLECTIVE_SOLR_MOCK_REGISTRY_FIXTURE
 from collective.solr.tests.utils import getData
 from collective.solr.utils import getConfig
 from collective.solr.vocabularies import I18NFacetTitlesVocabularyFactory
+from six.moves import map
 
 
 class Dummy(object):

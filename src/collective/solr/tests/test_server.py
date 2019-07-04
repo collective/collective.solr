@@ -4,8 +4,17 @@ from Acquisition import aq_parent
 from DateTime import DateTime
 from Missing import MV
 from Products.CMFCore.utils import getToolByName
-from collective.indexing.queue import getQueue
-from collective.indexing.queue import processQueue
+
+from plone import api
+from six.moves import range
+USE_COLLECTIVE_INDEXING = api.env.plone_version() < '5.1'
+if USE_COLLECTIVE_INDEXING:
+    from collective.indexing.queue import getQueue
+    from collective.indexing.queue import processQueue
+else:
+    from Products.CMFCore.indexing import getQueue
+    from Products.CMFCore.indexing import processQueue
+
 from collective.solr.dispatcher import FallBackException
 from collective.solr.dispatcher import solrSearchResults
 from collective.solr.flare import PloneFlare
@@ -28,7 +37,6 @@ from collective.solr.tests.utils import numFound
 from collective.solr.utils import activate
 from collective.solr.utils import getConfig
 from operator import itemgetter
-from plone import api
 from plone.app.testing import TEST_USER_ID
 from plone.app.testing import TEST_USER_NAME
 from plone.app.testing import login
@@ -41,7 +49,7 @@ from transaction import commit
 from unittest import TestCase
 from zExceptions import Unauthorized
 from zope.component import getUtility, queryAdapter
-from zope.interface import implements
+from zope.interface import implementer
 from zope.schema.interfaces import IVocabularyFactory
 from Products.Archetypes.interfaces import IBaseObject
 
@@ -68,11 +76,10 @@ if not HAS_PAC:
          'portal_type': 'Folder', 'depth': 0}])
 
 
+@implementer(ISolrAddHandler)
 class RaisingAdder(DefaultAdder):
     """AddHandler that raises an exception when called
     """
-
-    implements(ISolrAddHandler)
 
     def __call__(self, conn, **data):
         raise Exception('Test')
@@ -479,7 +486,7 @@ class SolrServerTests(TestCase):
         # but first all uncommitted changes made in the tests are aborted...
         abort()
         self.config.active = False
-        self.config.async = False
+        self.config.async_indexing = False
         self.config.auto_commit = True
         if getattr(self.search, 'config', None) is not None:
             self.search.config = None

@@ -1,6 +1,12 @@
 # -*- coding: utf-8 -*-
+from plone import api
+USE_COLLECTIVE_INDEXING = api.env.plone_version() < '5.1'
+if USE_COLLECTIVE_INDEXING:
+    from collective.indexing.interfaces import IIndexQueueProcessor
+else:
+    from Products.CMFCore.interfaces import IIndexQueueProcessor
+
 from Products.CMFCore.utils import getToolByName
-from collective.indexing.interfaces import IIndexQueueProcessor
 from collective.solr.exceptions import SolrInactiveException
 from collective.solr.interfaces import ISearch
 from collective.solr.interfaces import ISolrConnectionManager

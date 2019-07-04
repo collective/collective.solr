@@ -1,9 +1,12 @@
 # -*- coding: utf-8 -*-
 from Products.CMFCore.utils import getToolByName
 from collective.solr.utils import activate
+from plone import api
 from plone.app.robotframework.testing import REMOTE_LIBRARY_BUNDLE_FIXTURE
 from plone.app.testing import FunctionalTesting
 from plone.app.testing import IntegrationTesting
+import six
+from six.moves import range
 try:  # pragma: no cover
     from plone.app.contenttypes.testing import PLONE_APP_CONTENTTYPES_FIXTURE as PLONE_FIXTURE  # noqa
     HAS_PAC = True
@@ -23,9 +26,13 @@ from zope.interface import implementer
 from zope.component import provideUtility
 from time import sleep
 
+USE_COLLECTIVE_INDEXING = api.env.plone_version() < '5.1'
+if USE_COLLECTIVE_INDEXING:
+    from plone.testing.z2 import installProduct
+
 import os
 import sys
-import urllib2
+import six.moves.urllib.request, six.moves.urllib.error, six.moves.urllib.parse
 import subprocess
 import pkg_resources
 
@@ -76,11 +83,11 @@ class SolrLayer(Layer):
         solr_ping_url = '{0}/admin/ping?wt=xml'.format(self.solr_url)
         for i in range(1, 10):
             try:
-                result = urllib2.urlopen(solr_ping_url)
+                result = six.moves.urllib.request.urlopen(solr_ping_url)
                 if result.code == 200:
                     if '<str name="status">OK</str>' in result.read():
                         break
-            except urllib2.URLError:
+            except six.moves.urllib.error.URLError:
                 sleep(3)
                 sys.stdout.write('.')
             if i == 9:
@@ -135,12 +142,14 @@ class CollectiveSolrLayer(PloneSandboxLayer):
         )
 
     def setUpZope(self, app, configurationContext):
-        # Load ZCML
-        import collective.indexing
-        self.loadZCML(package=collective.indexing)
+        if USE_COLLECTIVE_INDEXING:
+            # Load ZCML
+            import collective.indexing
+            self.loadZCML(package=collective.indexing)
         import collective.solr
         self.loadZCML(package=collective.solr)
-        installProduct(app, 'collective.indexing')
+        if USE_COLLECTIVE_INDEXING:
+            installProduct(app, 'collective.indexing')
 
     def setUpPloneSite(self, portal):
         self.solr_layer.setUp()
@@ -203,7 +212,7 @@ class CollectiveSolrMockRegistry(object):
         self.host = u'localhost'
         self.port = None
         self.base = None
-        self.async = False
+        self.async_indexing = False
         self.auto_commit = True
         self.commit_within = 0
         self.index_timeout = 0
@@ -273,7 +282,7 @@ class CollectiveSolrMockRegistryLayer(Layer):
 
 def set_attributes(context, values):  # pragma: no cover
     if HAS_PAC:
-        for key, value in values.iteritems():
+        for key, value in six.iteritems(values):
             setattr(context, key, value)
     else:
         context.processForm(values=values)

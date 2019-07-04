@@ -1,7 +1,8 @@
+from __future__ import print_function
 from os.path import dirname, join
-from httplib import HTTPConnection
+from six.moves.http_client import HTTPConnection
 from threading import Thread
-from BaseHTTPServer import HTTPServer, BaseHTTPRequestHandler
+from six.moves.BaseHTTPServer import HTTPServer, BaseHTTPRequestHandler
 from StringIO import StringIO
 from socket import error
 from sys import stderr
@@ -157,15 +158,15 @@ def pingSolr():
         response = conn.getresponse()
         status = response.status == 200
         msg = "INFO: solr return status '%s'" % response.status
-    except error, e:
+    except error as e:
         status = False
         msg = 'WARNING: solr tests could not be run: "%s".' % e
     if not status:
-        print >> stderr
-        print >> stderr, '*' * len(msg)
-        print >> stderr, msg
-        print >> stderr, '*' * len(msg)
-        print >> stderr
+        print(file=stderr)
+        print('*' * len(msg), file=stderr)
+        print(msg, file=stderr)
+        print('*' * len(msg), file=stderr)
+        print(file=stderr)
     setLocal('solrStatus', status)
     return status
 
