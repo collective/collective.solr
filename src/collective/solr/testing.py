@@ -20,21 +20,19 @@ from plone.app.testing import login
 from plone.registry.interfaces import IRegistry
 from plone.testing import Layer
 from plone.testing import z2
-from plone.testing.z2 import installProduct
 from plone.api.portal import set_registry_record
 from zope.interface import implementer
 from zope.component import provideUtility
 from time import sleep
-
-USE_COLLECTIVE_INDEXING = api.env.plone_version() < '5.1'
-if USE_COLLECTIVE_INDEXING:
-    from plone.testing.z2 import installProduct
-
 import os
 import sys
 import six.moves.urllib.request, six.moves.urllib.error, six.moves.urllib.parse
 import subprocess
 import pkg_resources
+
+USE_COLLECTIVE_INDEXING = api.env.plone_version() < '5.1'
+if USE_COLLECTIVE_INDEXING:
+    from plone.testing.z2 import installProduct
 
 BIN_DIR = os.path.dirname(os.path.realpath(sys.argv[0]))
 
@@ -142,8 +140,8 @@ class CollectiveSolrLayer(PloneSandboxLayer):
         )
 
     def setUpZope(self, app, configurationContext):
+        # Load ZCML
         if USE_COLLECTIVE_INDEXING:
-            # Load ZCML
             import collective.indexing
             self.loadZCML(package=collective.indexing)
         import collective.solr

@@ -4,17 +4,14 @@ from Acquisition import aq_parent
 from DateTime import DateTime
 from Missing import MV
 from Products.CMFCore.utils import getToolByName
-
-from plone import api
-from six.moves import range
-USE_COLLECTIVE_INDEXING = api.env.plone_version() < '5.1'
-if USE_COLLECTIVE_INDEXING:
-    from collective.indexing.queue import getQueue
-    from collective.indexing.queue import processQueue
-else:
+try:
     from Products.CMFCore.indexing import getQueue
+except ImportError:
+    from collective.indexing.queue import getQueue
+try:
     from Products.CMFCore.indexing import processQueue
-
+except ImportError:
+    from collective.indexing.queue import processQueue
 from collective.solr.dispatcher import FallBackException
 from collective.solr.dispatcher import solrSearchResults
 from collective.solr.flare import PloneFlare
@@ -37,12 +34,14 @@ from collective.solr.tests.utils import numFound
 from collective.solr.utils import activate
 from collective.solr.utils import getConfig
 from operator import itemgetter
+from plone import api
 from plone.app.testing import TEST_USER_ID
 from plone.app.testing import TEST_USER_NAME
 from plone.app.testing import login
 from plone.app.testing import setRoles
 from plone.namedfile.file import NamedBlobFile
 from re import split
+from six.moves import range
 from time import sleep
 from transaction import abort
 from transaction import commit
@@ -51,6 +50,10 @@ from zExceptions import Unauthorized
 from zope.component import getUtility, queryAdapter
 from zope.interface import implementer
 from zope.schema.interfaces import IVocabularyFactory
+try:
+    from Products.Archetypes.interfaces import IBaseObject
+except ImportError:
+    IBaseObject = None
 
 import unittest
 
@@ -297,11 +300,11 @@ class SolrMaintenanceTests(TestCase):
             from plone.app.contenttypes.interfaces import IImage
             iface = IImage
         else:
-            from Products.Archetypes.interfaces import IBaseObject
             iface = IBaseObject
-        sm.registerAdapter(RaisingAdder,
-                           required=(iface,),
-                           name='Image')
+        if iface:
+            sm.registerAdapter(RaisingAdder,
+                               required=(iface,),
+                               name='Image')
         # ignore_exceptions=False should raise the handler's exception,
         # thereby aborting the reindex tx
         maintenance = self.portal.unrestrictedTraverse('solr-maintenance')

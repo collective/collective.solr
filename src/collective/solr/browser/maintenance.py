@@ -8,7 +8,10 @@ from Products.Five.browser import BrowserView
 from plone.uuid.interfaces import IUUID, IUUIDAware
 from zope.interface import implementer
 from zope.component import queryUtility, queryAdapter
-
+try:
+    from collective.indexing.indexer import getOwnIndexMethod
+except ImportError:
+    getOwnIndexMethod = None
 from collective.solr.indexer import DefaultAdder
 from collective.solr.flare import PloneFlare
 from collective.solr.interfaces import ISolrConnectionManager
@@ -121,7 +124,8 @@ class SolrMaintenanceView(BrowserView):
         schema = manager.getSchema()
         key = schema.uniqueKey
         updates = {}            # list to hold data to be updated
-        flush = lambda: conn.commit(soft=True)
+
+        def flush(): return conn.commit(soft=True)
         flush = notimeout(flush)
 
         def checkPoint():
@@ -148,11 +152,7 @@ class SolrMaintenanceView(BrowserView):
 
         for path, obj in findObjects(self.context):
             if ICheckIndexable(obj)():
-
-                from plone import api
-                USE_COLLECTIVE_INDEXING = (api.env.plone_version() < '5.1')
-                if USE_COLLECTIVE_INDEXING:
-                    from collective.indexing.indexer import getOwnIndexMethod
+                if getOwnIndexMethod:
                     if getOwnIndexMethod(obj, 'indexObject') is not None:
                         log('skipping indexing of %r via private method.\n' % obj)
                         continue
@@ -240,7 +240,7 @@ class SolrMaintenanceView(BrowserView):
         def _utc_convert(value):
             t_tup = value.utctimetuple()
             return ((((t_tup[0] * 12 + t_tup[1]) * 31 + t_tup[2])
-                    * 24 + t_tup[3]) * 60 + t_tup[4])
+                     * 24 + t_tup[3]) * 60 + t_tup[4])
         for flare in flares:
             uid = flare[key]
             solr_uids.add(uid)
@@ -384,7 +384,7 @@ class SolrMaintenanceView(BrowserView):
                     conn.delete(flare[key])
                     deleted += 1
                     realob_res = SolrResponse(conn.search(q='%s:%s' %
-                                              (key, uuid))).results()
+                                                          (key, uuid))).results()
                     if len(realob_res) == 0:
                         log('no sane entry for last object, reindexing\n')
                         data, missing = proc.getData(ob)

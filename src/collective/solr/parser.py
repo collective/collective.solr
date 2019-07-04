@@ -9,7 +9,6 @@ except ImportError:
     from Products.ZCatalog.Lazy import _marker
 
 from zope.interface import implementer
-
 from collective.solr.interfaces import ISolrFlare
 from xml.etree.cElementTree import iterparse
 import six

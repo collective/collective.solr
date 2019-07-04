@@ -1,12 +1,10 @@
 # -*- coding: utf-8 -*-
-from plone import api
-USE_COLLECTIVE_INDEXING = api.env.plone_version() < '5.1'
-if USE_COLLECTIVE_INDEXING:
-    from collective.indexing.interfaces import IIndexQueueProcessor
-else:
-    from Products.CMFCore.interfaces import IIndexQueueProcessor
-
 from Products.CMFCore.utils import getToolByName
+try:
+    from Products.CMFCore.interfaces import IIndexQueueProcessor
+except ImportError:
+    # Plone < 5.1
+    from collective.indexing.interfaces import IIndexQueueProcessor
 from collective.solr.exceptions import SolrInactiveException
 from collective.solr.interfaces import ISearch
 from collective.solr.interfaces import ISolrConnectionManager
@@ -250,5 +248,6 @@ class SiteSetupTests(TestCase):
 
     def testTranslation(self):
         utrans = getToolByName(self.portal, 'translation_service').utranslate
-        translate = lambda msg: utrans(msgid=msg, domain='solr')
+
+        def translate(msg): return utrans(msgid=msg, domain='solr')
         self.assertEqual(translate('portal_type'), u'Content type')
