@@ -174,6 +174,8 @@ def pingSolr():
 
 
 def numFound(result):
+    if isinstance(result, six.binary_type):
+        result = result.decode('utf-8')
     match = search(r'numFound="(\d+)"', result)
     if match is not None:
         match = int(match.group(1))
