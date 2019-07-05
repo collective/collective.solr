@@ -395,9 +395,12 @@ class QueryParameterTests(TestCase):
             ]
         )
         config.filter_queries = ['a c', 'b']
-        self.assertEqual(
+        self.assertIn(
             optimize(),
-            ({'*': '*:*'}, dict(fq=['c:(23 42) a:23', 'b:42']))
+            [
+                ({'*': '*:*'}, dict(fq=['c:(23 42) a:23', 'b:42'])),
+                ({'*': '*:*'}, dict(fq=['a:23 c:(23 42)', 'b:42'])),
+            ]
         )
         # for multiple matches the first takes precedence
         config.filter_queries = ['a', 'a c', 'b']
