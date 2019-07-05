@@ -83,7 +83,7 @@ class SolrLayer(Layer):
             try:
                 result = six.moves.urllib.request.urlopen(solr_ping_url)
                 if result.code == 200:
-                    if '<str name="status">OK</str>' in result.read():
+                    if b'<str name="status">OK</str>' in result.read():
                         break
             except six.moves.urllib.error.URLError:
                 sleep(3)
