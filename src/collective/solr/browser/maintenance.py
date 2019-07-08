@@ -125,7 +125,9 @@ class SolrMaintenanceView(BrowserView):
         key = schema.uniqueKey
         updates = {}            # list to hold data to be updated
 
-        def flush(): return conn.commit(soft=True)
+        def flush():
+            return conn.commit(soft=True)
+
         flush = notimeout(flush)
 
         def checkPoint():
@@ -383,8 +385,8 @@ class SolrMaintenanceView(BrowserView):
                         flare['path_string'])
                     conn.delete(flare[key])
                     deleted += 1
-                    realob_res = SolrResponse(conn.search(q='%s:%s' %
-                                                          (key, uuid))).results()
+                    realob_res = SolrResponse(
+                        conn.search(q='%s:%s' % (key, uuid))).results()
                     if len(realob_res) == 0:
                         log('no sane entry for last object, reindexing\n')
                         data, missing = proc.getData(ob)

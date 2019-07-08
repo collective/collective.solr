@@ -16,7 +16,7 @@ import six
 try:
     from Products.Archetypes.CatalogMultiplex import CatalogMultiplex
 except ImportError:
-    from Products.CMFCore.CMFCatalogAware import CMFCatalogAware as CatalogMultiplex
+    CatalogMultipex = None
 try:   # pragma: no cover
     from plone.app.content.interfaces import IIndexableObjectWrapper
 except ImportError:  # pragma: no cover
@@ -49,9 +49,11 @@ class BaseIndexable(object):
         self.context = context
 
     def __call__(self):
-        if isinstance(self.context, CatalogMultiplex):
-            return True
-        return isinstance(self.context, CMFCatalogAware)
+        if CatalogMultiplex:
+            return isinstance(self.context, CMFCatalogAware)
+        else:
+            return isinstance(self.context, (CatalogMultiplex,
+                                             CMFCatalogAware))
 
 
 def datehandler(value):

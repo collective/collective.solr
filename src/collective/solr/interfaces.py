@@ -4,7 +4,6 @@ try:
 except ImportError:
     # Plone < 5.1
     from collective.indexing.interfaces import IIndexQueueProcessor
-
 from zope.interface import Interface
 from zope.schema import Bool
 from zope.schema import Float
