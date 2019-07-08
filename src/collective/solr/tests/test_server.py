@@ -310,6 +310,11 @@ class SolrMaintenanceTests(TestCase):
                                required=(iface,),
                                name='Image')
 
+        manager = getUtility(ISolrConnectionManager)
+        conn = manager.getConnection()
+        # make sure we don't have old data queued
+        conn.abort()
+
         # ignore_exceptions=False should raise the handler's exception,
         # thereby aborting the reindex tx
         maintenance = self.portal.unrestrictedTraverse('solr-maintenance')
