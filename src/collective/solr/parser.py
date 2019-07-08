@@ -102,6 +102,8 @@ class SolrResponse(Lazy):
 
     def parse(self, data):
         """ parse a solr response contained in a string or file-like object """
+        if isinstance(data, six.binary_type):
+            data = data.decode('utf-8')
         if isinstance(data, six.string_types):
             data = six.StringIO(data)
         stack = [self]      # the response object is the outmost container
