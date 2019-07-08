@@ -145,12 +145,34 @@ class SuggestTermsViewIntegrationTest(unittest.TestCase):
         if hasattr(view, '__of__'):
             view = view.__of__(self.portal)
         self.failUnless(view())
+        output = json.loads(view())
         self.assertEqual(
-            view(),
-            json.dumps([{
-                "value": {"freq": 13, "word": "Plone"},
-                "label": {"freq": 13, "word": "Plone"}
-            }])
+            len(output),
+            1,
+        )
+        self.assertEqual(
+            list(output[0]['value'].keys()),
+            ['word', 'freq'],
+        )
+        self.assertEqual(
+            output[0]['value']['word'],
+            'Plone',
+        )
+        self.assertEqual(
+            output[0]['value']['freq'],
+            13,
+        )
+        self.assertEqual(
+            list(output[0]['label'].keys()),
+            ['word', 'freq'],
+        )
+        self.assertEqual(
+            output[0]['label']['word'],
+            'Plone',
+        )
+        self.assertEqual(
+            output[0]['label']['freq'],
+            13,
         )
 
 
