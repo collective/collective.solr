@@ -67,7 +67,7 @@ class PloneFlare(AttrDict):
             url = self.request.physicalPathToURL(path, relative)
         except AttributeError:
             url = path2url(path.split('/'))
-        return url.encode('utf-8')
+        return url
 
     def pretty_title_or_id(self):
         context = getSite()
