@@ -128,7 +128,7 @@ class SolrFacettingTests(TestCase):
         self.assertEqual(facets, ['portal_type', 'review_state'])
 
     def testFacettedSearchWithUnicodeFilterQuery(self):
-        self.portal.news.portal_type = u'Føø'.encode('utf-8')
+        self.portal.news.portal_type = 'Føø'
         self.maintenance.reindex()
         self.request.form['SearchableText'] = 'News'
         self.request.form['facet'] = 'true'
