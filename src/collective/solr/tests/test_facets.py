@@ -160,7 +160,8 @@ class SolrFacettingTests(TestCase):
         alsoProvides(self.request, IThemeSpecific)
         view = getMultiAdapter((self.portal, self.request),
                                name='search-facets')
-        view = view.__of__(self.portal)     # needed to traverse `view/`
+        if hasattr(view, '__of__'):
+            view = view.__of__(self.portal)
         results = solrSearchResults(self.request)
         output = view(results=results)
         self.checkOrder(
@@ -176,7 +177,8 @@ class SolrFacettingTests(TestCase):
     def testFacetFieldsInSearchBox(self):
         self.request = self.portal.REQUEST
         viewlet = SearchBox(self.portal, self.request, None, None)
-        viewlet = viewlet.__of__(self.portal)   # needed to get security right
+        if hasattr(viewlet, '__of__'):
+            viewlet = viewlet.__of__(self.portal)
         viewlet.update()
         output = viewlet.render()
         self.checkOrder(
@@ -210,7 +212,8 @@ class SolrFacettingTests(TestCase):
         alsoProvides(self.request, IThemeSpecific)
         view = getMultiAdapter((self.portal, self.request),
                                name='search-facets')
-        view = view.__of__(self.portal)     # needed to traverse `view/`
+        if hasattr(view, '__of__'):
+            view = view.__of__(self.portal)
         output = view(results=solrSearchResults(self.request))
         self.assertFalse('portal-searchfacets' in output, output)
 
@@ -227,7 +230,8 @@ class SolrFacettingTests(TestCase):
         alsoProvides(self.request, IThemeSpecific)
         view = getMultiAdapter((self.portal, self.request),
                                name='search-facets')
-        view = view.__of__(self.portal)     # needed to traverse `view/`
+        if hasattr(view, '__of__'):
+            view = view.__of__(self.portal)
         results = solrSearchResults(self.request)
         output = view(results=results)
         # the empty facet value should be displayed resulting in
@@ -243,7 +247,8 @@ class SolrFacettingTests(TestCase):
         alsoProvides(self.request, IThemeSpecific)
         view = getMultiAdapter((self.portal, self.request),
                                name='search-facets')
-        view = view.__of__(self.portal)     # needed to traverse `view/`
+        if hasattr(view, '__of__'):
+            view = view.__of__(self.portal)
         results = solrSearchResults(self.request)
         output = view(results=results)
         # the displayed facets should match the given order...

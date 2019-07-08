@@ -98,7 +98,8 @@ class SuggestTermsViewIntegrationTest(unittest.TestCase):
         view = getMultiAdapter(
             (self.portal, self.portal.REQUEST),
             name="suggest-terms")
-        view = view.__of__(self.portal)
+        if hasattr(view, '__of__'):
+            view = view.__of__(self.portal)
         self.failUnless(view())
         self.assertEqual(view(), '[]')
 
@@ -107,7 +108,8 @@ class SuggestTermsViewIntegrationTest(unittest.TestCase):
         view = getMultiAdapter(
             (self.portal, self.portal.REQUEST),
             name="suggest-terms")
-        view = view.__of__(self.portal)
+        if hasattr(view, '__of__'):
+            view = view.__of__(self.portal)
         self.failUnless(view())
         self.assertEqual(view(), '[]')
 
@@ -116,7 +118,8 @@ class SuggestTermsViewIntegrationTest(unittest.TestCase):
         view = getMultiAdapter(
             (self.portal, self.portal.REQUEST),
             name="suggest-terms")
-        view = view.__of__(self.portal)
+        if hasattr(view, '__of__'):
+            view = view.__of__(self.portal)
         self.failUnless(view())
         self.assertEqual(view(), '[]')
 
@@ -125,7 +128,8 @@ class SuggestTermsViewIntegrationTest(unittest.TestCase):
         view = getMultiAdapter(
             (self.portal, self.portal.REQUEST),
             name="suggest-terms")
-        view = view.__of__(self.portal)
+        if hasattr(view, '__of__'):
+            view = view.__of__(self.portal)
         self.failUnless(view())
         self.assertEqual(view(), '[]')
 
@@ -138,7 +142,8 @@ class SuggestTermsViewIntegrationTest(unittest.TestCase):
         view = getMultiAdapter(
             (self.portal, self.portal.REQUEST),
             name="suggest-terms")
-        view = view.__of__(self.portal)
+        if hasattr(view, '__of__'):
+            view = view.__of__(self.portal)
         self.failUnless(view())
         self.assertEqual(
             view(),
