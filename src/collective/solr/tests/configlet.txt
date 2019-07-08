@@ -20,7 +20,7 @@ active without *having* it active.
     8983
     >>> str(config.base)
     '/solr/plone'
-    >>> config.async
+    >>> config.async_indexing
     False
     >>> config.auto_commit
     True
@@ -33,11 +33,11 @@ active without *having* it active.
     >>> config.max_results
     10000000
     >>> config.required
-    [u'SearchableText']
+    ['SearchableText']
     >>> config.facets
-    [u'portal_type', u'review_state']
+    ['portal_type', 'review_state']
     >>> config.filter_queries
-    [u'portal_type']
+    ['portal_type']
     >>> config.slow_query_threshold
     0
     >>> config.effective_steps
@@ -47,9 +47,9 @@ active without *having* it active.
     >>> config.highlight_fields
     []
     >>> config.highlight_formatter_pre
-    u'['
+    '['
     >>> config.highlight_formatter_post
-    u']'
+    ']'
     >>> config.highlight_fragsize
     100
     >>> config.field_list
@@ -74,7 +74,7 @@ Viewing the site control panel
     >>> browser.open('http://nohost/plone/login_form')
     >>> browser.getControl(name='__ac_name').value = TEST_USER_NAME
     >>> browser.getControl(name='__ac_password').value = TEST_USER_PASSWORD
-    >>> browser.getControl(name='submit').click()
+    >>> browser.getControl('Log in').click()
     >>> browser.open('http://nohost/plone/@@solr-controlpanel')
     >>> browser.url
     'http://nohost/plone/@@solr-controlpanel'
@@ -102,7 +102,7 @@ Make some changes
     >>> browser.getControl(name='form.widgets.host').value = 'foo.bar'
     >>> browser.getControl(name='form.widgets.port').value = '1234'
     >>> browser.getControl(name='form.widgets.base').value = '/solr/plone'
-    >>> browser.getControl(name='form.widgets.async:list').value = True
+    >>> browser.getControl(name='form.widgets.async_indexing:list').value = True
     >>> browser.getControl(name='form.widgets.auto_commit:list').value = False
     >>> browser.getControl(name='form.widgets.commit_within').value = '10000'
     >>> browser.getControl(name='form.widgets.index_timeout').value = '7.0'
@@ -139,12 +139,12 @@ Make sure the changes have been applied correctly to the tool:
     >>> config.active
     True
     >>> config.host
-    u'foo.bar'
+    'foo.bar'
     >>> config.port
     1234
     >>> config.base
-    u'/solr/plone'
-    >>> config.async
+    '/solr/plone'
+    >>> config.async_indexing
     True
     >>> config.auto_commit
     False
@@ -157,11 +157,11 @@ Make sure the changes have been applied correctly to the tool:
     >>> config.max_results
     23
     >>> config.required
-    [u'foo', u'bar']
+    ['foo', 'bar']
     >>> config.search_pattern
-    u'(Title:{value})'
+    '(Title:{value})'
     >>> config.facets
-    [u'type', u'state']
+    ['type', 'state']
     >>> config.slow_query_threshold
     50
     >>> config.effective_steps
@@ -169,15 +169,15 @@ Make sure the changes have been applied correctly to the tool:
     >>> config.exclude_user
     True
     >>> config.highlight_fields
-    [u'SearchableText']
+    ['SearchableText']
     >>> config.highlight_formatter_pre
-    u'>'
+    '>'
     >>> config.highlight_formatter_post
-    u'<'
+    '<'
     >>> config.highlight_fragsize
     150
     >>> config.field_list
-    [u'Title', u'effective']
+    ['Title', 'effective']
     >>> config.levenshtein_distance
     1.0
     >>> config.atomic_updates
@@ -192,7 +192,7 @@ correct host and port:
     >>> browser.getControl(name='form.widgets.filter_queries').value = 'Subject\r\nreview_state'
     >>> browser.getControl(name="form.buttons.save").click()
     >>> sorted(config.filter_queries)
-    [u'Subject', u'review_state']
+    ['Subject', 'review_state']
 
 
 Required query parameters

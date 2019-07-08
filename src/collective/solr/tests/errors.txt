@@ -23,7 +23,7 @@ bite anymore:
   >>> search('foo')
   Traceback (most recent call last):
   ...
-  SolrInactiveException
+  collective.solr.exceptions.SolrInactiveException
 
 Next we test error handling when Solr support has been activated, i.e. when
 searches should in fact be possible, but things like network failures get in
