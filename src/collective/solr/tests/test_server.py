@@ -54,6 +54,10 @@ try:
     from Products.Archetypes.interfaces import IBaseObject
 except ImportError:
     IBaseObject = None
+try:
+    from Products.Archetypes.config import UUID_ATTR
+except ImportError:
+    UUID_ATTR = None
 
 import unittest
 
@@ -120,7 +124,7 @@ class SolrMaintenanceTests(TestCase):
             self.search.config = None
 
     def search(self, query='+UID:[* TO *]'):
-        return self.connection.search(q=query).read()
+        return self.connection.search(q=query).read().decode('utf-8')
 
     def counts(self):
         """ crude count of metadata records in the database """
@@ -171,7 +175,7 @@ class SolrMaintenanceTests(TestCase):
         log = []
 
         def write(msg):
-            if 'intermediate' in msg:
+            if b'intermediate' in msg:
                 log.append(msg)
         self.response.write = write
         self.maintenance.clear()
@@ -305,6 +309,7 @@ class SolrMaintenanceTests(TestCase):
             sm.registerAdapter(RaisingAdder,
                                required=(iface,),
                                name='Image')
+
         # ignore_exceptions=False should raise the handler's exception,
         # thereby aborting the reindex tx
         maintenance = self.portal.unrestrictedTraverse('solr-maintenance')
@@ -388,8 +393,8 @@ class SolrMaintenanceTests(TestCase):
         results = [(r.path_string, r.modified) for r in results]
         for path, solr_mod in results:
             obj = self.portal.unrestrictedTraverse(path)
-            obj_mod = obj.modified().toZone('UTC').millis() / 1000
-            solr_mod = solr_mod.toZone('UTC').millis() / 1000
+            obj_mod = int(obj.modified().toZone('UTC').millis() / 1000)
+            solr_mod = int(solr_mod.toZone('UTC').millis() / 1000)
             self.assertEqual(solr_mod, obj_mod)
 
 
@@ -744,7 +749,13 @@ class SolrServerTests(TestCase):
         kw_query['Type'] = 'xy'
         response = solrSearchResults(**kw_query)
         query = response.responseHeader['params']['q']
-        self.assertEqual(query, '+Type:xy (Title:"news"^5 OR getId:"news")')
+        self.assertIn(
+            query,
+            [
+                '+Type:xy (Title:"news"^5 OR getId:"news")',
+                '(Title:"news"^5 OR getId:"news") +Type:xy',
+            ]
+        )
         del kw_query['Type']
         # both value and base_value work
         self.config.search_pattern = u'(Title:{value} OR getId:{base_value})'
@@ -1484,7 +1495,6 @@ class SolrServerTests(TestCase):
     def testCleanup_uid(self):
         self.maintenance.reindex()
         # low level delete to force ascync index and
-        from Products.Archetypes.config import UUID_ATTR
         from plone.uuid.interfaces import ATTRIBUTE_NAME
         from plone.uuid.interfaces import IUUID
         uuid_orig = IUUID(self.portal['news'])
@@ -1492,7 +1502,8 @@ class SolrServerTests(TestCase):
         # Dexterity
         setattr(self.portal['news'], ATTRIBUTE_NAME, 'test-solr-uid')
         # Archetypes
-        setattr(self.portal['news'], UUID_ATTR, 'test-solr-uid')
+        if UUID_ATTR:
+            setattr(self.portal['news'], UUID_ATTR, 'test-solr-uid')
         resp = self.search('NewsFolder')
         self.assertEqual(len(resp), 1)
         self.assertEqual(resp.results()[0]['UID'], uuid_orig)
