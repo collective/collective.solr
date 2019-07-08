@@ -77,7 +77,7 @@ simpleTerm = compile(r'^[\w\d]+$', UNICODE)
 
 
 def isSimpleTerm(term):
-    if isinstance(term, str):
+    if isinstance(term, six.binary_type):
         term = six.text_type(term, 'utf-8', 'ignore')
     term = term.strip()
     simple = bool(simpleTerm.match(term))
