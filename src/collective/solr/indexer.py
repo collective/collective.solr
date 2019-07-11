@@ -16,7 +16,7 @@ import six
 try:
     from Products.Archetypes.CatalogMultiplex import CatalogMultiplex
 except ImportError:
-    CatalogMultipex = None
+    CatalogMultiplex = None
 try:   # pragma: no cover
     from plone.app.content.interfaces import IIndexableObjectWrapper
 except ImportError:  # pragma: no cover
@@ -49,7 +49,7 @@ class BaseIndexable(object):
         self.context = context
 
     def __call__(self):
-        if CatalogMultiplex:
+        if not CatalogMultiplex:
             return isinstance(self.context, CMFCatalogAware)
         else:
             return isinstance(self.context, (CatalogMultiplex,
