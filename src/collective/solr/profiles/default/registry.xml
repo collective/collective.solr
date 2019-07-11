@@ -11,7 +11,7 @@
     <value key="max_results">10000000</value>
     <value key="exclude_user">False
     </value>
-    <value key="search_pattern">+(Title:{value}^5 OR Description:{value}^2 OR SearchableText:{value} OR SearchableText:({base_value}) OR searchwords:({base_value})^1000) +showinsearch:True
+    <value key="search_pattern">+(Title:{value}^5 OR Description:{value}^2 OR SearchableText:{value} OR SearchableText:({base_value}) OR searchwords:({base_value})^1000) -showinsearch:False
     </value>
     <value key="required">
       <element>SearchableText</element>
