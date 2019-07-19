@@ -80,8 +80,12 @@ def fakehttp(solrconn, *fakedata):
         def sendall(self, str):
             output.log(str)
 
-        def makefile(self, mode):
-            return self
+        if six.PY2:
+            def makefile(self, mode, name):
+                return self
+        else:
+            def makefile(self, mode):
+                return self
 
         def read(self, amt=None):
             if self.closed:
