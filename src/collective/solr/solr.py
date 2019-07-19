@@ -178,7 +178,12 @@ class SolrConnection:
     def escapeVal(self, val):
         if not isinstance(val, six.text_type):
             val = six.text_type(val)
-        return escape(val.translate(translation_map))
+        if six.PY2:
+            val = val.encode('utf-8')
+        escaped_val = escape(val.translate(translation_map))
+        if isinstance(escaped_val, six.binary_type):
+            escaped_val = escaped_val.decode('utf-8')
+        return escaped_val
 
     def escapeKey(self, key):
         if not isinstance(key, six.text_type):
