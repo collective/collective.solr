@@ -10,6 +10,12 @@ import six
 from six.moves import range
 
 
+if hasattr(str, 'maketrans'):
+    maketrans = str.maketrans
+else:
+    from string import maketrans
+
+
 def getConfig():
     registry = getUtility(IRegistry)
     return registry.forInterface(ISolrSchema, prefix='collective.solr')
@@ -36,13 +42,13 @@ def setupTranslationMap():
         tab, new-line and carriage-return """
     ctrls = trans = ''
     for n in range(0, 32):
-        char = chr(n)
+        char = six.unichr(n)
         ctrls += char
         if char in '\t\n\r':
             trans += char
         else:
             trans += ' '
-    return str.maketrans(ctrls, trans)
+    return maketrans(ctrls, trans)
 
 
 translation_map = setupTranslationMap()
@@ -66,7 +72,15 @@ def prepareData(data):
     if searchable is not None:
         if isinstance(searchable, dict):
             searchable = searchable['query']
+
+        if isinstance(searchable, six.binary_type):
+            searchable = searchable.decode('utf-8')
+        if six.PY2:
+            searchable = searchable.encode('utf-8')
+
         data['SearchableText'] = searchable.translate(translation_map)
+        if isinstance(data['SearchableText'], six.binary_type):
+            data['SearchableText'] = data['SearchableText'].decode('utf-8')
     # mangle path query from plone.app.collection
     path = data.get('path')
     if isinstance(path, dict) and not path.get('query'):
@@ -177,6 +191,8 @@ def findObjects(origin):
         the given start point """
     traverse = origin.unrestrictedTraverse
     base = '/'.join(origin.getPhysicalPath())
+    if isinstance(base, six.text_type):
+        base = base.encode('utf-8')
     cut = len(base) + 1
     paths = [base]
     for idx, path in enumerate(paths):
@@ -184,7 +200,9 @@ def findObjects(origin):
         yield path[cut:], obj
         if hasattr(aq_base(obj), 'objectIds'):
             for id in obj.objectIds():
-                paths.insert(idx + 1, path + '/' + id)
+                if isinstance(id, six.text_type):
+                    id = id.encode('utf-8')
+                paths.insert(idx + 1, path + b'/' + id)
 
 
 def padResults(results, start=0, **kw):
