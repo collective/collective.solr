@@ -33,9 +33,9 @@ class Foo(CMFCatalogAware):
 
 def sortFields(output):
     """ helper to sort `<field>` tags in output for testing """
-    pattern = rb'^(.*<doc>)(<field .*</field>)(</doc>.*)'
+    pattern = br'^(.*<doc>)(<field .*</field>)(</doc>.*)'
     prefix, fields, suffix = search(pattern, output, DOTALL).groups()
-    tags = rb'(<field [^>]*>[^<]*</field>)'
+    tags = br'(<field [^>]*>[^<]*</field>)'
     return prefix + b''.join(sorted(findall(tags, fields))) + suffix
 
 
