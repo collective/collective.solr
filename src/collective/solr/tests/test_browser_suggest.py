@@ -10,7 +10,7 @@ from plone.app.testing import TEST_USER_ID
 from zope.component import getMultiAdapter
 
 import json
-import socket
+import six
 import unittest
 
 
@@ -151,8 +151,8 @@ class SuggestTermsViewIntegrationTest(unittest.TestCase):
             1,
         )
         self.assertEqual(
-            list(output[0]['value'].keys()),
-            ['word', 'freq'],
+            set(output[0]['value'].keys()),
+            set(['word', 'freq']),
         )
         self.assertEqual(
             output[0]['value']['word'],
@@ -163,8 +163,8 @@ class SuggestTermsViewIntegrationTest(unittest.TestCase):
             13,
         )
         self.assertEqual(
-            list(output[0]['label'].keys()),
-            ['word', 'freq'],
+            set(output[0]['label'].keys()),
+            set(['word', 'freq']),
         )
         self.assertEqual(
             output[0]['label']['word'],
@@ -202,6 +202,10 @@ class TestErrorView(unittest.TestCase):
             raise OSError('Test Exception')
         except Exception as e:
             view = ErrorView(e, request)
+        if six.PY2:
+            expected_error = "<type 'exceptions.OSError"
+        else:
+            expected_error = 'OSError'
         self.assertEqual(
             view.errorInfo(),
-            {'type': 'OSError', 'value': ('Test Exception',)})
+            {'type': expected_error, 'value': ('Test Exception',)})
