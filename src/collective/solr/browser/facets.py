@@ -72,7 +72,7 @@ def convertFacets(fields, view, filter=None):
         for name, count in sorted_values:
             p = deepcopy(params)
             p.setdefault('fq', []).append(
-                '%s:"%s"' % (field, name))
+                ('%s:"%s"' % (field, name)).encode('utf-8'))
             if field in p.get('facet.field', []):
                 p['facet.field'].remove(field)
             if filter is None or filter(name, count):
