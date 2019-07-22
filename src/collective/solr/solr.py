@@ -298,6 +298,9 @@ class SolrConnection:
         request_handler = params.get('request_handler', 'select')
         if 'request_handler' in params:
             del params['request_handler']
+        for key, value in params.items():
+            if isinstance(value, six.text_type):
+                params[key] = value.encode('utf-8')
         request = six.moves.urllib.parse.urlencode(params, doseq=True)
         logger.debug('sending request: %s' % request)
         try:
