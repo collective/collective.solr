@@ -117,6 +117,7 @@ class TestSolr(TestCase):
         # the search method in Python.
         # This is why we have commented out code here.
         search_request = getData('search_request.txt').rstrip(b'\n')
+        search_request_py2 = getData('search_request_py2.txt').rstrip(b'\n')
         search_response = getData('search_response.txt')
         c = SolrConnection(host='localhost:8983', persistent=True)
         output = fakehttp(c, search_response)
@@ -132,9 +133,12 @@ class TestSolr(TestCase):
         res = c.search(**parameters)
         res = fromstring(res.read())
         normalize = lambda x: sorted(x.split(b'&'))      # sort request params
-        self.assertEqual(
+        self.assertIn(
             normalize(output.get()),
-            normalize(search_request),
+            [
+                normalize(search_request),
+                normalize(search_request_py2),
+            ]
         )
         self.failUnless(res.find(('.//doc')))
 

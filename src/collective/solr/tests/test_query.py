@@ -210,7 +210,7 @@ class QueryTests(TestCase):
         self.assertEqual(bq(('foo', 'bar')), '+(foo OR bar)')
         self.assertEqual(bq(('foo', 'bar*')), '+(foo OR bar*)')
         self.assertEqual(bq(('foo bar', 'hmm')), '+("foo bar" OR hmm)')
-        self.assertEqual(bq(('foø bar', 'hmm')), '+("foø bar" OR hmm)')
+        self.assertEqual(bq((u'foø bar', 'hmm')), u'+("foø bar" OR hmm)')
         self.assertEqual(bq(('"foo bar"', 'hmm')), '+("foo bar" OR hmm)')
         self.assertEqual(bq(name=['foo', 'bar']), '+name:(foo OR bar)')
         self.assertEqual(bq(name=['foo', 'bar*']), '+name:(foo OR bar*)')
@@ -243,16 +243,16 @@ class QueryTests(TestCase):
 
     def testUnicodeArguments(self):
         bq = self.bq
-        self.assertEqual(bq(u'foo'), '+foo')
-        self.assertEqual(bq(u'foø'), '+foø')
-        self.assertEqual(bq(u'john@foo.com'), '+john@foo.com')
-        self.assertEqual(bq(name=['foo', u'bar']), '+name:(foo OR bar)')
-        self.assertEqual(bq(name=['foo', u'bär']), '+name:(foo OR bär)')
-        self.assertEqual(bq(name='foo', cat=(u'bar', 'hmm')),
-                         '+cat:(bar OR hmm) +name:foo')
-        self.assertEqual(bq(name='foo', cat=(u'bär', 'hmm')),
-                         '+cat:(bär OR hmm) +name:foo')
-        self.assertEqual(bq(name=u'john@foo.com', cat='spammer'),
+        self.assertEqual(bq(u'foo'), u'+foo')
+        self.assertEqual(bq(u'foø'), u'+foø')
+        self.assertEqual(bq(u'john@foo.com'), u'+john@foo.com')
+        self.assertEqual(bq(name=[u'foo', u'bar']), u'+name:(foo OR bar)')
+        self.assertEqual(bq(name=[u'foo', u'bär']), u'+name:(foo OR bär)')
+        self.assertEqual(bq(name=u'foo', cat=(u'bar', u'hmm')),
+                         u'+cat:(bar OR hmm) +name:foo')
+        self.assertEqual(bq(name='foo', cat=(u'bär', u'hmm')),
+                         u'+cat:(bär OR hmm) +name:foo')
+        self.assertEqual(bq(name=u'john@foo.com', cat=u'spammer'),
                          '+cat:spammer +name:john@foo.com')
 
     def testQuotedQueries(self):
@@ -282,10 +282,10 @@ class QueryTests(TestCase):
 
     def testComplexQueries(self):
         bq = self.bq
-        self.assertEqual(bq('foo', name='"herb*"', cat=(u'bär', '"-hmm"')),
-                         '+cat:(bär OR "\-hmm") +foo +name:"herb\*"')
-        self.assertEqual(bq('foo', name='herb*', cat=(u'bär', '-hmm')),
-                         '+cat:(bär OR -hmm) +foo +name:herb*')
+        self.assertEqual(bq(u'foo', name=u'"herb*"', cat=(u'bär', u'"-hmm"')),
+                         u'+cat:(bär OR "\-hmm") +foo +name:"herb\*"')
+        self.assertEqual(bq(u'foo', name=u'herb*', cat=(u'bär', u'-hmm')),
+                         u'+cat:(bär OR -hmm) +foo +name:herb*')
 
     def testBooleanQueries(self):
         bq = self.bq
@@ -349,11 +349,18 @@ class SearchTests(TestCase):
         schema = getData('schema.xml')
         search = getData('search_response.txt')
         request = getData('search_request.txt').rstrip(b'\n')
+        request_py2 = getData('search_request_py2.txt').rstrip(b'\n')
         output = fakehttp(self.conn, schema, search)    # fake responses
         query, ignore = self.search.buildQueryAndParameters(id='[* TO *]')
         results = self.search(query, rows='10', wt='xml', indent='on').results()
         normalize = lambda x: sorted(x.split(b'&'))      # sort request params
-        self.assertEqual(normalize(output.get(skip=1)), normalize(request))
+        self.assertIn(
+            normalize(output.get(skip=1)),
+            [
+                normalize(request),
+                normalize(request_py2),
+            ]
+        )
         self.assertEqual(results.numFound, '1')
         self.assertEqual(len(results), 1)
         match = results[0]
