@@ -373,7 +373,7 @@ class SolrMaintenanceTests(TestCase):
 
     def test_sync(self):
         search = self.portal.portal_catalog.unrestrictedSearchResults
-        items = dict([(b.UID, b.modified) for b in search()])
+        items = dict([(b.UID, b.modified) for b in search(path='/')])
         self.assertEqual(len(items), len(DEFAULT_OBJS))
         self.assertEqual(numFound(self.search()), 0)
         self.maintenance.sync()
