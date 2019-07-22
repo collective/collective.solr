@@ -42,11 +42,11 @@ class Group(list):
         if lenres == 0:
             return ''
         elif lenres == 1:
-            return str(res[0])
+            return six.text_type(res[0])
         # Otherwise, also print whitespace
         return '%s%s%s' % (
             self.start,
-            ''.join([str(x) for x in self]),
+            ''.join([six.text_type(x) for x in self]),
             self.end)
 
 
@@ -61,7 +61,7 @@ class Quote(Group):
                 self.end = ')'
         return '%s%s%s' % (
             self.start,
-            ''.join([str(x) for x in self]),
+            ''.join([six.text_type(x) for x in self]),
             self.end)
 
 
@@ -75,18 +75,18 @@ class Range(Group):
             # Not valid range, quote
             return '\\%s%s\\%s' % (
                 self.start,
-                ''.join([str(x) for x in self]),
+                ''.join([six.text_type(x) for x in self]),
                 self.end)
         else:
             # split on 'TO'
             split = self.index('TO')
             if split > 0:
                 first = ''.join([
-                    str(x) for x in self[:split]
+                    six.text_type(x) for x in self[:split]
                     if not isinstance(x, Whitespace)])
             if split < (len(self) - 1):
                 last = ''.join([
-                    str(x) for x in self[split + 1:]
+                    six.text_type(x) for x in self[split + 1:]
                     if not isinstance(x, Whitespace)])
         return '%s%s TO %s%s' % (self.start, first, last, self.end)
 
@@ -105,7 +105,7 @@ class Stack(list):
         return self[-1]
 
     def __str__(self):
-        return ''.join([str(x) for x in self[0]])
+        return ''.join([six.text_type(x) for x in self[0]])
 
 
 def quote(term, textfield=False):
@@ -255,7 +255,7 @@ def quote(term, textfield=False):
                     stack.current and
                     not getattr(stack.current[-1], 'isgroup', False) and
                     (
-                        isinstance(stack.current[-1], str) and
+                        isinstance(stack.current[-1], six.text_type) and
                         not stack.current[-1] in special
                     )
                 ) or isinstance(stack.current, Range):
@@ -269,7 +269,7 @@ def quote(term, textfield=False):
             elif isinstance(stack.current, list):
                 stack.current.append('\\%s' % special)
         i += 1
-    return str(stack)
+    return six.text_type(stack)
 
 
 def quote_iterable_item(term):
