@@ -191,18 +191,18 @@ def findObjects(origin):
         the given start point """
     traverse = origin.unrestrictedTraverse
     base = '/'.join(origin.getPhysicalPath())
-    if isinstance(base, six.text_type):
-        base = base.encode('utf-8')
     cut = len(base) + 1
     paths = [base]
     for idx, path in enumerate(paths):
+        if six.PY2:
+            path = path.encode('utf-8')
         obj = traverse(path)
+        if six.PY2:
+            path = path.decode('utf-8')
         yield path[cut:], obj
         if hasattr(aq_base(obj), 'objectIds'):
             for id in obj.objectIds():
-                if isinstance(id, six.text_type):
-                    id = id.encode('utf-8')
-                paths.insert(idx + 1, path + b'/' + id)
+                paths.insert(idx + 1, path + '/' + id)
 
 
 def padResults(results, start=0, **kw):
