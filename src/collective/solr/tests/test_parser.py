@@ -35,7 +35,7 @@ class ParserTests(TestCase):
         self.assertEqual(headers['params']['q'], 'id:[* TO *]')
 
     def testParseComplexSearchResults(self):
-        complex_xml_response = getData('complex_xml_response.txt').decode('utf-8')
+        complex_xml_response = getData('complex_xml_response.txt')
         response = SolrResponse(complex_xml_response)
         results = response.response     # the result set is named 'response'
         self.assertEqual(results.numFound, '2')

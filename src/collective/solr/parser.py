@@ -102,10 +102,10 @@ class SolrResponse(Lazy):
 
     def parse(self, data):
         """ parse a solr response contained in a string or file-like object """
+        if isinstance(data, six.text_type):
+            data = data.encode('utf-8')
         if isinstance(data, six.binary_type):
-            data = data.decode('utf-8')
-        if isinstance(data, six.string_types):
-            data = six.StringIO(data)
+            data = six.BytesIO(data)
         stack = [self]      # the response object is the outmost container
         elements = iterparse(data, events=('start', 'end'))
         for action, elem in elements:
@@ -115,6 +115,10 @@ class SolrResponse(Lazy):
                     data = nested[tag]()
                     for key, value in elem.attrib.items():
                         if not key == 'name':   # set extra attributes
+                            if isinstance(key, six.binary_type):
+                                key = key.decode('utf-8')
+                            if isinstance(value, six.binary_type):
+                                value = value.decode('utf-8')
                             setattr(data, key, value)
                     stack.append(data)
             elif action == 'end':
