@@ -194,11 +194,7 @@ def findObjects(origin):
     cut = len(base) + 1
     paths = [base]
     for idx, path in enumerate(paths):
-        if six.PY2:
-            path = path.encode('utf-8')
         obj = traverse(path)
-        if six.PY2:
-            path = path.decode('utf-8')
         yield path[cut:], obj
         if hasattr(aq_base(obj), 'objectIds'):
             for id in obj.objectIds():
