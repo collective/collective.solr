@@ -31,3 +31,12 @@ def update_registry(context):
         sm.unregisterUtility(provided=ISolrConnectionConfig)
 
     registry.registerInterface(ISolrSchema, prefix='collective.solr')
+
+
+def migrateTo4(context):
+    registry = getUtility(IRegistry)
+    if 'collective.solr.async' in registry.records:
+        old_record = registry.records['collective.solr.async']
+        registry.records['collective.solr.async_indexing'] = old_record
+        del registry.records['collective.solr.async']
+        logger.info('Migrated to version 4: async_indexing setting')
