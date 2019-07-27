@@ -523,8 +523,6 @@ class SolrServerTests(TestCase):
         if HAS_PAC:
             # remove getIcon which is defined for Plone 5 only
             fields.remove('getIcon')
-            # remove searchwords which is defined for Plone 5 only
-            fields.remove('searchwords')
 
         proc = SolrIndexProcessor(manager)
         # without explicit attributes all data should be returned

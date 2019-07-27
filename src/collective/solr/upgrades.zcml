@@ -25,7 +25,7 @@
 
   <genericsetup:upgradeStep
     title="Upgrade to collective.solr 4"
-    description="Migrate configuration option 'async' to 'async_indexing'."
+    description="Migrate configuration option 'async' to 'async_indexing' and add new behavior to standard content types."
     source="3"
     destination="4"
     handler=".setuphandlers.migrateTo4"
