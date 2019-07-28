@@ -600,6 +600,12 @@ class SolrServerTests(TestCase):
         ob._setId('new_id')
         commit()
 
+        # No change in solr so far
+        self.assertEqual(search('+path_parents:\/plone\/news\/folder'), 1)
+
+        proc.reindex(self.folder, attributes=['path', ])
+        proc.commit()
+
         # Crosscheck
         self.assertEqual(search('+path_parents:\/plone\/news\/folder'), 0)
 
