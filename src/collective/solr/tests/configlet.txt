@@ -32,12 +32,12 @@ active without *having* it active.
     0.0
     >>> config.max_results
     10000000
-    >>> config.required
-    ['SearchableText']
-    >>> config.facets
-    ['portal_type', 'review_state']
-    >>> config.filter_queries
-    ['portal_type']
+    >>> config.required == ['SearchableText']
+    True
+    >>> config.facets == ['portal_type', 'review_state']
+    True
+    >>> config.filter_queries == ['portal_type']
+    True
     >>> config.slow_query_threshold
     0
     >>> config.effective_steps
@@ -46,10 +46,10 @@ active without *having* it active.
     False
     >>> config.highlight_fields
     []
-    >>> config.highlight_formatter_pre
-    '['
-    >>> config.highlight_formatter_post
-    ']'
+    >>> config.highlight_formatter_pre == '['
+    True
+    >>> config.highlight_formatter_post == ']'
+    True
     >>> config.highlight_fragsize
     100
     >>> config.field_list
@@ -138,12 +138,12 @@ Make sure the changes have been applied correctly to the tool:
 
     >>> config.active
     True
-    >>> config.host
-    'foo.bar'
+    >>> config.host == 'foo.bar'
+    True
     >>> config.port
     1234
-    >>> config.base
-    '/solr/plone'
+    >>> config.base == '/solr/plone'
+    True
     >>> config.async_indexing
     True
     >>> config.auto_commit
@@ -156,28 +156,28 @@ Make sure the changes have been applied correctly to the tool:
     3.1...
     >>> config.max_results
     23
-    >>> config.required
-    ['foo', 'bar']
-    >>> config.search_pattern
-    '(Title:{value})'
-    >>> config.facets
-    ['type', 'state']
+    >>> config.required == ['foo', 'bar']
+    True
+    >>> config.search_pattern == '(Title:{value})'
+    True
+    >>> config.facets == ['type', 'state']
+    True
     >>> config.slow_query_threshold
     50
     >>> config.effective_steps
     300
     >>> config.exclude_user
     True
-    >>> config.highlight_fields
-    ['SearchableText']
-    >>> config.highlight_formatter_pre
-    '>'
-    >>> config.highlight_formatter_post
-    '<'
+    >>> config.highlight_fields == ['SearchableText']
+    True
+    >>> config.highlight_formatter_pre == '>'
+    True
+    >>> config.highlight_formatter_post == '<'
+    True
     >>> config.highlight_fragsize
     150
-    >>> config.field_list
-    ['Title', 'effective']
+    >>> config.field_list == ['Title', 'effective']
+    True
     >>> config.levenshtein_distance
     1.0
     >>> config.atomic_updates
@@ -191,8 +191,8 @@ correct host and port:
     >>> browser.getControl(name='form.widgets.port').value = '8983'
     >>> browser.getControl(name='form.widgets.filter_queries').value = 'Subject\r\nreview_state'
     >>> browser.getControl(name="form.buttons.save").click()
-    >>> sorted(config.filter_queries)
-    ['Subject', 'review_state']
+    >>> sorted(config.filter_queries) == ['Subject', 'review_state']
+    True
 
 
 Required query parameters
