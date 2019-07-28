@@ -18,7 +18,7 @@
     Solr Error
   </h1>
 
-  <div tal:condition="python: type == 'socket.error'">
+  <div tal:condition="python: type in ['socket.error', 'ConnectionRefusedError']">
     <tal:marker define="global handled python: True" />
     <p>
       <strong i18n:translate="description_solr_unreachable">

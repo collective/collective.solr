@@ -71,6 +71,7 @@ intended error message is returned and we can continue the test:
 
   >>> from ZPublisher import HTTPResponse
   >>> HTTPResponse.status_codes['error'] = 200
+  >>> HTTPResponse.status_codes['connectionrefusederror'] = 200
   >>> import transaction
   >>> transaction.commit()
   >>> browser = Browser(layer['app'])
