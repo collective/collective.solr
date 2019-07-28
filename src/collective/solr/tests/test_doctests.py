@@ -5,7 +5,8 @@ from unittest import TestSuite
 import doctest
 
 optionflags = (doctest.ELLIPSIS | doctest.NORMALIZE_WHITESPACE
-               | doctest.REPORT_ONLY_FIRST_FAILURE)
+               | doctest.REPORT_ONLY_FIRST_FAILURE
+               | doctest.IGNORE_EXCEPTION_DETAIL)
 
 
 def test_suite():
