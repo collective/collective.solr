@@ -23,6 +23,7 @@ from plone.testing import z2
 from plone.api.portal import set_registry_record
 from zope.interface import implementer
 from zope.component import provideUtility
+from ZPublisher.HTTPRequest import HTTPRequest
 from time import sleep
 import os
 import sys
@@ -140,6 +141,12 @@ class CollectiveSolrLayer(PloneSandboxLayer):
         )
 
     def setUpZope(self, app, configurationContext):
+        # In a full instance the retry_max_count is set in
+        # Zope2.startup.handlers. This does not happen in tests, but we need a
+        # non-zero retry count for test_retry_on_conflict.
+        self._orig_retry_max_count = HTTPRequest.retry_max_count
+        HTTPRequest.retry_max_count = 3
+
         # Load ZCML
         if USE_COLLECTIVE_INDEXING:
             import collective.indexing
@@ -148,6 +155,9 @@ class CollectiveSolrLayer(PloneSandboxLayer):
         self.loadZCML(package=collective.solr)
         if USE_COLLECTIVE_INDEXING:
             installProduct(app, 'collective.indexing')
+
+    def tearDownZope(self, app):
+        HTTPRequest.retry_max_count = self._orig_retry_max_count
 
     def setUpPloneSite(self, portal):
         self.solr_layer.setUp()
