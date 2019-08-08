@@ -8,7 +8,10 @@ from collective.solr.testing import HAS_PAC
 from collective.solr.testing import LEGACY_COLLECTIVE_SOLR_FUNCTIONAL_TESTING
 from plone.app.testing import SITE_OWNER_NAME
 from plone.app.testing import SITE_OWNER_PASSWORD
-from plone.testing.zope import Browser
+try:
+    from plone.testing.zope import Browser
+except ImportError:
+    from plone.testing.z2 import Browser
 from transaction import commit
 from ZODB.POSException import ConflictError
 from zope import component
