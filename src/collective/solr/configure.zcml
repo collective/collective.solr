@@ -150,11 +150,6 @@
     factory="collective.solr.serializer.LazySolrCatalogResultSerializer"
     />
 
-  <adapter
-    zcml:condition="installed plone.restapi"
-    factory="collective.solr.serializer.SolrFlareSerializer"
-    />
-
   <browser:resourceDirectory
     name="collective.solr.static"
     directory="static"
