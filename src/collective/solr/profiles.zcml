@@ -1,12 +1,24 @@
 <configure
     xmlns="http://namespaces.zope.org/zope"
+    xmlns:zcml="http://namespaces.zope.org/zcml"
     xmlns:genericsetup="http://namespaces.zope.org/genericsetup"
     i18n_domain="solr">
 
   <genericsetup:registerProfile
+      zcml:condition="have plone-50"
       name="default"
       title="collective.solr"
       directory="profiles/default"
+      description="Solr integration for Plone"
+      for="Products.CMFPlone.interfaces.IPloneSiteRoot"
+      provides="Products.GenericSetup.interfaces.EXTENSION"
+      />
+
+  <genericsetup:registerProfile
+      zcml:condition="not-have plone-50"
+      name="default"
+      title="collective.solr"
+      directory="profiles/plone4"
       description="Solr integration for Plone"
       for="Products.CMFPlone.interfaces.IPloneSiteRoot"
       provides="Products.GenericSetup.interfaces.EXTENSION"

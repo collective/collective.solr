@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<registry>
+  <records interface="collective.solr.interfaces.ISolrSchema"
+           prefix="collective.solr">
+    <value key="active">False</value>
+    <value key="host">127.0.0.1</value>
+    <value key="port">8983</value>
+    <value key="base">/solr/plone</value>
+    <value key="index_timeout">0.0</value>
+    <value key="search_timeout">0.0</value>
+    <value key="max_results">10000000</value>
+    <value key="exclude_user">False
+    </value>
+    <value key="search_pattern">+(Title:{value}^5 OR Description:{value}^2 OR SearchableText:{value} OR SearchableText:({base_value}) OR searchwords:({base_value})^1000) -showinsearch:False
+    </value>
+    <value key="required">
+      <element>SearchableText</element>
+    </value>
+    <value key="facets">
+      <element>portal_type</element>
+      <element>review_state</element>
+    </value>
+    <value key="filter_queries">
+      <element>portal_type</element>
+    </value>
+    <value key="boost_script"></value>
+  </records>
+
+</registry>
