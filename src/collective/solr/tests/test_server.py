@@ -301,6 +301,9 @@ class SolrMaintenanceTests(TestCase):
     def testReindexIgnoreExceptions(self):
         self.folder.invokeFactory('Image', id='dull', title='foo',
                                   description='the bar is missing here')
+        # On Plone 4 the folder is not reindexed by the above call.
+        # Reindex manually to ensure well-defined initial state.
+        self.folder.reindexObject()
         commit()
         self.assertEqual(numFound(self.search()), 2)
         sm = self.portal.getSiteManager()
@@ -598,6 +601,8 @@ class SolrServerTests(TestCase):
         parent._delObject('folder', suppress_events=True)
         ob = aq_base(self.folder)
         ob._setId('new_id')
+        # Clear all indexing operations that may have been queued anyway
+        getQueue().clear()
         commit()
 
         # No change in solr so far
