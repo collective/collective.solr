@@ -5,7 +5,7 @@
     i18n_domain="solr">
 
   <genericsetup:registerProfile
-      zcml:condition="have plone-50"
+      zcml:condition="have plone-5"
       name="default"
       title="collective.solr"
       directory="profiles/default"
@@ -15,7 +15,7 @@
       />
 
   <genericsetup:registerProfile
-      zcml:condition="not-have plone-50"
+      zcml:condition="not-have plone-5"
       name="default"
       title="collective.solr"
       directory="profiles/plone4"
