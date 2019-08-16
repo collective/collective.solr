@@ -1,0 +1,7 @@
+POST /solr/plone/select HTTP/1.1
+Host: localhost
+Accept-Encoding: identity
+Content-Length: 106
+Content-Type: application/x-www-form-urlencoded; charset=utf-8
+
+rows=10&q=%2Bid%3A%5B%2A+TO+%2A%5D&fl=%2A+score&indent=on&lowercaseOperators=true&q.op=AND&sow=true&wt=xml

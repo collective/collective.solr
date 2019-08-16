@@ -13,7 +13,7 @@ class TestSolr(TestCase):
     def test_add(self):
         config = getConfig()
         config.atomic_updates = True
-        add_request = getData('add_request.txt').rstrip('\n')
+        add_request = getData('add_request.txt').rstrip(b'\n')
         add_response = getData('add_response.txt')
 
         c = SolrConnection(host='localhost:8983', persistent=True)
@@ -27,7 +27,7 @@ class TestSolr(TestCase):
         res = c.flush()
         self.assertEqual(len(res), 1)   # one request was sent
         res = res[0]
-        self.failUnlessEqual(str(output), add_request)
+        self.failUnlessEqual(str(output), add_request.decode('utf-8'))
         # Status
         node = res.findall(".//int")[0]
         self.failUnlessEqual(node.attrib['name'], 'status')
@@ -41,7 +41,7 @@ class TestSolr(TestCase):
     def test_add_with_boost_values(self):
         config = getConfig()
         config.atomic_updates = False
-        add_request = getData('add_request_with_boost_values.txt').rstrip('\n')
+        add_request = getData('add_request_with_boost_values.txt').rstrip(b'\n')
         add_response = getData('add_response.txt')
         c = SolrConnection(host='localhost:8983', persistent=True)
 
@@ -58,7 +58,7 @@ class TestSolr(TestCase):
 
         res = c.flush()
         self.assertEqual(len(res), 1)   # one request was sent
-        self.failUnlessEqual(str(output), add_request)
+        self.failUnlessEqual(str(output), add_request.decode('utf-8'))
 
     def test_connection_str(self):
         c = SolrConnection(host='localhost:8983', persistent=True)
@@ -69,14 +69,14 @@ class TestSolr(TestCase):
             "charset=utf-8'}, reconnects=0}")
 
     def test_commit(self):
-        commit_request = getData('commit_request.txt').rstrip('\n')
+        commit_request = getData('commit_request.txt').rstrip(b'\n')
         commit_response = getData('commit_response.txt')
         c = SolrConnection(host='localhost:8983', persistent=True)
         output = fakehttp(c, commit_response)
         res = c.commit()
         self.assertEqual(len(res), 1)   # one request was sent
         res = res[0]
-        self.failUnlessEqual(str(output), commit_request)
+        self.failUnlessEqual(str(output), commit_request.decode('utf-8'))
         # Status
         node = res.findall(".//int")[0]
         self.failUnlessEqual(node.attrib['name'], 'status')
@@ -88,35 +88,36 @@ class TestSolr(TestCase):
         res.find('QTime')
 
     def test_optimize(self):
-        commit_request = getData('optimize_request.txt').rstrip('\n')
+        commit_request = getData('optimize_request.txt').rstrip(b'\n')
         commit_response = getData('commit_response.txt')
         c = SolrConnection(host='localhost:8983', persistent=True)
         output = fakehttp(c, commit_response)
         c.commit(optimize=True)
-        self.failUnlessEqual(str(output), commit_request)
+        self.failUnlessEqual(str(output), commit_request.decode('utf-8'))
 
     def test_commit_no_wait_flush(self):
-        commit_request = getData('commit_request.txt').rstrip('\n')
+        commit_request = getData('commit_request.txt').rstrip(b'\n')
         commit_response = getData('commit_response.txt')
         c = SolrConnection(host='localhost:8983', persistent=True)
         output = fakehttp(c, commit_response)
         c.commit()
-        self.failUnlessEqual(str(output), commit_request)
+        self.failUnlessEqual(str(output), commit_request.decode('utf-8'))
 
     def test_commit_no_wait_searcher(self):
         commit_request = getData(
-            'commit_request_no_wait_searcher.txt').rstrip('\n')
+            'commit_request_no_wait_searcher.txt').rstrip(b'\n')
         commit_response = getData('commit_response.txt')
         c = SolrConnection(host='localhost:8983', persistent=True)
         output = fakehttp(c, commit_response)
         c.commit(waitSearcher=False)
-        self.failUnlessEqual(str(output), commit_request)
+        self.failUnlessEqual(str(output), commit_request.decode('utf-8'))
 
     def test_search(self):
         # XXX: Solr 7 has a new query param 'q.op' which can not be passed to
         # the search method in Python.
         # This is why we have commented out code here.
-        search_request = getData('search_request.txt').rstrip('\n')
+        search_request = getData('search_request.txt').rstrip(b'\n')
+        search_request_py2 = getData('search_request_py2.txt').rstrip(b'\n')
         search_response = getData('search_response.txt')
         c = SolrConnection(host='localhost:8983', persistent=True)
         output = fakehttp(c, search_response)
@@ -131,8 +132,14 @@ class TestSolr(TestCase):
 
         res = c.search(**parameters)
         res = fromstring(res.read())
-        normalize = lambda x: sorted(x.split('&'))      # sort request params
-        self.assertEqual(normalize(output.get()), normalize(search_request))
+        normalize = lambda x: sorted(x.split(b'&'))      # sort request params
+        self.assertIn(
+            normalize(output.get()),
+            [
+                normalize(search_request),
+                normalize(search_request_py2),
+            ]
+        )
         self.failUnless(res.find(('.//doc')))
 
     def test_search_with_default_request_handler(self):
@@ -150,7 +157,7 @@ class TestSolr(TestCase):
         self.assertEqual('/solr/plone/custom', c.conn.url)
 
     def test_delete(self):
-        delete_request = getData('delete_request.txt').rstrip('\n')
+        delete_request = getData('delete_request.txt').rstrip(b'\n')
         delete_response = getData('delete_response.txt')
         c = SolrConnection(host='localhost:8983', persistent=True)
         output = fakehttp(c, delete_response)
@@ -158,7 +165,7 @@ class TestSolr(TestCase):
         res = c.flush()
         self.assertEqual(len(res), 1)   # one request was sent
         res = res[0]
-        self.failUnlessEqual(str(output), delete_request)
+        self.failUnlessEqual(str(output), delete_request.decode('utf-8'))
         # Status
         node = res.findall(".//int")[0]
         self.failUnlessEqual(node.attrib['name'], 'status')

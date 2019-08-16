@@ -18,7 +18,9 @@ from collective.solr.utils import getConfig
 from logging import getLogger
 from time import time
 from zope.component import queryUtility
-from zope.interface import implements
+from zope.interface import implementer
+import six
+from six.moves import map
 
 try:
     from Products.LinguaPlone.catalog import languageFilter
@@ -29,9 +31,9 @@ except ImportError:
 logger = getLogger('collective.solr.search')
 
 
+@implementer(ISearch)
 class Search(object):
     """ a search utility for solr """
-    implements(ISearch)
 
     def __init__(self):
         self.manager = None
@@ -91,7 +93,7 @@ class Search(object):
                 parameters['fl'] = '* score'
         if isinstance(query, dict):
             query = u' '.join([
-                safe_unicode(val) for val in query.values()]).encode('utf-8')
+                safe_unicode(val) for val in query.values()])
         logger.debug('searching for %r (%r)', query, parameters)
         if 'sort' in parameters:    # issue warning for unknown sort indices
             index, order = parameters['sort'].split()
@@ -140,7 +142,7 @@ class Search(object):
         args[None] = default
         query = {}
 
-        for name, value in sorted(args.items()):
+        for name, value in args.items():
             field = schema.get(name or defaultSearchField, None)
             if field is None or not field.indexed:
                 logger.info(
@@ -180,7 +182,7 @@ class Search(object):
                 else:
                     query[name] = '(%s)' % ' OR '.join(value)
                 continue
-            elif isinstance(value, basestring):
+            elif isinstance(value, six.string_types):
                 if field.class_ == 'solr.TextField':
                     if isWildCard(value):
                         value = prepare_wildcard(value)

@@ -9,6 +9,8 @@ from collective.solr.utils import splitSimpleSearch
 from collective.solr.utils import getConfig
 from zope.component import getUtility
 from plone.registry.interfaces import IRegistry
+import six
+from six.moves import map
 
 
 ranges = {
@@ -65,8 +67,6 @@ def makeSimpleExpressions(term, levenstein_distance):
 def mangleSearchableText(value, config):
     config = config or getConfig()
     pattern = getattr(config, 'search_pattern', u'')
-    if pattern:
-        pattern = pattern.encode('utf-8')
     levenstein_distance = getattr(config, 'levenshtein_distance', 0)
     value_parts = []
     base_value_parts = []
@@ -87,6 +87,8 @@ def mangleSearchableText(value, config):
         value = pattern.format(value=quote(value),
                                base_value=base_value)
         return set([value])    # add literal query parameter
+    if pattern:
+        pattern = pattern.encode('utf-8')
     return value
 
 
@@ -104,7 +106,7 @@ def mangleQuery(keywords, config, schema):
     """ translate / mangle query parameters to replace zope specifics
         with equivalent constructs for solr """
     extras = {}
-    for key, value in keywords.items():
+    for key, value in keywords.copy().items():
         if key.endswith('_usage'):          # convert old-style parameters
             category, spec = value.split(':', 1)
             extras[key[:-6]] = {category: spec}
@@ -136,14 +138,14 @@ def mangleQuery(keywords, config, schema):
     else:
         epi_indexes = ['path']
 
-    for key, value in keywords.items():
+    for key, value in keywords.copy().items():
         args = extras.get(key, {})
         if key == 'SearchableText':
             keywords[key] = mangleSearchableText(value, config)
             continue
         if key in epi_indexes:
             if isinstance(value, (list, tuple)):
-                value = map(quotePath, value)
+                value = list(map(quotePath, value))
             else:
                 value = quotePath(value)
             path = keywords['%s_parents' % key] = value
@@ -181,13 +183,13 @@ def mangleQuery(keywords, config, schema):
         elif 'range' in args:
             if not isinstance(value, (list, tuple)):
                 value = [value]
-            payload = map(iso8601date, value)
+            payload = list(map(iso8601date, value))
             keywords[key] = ranges[args['range']] % tuple(payload)
             del args['range']
         elif 'operator' in args:
             if isinstance(value, (list, tuple)) and len(value) > 1:
                 sep = ' %s ' % args['operator'].upper()
-                value = sep.join(map(str, map(iso8601date, value)))
+                value = sep.join(map(str, list(map(iso8601date, value))))
                 keywords[key] = '(%s)' % value
             del args['operator']
         elif key == 'allowedRolesAndUsers':
@@ -197,7 +199,7 @@ def mangleQuery(keywords, config, schema):
                     value.remove(token)
         elif isinstance(value, DateTime):
             keywords[key] = iso8601date(value)
-        elif not isinstance(value, basestring):
+        elif not isinstance(value, six.string_types):
             assert not args, 'unsupported usage: %r' % args
 
 
@@ -225,14 +227,14 @@ def subtractQueryParameters(args, request_keywords=None):
     if limit:
         params['rows'] = int(limit)
 
-    for key, value in args.items():
+    for key, value in args.copy().items():
         if key in ('fq', 'fl', 'facet', 'hl', 'd', 'pt', 'sfield'):
             params[key] = value
             del args[key]
         elif key.startswith('facet.') or key.startswith('facet_'):
             def name(facet): return facet.split(':', 1)[0]
             if isinstance(value, list):
-                value = map(name, value)
+                value = list(map(name, value))
             elif isinstance(value, tuple):
                 value = tuple(map(name, value))
             else:
@@ -279,7 +281,7 @@ def optimizeQueryParameters(query, params):
     if filter_queries is not None:
         for idxs in filter_queries:
             idxs = set(idxs.split(' '))
-            if idxs.issubset(query.keys()):
+            if idxs.issubset(list(query.keys())):
                 fq.append(' '.join([query.pop(idx) for idx in idxs]))
     if 'fq' in params:
         if isinstance(params['fq'], list):

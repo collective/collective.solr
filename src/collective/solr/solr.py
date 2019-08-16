@@ -28,18 +28,19 @@
 # c.delete('123')
 # c.commit()
 
-import httplib
+import six.moves.http_client
 import socket
 from xml.etree.cElementTree import fromstring
 from xml.sax.saxutils import escape
 import codecs
-import urllib
+import six.moves.urllib.request, six.moves.urllib.parse, six.moves.urllib.error
 from collective.solr.exceptions import SolrConnectionException
 from collective.solr.parser import SolrSchema
 from collective.solr.utils import getConfig
 from collective.solr.utils import translation_map
 
 from logging import getLogger
+import six
 logger = getLogger(__name__)
 
 
@@ -55,7 +56,7 @@ class SolrConnection:
         # responses from Solr will always be in UTF-8
         self.decoder = codecs.getdecoder('utf-8')
         # a real connection to the server is not opened at this point.
-        self.conn = httplib.HTTPConnection(self.host, timeout=timeout)
+        self.conn = six.moves.http_client.HTTPConnection(self.host, timeout=timeout)
         # self.conn.set_debuglevel(1000000)
         self.xmlbody = []
         self.xmlheaders = {'Content-Type': 'text/xml; charset=utf-8'}
@@ -112,12 +113,14 @@ class SolrConnection:
         return self.doGetOrPost('GET', url, '', headers)
 
     def doGetOrPost(self, method, url, body, headers):
+        if not isinstance(body, six.binary_type):
+            body = body.encode('utf-8')
         try:
             self.conn.request(method, url, body, headers)
             return self.__errcheck(self.conn.getresponse())
         except (
-            socket.error, httplib.CannotSendRequest,
-            httplib.ResponseNotReady, httplib.BadStatusLine
+            socket.error, six.moves.http_client.CannotSendRequest,
+            six.moves.http_client.ResponseNotReady, six.moves.http_client.BadStatusLine
         ):
             # Reconnect in case the connection was broken from the server
             # going down, the server timing out our persistent connection, or
@@ -173,17 +176,18 @@ class SolrConnection:
         return parsed
 
     def escapeVal(self, val):
-        if isinstance(val, unicode):
+        if not isinstance(val, six.text_type):
+            val = six.text_type(val)
+        if six.PY2:
             val = val.encode('utf-8')
-        else:
-            val = str(val)
-        return escape(val.translate(translation_map))
+        escaped_val = escape(val.translate(translation_map))
+        if isinstance(escaped_val, six.binary_type):
+            escaped_val = escaped_val.decode('utf-8')
+        return escaped_val
 
     def escapeKey(self, key):
-        if isinstance(key, unicode):
-            key = key.encode('utf-8')
-        else:
-            key = str(key)
+        if not isinstance(key, six.text_type):
+            key = six.text_type(key)
         key = key.replace("&", "&amp;")
         key = key.replace('"', "&quot;")
         return key
@@ -294,7 +298,10 @@ class SolrConnection:
         request_handler = params.get('request_handler', 'select')
         if 'request_handler' in params:
             del params['request_handler']
-        request = urllib.urlencode(params, doseq=True)
+        for key, value in params.items():
+            if isinstance(value, six.text_type):
+                params[key] = value.encode('utf-8')
+        request = six.moves.urllib.parse.urlencode(params, doseq=True)
         logger.debug('sending request: %s' % request)
         try:
             response = self.doPost(
@@ -314,8 +321,8 @@ class SolrConnection:
             self.conn.request('GET', schema_url % self.solrBase)
             response = self.conn.getresponse()
         except (
-            socket.error, httplib.CannotSendRequest,
-            httplib.ResponseNotReady, httplib.BadStatusLine
+            socket.error, six.moves.http_client.CannotSendRequest,
+            six.moves.http_client.ResponseNotReady, six.moves.http_client.BadStatusLine
         ):
             # see `doPost` method for more info about these exceptions
             self.__reconnect()
@@ -323,7 +330,7 @@ class SolrConnection:
             response = self.conn.getresponse()
 
         if response.status == 200:
-            xml = response.read()
+            xml = response.read().decode('utf-8')
             return SolrSchema(xml.strip())
 
         self.__errcheck(response)       # raise a SolrConnectionException

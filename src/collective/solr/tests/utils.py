@@ -1,14 +1,16 @@
+from __future__ import print_function
 from os.path import dirname, join
-from httplib import HTTPConnection
+from six.moves.http_client import HTTPConnection
 from threading import Thread
-from BaseHTTPServer import HTTPServer, BaseHTTPRequestHandler
-from StringIO import StringIO
+from six.moves.BaseHTTPServer import HTTPServer, BaseHTTPRequestHandler
 from socket import error
 from sys import stderr
 from re import search
 
 from collective.solr.local import getLocal, setLocal
 from collective.solr import tests
+
+import six
 
 try:
     from zope.component.hooks import getSite, setSite
@@ -34,7 +36,7 @@ def loadZCMLString(string):
 def getData(filename):
     """ return a file object from the test data folder """
     filename = join(dirname(tests.__file__), 'data', filename)
-    return open(filename, 'r').read()
+    return open(filename, 'rb').read()
 
 
 def fakehttp(solrconn, *fakedata):
@@ -51,7 +53,7 @@ def fakehttp(solrconn, *fakedata):
 
         def get(self, skip=0):
             self[:] = self[skip:]
-            return ''.join(self.pop(0)).replace('\r', '')
+            return b''.join(self.pop(0)).replace(b'\r', b'')
 
         def new(self):
             self.current = []
@@ -64,31 +66,36 @@ def fakehttp(solrconn, *fakedata):
         def __str__(self):
             self.conn.flush()   # send out all pending xml
             if self:
-                return ''.join(self[0]).replace('\r', '')
+                return ''.join([chunk.decode('utf-8')
+                                for chunk in self[0]]).replace('\r', '')
             else:
                 return ''
 
     output = FakeOutput()
 
-    class FakeSocket(StringIO):
+    class FakeSocket(six.BytesIO):
 
         """ helper class to fake socket communication """
 
         def sendall(self, str):
             output.log(str)
 
-        def makefile(self, mode, name):
-            return self
+        if six.PY2:
+            def makefile(self, mode, name):
+                return self
+        else:
+            def makefile(self, mode):
+                return self
 
         def read(self, amt=None):
             if self.closed:
-                return ''
-            return StringIO.read(self, amt)
+                return b''
+            return six.BytesIO.read(self, amt)
 
         def readline(self, length=None):
             if self.closed:
-                return ''
-            return StringIO.readline(self, length)
+                return b''
+            return six.BytesIO.readline(self, length)
 
     class FakeHTTPConnection(HTTPConnection):
 
@@ -157,20 +164,22 @@ def pingSolr():
         response = conn.getresponse()
         status = response.status == 200
         msg = "INFO: solr return status '%s'" % response.status
-    except error, e:
+    except error as e:
         status = False
         msg = 'WARNING: solr tests could not be run: "%s".' % e
     if not status:
-        print >> stderr
-        print >> stderr, '*' * len(msg)
-        print >> stderr, msg
-        print >> stderr, '*' * len(msg)
-        print >> stderr
+        print(file=stderr)
+        print('*' * len(msg), file=stderr)
+        print(msg, file=stderr)
+        print('*' * len(msg), file=stderr)
+        print(file=stderr)
     setLocal('solrStatus', status)
     return status
 
 
 def numFound(result):
+    if isinstance(result, six.binary_type):
+        result = result.decode('utf-8')
     match = search(r'numFound="(\d+)"', result)
     if match is not None:
         match = int(match.group(1))
