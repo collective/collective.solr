@@ -6,9 +6,15 @@ from unittest import TestSuite, defaultTestLoader
 from collective.solr.interfaces import ISolrConnectionConfig
 from collective.solr.tests.utils import pingSolr
 from collective.solr.dispatcher import solrSearchResults
+from collective.solr.testing import LEGACY_COLLECTIVE_SOLR_FUNCTIONAL_TESTING
+from collective.solr.testing import activateAndReindex
 from collective.solr.utils import activate
+from collective.solr.utils import getConfig
 from plone.dexterity.fti import DexterityFTI
 from plone.dexterity.content import Item
+from plone.app.testing import TEST_USER_ID
+from plone.app.testing import setRoles
+from transaction import commit
 from zope.interface import implements
 from zope.interface import Interface
 from zope.component import getUtility
@@ -32,18 +38,21 @@ class Location(Item):
 
 class SolrSpatialSearchTests(unittest.TestCase):
 
-    def afterSetUp(self):
+    layer = LEGACY_COLLECTIVE_SOLR_FUNCTIONAL_TESTING
+
+    def setUp(self):
+        self.portal = self.layer['portal']
+        self.request = self.layer['request']
         self._setUpGeolocationCatalogIndex()
         self._setUpLocationType()
-        self._makeSearchableTextOptionalInSolrConfiguration()
-        activate()
-        self.portal.REQUEST.RESPONSE.write = lambda x: x    # ignore output
+        setRoles(self.portal, TEST_USER_ID, ('Manager',))
+        self.config = getConfig()
+        self.config.required = []
         self.maintenance = self.portal.unrestrictedTraverse('solr-maintenance')
-        self.maintenance.clear()
-        self.maintenance.reindex()
-        self.setRoles(('Manager',))
+        commit()
+        activateAndReindex(self.portal)
 
-    def beforeTearDown(self):
+    def tearDown(self):
         activate(active=False)
 
     def _setUpLocationType(self):
@@ -66,10 +75,9 @@ class SolrSpatialSearchTests(unittest.TestCase):
         self.portal.location1.reindexObject()
         self.maintenance.reindex()
         results = solrSearchResults(
-            spatial='true',
             portal_type='Location',
             sfield='geolocation',
-            fq='{!bbox}',
+            fq='{!geofilt}',
             pt='50.2,-7.1',
             d=0,
         )
@@ -84,8 +92,8 @@ class SolrSpatialSearchTests(unittest.TestCase):
         self.portal.location1.reindexObject()
         self.maintenance.reindex()
         results = solrSearchResults(
-            spatial='true',
-            fq='{!bbox}',
+            portal_type='Location',
+            fq='{!geofilt}',
             sfield='geolocation',
             pt='50.3,-7.4',
             d=100,
@@ -101,8 +109,7 @@ class SolrSpatialSearchTests(unittest.TestCase):
         self.portal.location1.reindexObject()
         self.maintenance.reindex()
         results = solrSearchResults(
-            spatial='true',
-            fq='{!bbox}',
+            fq='{!geofilt}',
             sfield='geolocation',
             pt='80,123',
             d=0.2,
@@ -126,7 +133,6 @@ class SolrSpatialSearchTests(unittest.TestCase):
 
         # Query: 52,1 | 50,1 (locaction1) < 60,1 (location2)
         results = solrSearchResults(
-            spatial='true',
             fq='{!bbox}',
             sfield='geolocation',
             pt='52,1',
@@ -140,7 +146,6 @@ class SolrSpatialSearchTests(unittest.TestCase):
 
         # Query: 58,1 | 60,1 (locaction2) < 50,1 (location1)
         results = solrSearchResults(
-            spatial='true',
             fq='{!bbox}',
             sfield='geolocation',
             pt='58,1',
@@ -153,8 +158,8 @@ class SolrSpatialSearchTests(unittest.TestCase):
         )
 
 
-def test_suite():
-    if pingSolr():
-        return defaultTestLoader.loadTestsFromName(__name__)
-    else:
-        return TestSuite()
+# def test_suite():
+#     if pingSolr():
+#         return defaultTestLoader.loadTestsFromName(__name__)
+#     else:
+#         return TestSuite()

@@ -28,7 +28,7 @@
     <fieldType name="pdates" class="solr.DatePointField" docValues="true" multiValued="true"/>
 
     <!-- A specialized field for geospatial search. If indexed, this fieldType must not be multivalued. -->
-    <fieldType name="location" class="solr.LatLonType" subFieldSuffix="_coordinate"/>
+    <fieldType name="location" class="solr.LatLonPointSpatialField" docValues="true"/>
 
     <!-- A general text field that has reasonable, generic
          cross-language defaults: it tokenizes with StandardTokenizer,
@@ -152,12 +152,6 @@
       geospatial solr features
     -->
     <field name="geolocation" type="location" indexed="true" stored="true" />
-
-    <!-- Type used to index the lat and lon components for the "location" FieldType -->
-    <dynamicField name="*_coordinate" type="pdouble" indexed="true" stored="false" />
-    <dynamicField name="*_dt" type="pdate" indexed="true" stored="true"/>
-    <dynamicField name="*_dts" type="pdate" indexed="true" stored="true" multiValued="true"/>
-    <dynamicField name="*_p" type="location" indexed="true" stored="true"/>
 
     <copyField source="Title" dest="default"/>
     <copyField source="Description" dest="default"/>
