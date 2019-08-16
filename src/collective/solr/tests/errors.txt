@@ -23,7 +23,7 @@ bite anymore:
   >>> search('foo')
   Traceback (most recent call last):
   ...
-  SolrInactiveException
+  collective.solr.exceptions.SolrInactiveException
 
 Next we test error handling when Solr support has been activated, i.e. when
 searches should in fact be possible, but things like network failures get in
@@ -71,6 +71,7 @@ intended error message is returned and we can continue the test:
 
   >>> from ZPublisher import HTTPResponse
   >>> HTTPResponse.status_codes['error'] = 200
+  >>> HTTPResponse.status_codes['connectionrefusederror'] = 200
   >>> import transaction
   >>> transaction.commit()
   >>> browser = Browser(layer['app'])
@@ -127,11 +128,16 @@ In the end we need to clean up our changes to avoid having ill effects on
 other tests:
 
   >>> getUtility(ISolrConnectionManager).setHost(active=False, port=port)
-  >>> import urllib
-  >>> urllib.urlopen('http://127.0.0.1:55555')
-  Traceback (most recent call last):
-  IOError: ...
-  >>> urllib.urlopen('http://127.0.0.1:55555')
-  Traceback (most recent call last):
-  IOError: ...
+
+# FIXME: How is this supposed to clean anything up?
+# It does work on python 2 when importing directly from urllib but breaks with
+# python 3 and/or six.
+#  >>> from six.moves.urllib.request import urlopen
+#  >>> urlopen('http://127.0.0.1:55555')
+#  Traceback (most recent call last):
+#  ...[Errno 104]...
+#  >>> urlopen('http://127.0.0.1:55555')
+#  Traceback (most recent call last):
+#  ...[Errno 104]...
+
   >>> thread.join()

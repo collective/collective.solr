@@ -1,4 +1,3 @@
-from string import maketrans
 from re import compile, UNICODE
 
 from Acquisition import aq_base
@@ -7,6 +6,14 @@ from unidecode import unidecode
 from collective.solr.interfaces import ISolrSchema
 from zope.component import getUtility
 from plone.registry.interfaces import IRegistry
+import six
+from six.moves import range
+
+
+if hasattr(str, 'maketrans'):
+    maketrans = str.maketrans
+else:
+    from string import maketrans
 
 
 def getConfig():
@@ -35,13 +42,14 @@ def setupTranslationMap():
         tab, new-line and carriage-return """
     ctrls = trans = ''
     for n in range(0, 32):
-        char = chr(n)
+        char = six.unichr(n)
         ctrls += char
         if char in '\t\n\r':
             trans += char
         else:
             trans += ' '
     return maketrans(ctrls, trans)
+
 
 translation_map = setupTranslationMap()
 
@@ -64,9 +72,15 @@ def prepareData(data):
     if searchable is not None:
         if isinstance(searchable, dict):
             searchable = searchable['query']
-        if isinstance(searchable, unicode):
+
+        if isinstance(searchable, six.binary_type):
+            searchable = searchable.decode('utf-8')
+        if six.PY2:
             searchable = searchable.encode('utf-8')
+
         data['SearchableText'] = searchable.translate(translation_map)
+        if isinstance(data['SearchableText'], six.binary_type):
+            data['SearchableText'] = data['SearchableText'].decode('utf-8')
     # mangle path query from plone.app.collection
     path = data.get('path')
     if isinstance(path, dict) and not path.get('query'):
@@ -77,8 +91,8 @@ simpleTerm = compile(r'^[\w\d]+$', UNICODE)
 
 
 def isSimpleTerm(term):
-    if isinstance(term, str):
-        term = unicode(term, 'utf-8', 'ignore')
+    if isinstance(term, six.binary_type):
+        term = six.text_type(term, 'utf-8', 'ignore')
     term = term.strip()
     simple = bool(simpleTerm.match(term))
     if simple and is_digit.match(term[-1]):
@@ -93,8 +107,8 @@ is_digit = compile('\d', UNICODE)
 
 def isSimpleSearch(term):
     term = term.strip()
-    if isinstance(term, str):
-        term = unicode(term, 'utf-8', 'ignore')
+    if isinstance(term, six.binary_type):
+        term = six.text_type(term, 'utf-8', 'ignore')
     if not term:
         return False
     num_quotes = term.count('"')
@@ -145,8 +159,8 @@ wildCard = compile(r'^[\w\d\s*?]*[*?]+[\w\d\s*?]*$', UNICODE)
 
 
 def isWildCard(term):
-    if isinstance(term, str):
-        term = unicode(term, 'utf-8', 'ignore')
+    if isinstance(term, six.binary_type):
+        term = six.text_type(term, 'utf-8', 'ignore')
     return bool(wildCard.match(term))
 
 
@@ -156,10 +170,10 @@ def prepare_wildcard(value):
     # Unfortunately we cannot easily inspect the field analyzer and tokenizer,
     # so we assume the default config contains ICUFoldingFilterFactory and hope
     # unidecode will produce the same results
-    if not isinstance(value, unicode):
-        value = unicode(value, 'utf-8', 'ignore')
+    if not isinstance(value, six.text_type):
+        value = six.text_type(value, 'utf-8', 'ignore')
 
-    value = str(unidecode(value))
+    value = six.text_type(unidecode(value))
 
     # boolean operators must not be lowercased, otherwise Solr will interpret
     # them as search terms. So we split the search term into tokens and

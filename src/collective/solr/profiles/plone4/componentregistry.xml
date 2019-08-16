@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<componentregistry>
+ <adapters/>
+ <utilities>
+  <utility
+     interface="collective.solr.interfaces.ISolrConnectionManager"
+     factory="collective.solr.manager.SolrConnectionManager"/>
+  <utility
+     interface="collective.solr.interfaces.ISolrIndexQueueProcessor"
+     name="solr"
+     factory="collective.solr.indexer.SolrIndexProcessor"/>
+   <utility
+     interface="collective.solr.interfaces.ISearch"
+     factory="collective.solr.search.Search"/>
+ </utilities>
+</componentregistry>

@@ -15,7 +15,7 @@ from logging import getLogger
 from zope.component import queryMultiAdapter
 from zope.component import queryUtility
 from zope.component.hooks import getSite
-from zope.interface import implements
+from zope.interface import implementer
 from zope.publisher.interfaces.http import IHTTPRequest
 from zope.component import getUtility
 from plone.registry.interfaces import IRegistry
@@ -26,10 +26,10 @@ patchCatalogTool()  # patch catalog tool to use the dispatcher...
 logger = getLogger('collective.solr.dispatcher')
 
 
+@implementer(ISearchDispatcher)
 class SearchDispatcher(object):
     """ adapter for potentially dispatching a given query to an
         alternative search backend (instead of the portal catalog) """
-    implements(ISearchDispatcher)
 
     def __init__(self, context):
         self.context = context

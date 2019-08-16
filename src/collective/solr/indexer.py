@@ -6,13 +6,17 @@ from DateTime import DateTime
 from datetime import date, datetime
 from zope.component import queryUtility, queryMultiAdapter
 from zope.component import queryAdapter, adapts
-from zope.interface import implements
+from zope.interface import implementer
 from zope.interface import Interface
 from ZODB.interfaces import BlobError
 from ZODB.POSException import ConflictError
 from Products.CMFCore.utils import getToolByName
 from Products.CMFCore.CMFCatalogAware import CMFCatalogAware
-from Products.Archetypes.CatalogMultiplex import CatalogMultiplex
+import six
+try:
+    from Products.Archetypes.CatalogMultiplex import CatalogMultiplex
+except ImportError:
+    CatalogMultiplex = None
 try:   # pragma: no cover
     from plone.app.content.interfaces import IIndexableObjectWrapper
 except ImportError:  # pragma: no cover
@@ -30,23 +34,26 @@ from collective.solr.exceptions import SolrConnectionException
 from collective.solr.utils import prepareData
 from collective.solr.utils import getConfig
 from socket import error
-from urllib import urlencode
+from six.moves.urllib.parse import urlencode
 
 
 logger = getLogger('collective.solr.indexer')
 
 
+@implementer(ICheckIndexable)
 class BaseIndexable(object):
 
-    implements(ICheckIndexable)
     adapts(Interface)
 
     def __init__(self, context):
         self.context = context
 
     def __call__(self):
-        return isinstance(self.context, CatalogMultiplex) or \
-            isinstance(self.context, CMFCatalogAware)
+        if not CatalogMultiplex:
+            return isinstance(self.context, CMFCatalogAware)
+        else:
+            return isinstance(self.context, (CatalogMultiplex,
+                                             CMFCatalogAware))
 
 
 def datehandler(value):
@@ -95,11 +102,10 @@ handlers = {
 }
 
 
+@implementer(ISolrAddHandler)
 class DefaultAdder(object):
     """
     """
-
-    implements(ISolrAddHandler)
 
     def __init__(self, context):
         self.context = context
@@ -149,10 +155,10 @@ class BinaryAdder(DefaultAdder):
                 url, urlencode(postdata, doseq=True), conn.formheaders)
             root = etree.parse(response)
             data['SearchableText'] = root.find('.//str').text.strip()
-        except SolrConnectionException, e:
+        except SolrConnectionException as e:
             logger.warn('Error %s @ %s', e, data['path_string'])
             data['SearchableText'] = ''
-        except etree.XMLSyntaxError, e:
+        except etree.XMLSyntaxError as e:
             logger.warn('Parsing error %s @ %s.', e, data['path_string'])
             data['SearchableText'] = ''
         super(BinaryAdder, self).__call__(conn, **data)
@@ -180,9 +186,9 @@ def boost_values(obj, data):
         return boost_index_getter(data)
 
 
+@implementer(ISolrIndexQueueProcessor)
 class SolrIndexProcessor(object):
     """ a queue processor for solr """
-    implements(ISolrIndexQueueProcessor)
 
     def __init__(self, manager=None):
         self.manager = manager
@@ -207,7 +213,7 @@ class SolrIndexProcessor(object):
                 logger.warning(msg, obj)
                 return
 
-            if attributes is not None:
+            if attributes:
 
                 if 'path' in attributes:
                     attributes = list(attributes)
@@ -247,7 +253,9 @@ class SolrIndexProcessor(object):
                 except (SolrConnectionException, error):
                     logger.exception('exception during indexing %r', obj)
 
-    def reindex(self, obj, attributes=None):
+    def reindex(self, obj, attributes=None, update_metadata=False):
+        if not attributes:
+            attributes = None
         self.index(obj, attributes)
 
     def unindex(self, obj):
@@ -295,7 +303,7 @@ class SolrIndexProcessor(object):
         if conn is not None:
             config = getConfig()
             if not isinstance(wait, bool):
-                wait = not config.async
+                wait = not config.async_indexing
             try:
                 logger.debug('committing')
                 if not config.auto_commit or config.commit_within:
@@ -354,7 +362,7 @@ class SolrIndexProcessor(object):
         if schema is None:
             return {}, ()
         if attributes is None:
-            attributes = schema.keys()
+            attributes = list(schema.keys())
         obj = self.wrapObject(obj)
         data = {}
         for name in attributes:
@@ -380,8 +388,8 @@ class SolrIndexProcessor(object):
             elif isinstance(value, (list, tuple)) and not field.multiValued:
                 separator = getattr(field, 'separator', ' ')
                 value = separator.join(value)
-            if isinstance(value, str):
-                value = unicode(value, 'utf-8', 'ignore').encode('utf-8')
+            if isinstance(value, six.binary_type):
+                value = value.decode('utf-8')
             data[name] = value
         missing = set(schema.requiredFields) - set(data.keys())
         return data, missing

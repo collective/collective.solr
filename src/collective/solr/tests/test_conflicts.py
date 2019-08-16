@@ -8,7 +8,10 @@ from collective.solr.testing import HAS_PAC
 from collective.solr.testing import LEGACY_COLLECTIVE_SOLR_FUNCTIONAL_TESTING
 from plone.app.testing import SITE_OWNER_NAME
 from plone.app.testing import SITE_OWNER_PASSWORD
-from plone.testing.z2 import Browser
+try:
+    from plone.testing.zope import Browser
+except ImportError:
+    from plone.testing.z2 import Browser
 from transaction import commit
 from ZODB.POSException import ConflictError
 from zope import component
@@ -44,6 +47,15 @@ class ConflictTests(TestCase):
         )
 
     def test_retry_on_conflict(self):
+        """ This tests transaction handling when indexing in Solr, or more
+        specifically properly aborting a transaction.  To do this we'll try to
+        create some content and fake a `ConflictError` shortly before the
+        transaction completes.  The publisher will catch it and retry, but
+        while doing so the object will get a different UID than the first time.
+        Without being able to abort the transaction Solr would receive two sets
+        of data and consequently return two results when searching for this
+        particular piece of content later on.
+        """
         self.browser.open(self.layer['portal'].absolute_url())
         self.browser.getLink('Page').click()
         self.browser.getControl('Title', index=0).value = 'Foo'

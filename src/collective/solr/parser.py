@@ -1,14 +1,17 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
-from StringIO import StringIO
-
 from DateTime import DateTime
-from Products.ZCatalog.Lazy import Lazy
-from Products.ZCatalog.Lazy import _marker
-from zope.interface import implements
+try:
+    from ZTUtils.Lazy import Lazy
+    from ZTUtils.Lazy import _marker
+except ImportError:
+    from Products.ZCatalog.Lazy import Lazy
+    from Products.ZCatalog.Lazy import _marker
 
+from zope.interface import implementer
 from collective.solr.interfaces import ISolrFlare
 from xml.etree.cElementTree import iterparse
+import six
 
 
 class AttrDict(dict):
@@ -24,9 +27,9 @@ class AttrDict(dict):
             raise AttributeError(name)
 
 
+@implementer(ISolrFlare)
 class SolrFlare(AttrDict):
     """ a sol(a)r brain, i.e. a data container for search results """
-    implements(ISolrFlare)
 
     __allow_access_to_unprotected_subobjects__ = True
 
@@ -62,7 +65,7 @@ unmarshallers = {
     'int': int,
     'float': float,
     'double': float,
-    'long': long,
+    'long': int,
     'bool': lambda x: x == 'true',
     'str': lambda x: x or '',
     'date': parseDate,
@@ -99,8 +102,10 @@ class SolrResponse(Lazy):
 
     def parse(self, data):
         """ parse a solr response contained in a string or file-like object """
-        if isinstance(data, basestring):
-            data = StringIO(data)
+        if isinstance(data, six.text_type):
+            data = data.encode('utf-8')
+        if isinstance(data, six.binary_type):
+            data = six.BytesIO(data)
         stack = [self]      # the response object is the outmost container
         elements = iterparse(data, events=('start', 'end'))
         for action, elem in elements:
@@ -110,6 +115,10 @@ class SolrResponse(Lazy):
                     data = nested[tag]()
                     for key, value in elem.attrib.items():
                         if not key == 'name':   # set extra attributes
+                            if isinstance(key, six.binary_type):
+                                key = key.decode('utf-8')
+                            if isinstance(value, six.binary_type):
+                                value = value.decode('utf-8')
                             setattr(data, key, value)
                     stack.append(data)
             elif action == 'end':
@@ -180,8 +189,8 @@ class SolrSchema(AttrDict):
     def parse(self, data):
         """ parse a solr schema to collect information for building
             search and indexing queries later on """
-        if isinstance(data, basestring):
-            data = StringIO(data)
+        if isinstance(data, six.string_types):
+            data = six.StringIO(data)
         self['requiredFields'] = required = []
         types = {}
         for action, elem in iterparse(data):

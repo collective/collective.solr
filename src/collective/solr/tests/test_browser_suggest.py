@@ -10,7 +10,7 @@ from plone.app.testing import TEST_USER_ID
 from zope.component import getMultiAdapter
 
 import json
-import socket
+import six
 import unittest
 
 
@@ -98,7 +98,8 @@ class SuggestTermsViewIntegrationTest(unittest.TestCase):
         view = getMultiAdapter(
             (self.portal, self.portal.REQUEST),
             name="suggest-terms")
-        view = view.__of__(self.portal)
+        if hasattr(view, '__of__'):
+            view = view.__of__(self.portal)
         self.failUnless(view())
         self.assertEqual(view(), '[]')
 
@@ -107,7 +108,8 @@ class SuggestTermsViewIntegrationTest(unittest.TestCase):
         view = getMultiAdapter(
             (self.portal, self.portal.REQUEST),
             name="suggest-terms")
-        view = view.__of__(self.portal)
+        if hasattr(view, '__of__'):
+            view = view.__of__(self.portal)
         self.failUnless(view())
         self.assertEqual(view(), '[]')
 
@@ -116,7 +118,8 @@ class SuggestTermsViewIntegrationTest(unittest.TestCase):
         view = getMultiAdapter(
             (self.portal, self.portal.REQUEST),
             name="suggest-terms")
-        view = view.__of__(self.portal)
+        if hasattr(view, '__of__'):
+            view = view.__of__(self.portal)
         self.failUnless(view())
         self.assertEqual(view(), '[]')
 
@@ -125,7 +128,8 @@ class SuggestTermsViewIntegrationTest(unittest.TestCase):
         view = getMultiAdapter(
             (self.portal, self.portal.REQUEST),
             name="suggest-terms")
-        view = view.__of__(self.portal)
+        if hasattr(view, '__of__'):
+            view = view.__of__(self.portal)
         self.failUnless(view())
         self.assertEqual(view(), '[]')
 
@@ -138,14 +142,37 @@ class SuggestTermsViewIntegrationTest(unittest.TestCase):
         view = getMultiAdapter(
             (self.portal, self.portal.REQUEST),
             name="suggest-terms")
-        view = view.__of__(self.portal)
+        if hasattr(view, '__of__'):
+            view = view.__of__(self.portal)
         self.failUnless(view())
+        output = json.loads(view())
         self.assertEqual(
-            view(),
-            json.dumps([{
-                "value": {"freq": 13, "word": "Plone"},
-                "label": {"freq": 13, "word": "Plone"}
-            }])
+            len(output),
+            1,
+        )
+        self.assertEqual(
+            set(output[0]['value'].keys()),
+            set(['word', 'freq']),
+        )
+        self.assertEqual(
+            output[0]['value']['word'],
+            'Plone',
+        )
+        self.assertEqual(
+            output[0]['value']['freq'],
+            13,
+        )
+        self.assertEqual(
+            set(output[0]['label'].keys()),
+            set(['word', 'freq']),
+        )
+        self.assertEqual(
+            output[0]['label']['word'],
+            'Plone',
+        )
+        self.assertEqual(
+            output[0]['label']['freq'],
+            13,
         )
 
 
@@ -172,9 +199,13 @@ class TestErrorView(unittest.TestCase):
     def test_error_view(self):
         request = {}
         try:
-            raise socket.error('Test Exception')
-        except Exception, e:
+            raise OSError('Test Exception')
+        except Exception as e:
             view = ErrorView(e, request)
+        if six.PY2:
+            expected_error = "<type 'exceptions.OSError"
+        else:
+            expected_error = 'OSError'
         self.assertEqual(
             view.errorInfo(),
-            {'type': 'socket.error', 'value': ('Test Exception',)})
+            {'type': expected_error, 'value': ('Test Exception',)})

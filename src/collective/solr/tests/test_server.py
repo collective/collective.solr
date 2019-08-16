@@ -4,8 +4,14 @@ from Acquisition import aq_parent
 from DateTime import DateTime
 from Missing import MV
 from Products.CMFCore.utils import getToolByName
-from collective.indexing.queue import getQueue
-from collective.indexing.queue import processQueue
+try:
+    from Products.CMFCore.indexing import getQueue
+except ImportError:
+    from collective.indexing.queue import getQueue
+try:
+    from Products.CMFCore.indexing import processQueue
+except ImportError:
+    from collective.indexing.queue import processQueue
 from collective.solr.dispatcher import FallBackException
 from collective.solr.dispatcher import solrSearchResults
 from collective.solr.flare import PloneFlare
@@ -35,15 +41,23 @@ from plone.app.testing import login
 from plone.app.testing import setRoles
 from plone.namedfile.file import NamedBlobFile
 from re import split
+from six.moves import range
 from time import sleep
 from transaction import abort
 from transaction import commit
 from unittest import TestCase
 from zExceptions import Unauthorized
 from zope.component import getUtility, queryAdapter
-from zope.interface import implements
+from zope.interface import implementer
 from zope.schema.interfaces import IVocabularyFactory
-from Products.Archetypes.interfaces import IBaseObject
+try:
+    from Products.Archetypes.interfaces import IBaseObject
+except ImportError:
+    IBaseObject = None
+try:
+    from Products.Archetypes.config import UUID_ATTR
+except ImportError:
+    UUID_ATTR = None
 
 import unittest
 
@@ -68,11 +82,10 @@ if not HAS_PAC:
          'portal_type': 'Folder', 'depth': 0}])
 
 
+@implementer(ISolrAddHandler)
 class RaisingAdder(DefaultAdder):
     """AddHandler that raises an exception when called
     """
-
-    implements(ISolrAddHandler)
 
     def __call__(self, conn, **data):
         raise Exception('Test')
@@ -92,12 +105,9 @@ class SolrMaintenanceTests(TestCase):
         self.config = getConfig()
         activateAndReindex(self.portal)
         manager = getUtility(ISolrConnectionManager)
-        self.connection = connection = manager.getConnection()
+        self.connection = manager.getConnection()
         # make sure nothing is indexed
-        connection.deleteByQuery('+UID:[* TO *]')
-        connection.commit()
-        result = connection.search(q='+UID:[* TO *]').read()
-        self.assertEqual(numFound(result), 0)
+        self.clear_solr()
         # ignore any generated logging output
         self.response = self.request.RESPONSE
         self.write = self.response.write
@@ -110,8 +120,13 @@ class SolrMaintenanceTests(TestCase):
         if getattr(self.search, 'config', None) is not None:
             self.search.config = None
 
+    def clear_solr(self):
+        self.connection.deleteByQuery('+UID:[* TO *]')
+        self.connection.commit()
+        self.assertEqual(numFound(self.search()), 0)
+
     def search(self, query='+UID:[* TO *]'):
-        return self.connection.search(q=query).read()
+        return self.connection.search(q=query).read().decode('utf-8')
 
     def counts(self):
         """ crude count of metadata records in the database """
@@ -162,7 +177,7 @@ class SolrMaintenanceTests(TestCase):
         log = []
 
         def write(msg):
-            if 'intermediate' in msg:
+            if b'intermediate' in msg:
                 log.append(msg)
         self.response.write = write
         self.maintenance.clear()
@@ -286,25 +301,39 @@ class SolrMaintenanceTests(TestCase):
     def testReindexIgnoreExceptions(self):
         self.folder.invokeFactory('Image', id='dull', title='foo',
                                   description='the bar is missing here')
+        # On Plone 4 the folder is not reindexed by the above call.
+        # Reindex manually to ensure well-defined initial state.
+        self.folder.reindexObject()
+        commit()
+        self.assertEqual(numFound(self.search()), 2)
         sm = self.portal.getSiteManager()
         if api.env.plone_version() >= '5.0':
             from plone.app.contenttypes.interfaces import IImage
             iface = IImage
         else:
             iface = IBaseObject
-        sm.registerAdapter(RaisingAdder,
-                           required=(iface,),
-                           name='Image')
+        if iface:
+            sm.registerAdapter(RaisingAdder,
+                               required=(iface,),
+                               name='Image')
+
+        self.clear_solr()
         # ignore_exceptions=False should raise the handler's exception,
         # thereby aborting the reindex tx
         maintenance = self.portal.unrestrictedTraverse('solr-maintenance')
         self.assertRaises(Exception,
                           maintenance.reindex,
                           ignore_exceptions=False)
+        commit()
+        self.assertEqual(numFound(self.search()), 0)
+        # make sure we don't leave update data in the connection
+        self.assertEqual(self.connection.xmlbody, [])
+
         # ignore_exceptions=True should commit the reindex tx.
         # The object causing the exception will not be indexed
         maintenance = self.portal.unrestrictedTraverse('solr-maintenance')
         maintenance.reindex(ignore_exceptions=True)
+
         self.assertEqual(numFound(self.search()), len(DEFAULT_OBJS))
         # restore defaults
         sm.unregisterAdapter(RaisingAdder,
@@ -347,7 +376,7 @@ class SolrMaintenanceTests(TestCase):
 
     def test_sync(self):
         search = self.portal.portal_catalog.unrestrictedSearchResults
-        items = dict([(b.UID, b.modified) for b in search()])
+        items = dict([(b.UID, b.modified) for b in search(path='/')])
         self.assertEqual(len(items), len(DEFAULT_OBJS))
         self.assertEqual(numFound(self.search()), 0)
         self.maintenance.sync()
@@ -378,8 +407,8 @@ class SolrMaintenanceTests(TestCase):
         results = [(r.path_string, r.modified) for r in results]
         for path, solr_mod in results:
             obj = self.portal.unrestrictedTraverse(path)
-            obj_mod = obj.modified().toZone('UTC').millis() / 1000
-            solr_mod = solr_mod.toZone('UTC').millis() / 1000
+            obj_mod = int(obj.modified().toZone('UTC').millis() / 1000)
+            solr_mod = int(solr_mod.toZone('UTC').millis() / 1000)
             self.assertEqual(solr_mod, obj_mod)
 
 
@@ -479,7 +508,7 @@ class SolrServerTests(TestCase):
         # but first all uncommitted changes made in the tests are aborted...
         abort()
         self.config.active = False
-        self.config.async = False
+        self.config.async_indexing = False
         self.config.auto_commit = True
         if getattr(self.search, 'config', None) is not None:
             self.search.config = None
@@ -497,8 +526,6 @@ class SolrServerTests(TestCase):
         if HAS_PAC:
             # remove getIcon which is defined for Plone 5 only
             fields.remove('getIcon')
-            # remove searchwords which is defined for Plone 5 only
-            fields.remove('searchwords')
 
         proc = SolrIndexProcessor(manager)
         # without explicit attributes all data should be returned
@@ -574,7 +601,15 @@ class SolrServerTests(TestCase):
         parent._delObject('folder', suppress_events=True)
         ob = aq_base(self.folder)
         ob._setId('new_id')
+        # Clear all indexing operations that may have been queued anyway
+        getQueue().clear()
         commit()
+
+        # No change in solr so far
+        self.assertEqual(search('+path_parents:\/plone\/news\/folder'), 1)
+
+        proc.reindex(self.folder, attributes=['path', ])
+        proc.commit()
 
         # Crosscheck
         self.assertEqual(search('+path_parents:\/plone\/news\/folder'), 0)
@@ -734,7 +769,13 @@ class SolrServerTests(TestCase):
         kw_query['Type'] = 'xy'
         response = solrSearchResults(**kw_query)
         query = response.responseHeader['params']['q']
-        self.assertEqual(query, '+Type:xy (Title:"news"^5 OR getId:"news")')
+        self.assertIn(
+            query,
+            [
+                '+Type:xy (Title:"news"^5 OR getId:"news")',
+                '(Title:"news"^5 OR getId:"news") +Type:xy',
+            ]
+        )
         del kw_query['Type']
         # both value and base_value work
         self.config.search_pattern = u'(Title:{value} OR getId:{base_value})'
@@ -1474,7 +1515,6 @@ class SolrServerTests(TestCase):
     def testCleanup_uid(self):
         self.maintenance.reindex()
         # low level delete to force ascync index and
-        from Products.Archetypes.config import UUID_ATTR
         from plone.uuid.interfaces import ATTRIBUTE_NAME
         from plone.uuid.interfaces import IUUID
         uuid_orig = IUUID(self.portal['news'])
@@ -1482,7 +1522,8 @@ class SolrServerTests(TestCase):
         # Dexterity
         setattr(self.portal['news'], ATTRIBUTE_NAME, 'test-solr-uid')
         # Archetypes
-        setattr(self.portal['news'], UUID_ATTR, 'test-solr-uid')
+        if UUID_ATTR:
+            setattr(self.portal['news'], UUID_ATTR, 'test-solr-uid')
         resp = self.search('NewsFolder')
         self.assertEqual(len(resp), 1)
         self.assertEqual(resp.results()[0]['UID'], uuid_orig)

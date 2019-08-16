@@ -10,7 +10,7 @@ from Products.Archetypes.atapi import BooleanWidget
 from Products.Archetypes.atapi import TextAreaWidget
 from Products.Archetypes.atapi import TextField
 from Products.Archetypes.interfaces import IBaseObject
-from zope.interface import implements
+from zope.interface import implementer
 from zope.interface import Interface
 
 from collective.solr import SolrMessageFactory as _
@@ -55,10 +55,10 @@ class ExtensionBooleanField(ExtensionField, BooleanField):
     pass
 
 
+@implementer(ISchemaExtender, IBrowserLayerAwareExtender)
 class SearchExtender(object):
     """Adapter that adds search metadata."""
 
-    implements(ISchemaExtender, IBrowserLayerAwareExtender)
     layer = IThemeSpecific
 
     _fields = [

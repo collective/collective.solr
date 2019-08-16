@@ -8,6 +8,7 @@ from collective.solr.mangler import optimizeQueryParameters
 from collective.solr.mangler import subtractQueryParameters
 from collective.solr.parser import SolrField
 from collective.solr.parser import SolrSchema
+from collective.solr.testing import COLLECTIVE_SOLR_MOCK_REGISTRY_FIXTURE
 from collective.solr.utils import getConfig
 from unittest import TestCase
 from zope.component import getGlobalSiteManager
@@ -29,6 +30,8 @@ class Query:
 
 
 class QueryManglerTests(TestCase):
+
+    layer = COLLECTIVE_SOLR_MOCK_REGISTRY_FIXTURE
 
     def setUp(self):
         self.config = getConfig()
@@ -210,6 +213,8 @@ class PathManglerTests(TestCase):
 
 class QueryParameterTests(TestCase):
 
+    layer = COLLECTIVE_SOLR_MOCK_REGISTRY_FIXTURE
+
     def testSortIndex(self):
         extract = subtractQueryParameters
         params = extract({'sort_on': 'foo'})
@@ -383,14 +388,19 @@ class QueryParameterTests(TestCase):
         )
         # also test substitution of combined filter queries
         config.filter_queries = ['a c']
-        self.assertEqual(
-            optimize(),
-            (dict(b='b:42'), dict(fq=['a:23 c:(23 42)']))
+        self.assertTrue(
+            optimize() in [
+                (dict(b='b:42'), dict(fq=['c:(23 42) a:23'])),
+                (dict(b='b:42'), dict(fq=['a:23 c:(23 42)'])),
+            ]
         )
         config.filter_queries = ['a c', 'b']
-        self.assertEqual(
+        self.assertIn(
             optimize(),
-            ({'*': '*:*'}, dict(fq=['a:23 c:(23 42)', 'b:42']))
+            [
+                ({'*': '*:*'}, dict(fq=['c:(23 42) a:23', 'b:42'])),
+                ({'*': '*:*'}, dict(fq=['a:23 c:(23 42)', 'b:42'])),
+            ]
         )
         # for multiple matches the first takes precedence
         config.filter_queries = ['a', 'a c', 'b']
