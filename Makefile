@@ -3,7 +3,7 @@
 SHELL := /bin/bash
 CURRENT_DIR:=$(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 
-version = 3.7
+version = 2.7
 
 # We like colors
 # From: https://coderwall.com/p/izxssa/colored-makefile-for-golang-projects
@@ -27,6 +27,7 @@ update: ## Update Make and Buildout
 	wget -O plone-4.3.x.cfg https://raw.githubusercontent.com/kitconcept/buildout/master/plone-4.3.x.cfg
 	wget -O plone-5.1.x.cfg https://raw.githubusercontent.com/kitconcept/buildout/master/plone-5.1.x.cfg
 	wget -O plone-5.2.x.cfg https://raw.githubusercontent.com/kitconcept/buildout/master/plone-5.2.x.cfg
+	wget -O travis.cfg https://raw.githubusercontent.com/kitconcept/buildout/master/travis.cfg
 	wget -O versions.cfg https://raw.githubusercontent.com/kitconcept/buildout/master/versions.cfg
 
 .installed.cfg: bin/buildout *.cfg
@@ -66,10 +67,11 @@ build-py3:  ## Build Plone 5.2 with Python 3
 	virtualenv --python=python3 .
 	bin/pip install --upgrade pip
 	bin/pip install -r requirements.txt
+	bin/pip install black
 	bin/buildout -c plone-5.2.x.cfg
 
 bin/python bin/pip:
-	python$(version) -m venv .
+	virtualenv --clear --python=python$(version) .
 
 .PHONY: Test
 test:  ## Test
@@ -82,6 +84,14 @@ test-performance:
 .PHONY: Code Analysis
 code-analysis:  ## Code Analysis
 	bin/code-analysis
+
+.PHONY: Build Docs
+docs:  ## Build Docs
+	bin/sphinxbuilder
+
+.PHONY: Test Release
+test-release:  ## Run Pyroma and Check Manifest
+	bin/pyroma -n 10 -d .
 
 .PHONY: Release
 release:  ## Release
