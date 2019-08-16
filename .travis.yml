@@ -6,31 +6,31 @@ cache:
   directories:
     - $HOME/buildout-cache
 matrix:
-  include:
-    - python: 2.7
-      env: PLONE_VERSION=4.3.x SOLR_VERSION=7.4.0 EXTRA_EGGS=collective.indexing
-    - python: 2.7
-      env: PLONE_VERSION=4.3.x SOLR_VERSION=7.5.0 EXTRA_EGGS=collective.indexing
-    - python: 2.7
-      env: PLONE_VERSION=4.3.x SOLR_VERSION=7.6.0 EXTRA_EGGS=collective.indexing
-    - python: 2.7
-      env: PLONE_VERSION=5.1.x SOLR_VERSION=7.4.0 EXTRA_EGGS=
-    - python: 2.7
-      env: PLONE_VERSION=5.1.x SOLR_VERSION=7.5.0 EXTRA_EGGS=
-    - python: 2.7
-      env: PLONE_VERSION=5.1.x SOLR_VERSION=7.6.0 EXTRA_EGGS=
-    - python: 2.7
-      env: PLONE_VERSION=5.2.x SOLR_VERSION=7.4.0 EXTRA_EGGS=
-    - python: 2.7
-      env: PLONE_VERSION=5.2.x SOLR_VERSION=7.5.0 EXTRA_EGGS=
-    - python: 2.7
-      env: PLONE_VERSION=5.2.x SOLR_VERSION=7.6.0 EXTRA_EGGS=
-    - python: 3.7
-      env: PLONE_VERSION=5.2.x SOLR_VERSION=7.4.0 EXTRA_EGGS=
-    - python: 3.7
-      env: PLONE_VERSION=5.2.x SOLR_VERSION=7.5.0 EXTRA_EGGS=
-    - python: 3.7
-      env: PLONE_VERSION=5.2.x SOLR_VERSION=7.6.0 EXTRA_EGGS=
+    include:
+        - python: 2.7
+          env: PLONE_VERSION=4.3.x SOLR_VERSION=7.4.0 EXTRA_EGGS=collective.indexing
+        - python: 2.7
+          env: PLONE_VERSION=4.3.x SOLR_VERSION=7.5.0 EXTRA_EGGS=collective.indexing
+        - python: 2.7
+          env: PLONE_VERSION=4.3.x SOLR_VERSION=7.6.0 EXTRA_EGGS=collective.indexing
+        - python: 2.7
+          env: PLONE_VERSION=5.1.x SOLR_VERSION=7.4.0 EXTRA_EGGS=
+        - python: 2.7
+          env: PLONE_VERSION=5.1.x SOLR_VERSION=7.5.0 EXTRA_EGGS=
+        - python: 2.7
+          env: PLONE_VERSION=5.1.x SOLR_VERSION=7.6.0 EXTRA_EGGS=
+        - python: 2.7
+          env: PLONE_VERSION=5.2.x SOLR_VERSION=7.4.0 EXTRA_EGGS=
+        - python: 2.7
+          env: PLONE_VERSION=5.2.x SOLR_VERSION=7.5.0 EXTRA_EGGS=
+        - python: 2.7
+          env: PLONE_VERSION=5.2.x SOLR_VERSION=7.6.0 EXTRA_EGGS=
+        - python: 3.7
+          env: PLONE_VERSION=5.2.x SOLR_VERSION=7.4.0 EXTRA_EGGS=
+        - python: 3.7
+          env: PLONE_VERSION=5.2.x SOLR_VERSION=7.5.0 EXTRA_EGGS=
+        - python: 3.7
+          env: PLONE_VERSION=5.2.x SOLR_VERSION=7.6.0 EXTRA_EGGS=
 dist: xenial
 addons:
   apt:
@@ -50,14 +50,13 @@ before_install:
   - bin/pip install zest.pocompile
   - bin/pocompile src
 install:
-  - sed -ie "s#plone-.\..\.x\.cfg#plone-$PLONE_VERSION.cfg#" travis.cfg
-  - sed -ie "s#eggs +=#eggs += $EXTRA_EGGS#" travis.cfg
+  - sed -ie "s#plone-.\..\.x\.cfg#plone-$PLONE_VERSION.cfg#" buildout.cfg
+  - sed -ie "s#eggs +=#eggs += $EXTRA_EGGS#" buildout.cfg
   - sed -ie "s#solr/.\..\..#solr/$SOLR_VERSION#" base.cfg
   - sed -ie "s#solr-.\..\..#solr-$SOLR_VERSION#" base.cfg
   - cat base.cfg
   - cat buildout.cfg
-  - cat travis.cfg
-  - bin/buildout -N -t 20 -c travis.cfg
+  - bin/buildout -N -t 20
 script:
   - bin/code-analysis
   - bin/coverage run bin/test
