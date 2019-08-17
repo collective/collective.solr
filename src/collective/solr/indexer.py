@@ -18,9 +18,9 @@ try:
     from Products.Archetypes.CatalogMultiplex import CatalogMultiplex
 except ImportError:
     CatalogMultiplex = None
-try:  # pragma: no cover
+try:  # noqa
     from plone.app.content.interfaces import IIndexableObjectWrapper
-except ImportError:  # pragma: no cover
+except ImportError:  # noqa
     # Plone 5
     from plone.indexer.interfaces import IIndexableObjectWrapper
 from plone.indexer.interfaces import IIndexableObject
