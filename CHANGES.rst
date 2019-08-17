@@ -4,6 +4,9 @@ Changelog
 7.0.0a3 (unreleased)
 --------------------
 
+- Add support for Solr 8.
+  [timo]
+
 - Add support for Python 3.
   [jnns, reinhardt]
 
