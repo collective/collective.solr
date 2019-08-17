@@ -4,7 +4,6 @@ from zope.component.hooks import getSite
 
 
 class ErrorView(BrowserView):
-
     def __init__(self, context, request):
         # since this is a view adapting an exception and a request (instead
         # of a regular content object and a request), the exception object
@@ -18,9 +17,5 @@ class ErrorView(BrowserView):
 
     def errorInfo(self):
         """ provide error type and value """
-        type_ = str(self.exception.__class__).replace(
-            "<class '", '').replace("'>", '')
-        return {
-            'type': type_,
-            'value': self.exception.args,
-        }
+        type_ = str(self.exception.__class__).replace("<class '", "").replace("'>", "")
+        return {"type": type_, "value": self.exception.args}

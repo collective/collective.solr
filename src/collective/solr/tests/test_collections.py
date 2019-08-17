@@ -13,15 +13,17 @@ class CollectionsTestCase(unittest.TestCase):
     layer = LEGACY_COLLECTIVE_SOLR_INTEGRATION_TESTING
 
     def setUp(self):
-        portal = self.portal = self.layer['portal']
-        setRoles(self.portal, TEST_USER_ID, ['Manager'])
+        portal = self.portal = self.layer["portal"]
+        setRoles(self.portal, TEST_USER_ID, ["Manager"])
 
-        id_ = portal.invokeFactory('Collection', id='foo', title='Foo')
+        id_ = portal.invokeFactory("Collection", id="foo", title="Foo")
         collection = self.collection = portal[id_]
         self.query = query = [
-            {'i': 'SearchableText',
-             'o': 'plone.app.querystring.operation.string.contains',
-             'v': 'new'}
+            {
+                "i": "SearchableText",
+                "o": "plone.app.querystring.operation.string.contains",
+                "v": "new",
+            }
         ]
         collection.query = query
         activateAndReindex(portal)
@@ -40,5 +42,5 @@ class CollectionsTestCase(unittest.TestCase):
     def test_render_querybuilder_html_results(self):
         # If it renders, it's good.
         collection = self.collection
-        view = collection.unrestrictedTraverse('@@querybuilder_html_results')
+        view = collection.unrestrictedTraverse("@@querybuilder_html_results")
         view.html_results(self.query)

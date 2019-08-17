@@ -35,8 +35,8 @@ def loadZCMLString(string):
 
 def getData(filename):
     """ return a file object from the test data folder """
-    filename = join(dirname(tests.__file__), 'data', filename)
-    return open(filename, 'rb').read()
+    filename = join(dirname(tests.__file__), "data", filename)
+    return open(filename, "rb").read()
 
 
 def fakehttp(solrconn, *fakedata):
@@ -53,23 +53,24 @@ def fakehttp(solrconn, *fakedata):
 
         def get(self, skip=0):
             self[:] = self[skip:]
-            return b''.join(self.pop(0)).replace(b'\r', b'')
+            return b"".join(self.pop(0)).replace(b"\r", b"")
 
         def new(self):
             self.current = []
             self.append(self.current)
 
         def __len__(self):
-            self.conn.flush()   # send out all pending xml
+            self.conn.flush()  # send out all pending xml
             return super(FakeOutput, self).__len__()
 
         def __str__(self):
-            self.conn.flush()   # send out all pending xml
+            self.conn.flush()  # send out all pending xml
             if self:
-                return ''.join([chunk.decode('utf-8')
-                                for chunk in self[0]]).replace('\r', '')
+                return "".join([chunk.decode("utf-8") for chunk in self[0]]).replace(
+                    "\r", ""
+                )
             else:
-                return ''
+                return ""
 
     output = FakeOutput()
 
@@ -81,20 +82,23 @@ def fakehttp(solrconn, *fakedata):
             output.log(str)
 
         if six.PY2:
+
             def makefile(self, mode, name):
                 return self
+
         else:
+
             def makefile(self, mode):
                 return self
 
         def read(self, amt=None):
             if self.closed:
-                return b''
+                return b""
             return six.BytesIO.read(self, amt)
 
         def readline(self, length=None):
             if self.closed:
-                return b''
+                return b""
             return six.BytesIO.readline(self, length)
 
     class FakeHTTPConnection(HTTPConnection):
@@ -107,9 +111,9 @@ def fakehttp(solrconn, *fakedata):
 
         def putrequest(self, *args, **kw):
             self.url = args[1]
-            response = self.fakedata.pop(0)     # get first response
-            self.sock = FakeSocket(response)    # and set up a fake socket
-            output.new()                        # as well as an output buffer
+            response = self.fakedata.pop(0)  # get first response
+            self.sock = FakeSocket(response)  # and set up a fake socket
+            output.new()  # as well as an output buffer
             HTTPConnection.putrequest(self, *args, **kw)
 
         def setTimeout(self, timeout):
@@ -121,7 +125,7 @@ def fakehttp(solrconn, *fakedata):
 
 def fakemore(solrconn, *fakedata):
     """ helper function to add more fake http requests to a SolrConnection """
-    assert hasattr(solrconn.conn, 'fakedata')   # `isinstance()` doesn't work?
+    assert hasattr(solrconn.conn, "fakedata")  # `isinstance()` doesn't work?
     solrconn.conn.fakedata.extend(fakedata)
 
 
@@ -131,15 +135,15 @@ def fakeServer(actions, port=55555):
         receive the base handler as their only argument and are used to
         process the incoming requests in turn; returns a thread that should
         be 'joined' when done """
-    class Handler(BaseHTTPRequestHandler):
 
+    class Handler(BaseHTTPRequestHandler):
         def do_POST(self):
-            action = actions.pop(0)             # get next action
-            action(self)                        # and process it...
+            action = actions.pop(0)  # get next action
+            action(self)  # and process it...
 
         def do_GET(self):
-            action = actions.pop(0)             # get next action
-            action(self)                        # and process it...
+            action = actions.pop(0)  # get next action
+            action(self)  # and process it...
 
         def log_request(*args, **kw):
             pass
@@ -147,7 +151,8 @@ def fakeServer(actions, port=55555):
     def runner():
         while actions:
             server.handle_request()
-    server = HTTPServer(('', port), Handler)
+
+    server = HTTPServer(("", port), Handler)
     thread = Thread(target=runner)
     thread.start()
     return thread
@@ -155,12 +160,12 @@ def fakeServer(actions, port=55555):
 
 def pingSolr():
     """ test if the solr server is available """
-    status = getLocal('solrStatus')
+    status = getLocal("solrStatus")
     if status is not None:
         return status
-    conn = HTTPConnection('localhost', 8983)
+    conn = HTTPConnection("localhost", 8983)
     try:
-        conn.request('GET', '/solr/plone/admin/ping')
+        conn.request("GET", "/solr/plone/admin/ping")
         response = conn.getresponse()
         status = response.status == 200
         msg = "INFO: solr return status '%s'" % response.status
@@ -169,17 +174,17 @@ def pingSolr():
         msg = 'WARNING: solr tests could not be run: "%s".' % e
     if not status:
         print(file=stderr)
-        print('*' * len(msg), file=stderr)
+        print("*" * len(msg), file=stderr)
         print(msg, file=stderr)
-        print('*' * len(msg), file=stderr)
+        print("*" * len(msg), file=stderr)
         print(file=stderr)
-    setLocal('solrStatus', status)
+    setLocal("solrStatus", status)
     return status
 
 
 def numFound(result):
     if isinstance(result, six.binary_type):
-        result = result.decode('utf-8')
+        result = result.decode("utf-8")
     match = search(r'numFound="(\d+)"', result)
     if match is not None:
         match = int(match.group(1))

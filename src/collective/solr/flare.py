@@ -18,6 +18,7 @@ timezone = DateTime().timezone()
 @implementer(IFlare)
 class PloneFlare(AttrDict):
     """ a sol(a)r brain, i.e. a data container for search results """
+
     adapts(ISolrFlare, IHTTPRequest)
 
     __allow_access_to_unprotected_subobjects__ = True
@@ -25,20 +26,20 @@ class PloneFlare(AttrDict):
     def __init__(self, context, request=None):
         self.context = context
         self.request = request
-        self.update(context)        # copy data
+        self.update(context)  # copy data
 
     @property
     def id(self):
         """ convenience alias """
-        return self.get('id', self.get('getId'))
+        return self.get("id", self.get("getId"))
 
     def getPath(self):
         """ convenience alias """
-        return self['path_string']
+        return self["path_string"]
 
     def getRID(self):
         """Return a record id"""
-        return int(int(self['UID'], 16) % sys.maxsize)
+        return int(int(self["UID"], 16) % sys.maxsize)
 
     def getObject(self, REQUEST=None, restricted=True):
         """ return the actual object corresponding to this flare while
@@ -50,7 +51,7 @@ class PloneFlare(AttrDict):
         path = self.getPath()
         if not path:
             return None
-        path = path.split('/')
+        path = path.split("/")
         if restricted:
             parent = site.unrestrictedTraverse(path[:-1])
             return parent.restrictedTraverse(path[-1])
@@ -66,7 +67,7 @@ class PloneFlare(AttrDict):
         try:
             url = self.request.physicalPathToURL(path, relative)
         except AttributeError:
-            url = path2url(path.split('/'))
+            url = path2url(path.split("/"))
         return url
 
     def pretty_title_or_id(self):
@@ -75,27 +76,27 @@ class PloneFlare(AttrDict):
 
     @property
     def CreationDate(self):
-        created = self.get('created', None)
+        created = self.get("created", None)
         if created is None:
-            return 'n.a.'
+            return "n.a."
         return created.toZone(timezone).ISO8601()
 
     @property
     def ModificationDate(self):
-        modified = self.get('modified', None)
+        modified = self.get("modified", None)
         if modified is None:
-            return 'n.a.'
+            return "n.a."
         return modified.toZone(timezone).ISO8601()
 
     @property
     def data_record_normalized_score_(self):
-        score = self.get('score', None)
+        score = self.get("score", None)
         if score is None:
-            return 'n.a.'
-        return '%.1f' % (float(score) * 100)
+            return "n.a."
+        return "%.1f" % (float(score) * 100)
 
     @property
     def review_state(self):
-        if 'review_state' in self:
-            return self['review_state']
-        return ''
+        if "review_state" in self:
+            return self["review_state"]
+        return ""
