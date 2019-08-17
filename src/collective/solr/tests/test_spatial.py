@@ -15,7 +15,7 @@ from plone.dexterity.content import Item
 from plone.app.testing import TEST_USER_ID
 from plone.app.testing import setRoles
 from transaction import commit
-from zope.interface import implements
+from zope.interface import implementer
 from zope.interface import Interface
 from zope.component import getUtility
 from zope import schema
@@ -32,8 +32,9 @@ class ILocation(Interface):
     )
 
 
+@implementer(ILocation)
 class Location(Item):
-    implements(ILocation)
+    ''' '''
 
 
 class SolrSpatialSearchTests(unittest.TestCase):
@@ -50,10 +51,14 @@ class SolrSpatialSearchTests(unittest.TestCase):
         self.config.required = []
         self.maintenance = self.portal.unrestrictedTraverse('solr-maintenance')
         commit()
+        self.response = self.request.RESPONSE
+        self.write = self.response.write
+        self.response.write = lambda x: x  # temporarily ignore output
         activateAndReindex(self.portal)
 
     def tearDown(self):
         activate(active=False)
+        self.response.write = self.write
 
     def _setUpLocationType(self):
         types_tool = getToolByName(self.portal, 'portal_types')
