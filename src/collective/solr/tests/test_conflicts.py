@@ -8,6 +8,7 @@ from collective.solr.testing import HAS_PAC
 from collective.solr.testing import LEGACY_COLLECTIVE_SOLR_FUNCTIONAL_TESTING
 from plone.app.testing import SITE_OWNER_NAME
 from plone.app.testing import SITE_OWNER_PASSWORD
+
 try:
     from plone.testing.zope import Browser
 except ImportError:
@@ -20,7 +21,9 @@ from zope.lifecycleevent.interfaces import IObjectCreatedEvent
 
 # override IObjectCreatedEvent for AT content
 if not HAS_PAC:
-    from Products.Archetypes.interfaces import IObjectInitializedEvent as IObjectCreatedEvent  # noqa
+    from Products.Archetypes.interfaces import (
+        IObjectInitializedEvent as IObjectCreatedEvent,
+    )  # noqa
 
 
 UIDS = []
@@ -30,7 +33,7 @@ def raise_on_first_add(context, event):
     first = not bool(UIDS)
     UIDS.append(IUUID(context))
     if first:
-        raise ConflictError()   # trigger a retry (once)
+        raise ConflictError()  # trigger a retry (once)
 
 
 class ConflictTests(TestCase):
@@ -38,12 +41,11 @@ class ConflictTests(TestCase):
     layer = LEGACY_COLLECTIVE_SOLR_FUNCTIONAL_TESTING
 
     def setUp(self):
-        activateAndReindex(self.layer['portal'])
+        activateAndReindex(self.layer["portal"])
         commit()
-        self.browser = Browser(self.layer['app'])
+        self.browser = Browser(self.layer["app"])
         self.browser.addHeader(
-            'Authorization',
-            'Basic %s:%s' % (SITE_OWNER_NAME, SITE_OWNER_PASSWORD,)
+            "Authorization", "Basic %s:%s" % (SITE_OWNER_NAME, SITE_OWNER_PASSWORD)
         )
 
     def test_retry_on_conflict(self):
@@ -56,15 +58,13 @@ class ConflictTests(TestCase):
         of data and consequently return two results when searching for this
         particular piece of content later on.
         """
-        self.browser.open(self.layer['portal'].absolute_url())
-        self.browser.getLink('Page').click()
-        self.browser.getControl('Title', index=0).value = 'Foo'
-        component.provideHandler(
-            raise_on_first_add, (Interface, IObjectCreatedEvent,))
-        self.browser.getControl('Save').click()
+        self.browser.open(self.layer["portal"].absolute_url())
+        self.browser.getLink("Page").click()
+        self.browser.getControl("Title", index=0).value = "Foo"
+        component.provideHandler(raise_on_first_add, (Interface, IObjectCreatedEvent))
+        self.browser.getControl("Save").click()
         self.assertEqual(len(UIDS), 2)
-        self.assertEqual(len(solrSearchResults(SearchableText='Foo')), 1)
+        self.assertEqual(len(solrSearchResults(SearchableText="Foo")), 1)
 
         sm = component.getSiteManager()
-        sm.unregisterHandler(
-            raise_on_first_add, (Interface, IObjectCreatedEvent,))
+        sm.unregisterHandler(raise_on_first_add, (Interface, IObjectCreatedEvent))

@@ -25,11 +25,11 @@ class SolrIndexes(object):
             schema = manager.getSchema()
             if schema is not None:
                 for name, info in sorted(schema.items()):
-                    if 'indexed' in info and info.get('indexed', False):
+                    if "indexed" in info and info.get("indexed", False):
                         items.append(name)
         if not items:
             registry = getUtility(IRegistry)
-            items = registry['collective.solr.filter_queries']
+            items = registry["collective.solr.filter_queries"]
         return SimpleVocabulary([SimpleTerm(item) for item in items])
 
 
@@ -47,12 +47,11 @@ class I18NFacetTitles(object):
         title = SolrMessageFactory(term)
         if isinstance(term, six.text_type):
             # Terms must be byte strings
-            term = term.encode('utf8')
+            term = term.encode("utf8")
         return SimpleTerm(value, term, title)
 
 
 @implementer(IFacetTitleVocabularyFactory)
 class I18NFacetTitlesVocabularyFactory(object):
-
     def __call__(self, context):
         return I18NFacetTitles()

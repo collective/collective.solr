@@ -23,7 +23,7 @@ from plone.registry.interfaces import IRegistry
 patchCatalogTool()  # patch catalog tool to use the dispatcher...
 
 
-logger = getLogger('collective.solr.dispatcher')
+logger = getLogger("collective.solr.dispatcher")
 
 
 @implementer(ISearchDispatcher)
@@ -41,7 +41,7 @@ class SearchDispatcher(object):
                 return solrSearchResults(request, **keywords)
             except FallBackException:
                 pass
-        if getattr(aq_base(self.context), '_cs_old_searchResults', None):
+        if getattr(aq_base(self.context), "_cs_old_searchResults", None):
             return self.context._cs_old_searchResults(request, **keywords)
         return ZCatalog.searchResults(self.context, request, **keywords)
 
@@ -52,18 +52,18 @@ def solrSearchResults(request=None, **keywords):
     site = getSite()
     search = queryUtility(ISearch, context=site)
     if search is None:
-        logger.warn('No search utility found in site %s', site)
+        logger.warn("No search utility found in site %s", site)
         raise FallBackException
 
     registry = getUtility(IRegistry)
-    config_required = registry['collective.solr.required']
+    config_required = registry["collective.solr.required"]
 
     if request is None:
         # try to get a request instance, so that flares can be adapted to
         # ploneflares and urls can be converted into absolute ones etc;
         # however, in this case any arguments from the request are ignored
         args = deepcopy(keywords)
-        request = getattr(site, 'REQUEST', None)
+        request = getattr(site, "REQUEST", None)
     elif IHTTPRequest.providedBy(request):
         args = deepcopy(request.form)
         args.update(keywords)  # keywords take precedence
@@ -73,12 +73,12 @@ def solrSearchResults(request=None, **keywords):
         args.update(keywords)  # keywords take precedence
         # if request is a dict, we need the real request in order to
         # be able to adapt to plone flares
-        request = getattr(site, 'REQUEST', args)
+        request = getattr(site, "REQUEST", args)
 
-    if 'path' in args and 'navtree' in args['path']:
-        raise FallBackException     # we can't handle navtree queries yet
+    if "path" in args and "navtree" in args["path"]:
+        raise FallBackException  # we can't handle navtree queries yet
 
-    use_solr = args.get('use_solr', False)  # A special key to force Solr
+    use_solr = args.get("use_solr", False)  # A special key to force Solr
     if not use_solr and config_required:
         required = set(config_required).intersection(args)
         if required:
@@ -108,5 +108,5 @@ def solrSearchResults(request=None, **keywords):
         for missing in set(schema.stored).difference(flare):
             flare[missing] = MV
         results[idx] = wrap(flare)
-    padResults(results, **params)           # pad the batch
+    padResults(results, **params)  # pad the batch
     return response

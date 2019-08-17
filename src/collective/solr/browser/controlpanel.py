@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 from plone.app.registry.browser import controlpanel
+
 try:
     from plone.protect.interfaces import IDisableCSRFProtection
+
     PLONE_PROTECT_INSTALLED = True
 except ImportError:
     PLONE_PROTECT_INSTALLED = False
@@ -15,29 +17,28 @@ from zope.interface import alsoProvides
 class SolrControlPanelForm(controlpanel.RegistryEditForm):
 
     id = "SolrControlPanel"
-    label = _('label_solr_settings', default='Solr settings')
+    label = _("label_solr_settings", default="Solr settings")
     schema = ISolrSchema
     schema_prefix = "collective.solr"
 
-    boost_script_id = 'solr_boost_index_values'
+    boost_script_id = "solr_boost_index_values"
 
     def getContent(self):
         content = super(SolrControlPanelForm, self).getContent()
         portal = self.context
         if self.boost_script_id in portal:
-            boost_script = safe_unicode(
-                portal[self.boost_script_id].read())
+            boost_script = safe_unicode(portal[self.boost_script_id].read())
             # strip script metadata for display
-            content.boost_script = '\n'.join(
-                [l for l in boost_script.splitlines()
-                 if not l.startswith('##')])
+            content.boost_script = "\n".join(
+                [l for l in boost_script.splitlines() if not l.startswith("##")]
+            )
             if PLONE_PROTECT_INSTALLED:
                 alsoProvides(self.request, IDisableCSRFProtection)
         return content
 
     def applyChanges(self, data):
         changes = super(SolrControlPanelForm, self).applyChanges(data)
-        boost_script = data.get('boost_script', '')
+        boost_script = data.get("boost_script", "")
         if "##parameters=data\n" not in boost_script:
             boost_script = "##parameters=data\n" + boost_script
         portal = self.context
@@ -55,4 +56,4 @@ class SolrControlPanelForm(controlpanel.RegistryEditForm):
 class SolrControlPanel(controlpanel.ControlPanelFormWrapper):
 
     form = SolrControlPanelForm
-    index = ViewPageTemplateFile('controlpanel.pt')
+    index = ViewPageTemplateFile("controlpanel.pt")

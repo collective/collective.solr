@@ -19,11 +19,7 @@ def _get_site(app, args):
     # but that does not work with plone.recipe.zope2instance. Using positional
     # arguments therefore is unreliable - resolve to using a flag.
     parser = argparse.ArgumentParser()
-    parser.add_argument(
-        '--plonesite',
-        help='Name of the Plone site',
-        default=None
-    )
+    parser.add_argument("--plonesite", help="Name of the Plone site", default=None)
     namespace, unused = parser.parse_known_args(args)
     name = namespace.plonesite
     if name is not None:
@@ -32,6 +28,7 @@ def _get_site(app, args):
             sys.exit(1)
     else:
         from Products.CMFPlone.Portal import PloneSite
+
         for k, v in app.items():
             if isinstance(v, PloneSite):
                 name = k
@@ -48,7 +45,7 @@ def _get_site(app, args):
 def _solr_connection():
     manager = queryUtility(ISolrConnectionManager)
     conn = manager.getConnection()
-    logger.info('Opened Solr connection to %s' % conn.host)
+    logger.info("Opened Solr connection to %s" % conn.host)
     return conn
 
 
@@ -60,7 +57,7 @@ def solr_clear_index(app, args):
     """
     _get_site(app, args)  # calls setSite so queryUtility works
     conn = _solr_connection()
-    conn.deleteByQuery('[* TO *]')
+    conn.deleteByQuery("[* TO *]")
     conn.commit(optimize=True)
     conn.close()
 
@@ -75,12 +72,12 @@ def solr_reindex(app, args):
     site = makerequest(_get_site(app, args))
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        '--ignore_exceptions',
-        help='Ignore exceptions during reindexing (yes/no)',
-        choices=['yes', 'no'],
-        default='yes'
+        "--ignore_exceptions",
+        help="Ignore exceptions during reindexing (yes/no)",
+        choices=["yes", "no"],
+        default="yes",
     )
     namespace, unused = parser.parse_known_args(args)
-    ignore_exceptions = namespace.ignore_exceptions == 'yes'
+    ignore_exceptions = namespace.ignore_exceptions == "yes"
     mv = SolrMaintenanceView(site, site.REQUEST)
     mv.reindex(ignore_exceptions=ignore_exceptions)

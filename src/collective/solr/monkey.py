@@ -12,11 +12,11 @@ from collective.solr.interfaces import ISearchDispatcher
 def searchResults(self, REQUEST=None, **kw):
     """ based on the version in `CMFPlone/CatalogTool.py` """
     kw = kw.copy()
-    only_active = not kw.get('show_inactive', False)
+    only_active = not kw.get("show_inactive", False)
     user = _getAuthenticatedUser(self)
-    kw['allowedRolesAndUsers'] = self._listAllowedRolesAndUsers(user)
+    kw["allowedRolesAndUsers"] = self._listAllowedRolesAndUsers(user)
     if only_active and not _checkPermission(AccessInactivePortalContent, self):
-        kw['effectiveRange'] = DateTime()
+        kw["effectiveRange"] = DateTime()
 
     adapter = queryAdapter(self, ISearchDispatcher)
     if adapter is not None:
