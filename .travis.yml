@@ -6,31 +6,23 @@ cache:
   directories:
     - $HOME/buildout-cache
 matrix:
-    include:
-        - python: 2.7
-          env: PLONE_VERSION=4.3.x SOLR_VERSION=7.4.0 EXTRA_EGGS=collective.indexing
-        - python: 2.7
-          env: PLONE_VERSION=4.3.x SOLR_VERSION=7.5.0 EXTRA_EGGS=collective.indexing
-        - python: 2.7
-          env: PLONE_VERSION=4.3.x SOLR_VERSION=7.6.0 EXTRA_EGGS=collective.indexing
-        - python: 2.7
-          env: PLONE_VERSION=5.1.x SOLR_VERSION=7.4.0 EXTRA_EGGS=
-        - python: 2.7
-          env: PLONE_VERSION=5.1.x SOLR_VERSION=7.5.0 EXTRA_EGGS=
-        - python: 2.7
-          env: PLONE_VERSION=5.1.x SOLR_VERSION=7.6.0 EXTRA_EGGS=
-        - python: 2.7
-          env: PLONE_VERSION=5.2.x SOLR_VERSION=7.4.0 EXTRA_EGGS=
-        - python: 2.7
-          env: PLONE_VERSION=5.2.x SOLR_VERSION=7.5.0 EXTRA_EGGS=
-        - python: 2.7
-          env: PLONE_VERSION=5.2.x SOLR_VERSION=7.6.0 EXTRA_EGGS=
-        - python: 3.7
-          env: PLONE_VERSION=5.2.x SOLR_VERSION=7.4.0 EXTRA_EGGS=
-        - python: 3.7
-          env: PLONE_VERSION=5.2.x SOLR_VERSION=7.5.0 EXTRA_EGGS=
-        - python: 3.7
-          env: PLONE_VERSION=5.2.x SOLR_VERSION=7.6.0 EXTRA_EGGS=
+  include:
+    - python: 2.7
+      env: PLONE_VERSION=4.3.x SOLR_VERSION=7.7.2 EXTRA_EGGS=collective.indexing
+    - python: 2.7
+      env: PLONE_VERSION=4.3.x SOLR_VERSION=8.2.0 EXTRA_EGGS=collective.indexing
+    - python: 2.7
+      env: PLONE_VERSION=5.1.x SOLR_VERSION=7.7.2 EXTRA_EGGS=
+    - python: 2.7
+      env: PLONE_VERSION=5.1.x SOLR_VERSION=8.2.0 EXTRA_EGGS=
+    - python: 2.7
+      env: PLONE_VERSION=5.2.x SOLR_VERSION=7.7.2 EXTRA_EGGS=
+    - python: 2.7
+      env: PLONE_VERSION=5.2.x SOLR_VERSION=8.2.0 EXTRA_EGGS=
+    - python: 3.7
+      env: PLONE_VERSION=5.2.x SOLR_VERSION=7.7.2 EXTRA_EGGS=
+    - python: 3.7
+      env: PLONE_VERSION=5.2.x SOLR_VERSION=8.2.0 EXTRA_EGGS=
 dist: xenial
 addons:
   apt:

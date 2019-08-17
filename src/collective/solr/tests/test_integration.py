@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from Products.CMFCore.utils import getToolByName
+
 try:
     from Products.CMFCore.interfaces import IIndexQueueProcessor
 except ImportError:
@@ -18,6 +19,7 @@ from collective.solr.tests.utils import getData
 from collective.solr.utils import getConfig
 from plone.app.testing import TEST_USER_ID
 from plone.app.testing import setRoles
+
 # from socket import error
 # from socket import timeout
 # from time import sleep
@@ -38,27 +40,28 @@ class UtilityTests(TestCase):
     layer = LEGACY_COLLECTIVE_SOLR_FUNCTIONAL_TESTING
 
     def testGenericInterface(self):
-        proc = queryUtility(IIndexQueueProcessor, name='solr')
-        self.assertTrue(proc, 'utility not found')
+        proc = queryUtility(IIndexQueueProcessor, name="solr")
+        self.assertTrue(proc, "utility not found")
         self.assertTrue(IIndexQueueProcessor.providedBy(proc))
         self.assertTrue(ISolrIndexQueueProcessor.providedBy(proc))
 
     def testSolrInterface(self):
-        proc = queryUtility(ISolrIndexQueueProcessor, name='solr')
-        self.assertTrue(proc, 'utility not found')
+        proc = queryUtility(ISolrIndexQueueProcessor, name="solr")
+        self.assertTrue(proc, "utility not found")
         self.assertTrue(IIndexQueueProcessor.providedBy(proc))
         self.assertTrue(ISolrIndexQueueProcessor.providedBy(proc))
 
     def testRegisteredProcessors(self):
         procs = list(getUtilitiesFor(IIndexQueueProcessor))
-        self.assertTrue(procs, 'no utilities found')
-        solr = queryUtility(ISolrIndexQueueProcessor, name='solr')
-        self.assertTrue(solr in [util for name, util in procs],
-                        'solr utility not found')
+        self.assertTrue(procs, "no utilities found")
+        solr = queryUtility(ISolrIndexQueueProcessor, name="solr")
+        self.assertTrue(
+            solr in [util for name, util in procs], "solr utility not found"
+        )
 
     def testSearchInterface(self):
         search = queryUtility(ISearch)
-        self.assertTrue(search, 'search utility not found')
+        self.assertTrue(search, "search utility not found")
         self.assertTrue(ISearch.providedBy(search))
 
 
@@ -71,18 +74,16 @@ class QueryManglerTests(TestCase):
         search = queryUtility(ISearch)
         schema = search.getManager().getSchema() or {}
         # first test the default setting, i.e. not removing the user
-        keywords = dict(allowedRolesAndUsers=['Member', 'user$test_user_1_'])
+        keywords = dict(allowedRolesAndUsers=["Member", "user$test_user_1_"])
         mangleQuery(keywords, config, schema)
-        self.assertEqual(keywords, {
-            'allowedRolesAndUsers': ['Member', 'user$test_user_1_'],
-        })
+        self.assertEqual(
+            keywords, {"allowedRolesAndUsers": ["Member", "user$test_user_1_"]}
+        )
         # now let's remove it...
         config.exclude_user = True
-        keywords = dict(allowedRolesAndUsers=['Member', 'user$test_user_1_'])
+        keywords = dict(allowedRolesAndUsers=["Member", "user$test_user_1_"])
         mangleQuery(keywords, config, schema)
-        self.assertEqual(keywords, {
-            'allowedRolesAndUsers': ['Member'],
-        })
+        self.assertEqual(keywords, {"allowedRolesAndUsers": ["Member"]})
 
 
 class IndexingTests(TestCase):
@@ -90,18 +91,21 @@ class IndexingTests(TestCase):
     layer = LEGACY_COLLECTIVE_SOLR_FUNCTIONAL_TESTING
 
     def setUp(self):
-        replies = (getData('plone_schema.xml'), getData('add_response.txt'),
-                   getData('add_response.txt'),
-                   getData('add_response.txt'),
-                   getData('commit_response.txt'))
+        replies = (
+            getData("plone_schema.xml"),
+            getData("add_response.txt"),
+            getData("add_response.txt"),
+            getData("add_response.txt"),
+            getData("commit_response.txt"),
+        )
         self.proc = queryUtility(ISolrConnectionManager)
         self.proc.setHost(active=True)
         conn = self.proc.getConnection()
-        fakehttp(conn, *replies)              # fake schema response
-        self.proc.getSchema()               # read and cache the schema
-        self.portal = self.layer['portal']
-        setRoles(self.portal, TEST_USER_ID, ['Manager'])
-        self.portal.invokeFactory('Folder', id='folder')
+        fakehttp(conn, *replies)  # fake schema response
+        self.proc.getSchema()  # read and cache the schema
+        self.portal = self.layer["portal"]
+        setRoles(self.portal, TEST_USER_ID, ["Manager"])
+        self.portal.invokeFactory("Folder", id="folder")
         self.folder = self.portal.folder
         commit()
 
@@ -117,28 +121,27 @@ class IndexingTests(TestCase):
         connection = self.proc.getConnection()
         connection.get_schema()  # cache schema to avoid multiple calls
 
-        responses = (getData('plone_schema.xml'),
-                     getData('commit_response.txt'))
-        output = fakehttp(connection, *responses)           # fake responses
-        self.folder.title = 'Foo'
-        self.portal.invokeFactory('Folder', id='myfolder', title='Foo')
-        self.assertEqual(str(output), '', 'reindexed unqueued!')
-        commit()                        # indexing happens on commit
+        responses = (getData("plone_schema.xml"), getData("commit_response.txt"))
+        output = fakehttp(connection, *responses)  # fake responses
+        self.folder.title = "Foo"
+        self.portal.invokeFactory("Folder", id="myfolder", title="Foo")
+        self.assertEqual(str(output), "", "reindexed unqueued!")
+        commit()  # indexing happens on commit
         required = '<field name="Title" update="set">Foo</field>'
-        self.assertTrue(str(output).find(required) > 0,
-                        '"title" data not found')
+        self.assertTrue(str(output).find(required) > 0, '"title" data not found')
 
     def testNoIndexingForNonCatalogAwareContent(self):
         output = []
         connection = self.proc.getConnection()
-        responses = [getData('dummy_response.txt')] * 42    # set up enough...
-        output = fakehttp(connection, *responses)           # fake responses
+        responses = [getData("dummy_response.txt")] * 42  # set up enough...
+        output = fakehttp(connection, *responses)  # fake responses
         notify(ObjectModifiedEvent(self.folder))
-        self.portal.invokeFactory('Folder', id='myfolder', title='Foo')
-        commit()                        # indexing happens on commit
-        self.assertNotEqual(repr(output).find('Foo'), -1, 'title not found')
-        self.assertEqual(repr(output).find('at_references'), -1,
-                         '`at_references` found?')
+        self.portal.invokeFactory("Folder", id="myfolder", title="Foo")
+        commit()  # indexing happens on commit
+        self.assertNotEqual(repr(output).find("Foo"), -1, "title not found")
+        self.assertEqual(
+            repr(output).find("at_references"), -1, "`at_references` found?"
+        )
 
 
 class SiteSearchTests(TestCase):
@@ -146,7 +149,7 @@ class SiteSearchTests(TestCase):
     layer = LEGACY_COLLECTIVE_SOLR_FUNCTIONAL_TESTING
 
     def setUp(self):
-        self.portal = self.layer['portal']
+        self.portal = self.layer["portal"]
 
     def tearDown(self):
         # resetting the solr configuration after each test isn't strictly
@@ -157,7 +160,8 @@ class SiteSearchTests(TestCase):
 
     def testInactiveException(self):
         search = queryUtility(ISearch)
-        self.assertRaises(SolrInactiveException, search, 'foo')
+        self.assertRaises(SolrInactiveException, search, "foo")
+
 
 #    def testSearchWithoutServer(self):
 #        config = getConfig()
@@ -217,17 +221,21 @@ class ZCMLSetupTests(TestCase):
 
     def testConnectionConfigurationViaZCML(self):
         import collective.solr
-        context = xmlconfig.file('meta.zcml', collective.solr)
-        xmlconfig.string('''
+
+        context = xmlconfig.file("meta.zcml", collective.solr)
+        xmlconfig.string(
+            """
             <configure xmlns:solr="http://namespaces.plone.org/solr">
                 <solr:connection host="127.0.0.23" port="3898" base="/foo" />
             </configure>
-        ''', context=context)
+        """,
+            context=context,
+        )
         manager = queryUtility(ISolrConnectionManager)
-        manager.setHost(active=True)        # also clears connection cache
+        manager.setHost(active=True)  # also clears connection cache
         connection = manager.getConnection()
-        self.assertEqual(connection.host, '127.0.0.23:3898')
-        self.assertEqual(connection.solrBase, '/foo')
+        self.assertEqual(connection.host, "127.0.0.23:3898")
+        self.assertEqual(connection.solrBase, "/foo")
 
 
 class SiteSetupTests(TestCase):
@@ -235,20 +243,21 @@ class SiteSetupTests(TestCase):
     layer = LEGACY_COLLECTIVE_SOLR_FUNCTIONAL_TESTING
 
     def setUp(self):
-        self.portal = self.layer['portal']
+        self.portal = self.layer["portal"]
 
-    @unittest.skipIf(HAS_PAC, 'Plone 4 Only')
+    @unittest.skipIf(HAS_PAC, "Plone 4 Only")
     def testBrowserResourcesPlone4(self):
         cssreg = getToolByName(self.portal, "portal_css")
         self.assertTrue(
             cssreg.getResource(
-                '++resource++collective.solr.resources/style.css'
+                "++resource++collective.solr.resources/style.css"
             ).getEnabled()
         )
 
     def testTranslation(self):
-        utrans = getToolByName(self.portal, 'translation_service').utranslate
+        utrans = getToolByName(self.portal, "translation_service").utranslate
 
         def translate(msg):
-            return utrans(msgid=msg, domain='solr')
-        self.assertEqual(translate('portal_type'), u'Content type')
+            return utrans(msgid=msg, domain="solr")
+
+        self.assertEqual(translate("portal_type"), u"Content type")

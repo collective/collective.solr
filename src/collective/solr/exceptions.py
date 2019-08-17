@@ -19,15 +19,17 @@ class FallBackException(SolrException):
 class SolrConnectionException(SolrException):
     """An exception thrown by solr connections"""
 
-    def __init__(self, httpcode='000', reason=None, body=None):
+    def __init__(self, httpcode="000", reason=None, body=None):
         self.httpcode = httpcode
         self.reason = reason
         self.body = body
 
     def __repr__(self):
-        return 'HTTP code=%s, Reason=%s, body=%s' % (
-            self.httpcode, self.reason, self.body
+        return "HTTP code=%s, Reason=%s, body=%s" % (
+            self.httpcode,
+            self.reason,
+            self.body,
         )
 
     def __str__(self):
-        return 'HTTP code=%s, reason=%s' % (self.httpcode, self.reason)
+        return "HTTP code=%s, reason=%s" % (self.httpcode, self.reason)
