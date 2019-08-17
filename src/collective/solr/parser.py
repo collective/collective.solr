@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
 from DateTime import DateTime
+
 try:
     from ZTUtils.Lazy import Lazy
     from ZTUtils.Lazy import _marker
@@ -41,52 +42,47 @@ class SolrResults(list):
 def parseDate(value):
     """ use `DateTime` to parse a date, but take care of solr 1.4
         stripping away leading zeros for the year representation """
-    if value.find('-') < 4:
-        year, rest = value.split('-', 1)
-        value = '%04d-%s' % (int(year), rest)
+    if value.find("-") < 4:
+        year, rest = value.split("-", 1)
+        value = "%04d-%s" % (int(year), rest)
     return DateTime(value)
 
 
 def parse_date_as_datetime(value):
-    if value.find('-') < 4:
-        year, rest = value.split('-', 1)
-        value = '%04d-%s' % (int(year), rest)
-    format = '%Y-%m-%dT%H:%M:%S'
-    if '.' in value:
-        format += '.%fZ'
+    if value.find("-") < 4:
+        year, rest = value.split("-", 1)
+        value = "%04d-%s" % (int(year), rest)
+    format = "%Y-%m-%dT%H:%M:%S"
+    if "." in value:
+        format += ".%fZ"
     else:
-        format += 'Z'
+        format += "Z"
     return datetime.strptime(value, format)
 
 
 # unmarshallers for basic types
 unmarshallers = {
-    'null': lambda x: None,
-    'int': int,
-    'float': float,
-    'double': float,
-    'long': int,
-    'bool': lambda x: x == 'true',
-    'str': lambda x: x or '',
-    'date': parseDate,
+    "null": lambda x: None,
+    "int": int,
+    "float": float,
+    "double": float,
+    "long": int,
+    "bool": lambda x: x == "true",
+    "str": lambda x: x or "",
+    "date": parseDate,
 }
 
 # nesting tags along with their factories
-nested = {
-    'arr': list,
-    'lst': dict,
-    'result': SolrResults,
-    'doc': SolrFlare,
-}
+nested = {"arr": list, "lst": dict, "result": SolrResults, "doc": SolrFlare}
 
 
 def setter(item, name, value):
     """ sets the named value on item respecting its type """
     if isinstance(item, list):
-        item.append(value)      # name is ignored for lists
+        item.append(value)  # name is ignored for lists
     elif isinstance(item, dict):
         item[name] = value
-    else:                       # object is assumed...
+    else:  # object is assumed...
         setattr(item, name, value)
 
 
@@ -103,43 +99,43 @@ class SolrResponse(Lazy):
     def parse(self, data):
         """ parse a solr response contained in a string or file-like object """
         if isinstance(data, six.text_type):
-            data = data.encode('utf-8')
+            data = data.encode("utf-8")
         if isinstance(data, six.binary_type):
             data = six.BytesIO(data)
-        stack = [self]      # the response object is the outmost container
-        elements = iterparse(data, events=('start', 'end'))
+        stack = [self]  # the response object is the outmost container
+        elements = iterparse(data, events=("start", "end"))
         for action, elem in elements:
             tag = elem.tag
-            if action == 'start':
+            if action == "start":
                 if tag in nested:
                     data = nested[tag]()
                     for key, value in elem.attrib.items():
-                        if not key == 'name':   # set extra attributes
+                        if not key == "name":  # set extra attributes
                             if isinstance(key, six.binary_type):
-                                key = key.decode('utf-8')
+                                key = key.decode("utf-8")
                             if isinstance(value, six.binary_type):
-                                value = value.decode('utf-8')
+                                value = value.decode("utf-8")
                             setattr(data, key, value)
                     stack.append(data)
-            elif action == 'end':
+            elif action == "end":
                 if tag in nested:
                     data = stack.pop()
-                    setter(stack[-1], elem.get('name'), data)
+                    setter(stack[-1], elem.get("name"), data)
                 elif tag in self.unmarshallers:
                     data = self.unmarshallers[tag](elem.text)
-                    setter(stack[-1], elem.get('name'), data)
+                    setter(stack[-1], elem.get("name"), data)
         return self
 
     def results(self):
         """ return only the list of results, i.e. a `SolrResults` instance """
-        return getattr(self, 'response', [])
+        return getattr(self, "response", [])
 
     @property
     def actual_result_count(self):
         """
         return the actual_result_count
         """
-        if getattr(self, 'response', None):
+        if getattr(self, "response", None):
             return int(self.response.numFound)
         return 0
 
@@ -157,8 +153,8 @@ class SolrField(AttrDict):
     """ a schema field representation """
 
     def __init__(self, *args, **kw):
-        self['required'] = False
-        self['multiValued'] = False
+        self["required"] = False
+        self["multiValued"] = False
         super(SolrField, self).__init__(*args, **kw)
 
 
@@ -191,25 +187,25 @@ class SolrSchema(AttrDict):
             search and indexing queries later on """
         if isinstance(data, six.string_types):
             data = six.StringIO(data)
-        self['requiredFields'] = required = []
+        self["requiredFields"] = required = []
         types = {}
         for action, elem in iterparse(data):
-            name = elem.get('name')
-            if elem.tag == 'fieldType':
+            name = elem.get("name")
+            if elem.tag == "fieldType":
                 types[name] = elem.attrib
-            elif elem.tag == 'field':
-                field = SolrField(types[elem.get('type')])
+            elif elem.tag == "field":
+                field = SolrField(types[elem.get("type")])
                 field.update(elem.attrib)
-                field['class_'] = field['class']    # `.class` will not work
-                for key, value in field.items():    # convert to `bool`s
-                    if value in ('true', 'false'):
-                        field[key] = value == 'true'
+                field["class_"] = field["class"]  # `.class` will not work
+                for key, value in field.items():  # convert to `bool`s
+                    if value in ("true", "false"):
+                        field[key] = value == "true"
                 self[name] = field
-                if field.get('required', False):
+                if field.get("required", False):
                     required.append(name)
-            elif elem.tag in ('uniqueKey', 'defaultSearchField'):
+            elif elem.tag in ("uniqueKey", "defaultSearchField"):
                 self[elem.tag] = elem.text
-            elif elem.tag == 'solrQueryParser':
+            elif elem.tag == "solrQueryParser":
                 self[elem.tag] = AttrStr(elem.text, **elem.attrib)
 
     @property

@@ -4,11 +4,18 @@ Changelog
 7.0.0a3 (unreleased)
 --------------------
 
+- Add support for Solr 8.
+  [timo]
+
 - Add support for Python 3.
   [jnns, reinhardt]
 
 - Don't use collective.indexing if Plone>=5.1, Products.CMFCore provides all its functionality.
   [jnns]
+
+- Revert "Index comments" from 7.0.0a2 release.
+  [timo]
+
 
 7.0.0a2 (2019-03-21)
 --------------------

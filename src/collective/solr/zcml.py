@@ -31,6 +31,8 @@ class ISolrConnectionConfigDirective(Interface):
 
 def solrConnectionConfigDirective(_context, host, port, base):
 
-    utility(_context,
-            provides=IZCMLSolrConnectionConfig,
-            component=ZCMLSolrConnectionConfig(host, port, base))
+    utility(
+        _context,
+        provides=IZCMLSolrConnectionConfig,
+        component=ZCMLSolrConnectionConfig(host, port, base),
+    )

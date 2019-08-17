@@ -18,25 +18,25 @@ from collective.solr import SolrMessageFactory as _
 
 @indexer(IBaseObject)
 def searchwords(obj):
-    field = obj.getField('searchwords')
+    field = obj.getField("searchwords")
     if field is None:
         raise AttributeError
     words = field.get(obj)
-    words = [w.strip('\r ').decode('utf-8') for w in words.split('\n')]
+    words = [w.strip("\r ").decode("utf-8") for w in words.split("\n")]
     return tuple([w for w in words if w])
 
 
 @indexer(Interface)
 def showinsearch(obj):
     # if the object is a dexterity object, check for the showinsearch attribute
-    if getattr(aq_base(obj), 'showinsearch', True) is False:
+    if getattr(aq_base(obj), "showinsearch", True) is False:
         return obj.showinsearch
     # if the object isn't an Archetype, it should be included
-    getField = getattr(aq_base(obj), 'getField', None)
+    getField = getattr(aq_base(obj), "getField", None)
     if getField is None:
         return True
     # if the object doesn't have the field, it should be included
-    field = obj.getField('showinsearch')
+    field = obj.getField("showinsearch")
     if field is None:
         return True
     value = field.get(obj)
@@ -63,32 +63,31 @@ class SearchExtender(object):
 
     _fields = [
         ExtensionBooleanField(
-            'showinsearch',
+            "showinsearch",
             languageIndependent=True,
-            schemata='settings',
+            schemata="settings",
             default=True,
             widget=BooleanWidget(
-                label=_('label_showinsearch', default=u"Show in search"),
+                label=_("label_showinsearch", default=u"Show in search"),
                 visible={"edit": "visible", "view": "invisible"},
                 description="",
-            )
+            ),
         ),
-
         ExtentionTextField(
-            'searchwords',
+            "searchwords",
             searchable=True,
-            schemata='settings',
+            schemata="settings",
             languageIndependent=False,
             widget=TextAreaWidget(
-                label=_('label_searchwords', default=u"Search words"),
+                label=_("label_searchwords", default=u"Search words"),
                 description=_(
-                    'help_searchwords',
+                    "help_searchwords",
                     u"Specify words for which this item will show up "
                     u"as the first search result. Multiple words can be "
-                    u"specified on new lines."
+                    u"specified on new lines.",
                 ),
                 visible={"edit": "visible", "view": "invisible"},
-            )
+            ),
         ),
     ]
 

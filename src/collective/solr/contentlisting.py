@@ -13,7 +13,6 @@ from zope.interface import implementer
 
 @implementer(IContentListingObject)
 class FlareContentListingObject(object):
-
     def __init__(self, flare):
         self.flare = flare
 
@@ -33,15 +32,15 @@ class FlareContentListingObject(object):
         return self.flare.getURL(relative)
 
     def uuid(self):
-        if 'UID' in self.flare:
+        if "UID" in self.flare:
             return self.flare.UID
         else:
             return IUUID(self.getObject())
 
     def getIcon(self):
         return getMultiAdapter(
-            (self.getObject(), getRequest(), self.flare),
-            interface=IContentIcon)()
+            (self.getObject(), getRequest(), self.flare), interface=IContentIcon
+        )()
 
     def getSize(self):
         return self.flare.getObjSize
@@ -106,8 +105,7 @@ class FlareContentListingObject(object):
         return self.flare.Type
 
     def ContentTypeClass(self):
-        return "contenttype-" + getUtility(IIDNormalizer).normalize(
-            self.PortalType())
+        return "contenttype-" + getUtility(IIDNormalizer).normalize(self.PortalType())
 
     def PortalType(self):
         return self.flare.portal_type
@@ -117,31 +115,31 @@ class FlareContentListingObject(object):
 
     def getUserData(self, username):
         request = getRequest()
-        _usercache = request.get('usercache', None)
+        _usercache = request.get("usercache", None)
         if _usercache is None:
-            request.set('usercache', {})
+            request.set("usercache", {})
             _usercache = {}
         userdata = _usercache.get(username, None)
         if userdata is None:
-            membershiptool = api.portal.get_tool('portal_membership')
+            membershiptool = api.portal.get_tool("portal_membership")
             userdata = membershiptool.getMemberInfo(self.Creator())
             if not userdata:
                 userdata = {
-                    'username': username,
-                    'description': '',
-                    'language': '',
+                    "username": username,
+                    "description": "",
+                    "language": "",
                     # TODO
                     # string:${navigation_root_url}/author/${item_creator}
-                    'home_page': '/HOMEPAGEURL',
-                    'location': '',
-                    'fullname': username
+                    "home_page": "/HOMEPAGEURL",
+                    "location": "",
+                    "fullname": username,
                 }
             request.usercache[username] = userdata
         return userdata
 
     def CroppedDescription(self):
         registry = getUtility(IRegistry)
-        length = registry.get('plone.search_results_description_length')
+        length = registry.get("plone.search_results_description_length")
         plone_view = PloneView(None, None)
         if not length or not isinstance(length, int):
             # fallback if registry key is None
