@@ -24,7 +24,7 @@ class QuoteTests(TestCase):
         self.assertEqual(quote("foo bar"), "(foo bar)")
         self.assertEqual(quote('"foo bar" bah'), '("foo bar" bah)')
         self.assertEqual(quote("\\["), "\\[")
-        self.assertEqual(quote(")"), "\)")
+        self.assertEqual(quote(")"), r"\)")
         self.assertEqual(quote('"(foo bar)" bah'), '("\\(foo bar\\)" bah)')
         self.assertEqual(quote('"(foo\\"bar)" bah'), '("\\(foo\\"bar\\)" bah)')
         self.assertEqual(quote('"foo bar"'), '"foo bar"')
@@ -36,23 +36,23 @@ class QuoteTests(TestCase):
         self.assertEqual(quote("{}"), "")
         self.assertEqual(quote('...""'), '...\\"\\"')
         self.assertEqual(quote("\\"), "\\\\")  # Search for \ has to be quoted
-        self.assertEqual(quote("\?"), "\?")
+        self.assertEqual(quote(r"\?"), r"\?")
         self.assertEqual(quote("john@foo.com"), "john@foo.com")
         self.assertEqual(
-            quote("http://machine/folder and item and some/path " "and and amilli3*"),
-            "(http\:\\/\\/machine\\/folder and item and "
-            "some\\/path and and amilli3*)",
+            quote(r"http://machine/folder and item and some/path " "and and amilli3*"),
+            r"(http\:\\/\\/machine\\/folder and item and "
+            r"some\\/path and and amilli3*)",
         )
-        self.assertEqual(quote('"[]"'), '"\[\]"')
-        self.assertEqual(quote('"{}"'), '"\{\}"')
-        self.assertEqual(quote('"()"'), '"\(\)"')
+        self.assertEqual(quote(r'"[]"'), r'"\[\]"')
+        self.assertEqual(quote(r'"{}"'), r'"\{\}"')
+        self.assertEqual(quote(r'"()"'), r'"\(\)"')
         self.assertEqual(quote('foo and bar and 42"*'), "(foo and bar and " '42\\"\\*)')
         # Can't use ? or * as beginning of new query
         self.assertEqual(quote('"fix and it"*'), '"fix and it"')
         self.assertEqual(quote('"fix and it"?'), '"fix and it"')
         self.assertEqual(
-            quote("foo and bar and [foobar at foo.com]*"),
-            "(foo and bar and \[foobar at foo.com\])",
+            quote(r"foo and bar and [foobar at foo.com]*"),
+            r"(foo and bar and \[foobar at foo.com\])",
         )
 
     def testQuotingWildcardSearches(self):
@@ -148,21 +148,21 @@ class QuoteTests(TestCase):
         self.assertEqual(quote('"(/ OR x)"'), '"\\(\\/ OR x\\)"')
 
     def testUnicode(self):
-        self.assertEqual(quote("foø"), b"fo\xc3\xb8".decode("utf-8"))
-        self.assertEqual(quote('"foø'), b'\\"fo\xc3\xb8'.decode("utf-8"))
-        self.assertEqual(quote("whät?"), b"wh\xc3\xa4t?".decode("utf-8"))
-        self.assertEqual(quote('"whät?"'), b'"wh\xc3\xa4t\?"'.decode("utf-8"))
-        self.assertEqual(quote('"[ø]"'), b'"\[\xc3\xb8\]"'.decode("utf-8"))
-        self.assertEqual(quote("[ø]"), b"\\[\xc3\xb8\\]".decode("utf-8"))
-        self.assertEqual(quote('"foø*"'), b'"fo\xc3\xb8\*"'.decode("utf-8"))
-        self.assertEqual(quote('"foø bar?"'), b'"fo\xc3\xb8 bar\?"'.decode("utf-8"))
+        self.assertEqual(quote(r"foø"), b"fo\xc3\xb8".decode("utf-8"))
+        self.assertEqual(quote(r'"foø'), b'\\"fo\xc3\xb8'.decode("utf-8"))
+        self.assertEqual(quote(r"whät?"), b"wh\xc3\xa4t?".decode("utf-8"))
+        self.assertEqual(quote(r'"whät?"'), b'"wh\xc3\xa4t\?"'.decode("utf-8"))
+        self.assertEqual(quote(r'"[ø]"'), b'"\[\xc3\xb8\]"'.decode("utf-8"))
+        self.assertEqual(quote(r"[ø]"), b"\\[\xc3\xb8\\]".decode("utf-8"))
+        self.assertEqual(quote(r'"foø*"'), b'"fo\xc3\xb8\*"'.decode("utf-8"))
+        self.assertEqual(quote(r'"foø bar?"'), r'"fo\xc3\xb8 bar\?"'.decode("utf-8"))
         self.assertEqual(quote(u"john@foo.com"), "john@foo.com")
 
     def testSolrSpecifics(self):
         # http://wiki.apache.org/solr/SolrQuerySyntax
         # Seems to be ok to quote function
         self.assertEqual(
-            quote('"recip(rord(myfield),1,2,3)"'), '"recip\(rord\(myfield\),1,2,3\)"'
+            quote(r'"recip(rord(myfield),1,2,3)"'), r'"recip\(rord\(myfield\),1,2,3\)"'
         )
         self.assertEqual(quote("[* TO NOW]"), "[* TO NOW]")
         self.assertEqual(
@@ -282,33 +282,33 @@ class QueryTests(TestCase):
         bq = self.bq
         self.assertEqual(bq('"foo"'), '+"foo"')
         self.assertEqual(bq("foo"), "+foo")
-        self.assertEqual(bq('"foo*"'), '+"foo\*"')
+        self.assertEqual(bq('"foo*"'), r'+"foo\*"')
         self.assertEqual(bq("foo*"), "+foo*")
-        self.assertEqual(bq('"+foo"'), '+"\+foo"')
+        self.assertEqual(bq('"+foo"'), r'+"\+foo"')
         self.assertEqual(bq("+foo"), "+foo")
         self.assertEqual(bq('"foo bar"'), '+"foo bar"')
         self.assertEqual(bq("foo bar"), "+(foo bar)")
-        self.assertEqual(bq('"foo bar?"'), '+"foo bar\?"')
+        self.assertEqual(bq('"foo bar?"'), r'+"foo bar\?"')
         self.assertEqual(bq("foo bar?"), "+(foo bar?)")
         self.assertEqual(bq("-foo +bar"), "+(-foo +bar)")
-        self.assertEqual(bq('"-foo +bar"'), '+"\-foo \+bar"')
+        self.assertEqual(bq('"-foo +bar"'), r'+"\-foo \+bar"')
         self.assertEqual(bq("foo-bar"), '+"foo\\-bar"')
-        self.assertEqual(bq('"foo-bar"'), '+"foo\-bar"')
+        self.assertEqual(bq('"foo-bar"'), r'+"foo\-bar"')
         self.assertEqual(bq(name='"foo"'), '+name:"foo"')
-        self.assertEqual(bq(name='"foo bar'), '+name:(\\"foo bar)')
-        self.assertEqual(bq(name='"foo bar*'), '+name:(\\"foo bar\\*)')
+        self.assertEqual(bq(name='"foo bar'), r'+name:(\\"foo bar)')
+        self.assertEqual(bq(name='"foo bar*'), r'+name:(\\"foo bar\\*)')
         self.assertEqual(
             bq(name="-foo", timestamp="[* TO NOW]"), "+name:-foo +timestamp:[* TO NOW]"
         )
         self.assertEqual(bq(name='"john@foo.com"'), '+name:"john@foo.com"')
         self.assertEqual(bq(name='" "'), '+name:" "')
-        self.assertEqual(bq(name='""'), '+name:\\"\\"')
+        self.assertEqual(bq(name='""'), r'+name:\\"\\"')
 
     def testComplexQueries(self):
         bq = self.bq
         self.assertEqual(
             bq(u"foo", name=u'"herb*"', cat=(u"bär", u'"-hmm"')),
-            u'+cat:(bär OR "\-hmm") +foo +name:"herb\*"',
+            u'+cat:(bär OR "\-hmm") +foo +name:"herb\*"',  # noqa
         )
         self.assertEqual(
             bq(u"foo", name=u"herb*", cat=(u"bär", u"-hmm")),

@@ -12,7 +12,7 @@ GREEN=`tput setaf 2`
 RESET=`tput sgr0`
 YELLOW=`tput setaf 3`
 
-all: .installed.cfg
+all: build-plone-5.2
 
 # Add the following 'help' target to your Makefile
 # And add help text after each target name starting with '\#\#'
