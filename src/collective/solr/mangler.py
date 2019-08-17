@@ -219,7 +219,7 @@ def subtractQueryParameters(args, request_keywords=None):
         params["rows"] = int(limit)
 
     for key, value in args.copy().items():
-        if key in ('fq', 'fl', 'facet', 'hl', 'd', 'pt', 'sfield'):
+        if key in ("fq", "fl", "facet", "hl", "d", "pt", "sfield"):
             params[key] = value
             del args[key]
         elif key.startswith("facet.") or key.startswith("facet_"):
