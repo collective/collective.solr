@@ -33,7 +33,8 @@ import socket
 from xml.etree.cElementTree import fromstring
 from xml.sax.saxutils import escape
 import codecs
-import six.moves.urllib.request, six.moves.urllib.parse, six.moves.urllib.error
+import six.moves.urllib.request
+import six.moves.urllib.parse
 from collective.solr.exceptions import SolrConnectionException
 from collective.solr.parser import SolrSchema
 from collective.solr.utils import getConfig
@@ -103,7 +104,7 @@ class SolrConnection:
             ex = SolrConnectionException(rsp.status, rsp.reason)
             try:
                 ex.body = rsp.read()
-            except:  # pargam: no cover
+            except:  # noqa
                 pass
             raise ex
         return rsp

@@ -102,7 +102,7 @@ def isSimpleTerm(term):
 
 operators = compile(r"(.*)\s+(AND|OR|NOT)\s+", UNICODE)
 simpleCharacters = compile(r"^[\w\d\?\*\s]+$", UNICODE)
-is_digit = compile("\d", UNICODE)
+is_digit = compile(r"\d", UNICODE)
 
 
 def isSimpleSearch(term):
