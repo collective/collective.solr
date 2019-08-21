@@ -72,6 +72,69 @@ class SolrSpatialSearchTests(unittest.TestCase):
         config = getUtility(ISolrConnectionConfig)
         config.required = ()
 
+    def testGeoSpatialTypeIsIndexed(self):
+        self.portal.invokeFactory("Location", id="location1", title="Loc 1")
+        self.portal.location1.geolocation = "50.2,-7.1"
+        self.portal.location1.reindexObject()
+        self.maintenance.reindex()
+        results = solrSearchResults(portal_type="Location")
+        self.assertEqual(sorted([r.path_string for r in results]), ["/plone/location1"])
+
+    def testGeoSpatialFieldCanBeDeleted(self):
+        self.portal.invokeFactory("Location", id="location1", title="Loc 1")
+        self.portal.location1.geolocation = "50.2,-7.1"
+        self.portal.location1.reindexObject()
+        self.maintenance.reindex()
+        results = solrSearchResults(
+            portal_type="Location",
+            sfield="geolocation",
+            fq="{!geofilt}",
+            pt="50.2,-7.1",
+            d=0,
+        )
+        self.assertEqual(sorted([r.path_string for r in results]), ["/plone/location1"])
+        self.portal.location1.geolocation = None
+        self.portal.location1.reindexObject()
+        self.maintenance.reindex()
+        results = solrSearchResults(
+            portal_type="Location",
+            sfield="geolocation",
+            fq="{!geofilt}",
+            pt="50.2,-7.1",
+            d=0,
+        )
+        self.assertEqual(list(results), [])
+        results = solrSearchResults(portal_type="Location")
+        from Missing import Missing
+
+        self.assertEqual(sorted([r.path_string for r in results]), ["/plone/location1"])
+        self.assertTrue(isinstance(results[0].geolocation, Missing))
+
+    def testGeoSpatialFieldCanBeUpdated(self):
+        self.portal.invokeFactory("Location", id="location1", title="Loc 1")
+        self.portal.location1.geolocation = "50.2,-7.1"
+        self.portal.location1.reindexObject()
+        self.maintenance.reindex()
+        results = solrSearchResults(
+            portal_type="Location",
+            sfield="geolocation",
+            fq="{!geofilt}",
+            pt="50.2,-7.1",
+            d=0,
+        )
+        self.assertEqual(sorted([r.path_string for r in results]), ["/plone/location1"])
+        self.portal.location1.geolocation = "10.1, -8.4"
+        self.portal.location1.reindexObject()
+        self.maintenance.reindex()
+        results = solrSearchResults(
+            portal_type="Location",
+            sfield="geolocation",
+            fq="{!geofilt}",
+            pt="10.1, -8.4",
+            d=0,
+        )
+        self.assertEqual(sorted([r.path_string for r in results]), ["/plone/location1"])
+
     def testGeoSpatialSearchWithExactLocation(self):
         self.portal.invokeFactory("Location", id="location1", title="Loc 1")
         self.portal.location1.geolocation = "50.2,-7.1"
