@@ -10,7 +10,7 @@ New Features:
   [jnns, reinhardt, csenger, timo]
 
 - Python 3 compatibility.
-  [jnns, reinhardt, csenger, timo]
+  [jnns, reinhardt]
 
 - Solr 8 compatibility.
   [timo]
