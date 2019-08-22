@@ -1,7 +1,7 @@
 Changelog
 =========
 
-7.0.0a3 (unreleased)
+8.0.0a1 (2019-08-22)
 --------------------
 
 New Features:
