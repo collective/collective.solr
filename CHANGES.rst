@@ -4,20 +4,27 @@ Changelog
 7.0.0a3 (unreleased)
 --------------------
 
-- Add support for Solr 8.
+New Features:
+
+- Plone 5.2 compatibility.
+  [jnns, reinhardt, csenger, timo]
+
+- Python 3 compatibility.
+  [jnns, reinhardt, csenger, timo]
+
+- Solr 8 compatibility.
   [timo]
 
-- Add support for Python 3.
-  [jnns, reinhardt]
+- Add geospatial search filters.
+  [timo, csenger]
+
+Bugfixes:
 
 - Don't use collective.indexing if Plone>=5.1, Products.CMFCore provides all its functionality.
   [jnns]
 
 - Revert "Index comments" from 7.0.0a2 release.
   [timo]
-
-- Add geospatial search filters.
-  [timo, csenger]
 
 
 7.0.0a2 (2019-03-21)
