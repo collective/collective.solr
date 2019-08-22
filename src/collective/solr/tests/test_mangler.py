@@ -379,6 +379,27 @@ class QueryParameterTests(TestCase):
         params = extract({"request_handler": "custom"})
         self.assertEqual(params, {"request_handler": "custom"})
 
+    def testAllowDistanceParameter(self):
+        # d=distance is a Spatial Filter
+        extract = subtractQueryParameters
+        # 'd' should be passed on...
+        params = extract({"d": 0.2})
+        self.assertEqual(params, {"d": 0.2})
+
+    def testAllowPointParameter(self):
+        # p=point is a Spatial Filter
+        extract = subtractQueryParameters
+        # 'p' should be passed on...
+        params = extract({"pt": "50.73743,7.09821"})
+        self.assertEqual(params, {"pt": "50.73743,7.09821"})
+
+    def testAllowSfieldParameter(self):
+        # sfield=spatial indexed field is a Spatial Filter
+        extract = subtractQueryParameters
+        # 'p' should be passed on...
+        params = extract({"sfield": "geolocation"})
+        self.assertEqual(params, {"sfield": "geolocation"})
+
     def testSortIndexCleanup(self):
         cleanup = cleanupQueryParameters
         schema = SolrSchema()

@@ -230,6 +230,12 @@ class SolrConnection:
             )
             return
 
+        latlon_fields = [
+            field["name"]
+            for field in schema.fields
+            if field["class"] == "solr.LatLonPointSpatialField"
+        ]
+
         within = fields.pop("commitWithin", None)
         if within:
             lst = ['<add commitWithin="%s">' % str(within)]
@@ -241,6 +247,7 @@ class SolrConnection:
             lst.append('<doc boost="%s">' % boost_values[""])
         else:
             lst.append("<doc>")
+
         for f, v in fields.items():
 
             # Add update="set" attribute to each field except for the uniqueKey
@@ -250,6 +257,12 @@ class SolrConnection:
                 lst.append(tmpl % self.escapeVal(v))
                 continue
 
+            # geolocation need to be explicitly deleted. They can't index
+            # None or empty strings.
+            if f in latlon_fields and not v:
+                tmpl = '<field name="%s" update="set" null="true"/>'
+                lst.append(tmpl % (self.escapeKey(f)))
+                continue
             if f in boost_values:
                 tmpl = '<field name="%s" boost="%s" update="set">%%s</field>'
                 tmpl = tmpl % (self.escapeKey(f), boost_values[f])

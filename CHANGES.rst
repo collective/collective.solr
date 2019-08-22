@@ -16,6 +16,9 @@ Changelog
 - Revert "Index comments" from 7.0.0a2 release.
   [timo]
 
+- Add geospatial search filters.
+  [timo, csenger]
+
 
 7.0.0a2 (2019-03-21)
 --------------------
