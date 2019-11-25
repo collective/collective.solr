@@ -48,8 +48,6 @@ setup(
         'Products.CMFPlone >= 4.3.7',
         'Products.GenericSetup',
         'Products.ZCatalog',
-        'ZODB3',
-        'Zope2 >= 2.13',
         # 'collective.indexing >= 2.1',
         'collective.js.showmore',
         'lxml',
