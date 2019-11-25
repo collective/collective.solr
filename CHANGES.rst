@@ -4,6 +4,9 @@ Changelog
 8.0.0a2 (unreleased)
 --------------------
 
+- Add Plone 5.2 classifier to setup.py.
+  [timo]
+
 - Replace log.warn with log.warning to avoid deprecation message.
   [timo]
 
