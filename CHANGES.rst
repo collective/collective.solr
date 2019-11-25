@@ -6,6 +6,9 @@ Changelog
 
 Bugfixes:
 
+- Add "Plone 5.2" and "Python 3.7" classifiers to setup.py.
+  [timo]
+
 - Replace log.warn with log.warning to avoid deprecation messages.
   [timo]
 
