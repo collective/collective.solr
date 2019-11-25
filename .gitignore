@@ -17,6 +17,7 @@ var
 *.*~
 .*.cfg
 .Python
+pyvenv.cfg
 pip-selfcheck.json
 .idea
 docs/Makefile
