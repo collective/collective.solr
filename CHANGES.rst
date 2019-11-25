@@ -4,7 +4,11 @@ Changelog
 8.0.0a2 (unreleased)
 --------------------
 
-- Nothing changed yet.
+- Replace log.warn with log.warning to avoid deprecation message.
+  [timo]
+
+- Remove unecessary dependencies that are fetched by CMFPlone.
+  [timo]
 
 
 8.0.0a1 (2019-08-22)

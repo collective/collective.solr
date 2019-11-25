@@ -44,6 +44,7 @@ setup(
         "plone.api",
         "plone.restapi",
         "setuptools",
+        "collective.js.showmore",
     ],
     extras_require={
         "test": ["plone.app.testing[robot]", "plone.app.robotframework[debug]"],

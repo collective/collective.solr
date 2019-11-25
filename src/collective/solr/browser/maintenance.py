@@ -152,7 +152,7 @@ class SolrMaintenanceView(BrowserView):
                 try:
                     adder(conn, boost_values=my_boost_values, **data)
                 except Exception as e:
-                    logger.warn("Error %s @ %s", e, data["path_string"])
+                    logger.warning("Error %s @ %s", e, data["path_string"])
                     if not ignore_exceptions:
                         raise
             updates.clear()
