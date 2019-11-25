@@ -93,7 +93,7 @@ class FacettingHelperTest(TestCase):
         # next let's check the field names
         self.assertEqual([i["title"] for i in info], ["portal_type"])
         # and the fields contents
-        types, = info
+        (types,) = info
         self.assertEqual(types["title"], "portal_type")
         self.assertEqual(
             [(c["name"], c["title"], c["count"]) for c in types["counts"]],
