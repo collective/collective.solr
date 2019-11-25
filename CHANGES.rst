@@ -4,7 +4,8 @@ Changelog
 8.0.0a2 (unreleased)
 --------------------
 
-- Nothing changed yet.
+- Remove ZODB and Zope2 from depenencies in setup.py. This breaks collective.recipe.plonesite in Plone 5.
+  [timo]
 
 
 8.0.0a1 (2019-08-22)
