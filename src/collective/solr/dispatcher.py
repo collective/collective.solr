@@ -52,7 +52,7 @@ def solrSearchResults(request=None, **keywords):
     site = getSite()
     search = queryUtility(ISearch, context=site)
     if search is None:
-        logger.warn("No search utility found in site %s", site)
+        logger.warning("No search utility found in site %s", site)
         raise FallBackException
 
     registry = getUtility(IRegistry)

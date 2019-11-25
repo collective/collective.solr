@@ -4,7 +4,10 @@ Changelog
 8.0.0a3 (unreleased)
 --------------------
 
-- Nothing changed yet.
+Bugfixes:
+
+- Replace log.warn with log.warning to avoid deprecation messages.
+  [timo]
 
 
 8.0.0a2 (2019-11-25)

@@ -225,7 +225,7 @@ class SolrConnection:
             raise Exception("Could not get uniqueKey from Solr schema")
 
         if uniqueKey not in fields:
-            logger.warn(
+            logger.warning(
                 "uniqueKey '%s' missing for item %s, skipping" % (uniqueKey, fields)
             )
             return
