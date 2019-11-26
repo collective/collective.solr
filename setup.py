@@ -3,7 +3,8 @@ from setuptools import find_packages
 
 version = "8.0.0a3.dev0"
 
-long_description = "\n\n".join([open("README.rst").read(), open("CHANGES.rst").read()])
+long_description = "\n\n".join(
+    [open("README.rst").read(), open("CHANGES.rst").read()])
 
 setup(
     name="collective.solr",
@@ -17,6 +18,7 @@ setup(
         "Framework :: Plone :: 4.3",
         "Framework :: Plone :: 5.0",
         "Framework :: Plone :: 5.1",
+        "Framework :: Plone :: 5.2",
         "Intended Audience :: Developers",
         "Intended Audience :: System Administrators",
         "Intended Audience :: Other Audience",
@@ -24,6 +26,7 @@ setup(
         "Operating System :: OS Independent",
         "Programming Language :: Python",
         "Programming Language :: Python :: 2.7",
+        "Programming Language :: Python :: 3.7",
     ],
     keywords="plone cmf zope indexing searching solr lucene",
     author="Plone Community",

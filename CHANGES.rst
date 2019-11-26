@@ -4,7 +4,13 @@ Changelog
 8.0.0a3 (unreleased)
 --------------------
 
-- Nothing changed yet.
+Bugfixes:
+
+- Add "Plone 5.2" and "Python 3.7" classifiers to setup.py.
+  [timo]
+
+- Replace log.warn with log.warning to avoid deprecation messages.
+  [timo]
 
 
 8.0.0a2 (2019-11-25)

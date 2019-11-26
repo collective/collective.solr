@@ -161,10 +161,10 @@ class BinaryAdder(DefaultAdder):
             root = etree.parse(response)
             data["SearchableText"] = root.find(".//str").text.strip()
         except SolrConnectionException as e:
-            logger.warn("Error %s @ %s", e, data["path_string"])
+            logger.warning("Error %s @ %s", e, data["path_string"])
             data["SearchableText"] = ""
         except etree.XMLSyntaxError as e:
-            logger.warn("Parsing error %s @ %s.", e, data["path_string"])
+            logger.warning("Parsing error %s @ %s.", e, data["path_string"])
             data["SearchableText"] = ""
         super(BinaryAdder, self).__call__(conn, **data)
 
