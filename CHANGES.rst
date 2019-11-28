@@ -1,7 +1,7 @@
 Changelog
 =========
 
-8.0.0a4 (unreleased)
+8.0.0a4 (2019-11-28)
 --------------------
 
 - Remove superfluous for attribute on "Solr extension" behavior registration.
