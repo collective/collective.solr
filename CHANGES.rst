@@ -4,7 +4,8 @@ Changelog
 8.0.0a4 (unreleased)
 --------------------
 
-- Nothing changed yet.
+- Remove superfluous for attribute on "Solr extension" behavior registration.
+  [timo]
 
 
 8.0.0a3 (unreleased)
