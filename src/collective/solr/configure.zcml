@@ -73,7 +73,6 @@
 	  title="Solr extension"
 	  description="Extra fields for Solr indexing"
 	  provides=".behaviors.ISolrFields"
-	  for="plone.dexterity.interfaces.IDexterityContent"
 	  zcml:condition="installed plone.app.dexterity"
 	  />
 
