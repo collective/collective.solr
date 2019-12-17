@@ -1,7 +1,7 @@
 Changelog
 =========
 
-8.0.0a5 (unreleased)
+8.0.0a5 (2019-12-17)
 --------------------
 
 - Use named behavior "solr.fields" instead of "collective.solr.behaviors.ISolrFields".
