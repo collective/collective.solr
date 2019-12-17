@@ -71,6 +71,7 @@
       <!-- Schema extender as behavior -->
       <plone:behavior
 	  title="Solr extension"
+    name="solr.fields"
 	  description="Extra fields for Solr indexing"
 	  provides=".behaviors.ISolrFields"
 	  zcml:condition="installed plone.app.dexterity"
