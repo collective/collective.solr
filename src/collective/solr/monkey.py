@@ -27,7 +27,7 @@ def searchResults(self, REQUEST=None, **kw):
 
 def patchCatalogTool():
     """ monkey patch plone's catalogtool with the solr dispatcher """
-    if not hasattr(CatalogTool, '_cs_old_searchResults'):
+    if not hasattr(CatalogTool, "_cs_old_searchResults"):
         CatalogTool._cs_old_searchResults = CatalogTool.searchResults
         CatalogTool.searchResults = searchResults
         CatalogTool.__call__ = searchResults
