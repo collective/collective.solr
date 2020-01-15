@@ -25,11 +25,7 @@ matrix:
       env: PLONE_VERSION=5.2.x SOLR_VERSION=8.2.0 EXTRA_EGGS=
 dist: xenial
 addons:
-  apt:
-    sources:
-      - google-chrome
-    packages:
-      - google-chrome-stable
+  chrome: stable
 before_install:
   - wget "http://chromedriver.storage.googleapis.com/2.44/chromedriver_linux64.zip"
   - unzip chromedriver_linux64.zip
@@ -51,6 +47,7 @@ install:
   - bin/buildout -N -t 20
 script:
   - bin/code-analysis
+  - if [ -f "bin/black" ]; then bin/black src/ --check ; fi
   - bin/coverage run bin/test
   # Run Robot Framework in isolation to avoid test isolation issues.
   - export ROBOTSUITE_PREFIX=ONLYROBOT && bin/test -t ONLYROBOT --all
