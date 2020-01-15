@@ -24,14 +24,9 @@ matrix:
     - python: 3.7
       env: PLONE_VERSION=5.2.x SOLR_VERSION=8.2.0 EXTRA_EGGS=
 dist: xenial
-# addons:
-#   apt:
-#     sources:
-#       - google-chrome
-#     packages:
-#       - google-chrome-stable
+addons:
+  chrome: stable
 before_install:
-  - sudo apt install google-chrome-stable -y --allow-unauthenticated
   - wget "http://chromedriver.storage.googleapis.com/2.44/chromedriver_linux64.zip"
   - unzip chromedriver_linux64.zip
   - sudo mv chromedriver /usr/local/bin
