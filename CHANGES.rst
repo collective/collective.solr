@@ -4,7 +4,7 @@ Changelog
 8.0.0a6 (unreleased)
 --------------------
 
-- Nothing changed yet.
+- Fix index subjects with non-ascii characters. [mathias.leimgruber]
 
 
 8.0.0a5 (2019-12-17)

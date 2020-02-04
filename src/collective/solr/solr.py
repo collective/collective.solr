@@ -28,6 +28,7 @@
 # c.delete('123')
 # c.commit()
 
+from plone.dexterity.utils import safe_unicode
 import six.moves.http_client
 import socket
 from xml.etree.cElementTree import fromstring
@@ -181,7 +182,10 @@ class SolrConnection:
 
     def escapeVal(self, val):
         if not isinstance(val, six.text_type):
-            val = six.text_type(val)
+            try:
+                val = six.text_type(val)
+            except UnicodeDecodeError:
+                val = safe_unicode(val)
         if six.PY2:
             val = val.encode("utf-8")
         escaped_val = escape(val.translate(translation_map))
