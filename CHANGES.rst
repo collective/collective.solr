@@ -1,7 +1,7 @@
 Changelog
 =========
 
-8.0.0a6 (unreleased)
+8.0.0a6 (2020-02-28)
 --------------------
 
 - Fix index subjects with non-ascii characters. [mathias.leimgruber]
