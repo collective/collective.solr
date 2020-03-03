@@ -84,17 +84,17 @@
 	  name="default"
 	  />
 
-      <adapter
+      <!--<adapter
 	  factory=".indexer.DXFileBinaryAdder"
 	  for="plone.dexterity.interfaces.IDexterityContent"
 	  name="File"
-	  />
+	  />-->
 
-      <adapter
+      <!--<adapter
 	  factory=".indexer.DXImageBinaryAdder"
 	  for="plone.dexterity.interfaces.IDexterityContent"
 	  name="Image"
-	  />
+	  />-->
     </configure>
 
     <adapter
