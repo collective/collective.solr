@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 import json
-import six.moves.urllib.request, six.moves.urllib.parse, six.moves.urllib.error
+import six.moves.urllib.request
+import six.moves.urllib.parse
+import six.moves.urllib.error
 
 from collective.solr.interfaces import ISolrConnectionManager
 from Products.Five.browser import BrowserView

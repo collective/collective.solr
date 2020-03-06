@@ -13,7 +13,6 @@ from collective.solr.utils import prepare_wildcard
 from collective.solr.utils import setupTranslationMap
 from collective.solr.utils import splitSimpleSearch
 from unittest import TestCase
-import six
 
 
 class UtilsTests(TestCase):
