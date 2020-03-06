@@ -4,7 +4,8 @@ Changelog
 8.0.0a7 (unreleased)
 --------------------
 
-- Nothing changed yet.
+- Fix BinaryAdder for Tika. Newer Solr versions expect json so we have to set wt=xml in the BinaryAdder.
+  [timo]
 
 
 8.0.0a6 (2020-02-28)
