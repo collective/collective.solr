@@ -152,6 +152,7 @@ class BinaryAdder(DefaultAdder):
         )
         postdata["extractFormat"] = "text"
         postdata["extractOnly"] = "true"
+        postdata["wt"] = "xml"
 
         url = "%s/update/extract" % conn.solrBase
         try:
