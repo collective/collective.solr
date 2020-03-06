@@ -1,10 +1,7 @@
 # -*- coding: utf-8 -*-
 from Products.CMFCore.utils import getToolByName
 
-from unittest import TestSuite, defaultTestLoader
-
 from collective.solr.interfaces import ISolrConnectionConfig
-from collective.solr.tests.utils import pingSolr
 from collective.solr.dispatcher import solrSearchResults
 from collective.solr.testing import LEGACY_COLLECTIVE_SOLR_FUNCTIONAL_TESTING
 from collective.solr.testing import activateAndReindex

@@ -1,4 +1,3 @@
-from collective.solr.interfaces import ISearch
 from collective.solr.testing import LEGACY_COLLECTIVE_SOLR_FUNCTIONAL_TESTING
 from collective.solr.utils import activate
 from plone import api
@@ -6,8 +5,7 @@ from plone.app.testing import setRoles
 from plone.app.testing import TEST_USER_ID
 from plone.dexterity.utils import safe_unicode
 from unittest import TestCase
-from zope.component import getUtility
-import six
+
 import transaction
 
 
@@ -19,15 +17,15 @@ class TestDublincoreSubjectField(TestCase):
         self.portal = self.layer["portal"]
         setRoles(self.portal, TEST_USER_ID, ["Manager"])
 
-        subjects = [safe_unicode('\xc3\xbcber Keyword'),
-                    safe_unicode('Second one')]
+        subjects = [safe_unicode("\xc3\xbcber Keyword"), safe_unicode("Second one")]
 
         self.content = api.content.create(
             container=api.portal.get(),
-            type='Document',
-            title='test document',
-            subject=subjects
+            type="Document",
+            title="test document",
+            subject=subjects,
         )
+
     def test_successfully_reindex_umlauts(self):
         activate()
         self.content.reindexObject()

@@ -21,9 +21,9 @@ from zope.lifecycleevent.interfaces import IObjectCreatedEvent
 
 # override IObjectCreatedEvent for AT content
 if not HAS_PAC:
-    from Products.Archetypes.interfaces import (
+    from Products.Archetypes.interfaces import (  # noqa
         IObjectInitializedEvent as IObjectCreatedEvent,
-    )  # noqa
+    )
 
 
 UIDS = []
