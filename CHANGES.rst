@@ -4,7 +4,8 @@ Changelog
 8.0.0a8 (unreleased)
 --------------------
 
-- Nothing changed yet.
+- Add support for "not" queries.
+  [mpeeters]
 
 
 8.0.0a7 (2020-03-06)
