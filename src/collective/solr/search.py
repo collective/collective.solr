@@ -149,7 +149,10 @@ class Search(object):
         query = {}
 
         for name, value in args.items():
-            field = schema.get(name or defaultSearchField, None)
+            field_name = name
+            if name and name[0] in "+-":
+                field_name = name[1:]
+            field = schema.get(field_name or defaultSearchField, None)
             if field is None or not field.indexed:
                 logger.info(
                     'dropping unknown search attribute "%s" ' " (%r) for query: %r",
@@ -208,7 +211,10 @@ class Search(object):
                 if value and value[0] not in "+-":
                     value = "+%s" % value
             else:
-                value = "+%s:%s" % (name, value)
+                if name[0] not in "+-":
+                    value = "+%s:%s" % (name, value)
+                else:
+                    value = "%s:%s" % (name, value)
             query[name] = value
         logger.debug('built query "%s"', query)
 

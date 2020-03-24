@@ -108,8 +108,14 @@ def mangleQuery(keywords, config, schema):
             extras[key[:-6]] = {category: spec}
             del keywords[key]
         elif isinstance(value, dict):  # unify dict parameters
-            keywords[key] = value["query"]
-            del value["query"]
+            if "query" in value:
+                keywords[key] = value["query"]
+                del value["query"]
+            else:
+                del keywords[key]
+            if "not" in value:
+                keywords["-%s" % key] = value["not"]
+                del value["not"]
             extras[key] = value
         elif getattr(value, "query", None):  # unify object parameters
             keywords[key] = value.query
@@ -133,7 +139,6 @@ def mangleQuery(keywords, config, schema):
         epi_indexes = [k for k, v in epi_indexes.items() if v == 3]
     else:
         epi_indexes = ["path"]
-
     for key, value in keywords.copy().items():
         args = extras.get(key, {})
         if key == "SearchableText":

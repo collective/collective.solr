@@ -350,6 +350,16 @@ class QueryTests(TestCase):
             in ["(foo! OR +bar:camp)", "(+bar:camp OR foo!)"]
         )
 
+    def testNotQueries(self):
+        bq = self.bq
+        self.assertEqual(bq(name={"not": "foo"}), "-name:foo")
+        self.assertEqual(bq(name={"query": "bar", "not": "foo"}), "+name:bar -name:foo")
+        self.assertEqual(bq(cat={"not": ["foo", "bar"]}), "-cat:(foo OR bar)")
+        self.assertEqual(
+            bq(cat={"query": ["FOO", "BAR"], "not": ["foo", "bar"]}),
+            "+cat:(FOO OR BAR) -cat:(foo OR bar)"
+        )
+
 
 class InactiveQueryTests(TestCase):
 
