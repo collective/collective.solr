@@ -1,12 +1,15 @@
 # -*- coding: utf-8 -*-
 from AccessControl import getSecurityManager
 from DateTime import DateTime
+from datetime import date
+from datetime import datetime
 from collective.solr.queryparser import quote
 from collective.solr.utils import isSimpleSearch
 from collective.solr.utils import isWildCard
 from collective.solr.utils import prepare_wildcard
 from collective.solr.utils import splitSimpleSearch
 from collective.solr.utils import getConfig
+from pytz import timezone
 from zope.component import getUtility
 from plone.registry.interfaces import IRegistry
 import six
@@ -28,7 +31,11 @@ ignored = "use_solr", "-C"
 
 
 def iso8601date(value):
-    """ convert `DateTime` to iso 8601 date format """
+    """ convert `date`, `datetime` and `DateTime` to iso 8601 date format """
+    if isinstance(value, date) and not isinstance(value, datetime):
+        value = datetime(value.year, value.month, value.day, tzinfo=timezone("UTC"))
+    if isinstance(value, datetime):
+        value = DateTime(value)
     if isinstance(value, DateTime):
         v = value.toZone("UTC")
         value = "%04d-%02d-%02dT%02d:%02d:%06.3fZ" % (
@@ -192,7 +199,7 @@ def mangleQuery(keywords, config, schema):
                 token = "user$" + getSecurityManager().getUser().getId()
                 if token in value:
                     value.remove(token)
-        elif isinstance(value, DateTime):
+        elif isinstance(value, (DateTime, datetime, date)):
             keywords[key] = iso8601date(value)
         elif not isinstance(value, six.string_types):
             assert not args, "unsupported usage: %r" % args

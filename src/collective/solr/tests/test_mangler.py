@@ -10,6 +10,8 @@ from collective.solr.parser import SolrField
 from collective.solr.parser import SolrSchema
 from collective.solr.testing import COLLECTIVE_SOLR_MOCK_REGISTRY_FIXTURE
 from collective.solr.utils import getConfig
+from datetime import datetime
+from pytz import timezone
 from unittest import TestCase
 from zope.component import getGlobalSiteManager
 from zope.component import provideUtility
@@ -90,6 +92,16 @@ class QueryManglerTests(TestCase):
         self.assertEqual(keywords, {"foo": "[1972-05-11T00:00:00.000Z TO *]"})
         keywords = mangle(foo=Query(day))
         self.assertEqual(keywords, {"foo": "1972-05-11T00:00:00.000Z"})
+
+    def testPythonDatetimeConversion(self):
+        date = datetime(2020, 1, 13, 9, 23, 5, tzinfo=timezone("CET"))
+        keywords = mangle(foo=date)
+        self.assertEqual(keywords, {"foo": "2020-01-13T08:23:05.000Z"})
+
+    def testPythonDateConversion(self):
+        date = datetime(2020, 1, 15).date()
+        keywords = mangle(foo=date)
+        self.assertEqual(keywords, {"foo": "2020-01-15T00:00:00.000Z"})
 
     def testOperatorConversion(self):
         keywords = mangle(foo=(23, 42), foo_usage="operator:or")
