@@ -135,9 +135,15 @@ class SolrResponse(Lazy):
         """
         return the actual_result_count
         """
+        if self._rlen is not _marker:
+            return self._rlen
         if getattr(self, "response", None):
             return int(self.response.numFound)
         return 0
+
+    @actual_result_count.setter
+    def actual_result_count(self, value):
+        self._rlen = value
 
     def __len__(self):
         if self._len is not _marker:
