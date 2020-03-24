@@ -1,7 +1,7 @@
 Changelog
 =========
 
-8.0.0a9 (unreleased)
+8.0.0a9 (2020-03-24)
 --------------------
 
 - Correctly handle queries with python `date` or `datetime` objects
