@@ -4,6 +4,9 @@ Changelog
 8.0.0a9 (unreleased)
 --------------------
 
+- Correctly handle queries with python `date` or `datetime` objects
+  [mpeeters]
+
 - Correctly implement `actual_result_count` property setter
   [mpeeters]
 
