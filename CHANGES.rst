@@ -1,7 +1,7 @@
 Changelog
 =========
 
-8.0.0a8 (unreleased)
+8.0.0a8 (2020-03-24)
 --------------------
 
 - Add support for "not" queries.
