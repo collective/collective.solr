@@ -167,6 +167,15 @@ class ParserTests(TestCase):
         empty_uid = [r for r in results if r.UID == ""]
         self.assertEqual(empty_uid, [])
 
+    def testParseResultsActualResultCount(self):
+        complex_xml_response = getData("complex_xml_response.txt")
+        response = SolrResponse(complex_xml_response)
+        self.assertEqual(response.actual_result_count, 2)
+        response.actual_result_count = 1
+        results = response.response  # the result set is named 'response'
+        self.assertEqual(response.actual_result_count, 1)
+        self.assertEqual(len(results), 2)
+
 
 class ParseDateHelperTests(TestCase):
     def testParseDateHelper(self):
