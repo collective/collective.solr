@@ -4,7 +4,8 @@ Changelog
 8.0.0a9 (unreleased)
 --------------------
 
-- Nothing changed yet.
+- Correctly implement `actual_result_count` property setter
+  [mpeeters]
 
 
 8.0.0a8 (2020-03-24)
