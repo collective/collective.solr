@@ -85,6 +85,8 @@ def prepareData(data):
     path = data.get("path")
     if isinstance(path, dict) and not path.get("query"):
         data.pop("path")
+    if "getObjPositionInParent" in data and data["getObjPositionInParent"] is None:
+        data.pop("getObjPositionInParent")
 
 
 simpleTerm = compile(r"^[\w\d]+$", UNICODE)
