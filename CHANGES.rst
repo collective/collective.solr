@@ -1,7 +1,7 @@
 Changelog
 =========
 
-8.0.0a10 (unreleased)
+8.0.0a10 (2020-03-25)
 ---------------------
 
 - Fix queries with `integer` or `float` values
