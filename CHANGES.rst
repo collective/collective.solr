@@ -4,7 +4,8 @@ Changelog
 8.0.0a10 (unreleased)
 ---------------------
 
-- Nothing changed yet.
+- Fix queries with `integer` or `float` values
+  [mpeeters]
 
 
 8.0.0a9 (2020-03-24)

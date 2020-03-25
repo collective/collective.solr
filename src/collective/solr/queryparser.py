@@ -275,6 +275,8 @@ def quote(term, textfield=False):
 
 
 def quote_iterable_item(term):
+    if isinstance(term, (int, float)):
+        return str(term)
     quoted = quote(term)
     if not quoted.startswith('"') and not quoted == term:
         quoted = quote('"' + term + '"')
