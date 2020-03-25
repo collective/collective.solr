@@ -204,6 +204,8 @@ class Search(object):
                     value = quote(value)
                 if not value:  # don't search for empty strings, even quoted
                     continue
+            elif isinstance(value, (int, float)):
+                pass  # Do not raise an error for int or float values
             else:
                 logger.info('skipping unsupported value "%r" (%s)', value, name)
                 continue

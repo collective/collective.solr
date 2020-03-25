@@ -234,6 +234,8 @@ class QueryTests(TestCase):
         self.assertEqual(bq(name=["foo", "bar"]), "+name:(foo OR bar)")
         self.assertEqual(bq(name=["foo", "bar*"]), "+name:(foo OR bar*)")
         self.assertEqual(bq(name=["foo bar", "hmm"]), '+name:("foo bar" OR hmm)')
+        self.assertEqual(bq(price=[1.5, 2.5]), '+price:(1.5 OR 2.5)')
+        self.assertEqual(bq(popularity=[1.5, 2.5]), '+popularity:(1.5 OR 2.5)')
 
     def testMultiArgumentQueries(self):
         bq = self.bq
@@ -358,6 +360,21 @@ class QueryTests(TestCase):
         self.assertEqual(
             bq(cat={"query": ["FOO", "BAR"], "not": ["foo", "bar"]}),
             "+cat:(FOO OR BAR) -cat:(foo OR bar)"
+        )
+
+    def testIntegerFloatQueries(self):
+        bq = self.bq
+        self.assertEqual(bq(price=1.5), "+price:1.5")
+        self.assertEqual(bq(price={"query": 1.5}), "+price:1.5")
+        self.assertEqual(
+            bq(price={"query": (1.5, 2.5), "range": "min:max"}),
+            "+price:[1.5 TO 2.5]"
+        )
+        self.assertEqual(bq(popularity=2), "+popularity:2")
+        self.assertEqual(bq(popularity={"query": 2}), "+popularity:2")
+        self.assertEqual(
+            bq(popularity={"query": (2, 5), "range": "min:max"}),
+            "+popularity:[2 TO 5]"
         )
 
 
