@@ -75,6 +75,10 @@ build-plone-5.2: .installed.cfg  ## Build Plone 5.2
 test:  ## Test
 	bin/test
 
+.PHONY: Acceptance Tests
+test-acceptance:  ## Acceptance Tests
+	export ROBOTSUITE_PREFIX=ONLYROBOT && bin/test -t ONLYROBOT --all
+
 .PHONY: Test Performance
 test-performance:
 	jmeter -n -t performance.jmx -l jmeter.jtl
