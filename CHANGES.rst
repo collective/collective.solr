@@ -1,7 +1,7 @@
 Changelog
 =========
 
-8.0.0a11 (unreleased)
+8.0.0a11 (2020-03-27)
 ---------------------
 
 - Fix `getObjPositionInParent` index by avoiding indexing null values
