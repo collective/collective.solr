@@ -132,14 +132,14 @@ class QueueIndexerTests(TestCase):
             id="zeidler",
             name="andi",
             cat="nerd",
-            timestamp=DateTime("May 11 1972 03:45 GMT"),
+            timestamp=DateTime("May 11 1972 03:45:59.999730 GMT"),
         )
         response = getData("add_response.txt")
         # fake add response
         output = fakehttp(self.mngr.getConnection(), response)
         self.proc.index(foo)
         required = (
-            '<field name="timestamp" update="set">' "1972-05-11T03:45:00.000Z</field>"
+            '<field name="timestamp" update="set">' "1972-05-11T03:45:59.999Z</field>"
         )
         self.assert_(str(output).find(required) > 0, '"date" data not found')
 
@@ -148,14 +148,14 @@ class QueueIndexerTests(TestCase):
             id="gerken",
             name="patrick",
             cat="nerd",
-            timestamp=datetime(1980, 9, 29, 14, 0o2),
+            timestamp=datetime(1980, 9, 29, 14, 0o2, 59, 999730),
         )
         response = getData("add_response.txt")
         # fake add response
         output = fakehttp(self.mngr.getConnection(), response)
         self.proc.index(foo)
         required = (
-            '<field name="timestamp" update="set">' "1980-09-29T14:02:00.000Z</field>"
+            '<field name="timestamp" update="set">' "1980-09-29T14:02:59.999Z</field>"
         )
         self.assert_(str(output).find(required) > 0, '"date" data not found')
 
