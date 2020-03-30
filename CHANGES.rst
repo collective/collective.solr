@@ -1,7 +1,7 @@
 Changelog
 =========
 
-8.0.0a12 (unreleased)
+8.0.0a12 (2020-03-30)
 ---------------------
 
 - Fix millisecond management in datetime indexes
