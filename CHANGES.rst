@@ -4,7 +4,8 @@ Changelog
 8.0.0a12 (unreleased)
 ---------------------
 
-- Nothing changed yet.
+- Fix millisecond management in datetime indexes
+  [odelaere]
 
 
 8.0.0a11 (2020-03-27)
