@@ -102,10 +102,13 @@ def inthandler(value):
 
 handlers = {
     "solr.DateField": datehandler,
+    "solr.DatePointField": datehandler,
     "solr.FloatField": inthandler,
+    "solr.FloatPointField": inthandler,
     "solr.TrieDateField": datehandler,
     "solr.TrieIntField": inthandler,
     "solr.IntField": inthandler,
+    "solr.IntPointField": inthandler
 }
 
 
