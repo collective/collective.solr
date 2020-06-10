@@ -7,6 +7,10 @@ Changelog
 - Initial support for Python3.8 (see #265)
   [ale-rt]
 
+- Handlers for solr's IntPointField, FloatPointField, DatePointField.
+  [adrianschulz]
+
+
 8.0.0a12 (2020-03-30)
 ---------------------
 
