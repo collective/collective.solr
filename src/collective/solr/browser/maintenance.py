@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from logging import getLogger
-from time import time, clock, strftime
+from time import time, strftime
 
 from BTrees.IIBTree import IITreeSet
 from Products.CMFCore.utils import getToolByName
@@ -29,6 +29,13 @@ from collective.solr.utils import prepareData
 
 logger = getLogger("collective.solr.maintenance")
 MAX_ROWS = 1000000000
+
+
+try:
+    from time import process_time
+except ImportError:
+    # Python < 3.8
+    from time import clock as process_time
 
 
 def timer(func=time):
@@ -135,7 +142,7 @@ class SolrMaintenanceView(BrowserView):
             log("limiting indexing to %d object(s)...\n" % limit)
         real = timer()  # real time
         lap = timer()  # real lap time (for intermediate commits)
-        cpu = timer(clock)  # cpu time
+        cpu = timer(process_time)  # cpu time
         processed = 0
         schema = manager.getSchema()
         key = schema.uniqueKey
@@ -244,7 +251,7 @@ class SolrMaintenanceView(BrowserView):
         log = self.mklog()
         real = timer()  # real time
         lap = timer()  # real lap time (for intermediate commits)
-        cpu = timer(clock)  # cpu time
+        cpu = timer(process_time)  # cpu time
         # get Solr status
         response = conn.search(
             q=preImportDeleteQuery, rows=MAX_ROWS, fl="%s modified" % key
