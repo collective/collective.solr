@@ -626,14 +626,14 @@ class SolrServerTests(TestCase):
         proc.reindex(self.folder)
         proc.commit()
         self.assertEqual(search("+Title:Foo"), 0)
-        self.assertEqual(search("+path_parents:\/plone"), 1)
+        self.assertEqual(search("+path_parents:\\/plone"), 1)
         self.assertEqual(search("+portal_type:Folder"), 1)
         # now let's only update one index, which shouldn't change anything...
         set_attributes(self.folder, values={"title": "Foo"})
         proc.reindex(self.folder, ["UID", "Title"])
         proc.commit()
         self.assertEqual(search("+Title:Foo"), 1)
-        self.assertEqual(search("+path_parents:\/plone"), 1)
+        self.assertEqual(search("+path_parents:\\/plone"), 1)
         self.assertEqual(search("+portal_type:Folder"), 1)
 
     def testReindexObjectWithEmptyDate(self):
@@ -661,7 +661,7 @@ class SolrServerTests(TestCase):
         proc.commit()
         search = lambda query: numFound(connection.search(q=query).read())
 
-        self.assertEqual(search("+path_parents:\/plone\/news\/folder"), 1)
+        self.assertEqual(search("+path_parents:\\/plone\\/news\\/folder"), 1)
 
         # Rename obj, without triggering any events.
         parent = aq_parent(self.folder)
@@ -673,19 +673,19 @@ class SolrServerTests(TestCase):
         commit()
 
         # No change in solr so far
-        self.assertEqual(search("+path_parents:\/plone\/news\/folder"), 1)
+        self.assertEqual(search("+path_parents:\\/plone\\/news\\/folder"), 1)
 
         proc.reindex(self.folder, attributes=["path"])
         proc.commit()
 
         # Crosscheck
-        self.assertEqual(search("+path_parents:\/plone\/news\/folder"), 0)
+        self.assertEqual(search("+path_parents:\\/plone\\/news\\/folder"), 0)
 
-        self.assertEqual(search("+path_parents:\/plone\/news\/new_id"), 1)
+        self.assertEqual(search("+path_parents:\\/plone\\/news\\/new_id"), 1)
 
         # Check path_string is also up to date
         response = SolrResponse(
-            connection.search(q="+path_parents:\/plone\/news\/new_id")
+            connection.search(q="+path_parents:\\/plone\\/news\\/new_id")
         )
 
         self.assertEquals("/plone/news/new_id", response.results()[0]["path_string"])
@@ -1181,17 +1181,17 @@ class SolrServerTests(TestCase):
 
     def testLimitSearchResults(self):
         self.maintenance.reindex()
-        results = self.search("+path_parents:\/plone").results()
+        results = self.search("+path_parents:\\/plone").results()
         self.assertEqual(results.numFound, str(len(DEFAULT_OBJS)))
         self.assertEqual(len(results), len(DEFAULT_OBJS))
         # now let's limit the returned results
         config = getConfig()
         config.max_results = 2
-        results = self.search("+path_parents:\/plone").results()
+        results = self.search("+path_parents:\\/plone").results()
         self.assertEqual(results.numFound, str(len(DEFAULT_OBJS)))
         self.assertEqual(len(results), 2)
         # an explicit value should still override things
-        results = self.search("+path_parents:\/plone", rows=5).results()
+        results = self.search("+path_parents:\\/plone", rows=5).results()
         self.assertEqual(results.numFound, str(len(DEFAULT_OBJS)))
         self.assertEqual(len(results), 5)
 

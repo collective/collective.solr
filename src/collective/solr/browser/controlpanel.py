@@ -30,7 +30,11 @@ class SolrControlPanelForm(controlpanel.RegistryEditForm):
             boost_script = safe_unicode(portal[self.boost_script_id].read())
             # strip script metadata for display
             content.boost_script = "\n".join(
-                [l for l in boost_script.splitlines() if not l.startswith("##")]
+                [
+                    line
+                    for line in boost_script.splitlines()
+                    if not line.startswith("##")
+                ]
             )
             if PLONE_PROTECT_INSTALLED:
                 alsoProvides(self.request, IDisableCSRFProtection)

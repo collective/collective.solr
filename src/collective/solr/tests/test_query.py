@@ -24,7 +24,7 @@ class QuoteTests(TestCase):
         self.assertEqual(quote("foo bar"), "(foo bar)")
         self.assertEqual(quote('"foo bar" bah'), '("foo bar" bah)')
         self.assertEqual(quote("\\["), "\\[")
-        self.assertEqual(quote(")"), "\)")
+        self.assertEqual(quote(")"), "\\)")
         self.assertEqual(quote('"(foo bar)" bah'), '("\\(foo bar\\)" bah)')
         self.assertEqual(quote('"(foo\\"bar)" bah'), '("\\(foo\\"bar\\)" bah)')
         self.assertEqual(quote('"foo bar"'), '"foo bar"')
@@ -36,23 +36,23 @@ class QuoteTests(TestCase):
         self.assertEqual(quote("{}"), "")
         self.assertEqual(quote('...""'), '...\\"\\"')
         self.assertEqual(quote("\\"), "\\\\")  # Search for \ has to be quoted
-        self.assertEqual(quote("\?"), "\?")
+        self.assertEqual(quote("\\?"), "\\?")
         self.assertEqual(quote("john@foo.com"), "john@foo.com")
         self.assertEqual(
             quote("http://machine/folder and item and some/path " "and and amilli3*"),
-            "(http\:\\/\\/machine\\/folder and item and "
+            "(http\\:\\/\\/machine\\/folder and item and "
             "some\\/path and and amilli3*)",
         )
-        self.assertEqual(quote('"[]"'), '"\[\]"')
-        self.assertEqual(quote('"{}"'), '"\{\}"')
-        self.assertEqual(quote('"()"'), '"\(\)"')
+        self.assertEqual(quote('"[]"'), '"\\[\\]"')
+        self.assertEqual(quote('"{}"'), '"\\{\\}"')
+        self.assertEqual(quote('"()"'), '"\\(\\)"')
         self.assertEqual(quote('foo and bar and 42"*'), "(foo and bar and " '42\\"\\*)')
         # Can't use ? or * as beginning of new query
         self.assertEqual(quote('"fix and it"*'), '"fix and it"')
         self.assertEqual(quote('"fix and it"?'), '"fix and it"')
         self.assertEqual(
             quote("foo and bar and [foobar at foo.com]*"),
-            "(foo and bar and \[foobar at foo.com\])",
+            "(foo and bar and \\[foobar at foo.com\\])",
         )
 
     def testQuotingWildcardSearches(self):
@@ -151,18 +151,19 @@ class QuoteTests(TestCase):
         self.assertEqual(quote("foø"), b"fo\xc3\xb8".decode("utf-8"))
         self.assertEqual(quote('"foø'), b'\\"fo\xc3\xb8'.decode("utf-8"))
         self.assertEqual(quote("whät?"), b"wh\xc3\xa4t?".decode("utf-8"))
-        self.assertEqual(quote('"whät?"'), b'"wh\xc3\xa4t\?"'.decode("utf-8"))
-        self.assertEqual(quote('"[ø]"'), b'"\[\xc3\xb8\]"'.decode("utf-8"))
+        self.assertEqual(quote('"whät?"'), b'"wh\xc3\xa4t\\?"'.decode("utf-8"))
+        self.assertEqual(quote('"[ø]"'), b'"\\[\xc3\xb8\\]"'.decode("utf-8"))
         self.assertEqual(quote("[ø]"), b"\\[\xc3\xb8\\]".decode("utf-8"))
-        self.assertEqual(quote('"foø*"'), b'"fo\xc3\xb8\*"'.decode("utf-8"))
-        self.assertEqual(quote('"foø bar?"'), b'"fo\xc3\xb8 bar\?"'.decode("utf-8"))
+        self.assertEqual(quote('"foø*"'), b'"fo\xc3\xb8\\*"'.decode("utf-8"))
+        self.assertEqual(quote('"foø bar?"'), b'"fo\xc3\xb8 bar\\?"'.decode("utf-8"))
         self.assertEqual(quote(u"john@foo.com"), "john@foo.com")
 
     def testSolrSpecifics(self):
         # http://wiki.apache.org/solr/SolrQuerySyntax
         # Seems to be ok to quote function
         self.assertEqual(
-            quote('"recip(rord(myfield),1,2,3)"'), '"recip\(rord\(myfield\),1,2,3\)"'
+            quote('"recip(rord(myfield),1,2,3)"'),
+            '"recip\\(rord\\(myfield\\),1,2,3\\)"',
         )
         self.assertEqual(quote("[* TO NOW]"), "[* TO NOW]")
         self.assertEqual(
@@ -234,8 +235,8 @@ class QueryTests(TestCase):
         self.assertEqual(bq(name=["foo", "bar"]), "+name:(foo OR bar)")
         self.assertEqual(bq(name=["foo", "bar*"]), "+name:(foo OR bar*)")
         self.assertEqual(bq(name=["foo bar", "hmm"]), '+name:("foo bar" OR hmm)')
-        self.assertEqual(bq(price=[1.5, 2.5]), '+price:(1.5 OR 2.5)')
-        self.assertEqual(bq(popularity=[1.5, 2.5]), '+popularity:(1.5 OR 2.5)')
+        self.assertEqual(bq(price=[1.5, 2.5]), "+price:(1.5 OR 2.5)")
+        self.assertEqual(bq(popularity=[1.5, 2.5]), "+popularity:(1.5 OR 2.5)")
 
     def testMultiArgumentQueries(self):
         bq = self.bq
@@ -284,18 +285,18 @@ class QueryTests(TestCase):
         bq = self.bq
         self.assertEqual(bq('"foo"'), '+"foo"')
         self.assertEqual(bq("foo"), "+foo")
-        self.assertEqual(bq('"foo*"'), '+"foo\*"')
+        self.assertEqual(bq('"foo*"'), '+"foo\\*"')
         self.assertEqual(bq("foo*"), "+foo*")
-        self.assertEqual(bq('"+foo"'), '+"\+foo"')
+        self.assertEqual(bq('"+foo"'), '+"\\+foo"')
         self.assertEqual(bq("+foo"), "+foo")
         self.assertEqual(bq('"foo bar"'), '+"foo bar"')
         self.assertEqual(bq("foo bar"), "+(foo bar)")
-        self.assertEqual(bq('"foo bar?"'), '+"foo bar\?"')
+        self.assertEqual(bq('"foo bar?"'), '+"foo bar\\?"')
         self.assertEqual(bq("foo bar?"), "+(foo bar?)")
         self.assertEqual(bq("-foo +bar"), "+(-foo +bar)")
-        self.assertEqual(bq('"-foo +bar"'), '+"\-foo \+bar"')
+        self.assertEqual(bq('"-foo +bar"'), '+"\\-foo \\+bar"')
         self.assertEqual(bq("foo-bar"), '+"foo\\-bar"')
-        self.assertEqual(bq('"foo-bar"'), '+"foo\-bar"')
+        self.assertEqual(bq('"foo-bar"'), '+"foo\\-bar"')
         self.assertEqual(bq(name='"foo"'), '+name:"foo"')
         self.assertEqual(bq(name='"foo bar'), '+name:(\\"foo bar)')
         self.assertEqual(bq(name='"foo bar*'), '+name:(\\"foo bar\\*)')
@@ -310,7 +311,7 @@ class QueryTests(TestCase):
         bq = self.bq
         self.assertEqual(
             bq(u"foo", name=u'"herb*"', cat=(u"bär", u'"-hmm"')),
-            u'+cat:(bär OR "\-hmm") +foo +name:"herb\*"',
+            u'+cat:(bär OR "\\-hmm") +foo +name:"herb\\*"',
         )
         self.assertEqual(
             bq(u"foo", name=u"herb*", cat=(u"bär", u"-hmm")),
@@ -359,7 +360,7 @@ class QueryTests(TestCase):
         self.assertEqual(bq(cat={"not": ["foo", "bar"]}), "-cat:(foo OR bar)")
         self.assertEqual(
             bq(cat={"query": ["FOO", "BAR"], "not": ["foo", "bar"]}),
-            "+cat:(FOO OR BAR) -cat:(foo OR bar)"
+            "+cat:(FOO OR BAR) -cat:(foo OR bar)",
         )
 
     def testIntegerFloatQueries(self):
@@ -367,14 +368,12 @@ class QueryTests(TestCase):
         self.assertEqual(bq(price=1.5), "+price:1.5")
         self.assertEqual(bq(price={"query": 1.5}), "+price:1.5")
         self.assertEqual(
-            bq(price={"query": (1.5, 2.5), "range": "min:max"}),
-            "+price:[1.5 TO 2.5]"
+            bq(price={"query": (1.5, 2.5), "range": "min:max"}), "+price:[1.5 TO 2.5]"
         )
         self.assertEqual(bq(popularity=2), "+popularity:2")
         self.assertEqual(bq(popularity={"query": 2}), "+popularity:2")
         self.assertEqual(
-            bq(popularity={"query": (2, 5), "range": "min:max"}),
-            "+popularity:[2 TO 5]"
+            bq(popularity={"query": (2, 5), "range": "min:max"}), "+popularity:[2 TO 5]"
         )
 
 
