@@ -1,8 +1,8 @@
 Changelog
 =========
 
-8.0.0a13 (unreleased)
----------------------
+8.0.0b1 (2020-06-12)
+--------------------
 
 - Initial support for Python3.8 (see #265)
   [ale-rt]
