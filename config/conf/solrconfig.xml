@@ -98,4 +98,29 @@
     </lst>
   </requestHandler>
 
+  <!-- eea.facetednavigation autocomplete -->
+  <searchComponent name="suggest" class="solr.SpellCheckComponent">
+    <lst name="spellchecker">
+      <str name="name">suggest</str>
+      <str name="classname">org.apache.solr.spelling.suggest.Suggester</str>
+      <str name="lookupImpl">org.apache.solr.spelling.suggest.fst.WFSTLookupFactory</str>
+      <str name="field">Title</str>
+      <float name="threshold">0.005</float>
+      <str name="buildOnCommit">true</str>
+    </lst>
+  </searchComponent>
+
+  <requestHandler name="/suggest" class="org.apache.solr.handler.component.SearchHandler">
+     <lst name="defaults">
+      <str name="spellcheck">true</str>
+      <str name="spellcheck.dictionary">suggest</str>
+      <str name="spellcheck.count">10</str>
+      <str name="spellcheck.onlyMorePopular">true</str>
+      <str name="wt">xml</str>
+     </lst>
+     <arr name="components">
+      <str>suggest</str>
+     </arr>
+   </requestHandler>
+
 </config>

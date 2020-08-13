@@ -4,7 +4,8 @@ Changelog
 8.0.0b2 (unreleased)
 --------------------
 
-- Nothing changed yet.
+- Update default solrconfig.xml to include /suggest requestHandler used by eea.facetednavigation autocomplete
+  [avoinea]
 
 
 8.0.0b1 (2020-06-12)
