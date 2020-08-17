@@ -98,10 +98,12 @@
     </configure>
 
     <adapter
-        factory=".indexer.BaseIndexable" />
+        factory=".indexer.BaseIndexable"
+        provides="collective.solr.interfaces.ICheckIndexable" />
 
   <adapter
-      factory=".flare.PloneFlare" />
+      factory=".flare.PloneFlare"
+      provides="collective.solr.interfaces.IFlare" />
 
   <adapter
       for="*

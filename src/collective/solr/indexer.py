@@ -76,18 +76,17 @@ def datehandler(value):
             v.hour(),
             v.minute(),
             int(v.second()),
-            v.millis() % 1000
+            v.millis() % 1000,
         )
     elif isinstance(value, datetime):
         # Convert a timezone aware timetuple to a non timezone aware time
         # tuple representing utc time. Does nothing if object is not
         # timezone aware
-        millis = int(value.microsecond / 1000)  # 1 second = 1 000 millis = 1 000 000 microsecond
+        millis = int(
+            value.microsecond / 1000
+        )  # 1 second = 1 000 millis = 1 000 000 microsecond
         value = datetime(*value.utctimetuple()[:6])
-        value = "%s.%03dZ" % (
-            value.strftime("%Y-%m-%dT%H:%M:%S"),
-            millis
-        )
+        value = "%s.%03dZ" % (value.strftime("%Y-%m-%dT%H:%M:%S"), millis)
     elif isinstance(value, date):
         value = "%s.000Z" % value.strftime("%Y-%m-%dT%H:%M:%S")
     return value
@@ -108,7 +107,7 @@ handlers = {
     "solr.TrieDateField": datehandler,
     "solr.TrieIntField": inthandler,
     "solr.IntField": inthandler,
-    "solr.IntPointField": inthandler
+    "solr.IntPointField": inthandler,
 }
 
 

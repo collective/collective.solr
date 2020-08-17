@@ -7,6 +7,9 @@ Changelog
 - Update default solrconfig.xml to include /suggest requestHandler used by eea.facetednavigation autocomplete
   [avoinea]
 
+- Plone 5.2.2 compatibility.
+  [timo]
+
 
 8.0.0b1 (2020-06-12)
 --------------------
