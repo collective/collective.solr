@@ -4,7 +4,8 @@ Changelog
 8.0.0b2 (unreleased)
 --------------------
 
-- Nothing changed yet.
+- Plone 5.2.2 compatibility.
+  [timo]
 
 
 8.0.0b1 (2020-06-12)
