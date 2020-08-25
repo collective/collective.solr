@@ -145,6 +145,27 @@ class ISolrSchema(Interface):
         ),
     )
 
+    force_simple_search = Bool(
+        title=_("label_force_simple_search",
+                default=u"Force the use of the Pattern for FIXME"),
+        description=_(
+            "help_force_simple_search",
+            default=u"The search will always use the Pattern for simple search.",
+        ),
+    )
+
+    allow_complex_search = Bool(
+        title=_("allow_complex_search",
+                default=u"Allow complex search"),
+        description=_(
+            "help_allow_complex_search",
+            default=u"If \"Force the use of the Pattern for FIXME\" is set "
+            u"allow to pass throuh a complex solr pattern for SearchableText "
+            u"by either prefixing SearchableText with \"solr:\" or passing "
+            u"solr_complex_search=True in the catalog query.",
+        ),
+    )
+
     facets = List(
         title=_("label_facets", default=u"Default search facets"),
         description=_(
