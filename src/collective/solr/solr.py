@@ -122,9 +122,6 @@ class SolrConnection:
         return self.doGetOrPost("GET", url, "", headers)
 
     def doGetOrPost(self, method, url, body, headers):
-        from pprint import pprint
-        pprint(url)
-        pprint(body)
         if not isinstance(body, six.binary_type):
             body = body.encode("utf-8")
         try:
