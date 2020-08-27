@@ -9,6 +9,7 @@ from collective.solr.utils import isWildCard
 from collective.solr.utils import prepare_wildcard
 from collective.solr.utils import splitSimpleSearch
 from collective.solr.utils import getConfig
+from collective.solr.utils import removeSpecialCharactersAndOperators
 from pytz import timezone
 from zope.component import getUtility
 from plone.registry.interfaces import IRegistry
@@ -27,7 +28,7 @@ sort_aliases = {"sortable_title": "Title"}
 
 query_args = ("range", "operator", "depth")
 
-ignored = "use_solr", "-C"
+ignored = ("use_solr", "-C", 'solr_complex_search')
 
 
 def iso8601date(value):
@@ -70,15 +71,30 @@ def makeSimpleExpressions(term, levenstein_distance):
     return "(%s)" % value, "(%s)" % base_value
 
 
-def mangleSearchableText(value, config):
+def mangleSearchableText(value, config, force_complex_search=False):
     config = config or getConfig()
     pattern = getattr(config, "search_pattern", u"")
+    force_simple_search = getattr(config, "force_simple_search", False)
+    allow_complex_search = getattr(config, "allow_complex_search", False)
     levenstein_distance = getattr(config, "levenshtein_distance", 0)
     value_parts = []
     base_value_parts = []
 
-    if not isSimpleSearch(value):
+    stripped = value.strip()
+    force_complex_search_prefix = False
+    if stripped.startswith('solr:'):
+        stripped = stripped.replace('solr:', '', 1).strip()
+        force_complex_search_prefix = True
+
+    if not force_simple_search and not isSimpleSearch(value):
         return value
+
+    if allow_complex_search and (force_complex_search_prefix or force_complex_search):
+        # FIXME: fold in catalog solr_complex_search parameter check
+        return stripped
+
+    if force_simple_search:
+        return removeSpecialCharactersAndOperators(value)
 
     for term in splitSimpleSearch(value):
         (term_value, term_base_value) = makeSimpleExpressions(term, levenstein_distance)
@@ -109,6 +125,7 @@ def mangleQuery(keywords, config, schema):
     """ translate / mangle query parameters to replace zope specifics
         with equivalent constructs for solr """
     extras = {}
+    force_complex_search = bool(keywords.get("solr_complex_search"))
     for key, value in keywords.copy().items():
         if key.endswith("_usage"):  # convert old-style parameters
             category, spec = value.split(":", 1)
@@ -149,7 +166,8 @@ def mangleQuery(keywords, config, schema):
     for key, value in keywords.copy().items():
         args = extras.get(key, {})
         if key == "SearchableText":
-            keywords[key] = mangleSearchableText(value, config)
+            keywords[key] = mangleSearchableText(
+                value, config, force_complex_search=force_complex_search)
             continue
         if key in epi_indexes:
             if isinstance(value, (list, tuple)):

@@ -10,6 +10,7 @@ from collective.solr.utils import isWildCard
 from collective.solr.utils import padResults
 from collective.solr.utils import prepareData
 from collective.solr.utils import prepare_wildcard
+from collective.solr.utils import removeSpecialCharactersAndOperators
 from collective.solr.utils import setupTranslationMap
 from collective.solr.utils import splitSimpleSearch
 from unittest import TestCase
@@ -162,6 +163,19 @@ class UtilsTests(TestCase):
             prepare_wildcard("FOO AND BAR OR FOO AND NOT BAR"),
             "foo AND bar OR foo AND NOT bar",
         )
+
+    def test_removeSpecialCharactersAndOperators(self):
+        special = [
+            "AND", "OR", "NOT", "+", "-", "&", "|", "!", "(", ")",
+            "{", "}", "[", "]", "^", "~", "*", "?", ":", "\\", "/", "]"]
+        for character_or_operant in special:
+            self.assertEqual(
+                removeSpecialCharactersAndOperators(
+                    "%s text %s text %s" % (
+                        character_or_operant, character_or_operant,
+                        character_or_operant)),
+                    "  text   text  ",
+                    "Character not removed: %s" % character_or_operant)
 
     def test_solr_exception(self):
         e = SolrConnectionException(503, "Error happend", "<xml></xml>")
