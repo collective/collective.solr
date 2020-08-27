@@ -145,6 +145,28 @@ class ISolrSchema(Interface):
         ),
     )
 
+    force_simple_search = Bool(
+        title=_("label_force_simple_search",
+                default=u"Force simple search pattern"),
+        description=_(
+            "help_force_simple_search",
+            default=u"If set all queries in SearchableText will use the "
+            u"\"Pattern for simple search queries\". This will remove all special "
+            u"solr characters and operators from the query text.",
+        ),
+    )
+
+    allow_complex_search = Bool(
+        title=_("allow_complex_search",
+                default=u"Allow complex search"),
+        description=_(
+            "help_allow_complex_search",
+            default=u"Allow a complex search in SearchableText by either prefixing the "
+            u"search text with \"solr:\" or passing \"solr_complex_search\" as a field "
+            u"in the catalog query.",
+        ),
+    )
+
     facets = List(
         title=_("label_facets", default=u"Default search facets"),
         description=_(
