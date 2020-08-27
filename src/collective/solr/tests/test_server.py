@@ -1296,17 +1296,42 @@ class SolrServerTests(TestCase):
         results = solrSearchResults(SearchableText="Brazil Germa*")
         self.assertEqual(len(results), 1)
 
-    def testWildcardSearchesUnicode(self):
+    def testPrefixWildcardSearches(self):
         self.maintenance.reindex()
-        self.portal.invokeFactory("Document", id="an", title=u"Ärger nøkkel")
-        commit()
-        results = solrSearchResults(SearchableText=u"Ärger")
+
+        # Do not activate prefix wildcard search
+        config = getConfig()
+        config.prefix_wildcard = False
+
+        self.portal.invokeFactory("Document", id="p1", title="phrase")
+        self.portal.invokeFactory("Document", id="p2", title="ophrase")
+        commit()  # indexing happens on commit
+
+        results = solrSearchResults(SearchableText="phrase")
         self.assertEqual(len(results), 1)
-        results = solrSearchResults(SearchableText=u"Ärg*")
+        self.assertEqual(
+            sorted([i.Title for i in results]), ["phrase"]
+        )
+
+        config.prefix_wildcard = True
+        results = solrSearchResults(SearchableText="phrase")
+        from pprint import pprint
+        pprint(sorted([(i.Title, i.id) for i in results]))
+
+        self.assertEqual(len(results), 2)
+        self.assertEqual(
+            sorted([i.Title for i in results]), ["ophrase", "phrase"]
+        )
+
+    def testPrefixWildcardSearchesMultipleWords(self):
+        self.maintenance.reindex()
+        config = getConfig()
+        config.prefix_wildcard = True
+        self.portal.invokeFactory("Document", id="bg", title="Brazil Germany")
+        commit()  # indexing happens on commit
+        results = solrSearchResults(SearchableText="*azil")
         self.assertEqual(len(results), 1)
-        results = solrSearchResults(SearchableText=u"nøkkel")
-        self.assertEqual(len(results), 1)
-        results = solrSearchResults(SearchableText=u"nø*")
+        results = solrSearchResults(SearchableText="Brazil *rmany")
         self.assertEqual(len(results), 1)
 
     def testAbortedTransaction(self):

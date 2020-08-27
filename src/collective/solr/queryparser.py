@@ -114,7 +114,7 @@ class Stack(list):
         return "".join([six.text_type(x) for x in self[0]])
 
 
-def quote(term, textfield=False):
+def quote(term, textfield=False, prefix_wildcard=False):
     if isinstance(term, six.binary_type):
         term = term.decode("utf-8")
     stack = Stack()
@@ -253,6 +253,7 @@ def quote(term, textfield=False):
                     stack.current.append("\\%s" % special)
             elif special in "?*":
                 # ? and * can not be the first characters of a search
+                # if prefix_wildcard is not enabled
                 if (
                     stack.current
                     and not getattr(stack.current[-1], "isgroup", False)
@@ -260,6 +261,9 @@ def quote(term, textfield=False):
                         isinstance(stack.current[-1], six.text_type)
                         and not stack.current[-1] in special
                     )
+                ) or (
+                    prefix_wildcard and (
+                        not stack.current or not stack.current[-1] in special)
                 ) or isinstance(stack.current, Range):
                     stack.current.append(special)
             elif special in "/":

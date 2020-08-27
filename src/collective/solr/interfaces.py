@@ -145,6 +145,11 @@ class ISolrSchema(Interface):
         ),
     )
 
+    prefix_wildcard = Bool(
+        title=_("label_simple_search_prefix_wildcard",
+                default=u"Allow prefix wildcard searches and use them in simple searches"),
+    )
+
     force_simple_search = Bool(
         title=_("label_force_simple_search",
                 default=u"Force simple search pattern"),
