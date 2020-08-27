@@ -125,7 +125,7 @@ def mangleQuery(keywords, config, schema):
     """ translate / mangle query parameters to replace zope specifics
         with equivalent constructs for solr """
     extras = {}
-    force_complex_search = False
+    force_complex_search = bool(keywords.get("solr_complex_search"))
     for key, value in keywords.copy().items():
         if key.endswith("_usage"):  # convert old-style parameters
             category, spec = value.split(":", 1)
@@ -149,8 +149,6 @@ def mangleQuery(keywords, config, schema):
                 if arg_val is not None:
                     extra[arg] = arg_val
             extras[key] = extra
-        if key == "solr_complex_search":
-            force_complex_search = True
         elif key in ignored:
             del keywords[key]
 
