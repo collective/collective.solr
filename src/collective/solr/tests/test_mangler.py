@@ -165,7 +165,7 @@ class QueryManglerTests(TestCase):
         self.assertEqual(keywords, {"foo": "bar"})
         keywords = mangle(**{"-C": True, "foo": "bar"})
         self.assertEqual(keywords, {"foo": "bar"})
-        keywords = mangle(**{"solr_pass_through": True, "foo": "bar"})
+        keywords = mangle(**{"solr_complex_search": True, "foo": "bar"})
         self.assertEqual(keywords, {"foo": "bar"})
 
 

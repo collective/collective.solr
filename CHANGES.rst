@@ -7,6 +7,10 @@ Changelog
 - Plone 5.2.2 compatibility.
   [timo]
 
+- Add a feature to force a simple search on SearchableText without inspecting 
+  the passed text.
+  [csenger]
+
 
 8.0.0b1 (2020-06-12)
 --------------------
