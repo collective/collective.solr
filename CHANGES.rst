@@ -1,7 +1,7 @@
 Changelog
 =========
 
-8.1.0 (unreleased)
+8.1.0 (2020-08-27)
 ------------------
 
 - Add a feature to force a simple search on SearchableText without inspecting
