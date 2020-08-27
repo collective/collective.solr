@@ -4,7 +4,8 @@ Changelog
 8.1.1 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Add an option to allow prefix wildcard searches
+  [csenger]
 
 
 8.1.0 (2020-08-27)

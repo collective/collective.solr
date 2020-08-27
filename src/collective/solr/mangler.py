@@ -55,6 +55,9 @@ def makeSimpleExpressions(term, levenstein_distance):
     includes the levenstein distance and wildcards where appropriate.
     Returns both an expression for "value" and "base_value"'''
 
+    config = getConfig()
+    prefix_wildcard = getattr(config, "prefix_wildcard", False)
+    prefix_wildcard_str = "*" if prefix_wildcard else ""
     base_value = term
     if levenstein_distance:
         levenstein_expr = "~%s" % levenstein_distance
@@ -67,7 +70,8 @@ def makeSimpleExpressions(term, levenstein_distance):
         value = prepare_wildcard(term)
         base_value = quote(term.replace("*", "").replace("?", ""))
     else:
-        value = "%s* OR %s%s" % (prepare_wildcard(term), term, levenstein_expr)
+        value = "%s%s* OR %s%s" % (prefix_wildcard_str, prepare_wildcard(term),
+                                   term, levenstein_expr)
     return "(%s)" % value, "(%s)" % base_value
 
 
@@ -77,6 +81,7 @@ def mangleSearchableText(value, config, force_complex_search=False):
     force_simple_search = getattr(config, "force_simple_search", False)
     allow_complex_search = getattr(config, "allow_complex_search", False)
     levenstein_distance = getattr(config, "levenshtein_distance", 0)
+    prefix_wildcard = getattr(config, "prefix_wildcard", False)
     value_parts = []
     base_value_parts = []
 
@@ -104,7 +109,8 @@ def mangleSearchableText(value, config, force_complex_search=False):
     base_value = " ".join(base_value_parts)
     value = " ".join(value_parts)
     if pattern:
-        value = pattern.format(value=quote(value), base_value=base_value)
+        value = pattern.format(value=quote(value, prefix_wildcard=prefix_wildcard),
+                               base_value=base_value)
         return set([value])  # add literal query parameter
     if pattern:
         pattern = pattern.encode("utf-8")
