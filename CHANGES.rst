@@ -1,7 +1,7 @@
 Changelog
 =========
 
-8.1.1 (unreleased)
+8.2.0 (2020-08-28)
 ------------------
 
 - Add an option to allow prefix wildcard searches
