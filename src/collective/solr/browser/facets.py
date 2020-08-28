@@ -139,8 +139,8 @@ class SearchFacetsView(BrowserView, FacetMixin):
             return None
 
     def selected(self):
-        """ determine selected facets and prepare links to clear them;
-            this assumes that facets are selected using filter queries """
+        """determine selected facets and prepare links to clear them;
+        this assumes that facets are selected using filter queries"""
         info = []
         facets = param(self, "facet.field")
         fq = param(self, "fq")

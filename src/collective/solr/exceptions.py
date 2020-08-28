@@ -2,8 +2,7 @@
 
 
 class SolrException(Exception):
-    """Base class where all other exceptions from collective.solr derive from
-    """
+    """Base class where all other exceptions from collective.solr derive from"""
 
 
 class SolrInactiveException(SolrException):
@@ -12,7 +11,7 @@ class SolrInactiveException(SolrException):
 
 class FallBackException(SolrException):
     """Exception indicating the dispatcher should fall back to searching
-       the portal catalog
+    the portal catalog
     """
 
 

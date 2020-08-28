@@ -120,8 +120,8 @@ class SolrMaintenanceView(BrowserView):
         idxs=[],
         ignore_exceptions=False,
     ):
-        """ find all contentish objects (meaning all objects derived from one
-            of the catalog mixin classes) and (re)indexes them """
+        """find all contentish objects (meaning all objects derived from one
+        of the catalog mixin classes) and (re)indexes them"""
 
         if ignore_portal_types and only_portal_types:
             raise ValueError(
@@ -375,8 +375,8 @@ class SolrMaintenanceView(BrowserView):
         logger.info(msg)
 
     def cleanup(self, batch=1000):
-        """ remove entries from solr that don't have a corresponding Zope
-            object or have a different UID than the real object"""
+        """remove entries from solr that don't have a corresponding Zope
+        object or have a different UID than the real object"""
         manager = queryUtility(ISolrConnectionManager)
         proc = SolrIndexProcessor(manager)
         conn = manager.getConnection()

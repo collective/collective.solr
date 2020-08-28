@@ -166,16 +166,38 @@ class UtilsTests(TestCase):
 
     def test_removeSpecialCharactersAndOperators(self):
         special = [
-            "AND", "OR", "NOT", "+", "-", "&", "|", "!", "(", ")",
-            "{", "}", "[", "]", "^", "~", "*", "?", ":", "\\", "/", "]"]
+            "AND",
+            "OR",
+            "NOT",
+            "+",
+            "-",
+            "&",
+            "|",
+            "!",
+            "(",
+            ")",
+            "{",
+            "}",
+            "[",
+            "]",
+            "^",
+            "~",
+            "*",
+            "?",
+            ":",
+            "\\",
+            "/",
+            "]",
+        ]
         for character_or_operant in special:
             self.assertEqual(
                 removeSpecialCharactersAndOperators(
-                    "%s text %s text %s" % (
-                        character_or_operant, character_or_operant,
-                        character_or_operant)),
-                    "  text   text  ",
-                    "Character not removed: %s" % character_or_operant)
+                    "%s text %s text %s"
+                    % (character_or_operant, character_or_operant, character_or_operant)
+                ),
+                "  text   text  ",
+                "Character not removed: %s" % character_or_operant,
+            )
 
     def test_solr_exception(self):
         e = SolrConnectionException(503, "Error happend", "<xml></xml>")

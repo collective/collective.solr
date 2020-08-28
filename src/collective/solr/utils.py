@@ -38,8 +38,8 @@ def activate(active=True):
 
 
 def setupTranslationMap():
-    """ prepare translation map to remove all control characters except
-        tab, new-line and carriage-return """
+    """prepare translation map to remove all control characters except
+    tab, new-line and carriage-return"""
     ctrls = trans = ""
     for n in range(0, 32):
         char = six.unichr(n)
@@ -55,10 +55,10 @@ translation_map = setupTranslationMap()
 
 
 def prepareData(data):
-    """ modify data according to solr specifics, i.e. replace ':' by '$'
-        for "allowedRolesAndUsers" etc;  please note that this function
-        is also used while indexing, so no query-specific modification
-        should happen here! """
+    """modify data according to solr specifics, i.e. replace ':' by '$'
+    for "allowedRolesAndUsers" etc;  please note that this function
+    is also used while indexing, so no query-specific modification
+    should happen here!"""
     allowed = data.get("allowedRolesAndUsers", None)
     if allowed is not None:
         data["allowedRolesAndUsers"] = [r.replace(":", "$") for r in allowed]
@@ -106,11 +106,11 @@ reserved = compile(r"(AND|OR|NOT|[+\-&|!(){}\[\]^~*?:\\/]+)", UNICODE)
 
 
 def removeSpecialCharactersAndOperators(term):
-    '''
+    """
     Remove all special operators and characters used by Solr'
     Standard Query Parser (lucene)
-    '''
-    return reserved.sub(' ', term)
+    """
+    return reserved.sub(" ", term)
 
 
 operators = compile(r"(.*)\s+(AND|OR|NOT)\s+", UNICODE)
@@ -198,8 +198,8 @@ def prepare_wildcard(value):
 
 
 def findObjects(origin):
-    """ generator to recursively find and yield all zope objects below
-        the given start point """
+    """generator to recursively find and yield all zope objects below
+    the given start point"""
     traverse = origin.unrestrictedTraverse
     base = "/".join(origin.getPhysicalPath())
     cut = len(base) + 1

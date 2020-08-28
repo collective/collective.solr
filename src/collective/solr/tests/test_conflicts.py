@@ -49,7 +49,7 @@ class ConflictTests(TestCase):
         )
 
     def test_retry_on_conflict(self):
-        """ This tests transaction handling when indexing in Solr, or more
+        """This tests transaction handling when indexing in Solr, or more
         specifically properly aborting a transaction.  To do this we'll try to
         create some content and fake a `ConflictError` shortly before the
         transaction completes.  The publisher will catch it and retry, but

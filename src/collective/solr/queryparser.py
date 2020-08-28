@@ -255,16 +255,20 @@ def quote(term, textfield=False, prefix_wildcard=False):
                 # ? and * can not be the first characters of a search
                 # if prefix_wildcard is not enabled
                 if (
-                    stack.current
-                    and not getattr(stack.current[-1], "isgroup", False)
-                    and (
-                        isinstance(stack.current[-1], six.text_type)
-                        and not stack.current[-1] in special
+                    (
+                        stack.current
+                        and not getattr(stack.current[-1], "isgroup", False)
+                        and (
+                            isinstance(stack.current[-1], six.text_type)
+                            and not stack.current[-1] in special
+                        )
                     )
-                ) or (
-                    prefix_wildcard and (
-                        not stack.current or not stack.current[-1] in special)
-                ) or isinstance(stack.current, Range):
+                    or (
+                        prefix_wildcard
+                        and (not stack.current or not stack.current[-1] in special)
+                    )
+                    or isinstance(stack.current, Range)
+                ):
                     stack.current.append(special)
             elif special in "/":
                 stack.current.append("\\%s" % special)

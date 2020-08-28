@@ -28,7 +28,7 @@ sort_aliases = {"sortable_title": "Title"}
 
 query_args = ("range", "operator", "depth")
 
-ignored = ("use_solr", "-C", 'solr_complex_search')
+ignored = ("use_solr", "-C", "solr_complex_search")
 
 
 def iso8601date(value):
@@ -70,8 +70,12 @@ def makeSimpleExpressions(term, levenstein_distance):
         value = prepare_wildcard(term)
         base_value = quote(term.replace("*", "").replace("?", ""))
     else:
-        value = "%s%s* OR %s%s" % (prefix_wildcard_str, prepare_wildcard(term),
-                                   term, levenstein_expr)
+        value = "%s%s* OR %s%s" % (
+            prefix_wildcard_str,
+            prepare_wildcard(term),
+            term,
+            levenstein_expr,
+        )
     return "(%s)" % value, "(%s)" % base_value
 
 
@@ -87,8 +91,8 @@ def mangleSearchableText(value, config, force_complex_search=False):
 
     stripped = value.strip()
     force_complex_search_prefix = False
-    if stripped.startswith('solr:'):
-        stripped = stripped.replace('solr:', '', 1).strip()
+    if stripped.startswith("solr:"):
+        stripped = stripped.replace("solr:", "", 1).strip()
         force_complex_search_prefix = True
 
     if not force_simple_search and not isSimpleSearch(value):
@@ -109,8 +113,9 @@ def mangleSearchableText(value, config, force_complex_search=False):
     base_value = " ".join(base_value_parts)
     value = " ".join(value_parts)
     if pattern:
-        value = pattern.format(value=quote(value, prefix_wildcard=prefix_wildcard),
-                               base_value=base_value)
+        value = pattern.format(
+            value=quote(value, prefix_wildcard=prefix_wildcard), base_value=base_value
+        )
         return set([value])  # add literal query parameter
     if pattern:
         pattern = pattern.encode("utf-8")
@@ -118,8 +123,8 @@ def mangleSearchableText(value, config, force_complex_search=False):
 
 
 def quotePath(path):
-    """ quote overlap of solr reserved characters and those allowed
-        in zope ids (see OFS.ObjectManager.bad_id) """
+    """quote overlap of solr reserved characters and those allowed
+    in zope ids (see OFS.ObjectManager.bad_id)"""
     if path.endswith("/"):
         path = path[:-1]
     for reserved in "/-~()":
@@ -128,8 +133,8 @@ def quotePath(path):
 
 
 def mangleQuery(keywords, config, schema):
-    """ translate / mangle query parameters to replace zope specifics
-        with equivalent constructs for solr """
+    """translate / mangle query parameters to replace zope specifics
+    with equivalent constructs for solr"""
     extras = {}
     force_complex_search = bool(keywords.get("solr_complex_search"))
     for key, value in keywords.copy().items():
@@ -173,7 +178,8 @@ def mangleQuery(keywords, config, schema):
         args = extras.get(key, {})
         if key == "SearchableText":
             keywords[key] = mangleSearchableText(
-                value, config, force_complex_search=force_complex_search)
+                value, config, force_complex_search=force_complex_search
+            )
             continue
         if key in epi_indexes:
             if isinstance(value, (list, tuple)):
@@ -230,8 +236,8 @@ def mangleQuery(keywords, config, schema):
 
 
 def subtractQueryParameters(args, request_keywords=None):
-    """ subtract parameters related to sorting and limiting search results
-        from a given set of arguments, also removing them from the input """
+    """subtract parameters related to sorting and limiting search results
+    from a given set of arguments, also removing them from the input"""
 
     def get(name):
         for prefix in "sort_", "sort-":
@@ -282,8 +288,8 @@ def subtractQueryParameters(args, request_keywords=None):
 
 
 def cleanupQueryParameters(args, schema):
-    """ validate and possibly clean up the given query parameters using
-        the given solr schema """
+    """validate and possibly clean up the given query parameters using
+    the given solr schema"""
     sort = args.get("sort", None)
     if sort is not None:
         field, order = sort.split(" ", 1)
@@ -300,8 +306,8 @@ def cleanupQueryParameters(args, schema):
 
 
 def optimizeQueryParameters(query, params):
-    """ optimize query parameters by using filter queries for
-        configured indexes """
+    """optimize query parameters by using filter queries for
+    configured indexes"""
     registry = getUtility(IRegistry)
     filter_queries = registry["collective.solr.filter_queries"]
     fq = []

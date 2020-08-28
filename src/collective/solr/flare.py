@@ -42,11 +42,11 @@ class PloneFlare(AttrDict):
         return int(int(self["UID"], 16) % sys.maxsize)
 
     def getObject(self, REQUEST=None, restricted=True):
-        """ return the actual object corresponding to this flare while
-            mimicking what publisher's traversal does, i.e. potentially
-            allowing access to the final object even if intermediate objects
-            cannot be accessed (much like the original implementation in
-            `ZCatalog.CatalogBrains.AbstractCatalogBrain`) """
+        """return the actual object corresponding to this flare while
+        mimicking what publisher's traversal does, i.e. potentially
+        allowing access to the final object even if intermediate objects
+        cannot be accessed (much like the original implementation in
+        `ZCatalog.CatalogBrains.AbstractCatalogBrain`)"""
         site = getSite()
         path = self.getPath()
         if not path:

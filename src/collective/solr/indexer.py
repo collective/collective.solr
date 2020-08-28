@@ -113,8 +113,7 @@ handlers = {
 
 @implementer(ISolrAddHandler)
 class DefaultAdder(object):
-    """
-    """
+    """"""
 
     def __init__(self, context):
         self.context = context
@@ -127,8 +126,7 @@ class DefaultAdder(object):
 
 
 class BinaryAdder(DefaultAdder):
-    """ Add binary content to index via tika
-    """
+    """Add binary content to index via tika"""
 
     def getblob(self):
         field = self.context.getPrimaryField()
@@ -189,8 +187,8 @@ class DXImageBinaryAdder(DXFileBinaryAdder):
 
 
 def boost_values(obj, data):
-    """ calculate boost values using a method or skin script;  returns
-        a dictionary with the values or `None` """
+    """calculate boost values using a method or skin script;  returns
+    a dictionary with the values or `None`"""
     boost_index_getter = aq_get(obj, "solr_boost_index_values", None)
     if boost_index_getter is not None:
         return boost_index_getter(data)
@@ -341,9 +339,9 @@ class SolrIndexProcessor(object):
             return self.manager.getConnection()
 
     def wrapObject(self, obj):
-        """ wrap object with an "IndexableObjectWrapper` (for Plone < 3.3) or
-            adapt it to `IIndexableObject` (for Plone >= 3.3), see
-            `CMFPlone...CatalogTool.catalog_object` for some background """
+        """wrap object with an "IndexableObjectWrapper` (for Plone < 3.3) or
+        adapt it to `IIndexableObject` (for Plone >= 3.3), see
+        `CMFPlone...CatalogTool.catalog_object` for some background"""
         wrapper = obj
         # first try the new way, i.e. using `plone.indexer`...
         catalog = getToolByName(obj, "portal_catalog", None)

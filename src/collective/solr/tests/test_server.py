@@ -130,8 +130,7 @@ if not HAS_PAC:
 
 @implementer(ISolrAddHandler)
 class RaisingAdder(DefaultAdder):
-    """AddHandler that raises an exception when called
-    """
+    """AddHandler that raises an exception when called"""
 
     def __call__(self, conn, **data):
         raise Exception("Test")
@@ -340,7 +339,7 @@ class SolrMaintenanceTests(TestCase):
         del self.portal[name]
 
     def testReindexAddHandlers(self):
-        """ Add handlers adapt Product.Archetypes.interfaces.IBaseObject.
+        """Add handlers adapt Product.Archetypes.interfaces.IBaseObject.
         This interfaces is not implemented by p.a.contenttypes in Plone 5.0.x.
         As a result, the DefaultAdder is used for all p.a.contenttypes content.
         """
@@ -1309,19 +1308,16 @@ class SolrServerTests(TestCase):
 
         results = solrSearchResults(SearchableText="phrase")
         self.assertEqual(len(results), 1)
-        self.assertEqual(
-            sorted([i.Title for i in results]), ["phrase"]
-        )
+        self.assertEqual(sorted([i.Title for i in results]), ["phrase"])
 
         config.prefix_wildcard = True
         results = solrSearchResults(SearchableText="phrase")
         from pprint import pprint
+
         pprint(sorted([(i.Title, i.id) for i in results]))
 
         self.assertEqual(len(results), 2)
-        self.assertEqual(
-            sorted([i.Title for i in results]), ["ophrase", "phrase"]
-        )
+        self.assertEqual(sorted([i.Title for i in results]), ["ophrase", "phrase"])
 
     def testPrefixWildcardSearchesMultipleWords(self):
         self.maintenance.reindex()
@@ -1669,33 +1665,26 @@ class SolrServerTests(TestCase):
         config.allow_complex_search = True
 
         # force complex search passing it as a field through the catalog query
-        request = dict(SearchableText="Bar Foo",
-                       solr_complex_search="1")
+        request = dict(SearchableText="Bar Foo", solr_complex_search="1")
         results = solrSearchResults(request)
         self.assertEqual(len(results), 1)
-        request = dict(SearchableText="Bar OR Foo",
-                       solr_complex_search="1")
+        request = dict(SearchableText="Bar OR Foo", solr_complex_search="1")
         results = solrSearchResults(request)
         self.assertEqual(len(results), 2)
-        request = dict(SearchableText="Bar AND Foo",
-                       solr_complex_search="1")
+        request = dict(SearchableText="Bar AND Foo", solr_complex_search="1")
         results = solrSearchResults(request)
         self.assertEqual(len(results), 1)
         # test again with `&&` and `||` aliases
-        request = dict(SearchableText="Bar || Foo",
-                       solr_complex_search="1")
+        request = dict(SearchableText="Bar || Foo", solr_complex_search="1")
         results = solrSearchResults(request)
         self.assertEqual(len(results), 2)
-        request = dict(SearchableText="Bar && Foo",
-                       solr_complex_search="1")
+        request = dict(SearchableText="Bar && Foo", solr_complex_search="1")
         results = solrSearchResults(request)
         self.assertEqual(len(results), 1)
-        request = dict(SearchableText="Bar [Foo",
-                       solr_complex_search="1")
+        request = dict(SearchableText="Bar [Foo", solr_complex_search="1")
         results = solrSearchResults(request)
         self.assertEqual(len(results), 1)
-        request = dict(SearchableText="solr:Bar*",
-                       solr_complex_search="1")
+        request = dict(SearchableText="solr:Bar*", solr_complex_search="1")
         results = solrSearchResults(request)
         self.assertEqual(len(results), 3)
 
@@ -1810,9 +1799,9 @@ class SolrServerTests(TestCase):
         self.assertEqual(resp.results()[0]["UID"], "test-solr-uid")
 
     def testOptimize(self):
-        """ Test call to optimze works
+        """Test call to optimze works
 
-            There is nothing more to check
+        There is nothing more to check
         """
         self.maintenance.reindex()
         self.maintenance.optimize()

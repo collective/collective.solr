@@ -28,8 +28,8 @@ logger = getLogger("collective.solr.dispatcher")
 
 @implementer(ISearchDispatcher)
 class SearchDispatcher(object):
-    """ adapter for potentially dispatching a given query to an
-        alternative search backend (instead of the portal catalog) """
+    """adapter for potentially dispatching a given query to an
+    alternative search backend (instead of the portal catalog)"""
 
     def __init__(self, context):
         self.context = context
@@ -47,8 +47,8 @@ class SearchDispatcher(object):
 
 
 def solrSearchResults(request=None, **keywords):
-    """ perform a query using solr after translating the passed in
-        parameters with portal catalog semantics """
+    """perform a query using solr after translating the passed in
+    parameters with portal catalog semantics"""
     site = getSite()
     search = queryUtility(ISearch, context=site)
     if search is None:

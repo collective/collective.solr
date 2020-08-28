@@ -40,8 +40,8 @@ class SolrResults(list):
 
 
 def parseDate(value):
-    """ use `DateTime` to parse a date, but take care of solr 1.4
-        stripping away leading zeros for the year representation """
+    """use `DateTime` to parse a date, but take care of solr 1.4
+    stripping away leading zeros for the year representation"""
     if value.find("-") < 4:
         year, rest = value.split("-", 1)
         value = "%04d-%s" % (int(year), rest)
@@ -175,22 +175,22 @@ class AttrStr(str):
 
 
 class SolrSchema(AttrDict):
-    """ a solr schema parser:  the xml schema is partially parsed and the
-        information collected is later on used both for indexing items as
-        well as buiding search queries;  for the time being we are mostly
-        interested in explicitly defined fields and their data types, so
-        all <analyzer> (tokenizers, filters) and <dynamicField> information
-        is ignored;  some of the other fields relevant to the implementation,
-        like <uniqueKey>, <solrQueryParser> or <defaultSearchField>, are also
-        parsed and provided, all others are ignored """
+    """a solr schema parser:  the xml schema is partially parsed and the
+    information collected is later on used both for indexing items as
+    well as buiding search queries;  for the time being we are mostly
+    interested in explicitly defined fields and their data types, so
+    all <analyzer> (tokenizers, filters) and <dynamicField> information
+    is ignored;  some of the other fields relevant to the implementation,
+    like <uniqueKey>, <solrQueryParser> or <defaultSearchField>, are also
+    parsed and provided, all others are ignored"""
 
     def __init__(self, data=None):
         if data is not None:
             self.parse(data)
 
     def parse(self, data):
-        """ parse a solr schema to collect information for building
-            search and indexing queries later on """
+        """parse a solr schema to collect information for building
+        search and indexing queries later on"""
         if isinstance(data, six.string_types):
             data = six.StringIO(data)
         self["requiredFields"] = required = []

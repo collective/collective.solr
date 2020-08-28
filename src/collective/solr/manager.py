@@ -102,8 +102,8 @@ class SolrConnectionManager(object):
         return schema
 
     def setTimeout(self, timeout, lock=marker):
-        """ set the timeout on the current (or to be opened) connection
-            to the given value """
+        """set the timeout on the current (or to be opened) connection
+        to the given value"""
         update = not self.lock  # update if not locked...
         if lock is not marker:
             self.lock = bool(lock)
@@ -116,15 +116,15 @@ class SolrConnectionManager(object):
                 conn.setTimeout(timeout)
 
     def setIndexTimeout(self):
-        """ set the timeout on the current (or to be opened) connection
-            to the value specified for indexing operations """
+        """set the timeout on the current (or to be opened) connection
+        to the value specified for indexing operations"""
         registry = getUtility(IRegistry)
         index_timeout = registry["collective.solr.index_timeout"]
         self.setTimeout(index_timeout or None)
 
     def setSearchTimeout(self):
-        """ set the timeout on the current (or to be opened) connection
-            to the value specified for search operations """
+        """set the timeout on the current (or to be opened) connection
+        to the value specified for search operations"""
         registry = getUtility(IRegistry)
         search_timeout = registry["collective.solr.search_timeout"]
         self.setTimeout(search_timeout or None)

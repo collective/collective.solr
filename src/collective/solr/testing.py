@@ -53,8 +53,8 @@ except pkg_resources.DistributionNotFound:  # pragma: no cover
 
 class SolrLayer(Layer):
     """Solr test layer that fires up and shuts down a Solr instance. This
-       layer can be used to unit test a Solr configuration without having to
-       fire up Plone.
+    layer can be used to unit test a Solr configuration without having to
+    fire up Plone.
     """
 
     proc = None
@@ -75,8 +75,7 @@ class SolrLayer(Layer):
         self.solr_url = "http://{0}:{1}{2}".format(solr_host, solr_port, solr_base)
 
     def setUp(self):
-        """Start Solr and poll until it is up and running.
-        """
+        """Start Solr and poll until it is up and running."""
         self.proc = subprocess.call(
             "./solr-start", shell=True, close_fds=True, cwd=BIN_DIR
         )
@@ -96,8 +95,7 @@ class SolrLayer(Layer):
                 sys.stdout.write("Solr Instance could not be started !!!")
 
     def tearDown(self):
-        """Stop Solr.
-        """
+        """Stop Solr."""
         subprocess.check_call("./solr-stop", shell=True, close_fds=True, cwd=BIN_DIR)
 
 
@@ -261,8 +259,8 @@ class CollectiveSolrMockRegistry(object):
 
 class CollectiveSolrMockRegistryLayer(Layer):
     """Solr test layer that fires up and shuts down a Solr instance. This
-       layer can be used to unit test a Solr configuration without having to
-       fire up Plone.
+    layer can be used to unit test a Solr configuration without having to
+    fire up Plone.
     """
 
     def setUp(self):

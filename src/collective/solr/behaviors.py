@@ -9,8 +9,7 @@ from zope.interface import provider
 
 @provider(IFormFieldProvider)
 class ISolrFields(model.Schema):
-    """ Additional fields to control Solr integration
-    """
+    """Additional fields to control Solr integration"""
 
     directives.fieldset("categorization", fields=["showinsearch", "searchwords"])
 

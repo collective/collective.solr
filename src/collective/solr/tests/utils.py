@@ -130,11 +130,11 @@ def fakemore(solrconn, *fakedata):
 
 
 def fakeServer(actions, port=55555):
-    """ helper to set up and activate a fake http server used for testing
-        purposes; <actions> must be a list of handler functions, which will
-        receive the base handler as their only argument and are used to
-        process the incoming requests in turn; returns a thread that should
-        be 'joined' when done """
+    """helper to set up and activate a fake http server used for testing
+    purposes; <actions> must be a list of handler functions, which will
+    receive the base handler as their only argument and are used to
+    process the incoming requests in turn; returns a thread that should
+    be 'joined' when done"""
 
     class Handler(BaseHTTPRequestHandler):
         def do_POST(self):

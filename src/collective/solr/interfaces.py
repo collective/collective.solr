@@ -146,28 +146,28 @@ class ISolrSchema(Interface):
     )
 
     prefix_wildcard = Bool(
-        title=_("label_simple_search_prefix_wildcard",
-                default=u"Allow prefix wildcard searches and use them in simple searches"),
+        title=_(
+            "label_simple_search_prefix_wildcard",
+            default=u"Allow prefix wildcard searches and use them in simple searches",
+        ),
     )
 
     force_simple_search = Bool(
-        title=_("label_force_simple_search",
-                default=u"Force simple search pattern"),
+        title=_("label_force_simple_search", default=u"Force simple search pattern"),
         description=_(
             "help_force_simple_search",
             default=u"If set all queries in SearchableText will use the "
-            u"\"Pattern for simple search queries\". This will remove all special "
+            u'"Pattern for simple search queries". This will remove all special '
             u"solr characters and operators from the query text.",
         ),
     )
 
     allow_complex_search = Bool(
-        title=_("allow_complex_search",
-                default=u"Allow complex search"),
+        title=_("allow_complex_search", default=u"Allow complex search"),
         description=_(
             "help_allow_complex_search",
             default=u"Allow a complex search in SearchableText by either prefixing the "
-            u"search text with \"solr:\" or passing \"solr_complex_search\" as a field "
+            u'search text with "solr:" or passing "solr_complex_search" as a field '
             u"in the catalog query.",
         ),
     )
@@ -356,8 +356,7 @@ class ISolrConnectionConfig(ISolrSchema):
 
 
 class IZCMLSolrConnectionConfig(Interface):
-    """Solr connection settings configured through ZCML.
-    """
+    """Solr connection settings configured through ZCML."""
 
 
 class ISolrConnectionManager(Interface):
@@ -373,21 +372,21 @@ class ISolrConnectionManager(Interface):
         """ returns an existing connection or opens one """
 
     def getSchema():
-        """ returns the currently used schema or fetches it.
-            If the schema cannot be fetched None is returned. """
+        """returns the currently used schema or fetches it.
+        If the schema cannot be fetched None is returned."""
 
     def setTimeout(timeout, lock=object()):
-        """ set the timeout on the current (or to be opened) connection
-            to the given value and optionally lock it until explicitly
-            freed again """
+        """set the timeout on the current (or to be opened) connection
+        to the given value and optionally lock it until explicitly
+        freed again"""
 
     def setIndexTimeout():
-        """ set the timeout on the current (or to be opened) connection
-            to the value specified for indexing operations """
+        """set the timeout on the current (or to be opened) connection
+        to the value specified for indexing operations"""
 
     def setSearchTimeout():
-        """ set the timeout on the current (or to be opened) connection
-            to the value specified for search operations """
+        """set the timeout on the current (or to be opened) connection
+        to the value specified for search operations"""
 
 
 class ISolrIndexQueueProcessor(IIndexQueueProcessor):
@@ -399,27 +398,27 @@ class ISolrFlare(Interface):
 
 
 class IFlare(Interface):
-    """ marker interface for pluggable brain wrapper classes, providing
-        additional helper methods like `getURL` etc """
+    """marker interface for pluggable brain wrapper classes, providing
+    additional helper methods like `getURL` etc"""
 
 
 class ISearch(Interface):
-    """ a generic search interface
-        FIXME: this should be defined in a generic package """
+    """a generic search interface
+    FIXME: this should be defined in a generic package"""
 
     def search(query, **parameters):
-        """ perform a search with the given querystring and extra parameters
-            (see http://wiki.apache.org/solr/CommonQueryParameters) """
+        """perform a search with the given querystring and extra parameters
+        (see http://wiki.apache.org/solr/CommonQueryParameters)"""
 
     def __call__(query, **parameters):
         """ convenience alias for `search` """
 
     def buildQueryAndParameters(default=None, **args):
-        """ helper to build a query for simple use-cases; the query is
-            returned as a dictionary which might be string-joined or
-            passed to the `search` method as the `query` argument,
-            additionally search parameters are substracted from the
-            args and returned as a separate dict"""
+        """helper to build a query for simple use-cases; the query is
+        returned as a dictionary which might be string-joined or
+        passed to the `search` method as the `query` argument,
+        additionally search parameters are substracted from the
+        args and returned as a separate dict"""
 
 
 class ICatalogTool(Interface):
@@ -427,12 +426,12 @@ class ICatalogTool(Interface):
 
 
 class ISearchDispatcher(Interface):
-    """ adapter for potentially dispatching a given query to an
-        alternative search backend (instead of the portal catalog) """
+    """adapter for potentially dispatching a given query to an
+    alternative search backend (instead of the portal catalog)"""
 
     def __call__(request, **keywords):
-        """ decide if an alternative search backend is capable of performing
-            the given query and use it or fall back to the portal catalog """
+        """decide if an alternative search backend is capable of performing
+        the given query and use it or fall back to the portal catalog"""
 
 
 class ISolrMaintenanceView(Interface):
@@ -445,19 +444,19 @@ class ISolrMaintenanceView(Interface):
         """ clear all data from solr, i.e. delete all indexed objects """
 
     def reindex(batch=1000, skip=0):
-        """ find all contentish objects (meaning all objects derived from one
-            of the catalog mixin classes) and (re)indexes them """
+        """find all contentish objects (meaning all objects derived from one
+        of the catalog mixin classes) and (re)indexes them"""
 
     def sync(batch=1000):
-        """ sync the solr index with the portal catalog;  records contained
-            in the catalog but not in solr will be indexed and records not
-            contained in the catalog can be optionally removed;  this can
-            be used to ensure consistency between zope and solr after the
-            solr server has been unavailable etc """
+        """sync the solr index with the portal catalog;  records contained
+        in the catalog but not in solr will be indexed and records not
+        contained in the catalog can be optionally removed;  this can
+        be used to ensure consistency between zope and solr after the
+        solr server has been unavailable etc"""
 
     def cleanup(batch=1000):
-        """ remove entries from solr that don't have a corresponding Zope
-            object  or have a different UID than the real object"""
+        """remove entries from solr that don't have a corresponding Zope
+        object  or have a different UID than the real object"""
 
 
 class ISolrAddHandler(Interface):
@@ -481,5 +480,4 @@ class ICheckIndexable(Interface):
     """ Check if an object is indexable """
 
     def __call__():
-        """ Return `True`, if context is indexable and `False`otherwise
-        """
+        """Return `True`, if context is indexable and `False`otherwise"""
