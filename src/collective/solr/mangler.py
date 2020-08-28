@@ -99,7 +99,7 @@ def mangleSearchableText(value, config, force_complex_search=False):
         return stripped
 
     if force_simple_search:
-        return removeSpecialCharactersAndOperators(value)
+        value = removeSpecialCharactersAndOperators(value)
 
     for term in splitSimpleSearch(value):
         (term_value, term_base_value) = makeSimpleExpressions(term, levenstein_distance)

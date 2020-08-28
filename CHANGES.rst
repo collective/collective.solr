@@ -7,6 +7,9 @@ Changelog
 - Add an option to allow prefix wildcard searches
   [csenger]
 
+- Fix force_simple_search
+  [csenger]
+
 
 8.1.0 (2020-08-27)
 ------------------

@@ -1594,8 +1594,8 @@ class SolrServerTests(TestCase):
         results = solrSearchResults(SearchableText="(foo/ OR boo)")
         self.assertEqual(sorted([r.Title for r in results]), ["foo/bar"])
 
-    def testForcedSimpleSearchWithoutAllowedGlobalSearch(self):
-        self.folder.invokeFactory("Document", id="doc1", title="Foo")
+    def testForceSimpleSearchWithoutAllowComplexSearch(self):
+        self.folder.invokeFactory("Document", id="doc1", title="Foooo barrr")
         self.folder.invokeFactory("Document", id="doc2", title="Bar")
         self.folder.invokeFactory("Document", id="doc3", title="Foo Bar")
         commit()  # indexing happens on commit
@@ -1606,26 +1606,26 @@ class SolrServerTests(TestCase):
 
         request = dict(SearchableText="Bar Foo")
         results = solrSearchResults(request)
-        self.assertEqual(len(results), 1)
+        self.assertEqual(len(results), 2)
         request = dict(SearchableText="Bar OR Foo")
         results = solrSearchResults(request)
-        self.assertEqual(len(results), 1)
+        self.assertEqual(len(results), 2)
         request = dict(SearchableText="Bar AND Foo")
         results = solrSearchResults(request)
-        self.assertEqual(len(results), 1)
+        self.assertEqual(len(results), 2)
         # test again with `&&` and `||` aliases
         request = dict(SearchableText="Bar || Foo")
         results = solrSearchResults(request)
-        self.assertEqual(len(results), 1)
+        self.assertEqual(len(results), 2)
         request = dict(SearchableText="Bar && Foo")
         results = solrSearchResults(request)
-        self.assertEqual(len(results), 1)
+        self.assertEqual(len(results), 2)
         request = dict(SearchableText="Bar [Foo")
         results = solrSearchResults(request)
-        self.assertEqual(len(results), 1)
+        self.assertEqual(len(results), 2)
 
-    def testForcedSimpleSearchWithAllowedComplexSearchByPrefix(self):
-        self.folder.invokeFactory("Document", id="doc1", title="Foo")
+    def testForceSimpleSearchWithAllowComplexSearchByPrefix(self):
+        self.folder.invokeFactory("Document", id="doc1", title="Foooo barrr")
         self.folder.invokeFactory("Document", id="doc2", title="Bar")
         self.folder.invokeFactory("Document", id="doc3", title="Foo Bar")
         commit()  # indexing happens on commit
@@ -1640,23 +1640,26 @@ class SolrServerTests(TestCase):
         self.assertEqual(len(results), 1)
         request = dict(SearchableText="solr:Bar OR Foo")
         results = solrSearchResults(request)
-        self.assertEqual(len(results), 3)
+        self.assertEqual(len(results), 2)
         request = dict(SearchableText="solr:Bar AND Foo")
         results = solrSearchResults(request)
         self.assertEqual(len(results), 1)
         # test again with `&&` and `||` aliases
         request = dict(SearchableText="solr:Bar || Foo")
         results = solrSearchResults(request)
-        self.assertEqual(len(results), 3)
+        self.assertEqual(len(results), 2)
         request = dict(SearchableText="solr:Bar && Foo")
         results = solrSearchResults(request)
         self.assertEqual(len(results), 1)
         request = dict(SearchableText="solr:Bar [Foo")
         results = solrSearchResults(request)
         self.assertEqual(len(results), 1)
+        request = dict(SearchableText="solr:Bar*")
+        results = solrSearchResults(request)
+        self.assertEqual(len(results), 3)
 
-    def testForcedSimpleSearchWithAllowedComplexSearchByParameter(self):
-        self.folder.invokeFactory("Document", id="doc1", title="Foo")
+    def testForceSimpleSearchWithAllowComplexSearchByParameter(self):
+        self.folder.invokeFactory("Document", id="doc1", title="Foooo barrr")
         self.folder.invokeFactory("Document", id="doc2", title="Bar")
         self.folder.invokeFactory("Document", id="doc3", title="Foo Bar")
         commit()  # indexing happens on commit
@@ -1673,7 +1676,7 @@ class SolrServerTests(TestCase):
         request = dict(SearchableText="Bar OR Foo",
                        solr_complex_search="1")
         results = solrSearchResults(request)
-        self.assertEqual(len(results), 3)
+        self.assertEqual(len(results), 2)
         request = dict(SearchableText="Bar AND Foo",
                        solr_complex_search="1")
         results = solrSearchResults(request)
@@ -1682,7 +1685,7 @@ class SolrServerTests(TestCase):
         request = dict(SearchableText="Bar || Foo",
                        solr_complex_search="1")
         results = solrSearchResults(request)
-        self.assertEqual(len(results), 3)
+        self.assertEqual(len(results), 2)
         request = dict(SearchableText="Bar && Foo",
                        solr_complex_search="1")
         results = solrSearchResults(request)
@@ -1691,6 +1694,10 @@ class SolrServerTests(TestCase):
                        solr_complex_search="1")
         results = solrSearchResults(request)
         self.assertEqual(len(results), 1)
+        request = dict(SearchableText="solr:Bar*",
+                       solr_complex_search="1")
+        results = solrSearchResults(request)
+        self.assertEqual(len(results), 3)
 
     def testForcedSimpleSearchIgnoresHyphen(self):
         self.portal.invokeFactory("Document", id="fb", title="foo-bar")
