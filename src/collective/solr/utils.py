@@ -96,10 +96,7 @@ def isSimpleTerm(term):
     if isinstance(term, six.binary_type):
         term = six.text_type(term, "utf-8", "ignore")
     term = term.strip()
-    simple = bool(simpleTerm.match(term))
-    if simple and is_digit.match(term[-1]):
-        return False
-    return simple
+    return bool(simpleTerm.match(term))
 
 
 reserved = compile(r"(AND|OR|NOT|[+\-&|!(){}\[\]^~*?:\\/]+)", UNICODE)
@@ -115,7 +112,6 @@ def removeSpecialCharactersAndOperators(term):
 
 operators = compile(r"(.*)\s+(AND|OR|NOT)\s+", UNICODE)
 simpleCharacters = compile(r"^[\w\d\?\*\s]+$", UNICODE)
-is_digit = compile(r"\d", UNICODE)
 
 
 def isSimpleSearch(term):
@@ -139,8 +135,6 @@ def isSimpleSearch(term):
                 new_parts.append("quoted")
         term = u"".join(new_parts)
     if bool(operators.match(term)):
-        return False
-    if is_digit.match(term[-1]):
         return False
     if bool(simpleCharacters.match(term)):
         return True

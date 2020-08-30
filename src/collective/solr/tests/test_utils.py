@@ -67,10 +67,10 @@ class UtilsTests(TestCase):
         self.assertFalse(isSimpleTerm(u"føø!"))
         # XXX Why would this be false?
         # self.assertFalse(isSimpleTerm(six.text_type('föö', 'latin')))
-        self.assertFalse(isSimpleTerm("foo42"))
-        self.assertFalse(isSimpleTerm("foo 42"))
-        self.assertFalse(isSimpleTerm("42 foo"))
+        self.assertTrue(isSimpleTerm("foo42"))
         self.assertTrue(isSimpleTerm("42foo"))
+        self.assertFalse(isSimpleTerm("foo bar"))
+        self.assertFalse(isSimpleTerm("42 foo"))
 
     def testSimpleSearch(self):
         self.assertTrue(isSimpleSearch("foo"))
@@ -111,10 +111,10 @@ class UtilsTests(TestCase):
         self.assertFalse(isSimpleSearch("+foo"))
         self.assertFalse(isSimpleSearch("name:foo"))
         self.assertFalse(isSimpleSearch("foo && bar"))
-        self.assertFalse(isSimpleSearch("2000"))
-        self.assertFalse(isSimpleSearch("foo 2000"))
+        self.assertTrue(isSimpleSearch("2000"))
+        self.assertTrue(isSimpleSearch("foo 2000"))
         self.assertFalse(isSimpleSearch("foo 1/2000"))
-        self.assertFalse(isSimpleSearch("foo 42 bar11"))
+        self.assertTrue(isSimpleSearch("foo 42 bar11"))
         self.assertTrue(isSimpleSearch("2000 foo"))
 
     def testSplitSimpleSearch(self):
@@ -123,7 +123,7 @@ class UtilsTests(TestCase):
             splitSimpleSearch('foo "bar foobar" baz'), ["foo", '"bar foobar"', "baz"]
         )
         self.assertRaises(AssertionError, splitSimpleSearch, "foo AND bar")
-        self.assertRaises(AssertionError, splitSimpleSearch, "foo42")
+        self.assertEqual(splitSimpleSearch("foo 42"), ["foo", "42"])
 
     def testIsWildCard(self):
         self.assertTrue(isWildCard("foo*"))

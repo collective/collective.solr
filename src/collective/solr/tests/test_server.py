@@ -705,6 +705,19 @@ class SolrServerTests(TestCase):
         conn.commit()
         self.assertEqual(self.search("+Title:Foo").results().numFound, "1")
 
+    def testSearchableTextWildcardOnNumbers(self):
+        '''
+        Test if we can do wild card searches if the term consist of only numbers
+        or the last character is a number.
+        '''
+        conn = getUtility(ISolrConnectionManager).getConnection()
+        conn.add(UID="foo", Title="foo", SearchableText="123456")
+        conn.commit()
+        self.assertEqual(self.search("+SearchableText:123456").results().numFound, "1")
+        self.assertEqual(self.search("+SearchableText:1234*").results().numFound, "1")
+        self.assertEqual(self.search("+SearchableText:*3456").results().numFound, "1")
+        self.assertEqual(self.search("+SearchableText:*34*").results().numFound, "1")
+
     def testCommitWithinConnection(self):
         conn = getUtility(ISolrConnectionManager).getConnection()
         conn.add(UID="foo", Title="foo", commitWithin="1000")
@@ -1312,10 +1325,6 @@ class SolrServerTests(TestCase):
 
         config.prefix_wildcard = True
         results = solrSearchResults(SearchableText="phrase")
-        from pprint import pprint
-
-        pprint(sorted([(i.Title, i.id) for i in results]))
-
         self.assertEqual(len(results), 2)
         self.assertEqual(sorted([i.Title for i in results]), ["ophrase", "phrase"])
 
@@ -1708,6 +1717,34 @@ class SolrServerTests(TestCase):
         commit()
         results = solrSearchResults(SearchableText="foo/bar")
         self.assertEqual(sorted([r.Title for r in results]), ["foo bar", "foo/bar"])
+
+    def testSimpleSearchForWildcardOnNumbers(self):
+        self.folder.invokeFactory("Document", id="doc1", title="12345")
+        self.folder.invokeFactory("Document", id="doc2", title="123")
+        self.folder.invokeFactory("Document", id="doc3", title="34567")
+        commit()  # indexing happens on commit
+
+        config = getConfig()
+        config.force_simple_search = True
+
+        request = dict(SearchableText="123")
+        results = solrSearchResults(request)
+        self.assertEqual(len(results), 2)
+        request = dict(SearchableText="12345")
+        results = solrSearchResults(request)
+        self.assertEqual(len(results), 1)
+        request = dict(SearchableText="345")
+        results = solrSearchResults(request)
+        self.assertEqual(len(results), 1)
+
+        config.prefix_wildcard = True
+        request = dict(SearchableText="345")
+        results = solrSearchResults(request)
+        self.assertEqual(len(results), 2)
+        request = dict(SearchableText="567")
+        results = solrSearchResults(request)
+        self.assertEqual(len(results), 1)
+
 
     def testBatchedSearchResults(self):
         self.portal.invokeFactory("Document", id="one", title="Aaa A")
