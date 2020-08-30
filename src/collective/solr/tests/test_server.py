@@ -1745,7 +1745,6 @@ class SolrServerTests(TestCase):
         results = solrSearchResults(request)
         self.assertEqual(len(results), 1)
 
-
     def testBatchedSearchResults(self):
         self.portal.invokeFactory("Document", id="one", title="Aaa A")
         self.portal.invokeFactory("Document", id="two", title="Aaa B")
