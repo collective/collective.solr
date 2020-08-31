@@ -1,7 +1,7 @@
 Changelog
 =========
 
-8.2.1 (unreleased)
+8.3.0 (2020-08-31)
 ------------------
 
 - Remove constrain on number wildcard searches
