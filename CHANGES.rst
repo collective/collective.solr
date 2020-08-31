@@ -4,7 +4,8 @@ Changelog
 8.2.1 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Remove constrain on number wildcard searches
+  [csenger]
 
 
 8.2.0 (2020-08-28)
