@@ -10,6 +10,7 @@ from Testing.makerequest import makerequest
 
 import logging
 import sys
+import transaction
 
 logger = logging.getLogger()
 
@@ -51,11 +52,15 @@ def _solr_connection():
 
 
 def solr_activate(app, args):
+    _get_site(app, args)
     activate(active=True)
+    transaction.commit()
 
 
 def solr_deactivate(app, args):
+    _get_site(app, args)
     activate(active=False)
+    transaction.commit()
 
 
 def solr_clear_index(app, args):
