@@ -4,7 +4,8 @@ Changelog
 8.3.1 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Add solr_activate and solr_deactivate command line scripts.
+  [timo]
 
 
 8.3.0 (2020-08-31)

@@ -80,6 +80,8 @@ setup(
       [z3c.autoinclude.plugin]
       target=plone
       [zopectl.command]
+      solr_activate=collective.solr.commands:solr_activate
+      solr_deactivate=collective.solr.commands:solr_deactivate
       solr_clear_index=collective.solr.commands:solr_clear_index
       solr_reindex=collective.solr.commands:solr_reindex
     """,

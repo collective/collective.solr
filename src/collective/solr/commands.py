@@ -2,6 +2,7 @@
 import argparse
 from collective.solr.interfaces import ISolrConnectionManager
 from collective.solr.browser.maintenance import SolrMaintenanceView
+from collective.solr.utils import activate
 from zope.component import queryUtility
 from zope.site.hooks import setHooks
 from zope.site.hooks import setSite
@@ -9,6 +10,7 @@ from Testing.makerequest import makerequest
 
 import logging
 import sys
+import transaction
 
 logger = logging.getLogger()
 
@@ -47,6 +49,18 @@ def _solr_connection():
     conn = manager.getConnection()
     logger.info("Opened Solr connection to %s" % conn.host)
     return conn
+
+
+def solr_activate(app, args):
+    _get_site(app, args)
+    activate(active=True)
+    transaction.commit()
+
+
+def solr_deactivate(app, args):
+    _get_site(app, args)
+    activate(active=False)
+    transaction.commit()
 
 
 def solr_clear_index(app, args):
