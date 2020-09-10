@@ -1,7 +1,7 @@
 Changelog
 =========
 
-8.3.1 (unreleased)
+8.4.0 (2020-09-10)
 ------------------
 
 - Add solr_activate and solr_deactivate command line scripts.
