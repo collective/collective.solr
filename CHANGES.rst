@@ -4,7 +4,9 @@ Changelog
 8.4.1 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Fix "AssertionError: term is not a simple search" with forced
+  simple search.
+  [csenger]
 
 
 8.4.0 (2020-09-10)
