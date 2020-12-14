@@ -1701,6 +1701,11 @@ class SolrServerTests(TestCase):
         self.portal.invokeFactory("Document", id="fb", title="foo-bar")
         self.portal.invokeFactory("Document", id="fb2", title="foo bar")
         commit()
+
+        config = getConfig()
+        config.force_simple_search = True
+        config.allow_complex_search = True
+
         results = solrSearchResults(SearchableText="foo-bar")
         self.assertEqual(sorted([r.Title for r in results]), ["foo bar", "foo-bar"])
 
@@ -1708,6 +1713,11 @@ class SolrServerTests(TestCase):
         self.portal.invokeFactory("Document", id="fb", title="foo:bar")
         self.portal.invokeFactory("Document", id="fb2", title="foo bar")
         commit()
+
+        config = getConfig()
+        config.force_simple_search = True
+        config.allow_complex_search = True
+
         results = solrSearchResults(SearchableText="foo:bar")
         self.assertEqual(sorted([r.Title for r in results]), ["foo bar", "foo:bar"])
 
@@ -1715,8 +1725,25 @@ class SolrServerTests(TestCase):
         self.portal.invokeFactory("Document", id="fb", title="foo/bar")
         self.portal.invokeFactory("Document", id="fb2", title="foo bar")
         commit()
+
+        config = getConfig()
+        config.force_simple_search = True
+        config.allow_complex_search = True
+
         results = solrSearchResults(SearchableText="foo/bar")
         self.assertEqual(sorted([r.Title for r in results]), ["foo bar", "foo/bar"])
+
+    def testForcedSimpleSearchIgnoresPoint(self):
+        self.portal.invokeFactory("Document", id="fb", title="Rundschreiben Nr. 32/2017*")
+        self.portal.invokeFactory("Document", id="fb2", title="Rundschreiben Nr 32 2017*")
+        commit()
+
+        config = getConfig()
+        config.force_simple_search = True
+        config.allow_complex_search = True
+
+        results = solrSearchResults(SearchableText="Rundschreiben Nr. 32/2017*")
+        self.assertEqual(sorted([r.id for r in results]), ["fb", "fb2"])
 
     def testSimpleSearchForWildcardOnNumbers(self):
         self.folder.invokeFactory("Document", id="doc1", title="12345")
