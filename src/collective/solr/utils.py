@@ -100,6 +100,7 @@ def isSimpleTerm(term):
 
 
 reserved = compile(r"(AND|OR|NOT|[+\-&|!(){}\[\]^~*?:\\/]+)", UNICODE)
+notSimpleCharacters = compile(r"[^\w\d\?\*\s]+", UNICODE)
 
 
 def removeSpecialCharactersAndOperators(term):
@@ -107,7 +108,7 @@ def removeSpecialCharactersAndOperators(term):
     Remove all special operators and characters used by Solr'
     Standard Query Parser (lucene)
     """
-    return reserved.sub(" ", term)
+    return notSimpleCharacters.sub(" ", reserved.sub(" ", term))
 
 
 operators = compile(r"(.*)\s+(AND|OR|NOT)\s+", UNICODE)
