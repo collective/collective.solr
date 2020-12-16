@@ -10,7 +10,6 @@ jobs:
         plone-version: [5.2, 5.1, 4.3]
         solr-version: [7.7.2, 8.2.0]
         include:
-        exclude:
           - python-version: 2.7
             plone-version: 4.3
             solr-version: 7.7.2
