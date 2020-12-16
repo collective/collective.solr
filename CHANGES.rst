@@ -1,7 +1,7 @@
 Changelog
 =========
 
-8.4.1 (unreleased)
+8.4.1 (2020-12-16)
 ------------------
 
 - Fix "AssertionError: term is not a simple search" with forced
