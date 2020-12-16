@@ -1,7 +1,7 @@
 from setuptools import setup
 from setuptools import find_packages
 
-version = "8.4.1"
+version = "8.4.2.dev0"
 
 long_description = "\n\n".join(
     [open("README.rst").read(), open("CHANGES.rst").read()])
