@@ -61,8 +61,8 @@ jobs:
         run: pip install -r requirements.txt
 
       # run pocompile for translation tests
-      - run: bin/pip install zest.pocompile
-      - run: bin/pocompile src
+      - run: pip install zest.pocompile
+      - run: pocompile src
 
       # choose Plone version
       - name: choose Plone version
