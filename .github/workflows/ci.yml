@@ -59,6 +59,12 @@ jobs:
       - run: pip install wheel
       - name: pip install
         run: pip install -r requirements.txt
+
+      # run pocompile for translation tests
+      - run: bin/pip install zest.pocompile
+      - run: bin/pocompile src
+
+      # choose Plone version
       - name: choose Plone version
         run: sed -ie "s#plone-x.x.x.cfg#plone-${{ matrix.plone-version }}.x.cfg#" travis.cfg
 
