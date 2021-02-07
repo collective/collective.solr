@@ -84,6 +84,10 @@ jobs:
       - name: choose Plone version
         run: sed -ie "s#plone-x.x.x.cfg#plone-${{ matrix.plone-version }}.x.cfg#" ci.cfg
 
+      # choose Solr version
+      - run: sed -ie "s#solr/.\..\..#solr/${{ matrix.solr-version }}#" base.cfg
+      - run: sed -ie "s#solr-.\..\..#solr-${{ matrix.solr-version }}#" base.cfg
+
       # buildout
       - name: buildout
         run: buildout -t 10 -c ci.cfg
