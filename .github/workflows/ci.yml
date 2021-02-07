@@ -102,6 +102,10 @@ jobs:
       - name: code analysis
         run: bin/code-analysis
 
+      - name: debug
+        run: bin/instance start
+      - run: cat bin/test
+
       # test
       - name: test
         run: bin/test
