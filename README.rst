@@ -1,8 +1,8 @@
 collective.solr - Solr integration for the Plone CMS
 ====================================================
 
-.. image:: https://secure.travis-ci.org/collective/collective.solr.svg?branch=master
-    :target: http://travis-ci.org/collective/collective.solr
+.. image:: https://github.com/collective/collective.solr/workflows/collective.solr%20CI/badge.svg
+    :target: https://github.com/collective/collective.solr/actions?query=workflow%3A%22collective.solr+CI%22
 
 .. image:: https://coveralls.io/repos/collective/collective.solr/badge.svg?branch=master
     :target: https://coveralls.io/r/collective/collective.solr
