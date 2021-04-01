@@ -36,6 +36,7 @@ class ContentListingTests(TestCase):
                     "Language": "de",
                     "portal_type": "NewsItem",
                     "Type": "Flare NewsItem",
+                    "othermetadata": "Flare Othermetadata",
                 }
             )
         )
@@ -164,3 +165,6 @@ class ContentListingTests(TestCase):
 
     def test_modified(self):
         self.assertEqual(self.flare.modified, self.flare.ModificationDate())
+
+    def test_defer_lookup_to_flare(self):
+        self.assertEqual(self.flare.othermetadata, "Flare Othermetadata")
