@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from Acquisition import aq_base
 from plone import api
 from plone.app.contentlisting.interfaces import IContentListingObject
 from plone.app.layout.icons.interfaces import IContentIcon
@@ -9,6 +10,9 @@ from Products.CMFPlone.browser.ploneview import Plone as PloneView
 from zope.component import getMultiAdapter, getUtility
 from zope.globalrequest import getRequest
 from zope.interface import implementer
+
+
+missing = object()
 
 
 @implementer(IContentListingObject)
@@ -163,3 +167,19 @@ class FlareContentListingObject(object):
 
     def MimeTypeIcon(self):
         raise NotImplementedError
+
+    def __getattr__(self, name):
+        """We'll override getattr so that we can defer name lookups to the real
+        underlying objects without knowing the names of all attributes.
+
+        Adapted from plone.app.contentlisting.catalog.CatalogContentListingObject
+        """
+        if name.startswith('_'):
+            raise AttributeError(name)
+        flare_value = self.flare.get(name, missing)
+        if flare_value is not missing:
+            return flare_value
+        object_value = getattr(aq_base(self.getObject()), name, missing)
+        if object_value is not missing:
+            return object_value
+        raise AttributeError(name)
