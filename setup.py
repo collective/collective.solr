@@ -72,6 +72,7 @@ setup(
         "test": ["plone.app.testing[robot]", "plone.app.robotframework[debug]"],
         "test4": [
             "Products.LinguaPlone >=3.1a1",
+            "plone.app.contenttypes",
             "plone.app.robotframework[debug]",
             "plone.app.testing[robot]",
         ],
