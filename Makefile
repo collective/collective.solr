@@ -3,7 +3,7 @@
 SHELL := /bin/bash
 CURRENT_DIR:=$(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 
-version = 2.7
+version = 3
 
 # We like colors
 # From: https://coderwall.com/p/izxssa/colored-makefile-for-golang-projects
@@ -27,7 +27,7 @@ update: ## Update Make and Buildout
 	wget -O plone-4.3.x.cfg https://raw.githubusercontent.com/kitconcept/buildout/master/plone-4.3.x.cfg
 	wget -O plone-5.1.x.cfg https://raw.githubusercontent.com/kitconcept/buildout/master/plone-5.1.x.cfg
 	wget -O plone-5.2.x.cfg https://raw.githubusercontent.com/kitconcept/buildout/master/plone-5.2.x.cfg
-	wget -O travis.cfg https://raw.githubusercontent.com/kitconcept/buildout/master/travis.cfg
+	wget -O ci.cfg https://raw.githubusercontent.com/kitconcept/buildout/master/ci.cfg
 	wget -O versions.cfg https://raw.githubusercontent.com/kitconcept/buildout/master/versions.cfg
 
 .installed.cfg: bin/buildout *.cfg
@@ -36,25 +36,40 @@ update: ## Update Make and Buildout
 bin/buildout: bin/pip
 	bin/pip install --upgrade pip
 	bin/pip install -r requirements.txt
+	bin/pip install black || true
 	@touch -c $@
 
+bin/python bin/pip:
+	python$(version) -m venv . || virtualenv --python=python$(version) .
+
+py2:
+	virtualenv --python=python2 .
+	bin/pip install --upgrade pip
+	bin/pip install -r requirements.txt
+
 .PHONY: Build Plone 4.3
-build-plone-4.3: .installed.cfg ## Build Plone 4.3
+build-plone-4.3: py2 ## Build Plone 4.3
 	bin/pip install --upgrade pip
 	bin/pip install -r requirements.txt
 	bin/buildout -c plone-4.3.x.cfg
 
 .PHONY: Build Plone 5.0
-build-plone-5.0: .installed.cfg ## Build Plone 5.0
+build-plone-5.0: py2 ## Build Plone 5.0
 	bin/pip install --upgrade pip
 	bin/pip install -r requirements.txt
 	bin/buildout -c plone-5.0.x.cfg
 
 .PHONY: Build Plone 5.1
-build-plone-5.1: .installed.cfg  ## Build Plone 5.1
+build-plone-5.1: py2  ## Build Plone 5.1
 	bin/pip install --upgrade pip
 	bin/pip install -r requirements.txt
 	bin/buildout -c plone-5.1.x.cfg
+
+.PHONY: Build Plone 5.2 with Python 2
+build-plone-5.2-py: py2  ## Build Plone 5.2 with Python 2
+	bin/pip install --upgrade pip
+	bin/pip install -r requirements.txt
+	bin/buildout -c plone-5.2.x.cfg
 
 .PHONY: Build Plone 5.2
 build-plone-5.2: .installed.cfg  ## Build Plone 5.2
@@ -62,16 +77,11 @@ build-plone-5.2: .installed.cfg  ## Build Plone 5.2
 	bin/pip install -r requirements.txt
 	bin/buildout -c plone-5.2.x.cfg
 
- ## Build Plone 5.2 with Python 3
-build-py3:  ## Build Plone 5.2 with Python 3
-	virtualenv --python=python3 .
+.PHONY: Build Plone 5.2 Performance
+build-plone-5.2-performance: .installed.cfg  ## Build Plone 5.2
 	bin/pip install --upgrade pip
 	bin/pip install -r requirements.txt
-	bin/pip install black
-	bin/buildout -c plone-5.2.x.cfg
-
-bin/python bin/pip:
-	virtualenv --clear --python=python$(version) .
+	bin/buildout -c plone-5.2.x-performance.cfg
 
 .PHONY: Test
 test:  ## Test
@@ -84,6 +94,12 @@ test-performance:
 .PHONY: Code Analysis
 code-analysis:  ## Code Analysis
 	bin/code-analysis
+	if [ -f "bin/black" ]; then bin/black src/ --check ; fi
+
+.PHONY: Black
+black:  ## Black
+	bin/code-analysis
+	if [ -f "bin/black" ]; then bin/black src/ ; fi
 
 .PHONY: Build Docs
 docs:  ## Build Docs
