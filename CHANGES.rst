@@ -1,7 +1,7 @@
 Changelog
 =========
 
-8.4.2 (unreleased)
+8.4.2 (2021-04-08)
 ------------------
 
 - Fix contentlisting when looking up unknown data
