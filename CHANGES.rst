@@ -4,7 +4,8 @@ Changelog
 8.4.2 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Fix contentlisting when looking up unknown data
+  [csenger]
 
 
 8.4.1 (2020-12-16)
