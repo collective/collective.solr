@@ -40,10 +40,10 @@ bin/buildout: bin/pip
 	@touch -c $@
 
 bin/python bin/pip:
-	python$(version) -m venv . || virtualenv --clear --python=python$(version) .
+	python$(version) -m venv . || virtualenv --python=python$(version) .
 
 py2:
-	virtualenv --clear --python=python2 .
+	virtualenv --python=python2 .
 	bin/pip install --upgrade pip
 	bin/pip install -r requirements.txt
 
@@ -64,6 +64,12 @@ build-plone-5.1: py2  ## Build Plone 5.1
 	bin/pip install --upgrade pip
 	bin/pip install -r requirements.txt
 	bin/buildout -c plone-5.1.x.cfg
+
+.PHONY: Build Plone 5.2 with Python 2
+build-plone-5.2-py: py2  ## Build Plone 5.2 with Python 2
+	bin/pip install --upgrade pip
+	bin/pip install -r requirements.txt
+	bin/buildout -c plone-5.2.x.cfg
 
 .PHONY: Build Plone 5.2
 build-plone-5.2: .installed.cfg  ## Build Plone 5.2
