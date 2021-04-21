@@ -281,6 +281,9 @@ class SolrConnection:
             if isinstance(v, (list, tuple)):  # multi-valued
                 for value in v:
                     lst.append(tmpl % self.escapeVal(value))
+                if not v:
+                    tmpl = '<field name="%s" update="set" null="true"/>'
+                    lst.append(tmpl % (self.escapeKey(f)))
             else:
                 lst.append(tmpl % self.escapeVal(v))
         lst.append("</doc>")
