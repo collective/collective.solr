@@ -5,6 +5,7 @@ from zope.schema import Bool
 from zope.schema import Float
 from zope.schema import Int
 from zope.schema import List
+from zope.schema import Password
 from zope.schema import Text
 from zope.schema import TextLine
 from zope.schema.interfaces import IVocabularyFactory
@@ -36,6 +37,22 @@ class ISolrSchema(Interface):
         description=_(
             "help_port", default=u"The port of the Solr instance to be used."
         ),
+    )
+
+    login = TextLine(
+        title=_("login", default=u"Login"),
+        description=_(
+            "help_login", default=u"Authentication login of the SolR instance."
+        ),
+        required=False,
+    )
+
+    password = Password(
+        title=_("password", default=u"Password"),
+        description=_(
+            "help_password", default=u"Authentication password of the SolR instance."
+        ),
+        required=False,
     )
 
     base = TextLine(

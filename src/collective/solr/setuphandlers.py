@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
+from Products.CMFCore.utils import getToolByName
 from collective.solr.interfaces import ISolrConnectionConfig
 from collective.solr.interfaces import ISolrSchema
 from plone import api
+from plone.registry import Record
+from plone.registry import field
 from plone.registry.interfaces import IRegistry
-from Products.CMFCore.utils import getToolByName
 from zope.component import getSiteManager
 from zope.component import getUtility
 from zope.component import queryUtility
@@ -63,3 +65,19 @@ def migrateTo4(context):
             logger.info("Added new behavior to {}".format(type_id))
 
     logger.info("Migrated to version 4")
+
+
+def migrate_to_5(context):
+    registry = getUtility(IRegistry)
+    if "collective.solr.login" not in registry.records:
+        registry_field = field.TextLine(title=u"Login")
+        registry_record = Record(registry_field)
+        registry_record.value = None
+        registry.records["collective.solr.login"] = registry_record
+    if "collective.solr.password" not in registry.records:
+        registry_field = field.TextLine(title=u"Password")
+        registry_record = Record(registry_field)
+        registry_record.value = None
+        registry.records["collective.solr.password"] = registry_record
+
+    logger.info("Migrated to version 5")

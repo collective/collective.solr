@@ -7,6 +7,8 @@ Changelog
 - Remove plone.app.contenttypes conditionals in code.
   [timo]
 
+- Add support of SolR basic authentication
+  [mpeeters]
 
 - Remove collective.js.showmore dependency
 - Remove plone.app.contenttypes conditionals in code
