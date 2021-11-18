@@ -3,6 +3,7 @@ from plone.app.registry.browser import controlpanel
 
 try:
     from plone.protect.interfaces import IDisableCSRFProtection
+
     PLONE_PROTECT_INSTALLED = True
 except ImportError:
     PLONE_PROTECT_INSTALLED = False
@@ -16,6 +17,7 @@ from zope.interface import Interface
 
 try:
     from plone.restapi.controlpanels import RegistryConfigletPanel
+
     PLONE_RESTAPI_INSTALLED = True
 except ImportError:
     PLONE_RESTAPI_INSTALLED = False
@@ -24,9 +26,9 @@ except ImportError:
 @adapter(Interface, Interface)
 class SolrControlpanelAdapter(RegistryConfigletPanel):
     schema = ISolrSchema
-    configlet_id = "Solr"
-    configlet_category_id = "plone-general"
-    schema_prefix = "solr"
+    configlet_id = "SolrSettings"
+    configlet_category_id = "Products"
+    schema_prefix = "collective.solr"
 
 
 class SolrControlPanelForm(controlpanel.RegistryEditForm):
