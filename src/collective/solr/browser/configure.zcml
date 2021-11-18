@@ -22,6 +22,10 @@
       class=".controlpanel.SolrControlPanel"
       permission="cmf.ManagePortal" />
 
+  <adapter
+    factory=".controlpanel.SolrControlpanelAdapter"
+    name="solr-controlpanel" />
+
   <browser:page
       for="*"
       name="solr-maintenance"
