@@ -11,7 +11,24 @@ from collective.solr.interfaces import ISolrSchema, _
 from Products.CMFPlone.utils import safe_unicode
 from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 from Products.PythonScripts.PythonScript import PythonScript
+from zope.component import adapter
 from zope.interface import alsoProvides
+from zope.interface import Interface
+
+try:
+    from plone.restapi.controlpanels import RegistryConfigletPanel
+
+    PLONE_RESTAPI_INSTALLED = True
+except ImportError:
+    PLONE_RESTAPI_INSTALLED = False
+
+
+@adapter(Interface, Interface)
+class SolrControlpanelAdapter(RegistryConfigletPanel):
+    schema = ISolrSchema
+    configlet_id = "SolrSettings"
+    configlet_category_id = "Products"
+    schema_prefix = "collective.solr"
 
 
 class SolrControlPanelForm(controlpanel.RegistryEditForm):
