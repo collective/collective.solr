@@ -4,7 +4,10 @@ Changelog
 8.4.3 (unreleased)
 ------------------
 
-- Drop Python 2, Plone 4.3, Plone 5.0, Plone 5.1 compatibility.
+- Add support for Plone 6 / Volto
+  [timo]
+
+- Drop Python 2, Plone 4.3, Plone 5.0, Plone 5.1 compatibility
   [timo]
 
 
