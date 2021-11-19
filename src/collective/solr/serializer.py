@@ -9,4 +9,4 @@ from zope.interface import Interface
 @implementer(ISerializeToJson)
 @adapter(SolrResponse, Interface)
 class LazySolrCatalogResultSerializer(LazyCatalogResultSerializer):
-    """ The LazyCatalog adapter for the plone.restapi JSON serialization """
+    """The LazyCatalog adapter for the plone.restapi JSON serialization"""

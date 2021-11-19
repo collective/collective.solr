@@ -8,7 +8,7 @@ marker = []
 
 
 def getLocal(name, factory=lambda: None):
-    """ get named thread-local value and optionally initialize it """
+    """get named thread-local value and optionally initialize it"""
     value = getattr(localData, name, marker)
     if value is marker:
         value = factory()
@@ -17,5 +17,5 @@ def getLocal(name, factory=lambda: None):
 
 
 def setLocal(name, value):
-    """ set a value for the named thread-local variable """
+    """set a value for the named thread-local variable"""
     setattr(localData, name, value)

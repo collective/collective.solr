@@ -22,7 +22,7 @@ def getConfig():
 
 
 def isActive():
-    """ indicate if the solr connection should/can be used """
+    """indicate if the solr connection should/can be used"""
     try:
         registry = getUtility(IRegistry)
         active = registry["collective.solr.active"]
@@ -32,7 +32,7 @@ def isActive():
 
 
 def activate(active=True):
-    """ (de)activate the solr integration """
+    """(de)activate the solr integration"""
     registry = getUtility(IRegistry)
     registry["collective.solr.active"] = active
 

@@ -174,7 +174,7 @@ class SolrMaintenanceTests(TestCase):
         return self.connection.search(q=query).read().decode("utf-8")
 
     def counts(self):
-        """ crude count of metadata records in the database """
+        """crude count of metadata records in the database"""
         info = {}
         result = self.search()
         for record in split(r'<(str|date) name="', result)[1:]:
@@ -706,10 +706,10 @@ class SolrServerTests(TestCase):
         self.assertEqual(self.search("+Title:Foo").results().numFound, "1")
 
     def testSearchableTextWildcardOnNumbers(self):
-        '''
+        """
         Test if we can do wild card searches if the term consist of only numbers
         or the last character is a number.
-        '''
+        """
         conn = getUtility(ISolrConnectionManager).getConnection()
         conn.add(UID="foo", Title="foo", SearchableText="123456")
         conn.commit()
@@ -1734,8 +1734,12 @@ class SolrServerTests(TestCase):
         self.assertEqual(sorted([r.Title for r in results]), ["foo bar", "foo/bar"])
 
     def testForcedSimpleSearchIgnoresPoint(self):
-        self.portal.invokeFactory("Document", id="fb", title="Rundschreiben Nr. 32/2017*")
-        self.portal.invokeFactory("Document", id="fb2", title="Rundschreiben Nr 32 2017*")
+        self.portal.invokeFactory(
+            "Document", id="fb", title="Rundschreiben Nr. 32/2017*"
+        )
+        self.portal.invokeFactory(
+            "Document", id="fb2", title="Rundschreiben Nr 32 2017*"
+        )
         commit()
 
         config = getConfig()

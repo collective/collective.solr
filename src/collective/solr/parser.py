@@ -16,10 +16,10 @@ import six
 
 
 class AttrDict(dict):
-    """ a dictionary with attribute access """
+    """a dictionary with attribute access"""
 
     def __getattr__(self, name):
-        """ look up attributes in dict """
+        """look up attributes in dict"""
         marker = []
         value = self.get(name, marker)
         if value is not marker:
@@ -30,13 +30,13 @@ class AttrDict(dict):
 
 @implementer(ISolrFlare)
 class SolrFlare(AttrDict):
-    """ a sol(a)r brain, i.e. a data container for search results """
+    """a sol(a)r brain, i.e. a data container for search results"""
 
     __allow_access_to_unprotected_subobjects__ = True
 
 
 class SolrResults(list):
-    """ a list of results returned from solr, i.e. sol(a)r flares """
+    """a list of results returned from solr, i.e. sol(a)r flares"""
 
 
 def parseDate(value):
@@ -77,7 +77,7 @@ nested = {"arr": list, "lst": dict, "result": SolrResults, "doc": SolrFlare}
 
 
 def setter(item, name, value):
-    """ sets the named value on item respecting its type """
+    """sets the named value on item respecting its type"""
     if isinstance(item, list):
         item.append(value)  # name is ignored for lists
     elif isinstance(item, dict):
@@ -87,7 +87,7 @@ def setter(item, name, value):
 
 
 class SolrResponse(Lazy):
-    """ a solr search response; TODO: this should get an interface!! """
+    """a solr search response; TODO: this should get an interface!!"""
 
     __allow_access_to_unprotected_subobjects__ = True
 
@@ -97,7 +97,7 @@ class SolrResponse(Lazy):
             self.parse(data)
 
     def parse(self, data):
-        """ parse a solr response contained in a string or file-like object """
+        """parse a solr response contained in a string or file-like object"""
         if isinstance(data, six.text_type):
             data = data.encode("utf-8")
         if isinstance(data, six.binary_type):
@@ -127,7 +127,7 @@ class SolrResponse(Lazy):
         return self
 
     def results(self):
-        """ return only the list of results, i.e. a `SolrResults` instance """
+        """return only the list of results, i.e. a `SolrResults` instance"""
         return getattr(self, "response", [])
 
     @property
@@ -156,7 +156,7 @@ class SolrResponse(Lazy):
 
 
 class SolrField(AttrDict):
-    """ a schema field representation """
+    """a schema field representation"""
 
     def __init__(self, *args, **kw):
         self["required"] = False
@@ -165,7 +165,7 @@ class SolrField(AttrDict):
 
 
 class AttrStr(str):
-    """ a string class with attributes """
+    """a string class with attributes"""
 
     def __new__(self, value, **kw):
         return str.__new__(self, value)
@@ -216,14 +216,14 @@ class SolrSchema(AttrDict):
 
     @property
     def fields(self):
-        """ return list of all fields the schema consists of """
+        """return list of all fields the schema consists of"""
         for name, field in self.items():
             if isinstance(field, SolrField):
                 yield field
 
     @property
     def stored(self):
-        """ return names of all stored fields, a.k.a. metadata """
+        """return names of all stored fields, a.k.a. metadata"""
         for field in self.fields:
             if field.stored:
                 yield field.name

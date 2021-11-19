@@ -19,7 +19,7 @@ from six.moves import map
 
 class Dummy(object):
 
-    """ dummy class that allows setting attributes """
+    """dummy class that allows setting attributes"""
 
     def __init__(self, **kw):
         self.__dict__.update(kw)
