@@ -4,7 +4,8 @@ Changelog
 8.4.3 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Drop Python 2, Plone 4.3, Plone 5.0, Plone 5.1 compatibility.
+  [timo]
 
 
 8.4.2 (2021-04-08)
