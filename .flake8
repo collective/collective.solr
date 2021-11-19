@@ -1,0 +1,15 @@
+[flake8]
+# Recommend matching the black line length (default 88),
+# rather than using the flake8 default of 79:
+max-line-length = 100000
+extend-ignore =
+    # See https://github.com/PyCQA/pycodestyle/issues/373
+    # copied from https://github.com/psf/black/blob/master/.flake8
+    # E203: https://github.com/psf/black#slices
+    E203
+    E266
+    E501
+    W503
+    # legacy
+    E731  # E731 do not assign a lambda expression, use a def
+    E722  # do not use bare except
