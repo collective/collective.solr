@@ -1,8 +1,8 @@
 Changelog
 =========
 
-8.4.3 (unreleased)
-------------------
+9.0.0a1 (2021-11-19)
+--------------------
 
 - Add support for Plone 6 / Volto
   [timo]
