@@ -111,7 +111,7 @@ class SolrConnection:
         return rsp
 
     def setTimeout(self, timeout):
-        """ set a timeout value for the currently open connection """
+        """set a timeout value for the currently open connection"""
         logger.debug("setting socket timeout on %r: %s", self, timeout)
         self.conn.timeout = timeout
 
@@ -151,7 +151,7 @@ class SolrConnection:
         self.xmlbody.append(request)
 
     def flush(self):
-        """ send out the stored requests to solr """
+        """send out the stored requests to solr"""
         count = 0
         responses = []
         for request in self.xmlbody:

@@ -39,7 +39,7 @@ except ImportError:
 
 
 def timer(func=time):
-    """ set up a generator returning the elapsed time since the last call """
+    """set up a generator returning the elapsed time since the last call"""
 
     def gen(last=func()):
         while True:
@@ -51,7 +51,7 @@ def timer(func=time):
 
 
 def checkpointIterator(function, interval=100):
-    """ the iterator will call the given function for every nth invocation """
+    """the iterator will call the given function for every nth invocation"""
     counter = 0
     while True:
         counter += 1
@@ -61,10 +61,10 @@ def checkpointIterator(function, interval=100):
 
 
 def notimeout(func):
-    """ decorator to prevent long-running solr tasks from timing out """
+    """decorator to prevent long-running solr tasks from timing out"""
 
     def wrapper(*args, **kw):
-        """ wrapper with random docstring so ttw access still works """
+        """wrapper with random docstring so ttw access still works"""
         manager = queryUtility(ISolrConnectionManager)
         manager.setTimeout(None, lock=True)
         try:
@@ -77,10 +77,10 @@ def notimeout(func):
 
 @implementer(ISolrMaintenanceView)
 class SolrMaintenanceView(BrowserView):
-    """ helper view for indexing all portal content in Solr """
+    """helper view for indexing all portal content in Solr"""
 
     def mklog(self, use_std_log=False):
-        """ helper to prepend a time stamp to the output """
+        """helper to prepend a time stamp to the output"""
         write = self.request.RESPONSE.write
 
         def log(msg, timestamp=True):
@@ -93,7 +93,7 @@ class SolrMaintenanceView(BrowserView):
         return log
 
     def optimize(self):
-        """ optimize solr indexes """
+        """optimize solr indexes"""
         manager = queryUtility(ISolrConnectionManager)
         conn = manager.getConnection()
         conn.setTimeout(None)
@@ -101,7 +101,7 @@ class SolrMaintenanceView(BrowserView):
         return "solr indexes optimized."
 
     def clear(self):
-        """ clear all data from solr, i.e. delete all indexed objects """
+        """clear all data from solr, i.e. delete all indexed objects"""
         manager = queryUtility(ISolrConnectionManager)
         uniqueKey = manager.getSchema().uniqueKey
         conn = manager.getConnection()

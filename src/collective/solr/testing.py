@@ -191,7 +191,7 @@ LEGACY_COLLECTIVE_SOLR_FIXTURE = LegacyCollectiveSolrLayer()
 
 
 def activateAndReindex(portal):
-    """ activate solr indexing and reindex the existing content """
+    """activate solr indexing and reindex the existing content"""
     activate()
     response = portal.REQUEST.RESPONSE
     original = response.write

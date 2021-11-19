@@ -174,7 +174,7 @@ class SolrMaintenanceTests(TestCase):
         return self.connection.search(q=query).read().decode("utf-8")
 
     def counts(self):
-        """ crude count of metadata records in the database """
+        """crude count of metadata records in the database"""
         info = {}
         result = self.search()
         for record in split(r'<(str|date) name="', result)[1:]:

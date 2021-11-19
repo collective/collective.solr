@@ -21,7 +21,7 @@ from collective.solr.utils import prepareData
 @implementer(ICheckIndexable)
 class Foo(CMFCatalogAware):
 
-    """ dummy test object """
+    """dummy test object"""
 
     def __init__(self, **kw):
         for key, value in kw.items():
@@ -32,7 +32,7 @@ class Foo(CMFCatalogAware):
 
 
 def sortFields(output):
-    """ helper to sort `<field>` tags in output for testing """
+    """helper to sort `<field>` tags in output for testing"""
     pattern = br"^(.*<doc>)(<field .*</field>)(</doc>.*)"
     prefix, fields, suffix = search(pattern, output, DOTALL).groups()
     tags = br"(<field [^>]*>[^<]*</field>)"

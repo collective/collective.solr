@@ -352,7 +352,7 @@ class ISolrSchema(Interface):
 
 
 class ISolrConnectionConfig(ISolrSchema):
-    """ utility to hold the connection configuration for the solr server """
+    """utility to hold the connection configuration for the solr server"""
 
 
 class IZCMLSolrConnectionConfig(Interface):
@@ -360,16 +360,16 @@ class IZCMLSolrConnectionConfig(Interface):
 
 
 class ISolrConnectionManager(Interface):
-    """ a thread-local connection manager for solr """
+    """a thread-local connection manager for solr"""
 
     def setHost(active=False, host="localhost", port=8983, base="/solr/plone"):
-        """ set connection parameters """
+        """set connection parameters"""
 
     def closeConnection(clearSchema=False):
-        """ close the current connection, if any """
+        """close the current connection, if any"""
 
     def getConnection():
-        """ returns an existing connection or opens one """
+        """returns an existing connection or opens one"""
 
     def getSchema():
         """returns the currently used schema or fetches it.
@@ -390,11 +390,11 @@ class ISolrConnectionManager(Interface):
 
 
 class ISolrIndexQueueProcessor(IIndexQueueProcessor):
-    """ an index queue processor for solr """
+    """an index queue processor for solr"""
 
 
 class ISolrFlare(Interface):
-    """ a sol(a)r brain, i.e. a data container for search results """
+    """a sol(a)r brain, i.e. a data container for search results"""
 
 
 class IFlare(Interface):
@@ -411,7 +411,7 @@ class ISearch(Interface):
         (see http://wiki.apache.org/solr/CommonQueryParameters)"""
 
     def __call__(query, **parameters):
-        """ convenience alias for `search` """
+        """convenience alias for `search`"""
 
     def buildQueryAndParameters(default=None, **args):
         """helper to build a query for simple use-cases; the query is
@@ -422,7 +422,7 @@ class ISearch(Interface):
 
 
 class ICatalogTool(Interface):
-    """ marker interface for plone's catalog tool """
+    """marker interface for plone's catalog tool"""
 
 
 class ISearchDispatcher(Interface):
@@ -435,13 +435,13 @@ class ISearchDispatcher(Interface):
 
 
 class ISolrMaintenanceView(Interface):
-    """ solr maintenance view for clearing, re-indexing content etc """
+    """solr maintenance view for clearing, re-indexing content etc"""
 
     def optimize():
-        """ optimize solr indexes """
+        """optimize solr indexes"""
 
     def clear():
-        """ clear all data from solr, i.e. delete all indexed objects """
+        """clear all data from solr, i.e. delete all indexed objects"""
 
     def reindex(batch=1000, skip=0):
         """find all contentish objects (meaning all objects derived from one
@@ -460,7 +460,7 @@ class ISolrMaintenanceView(Interface):
 
 
 class ISolrAddHandler(Interface):
-    """ An adder for solr documents """
+    """An adder for solr documents"""
 
 
 class IFacetTitleVocabularyFactory(IVocabularyFactory):
@@ -477,7 +477,7 @@ class IFacetTitleVocabularyFactory(IVocabularyFactory):
 
 
 class ICheckIndexable(Interface):
-    """ Check if an object is indexable """
+    """Check if an object is indexable"""
 
     def __call__():
         """Return `True`, if context is indexable and `False`otherwise"""
