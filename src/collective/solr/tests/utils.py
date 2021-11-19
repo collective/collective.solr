@@ -34,17 +34,17 @@ def loadZCMLString(string):
 
 
 def getData(filename):
-    """ return a file object from the test data folder """
+    """return a file object from the test data folder"""
     filename = join(dirname(tests.__file__), "data", filename)
     return open(filename, "rb").read()
 
 
 def fakehttp(solrconn, *fakedata):
-    """ helper function to set up a fake http request on a SolrConnection """
+    """helper function to set up a fake http request on a SolrConnection"""
 
     class FakeOutput(list):
 
-        """ helper class to organize output from fake connections """
+        """helper class to organize output from fake connections"""
 
         conn = solrconn
 
@@ -76,7 +76,7 @@ def fakehttp(solrconn, *fakedata):
 
     class FakeSocket(six.BytesIO):
 
-        """ helper class to fake socket communication """
+        """helper class to fake socket communication"""
 
         def sendall(self, str):
             output.log(str)
@@ -103,7 +103,7 @@ def fakehttp(solrconn, *fakedata):
 
     class FakeHTTPConnection(HTTPConnection):
 
-        """ helper class to fake a http connection object from httplib.py """
+        """helper class to fake a http connection object from httplib.py"""
 
         def __init__(self, host, *fakedata):
             HTTPConnection.__init__(self, host)
@@ -124,7 +124,7 @@ def fakehttp(solrconn, *fakedata):
 
 
 def fakemore(solrconn, *fakedata):
-    """ helper function to add more fake http requests to a SolrConnection """
+    """helper function to add more fake http requests to a SolrConnection"""
     assert hasattr(solrconn.conn, "fakedata")  # `isinstance()` doesn't work?
     solrconn.conn.fakedata.extend(fakedata)
 
@@ -159,7 +159,7 @@ def fakeServer(actions, port=55555):
 
 
 def pingSolr():
-    """ test if the solr server is available """
+    """test if the solr server is available"""
     status = getLocal("solrStatus")
     if status is not None:
         return status

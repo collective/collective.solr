@@ -17,7 +17,7 @@ timezone = DateTime().timezone()
 
 @implementer(IFlare)
 class PloneFlare(AttrDict):
-    """ a sol(a)r brain, i.e. a data container for search results """
+    """a sol(a)r brain, i.e. a data container for search results"""
 
     adapts(ISolrFlare, IHTTPRequest)
 
@@ -30,11 +30,11 @@ class PloneFlare(AttrDict):
 
     @property
     def id(self):
-        """ convenience alias """
+        """convenience alias"""
         return self.get("id", self.get("getId"))
 
     def getPath(self):
-        """ convenience alias """
+        """convenience alias"""
         return self["path_string"]
 
     def getRID(self):
@@ -61,7 +61,7 @@ class PloneFlare(AttrDict):
         return self.getObject(restricted=False)
 
     def getURL(self, relative=False):
-        """ convert the physical path into a url, if it was stored """
+        """convert the physical path into a url, if it was stored"""
         path = self.getPath()
         path = path
         try:

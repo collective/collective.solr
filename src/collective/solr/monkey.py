@@ -10,7 +10,7 @@ from collective.solr.interfaces import ISearchDispatcher
 
 
 def searchResults(self, REQUEST=None, **kw):
-    """ based on the version in `CMFPlone/CatalogTool.py` """
+    """based on the version in `CMFPlone/CatalogTool.py`"""
     kw = kw.copy()
     only_active = not kw.get("show_inactive", False)
     user = _getAuthenticatedUser(self)
@@ -26,7 +26,7 @@ def searchResults(self, REQUEST=None, **kw):
 
 
 def patchCatalogTool():
-    """ monkey patch plone's catalogtool with the solr dispatcher """
+    """monkey patch plone's catalogtool with the solr dispatcher"""
     if not hasattr(CatalogTool, "_cs_old_searchResults"):
         CatalogTool._cs_old_searchResults = CatalogTool.searchResults
         CatalogTool.searchResults = searchResults

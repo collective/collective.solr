@@ -32,7 +32,7 @@ ignored = ("use_solr", "-C", "solr_complex_search")
 
 
 def iso8601date(value):
-    """ convert `date`, `datetime` and `DateTime` to iso 8601 date format """
+    """convert `date`, `datetime` and `DateTime` to iso 8601 date format"""
     if isinstance(value, date) and not isinstance(value, datetime):
         value = datetime(value.year, value.month, value.day, tzinfo=timezone("UTC"))
     if isinstance(value, datetime):

@@ -31,7 +31,7 @@ class ZCMLSolrConnectionConfig(object):
 
 @implementer(ISolrConnectionManager)
 class SolrConnectionManager(object):
-    """ a thread-local connection manager for solr """
+    """a thread-local connection manager for solr"""
 
     lock = False
 
@@ -40,7 +40,7 @@ class SolrConnectionManager(object):
             self.setHost(active=active)
 
     def setHost(self, active=False, host="localhost", port=8983, base="/solr/plone"):
-        """ set connection parameters """
+        """set connection parameters"""
         config = getConfig()
         config.active = active
         config.host = six.text_type(host)
@@ -49,7 +49,7 @@ class SolrConnectionManager(object):
         self.closeConnection(clearSchema=True)
 
     def closeConnection(self, clearSchema=False):
-        """ close the current connection, if any """
+        """close the current connection, if any"""
         logger.debug("closing connection")
         conn = getLocal("connection")
         if conn is not None:
@@ -59,7 +59,7 @@ class SolrConnectionManager(object):
             setLocal("schema", None)
 
     def getConnection(self):
-        """ returns an existing connection or opens one """
+        """returns an existing connection or opens one"""
         if not isActive():
             return None
         conn = getLocal("connection")
@@ -87,7 +87,7 @@ class SolrConnectionManager(object):
         return conn
 
     def getSchema(self):
-        """ returns the currently used schema or fetches it """
+        """returns the currently used schema or fetches it"""
         schema = getLocal("schema")
         if schema is None:
             conn = self.getConnection()

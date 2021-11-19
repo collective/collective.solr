@@ -143,7 +143,7 @@ class Search(BrowserView):
         return self.filter_types(list(used_types))
 
     def sort_options(self):
-        """ Sorting options for search results view. """
+        """Sorting options for search results view."""
         return (
             SortOption(self.request, _pmf(u"relevance"), ""),
             SortOption(

@@ -16,7 +16,7 @@ import six
 
 @implementer(IVocabularyFactory)
 class SolrIndexes(object):
-    """ vocabulary provider yielding all available solr indexes """
+    """vocabulary provider yielding all available solr indexes"""
 
     def __call__(self, context):
         items = []
