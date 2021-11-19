@@ -91,14 +91,6 @@ jobs:
         env:
           CI: true
 
-      # black
-      - name: black
-        run: if [ "${{ matrix.plone-version }}" == "5.2" ] && [ ${{ matrix.python-version }} == '3.7' ]; then pip install black && black src/ --check; fi
-
-      # code analysis
-      - name: code analysis
-        run: bin/code-analysis
-
       # test
       - name: test
         run: bin/test
