@@ -3,24 +3,17 @@ from plone.app.registry.browser import controlpanel
 
 try:
     from plone.protect.interfaces import IDisableCSRFProtection
-
     PLONE_PROTECT_INSTALLED = True
 except ImportError:
     PLONE_PROTECT_INSTALLED = False
 from collective.solr.interfaces import ISolrSchema, _
+from plone.restapi.controlpanels import RegistryConfigletPanel
 from Products.CMFPlone.utils import safe_unicode
 from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 from Products.PythonScripts.PythonScript import PythonScript
 from zope.component import adapter
 from zope.interface import alsoProvides
 from zope.interface import Interface
-
-try:
-    from plone.restapi.controlpanels import RegistryConfigletPanel
-
-    PLONE_RESTAPI_INSTALLED = True
-except ImportError:
-    PLONE_RESTAPI_INSTALLED = False
 
 
 @adapter(Interface, Interface)
