@@ -196,7 +196,7 @@ def boost_values(obj, data):
 
 @implementer(ISolrIndexQueueProcessor)
 class SolrIndexProcessor(object):
-    """ a queue processor for solr """
+    """a queue processor for solr"""
 
     def __init__(self, manager=None):
         self.manager = manager

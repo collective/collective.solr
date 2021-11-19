@@ -17,7 +17,7 @@ import six
 
 
 def param(view, name):
-    """ return a request parameter as a list """
+    """return a request parameter as a list"""
     value = view.request.form.get(name, [])
     if isinstance(value, six.string_types):
         value = [value]
@@ -25,7 +25,7 @@ def param(view, name):
 
 
 def facetParameters(view):
-    """ determine facet fields to be queried for """
+    """determine facet fields to be queried for"""
     marker = []
     fields = view.request.get("facet.field", view.request.get("facet_field", marker))
     if isinstance(fields, six.string_types):
@@ -46,7 +46,7 @@ def facetParameters(view):
 
 
 def convertFacets(fields, view, filter=None):
-    """ convert facet info to a form easy to process in templates """
+    """convert facet info to a form easy to process in templates"""
     info = []
     params = view.request.form.copy()
     if "b_start" in params:
@@ -104,12 +104,12 @@ def convertFacets(fields, view, filter=None):
 
 
 class FacetMixin:
-    """ mixin with helpers common to the viewlet and view """
+    """mixin with helpers common to the viewlet and view"""
 
     hidden = ViewPageTemplateFile("hiddenfields.pt")
 
     def hiddenfields(self):
-        """ render hidden fields suitable for inclusion in search forms """
+        """render hidden fields suitable for inclusion in search forms"""
         facets, dependencies = facetParameters(self)
         queries = param(self, "fq")
         return self.hidden(facets=facets, queries=queries)
@@ -121,7 +121,7 @@ class SearchBox(SearchBoxViewlet, FacetMixin):
 
 
 class SearchFacetsView(BrowserView, FacetMixin):
-    """ view for displaying facetting info as provided by solr searches """
+    """view for displaying facetting info as provided by solr searches"""
 
     def __call__(self, *args, **kw):
         self.args = args
@@ -129,7 +129,7 @@ class SearchFacetsView(BrowserView, FacetMixin):
         return super(SearchFacetsView, self).__call__(*args, **kw)
 
     def facets(self):
-        """ prepare and return facetting info for the given SolrResponse """
+        """prepare and return facetting info for the given SolrResponse"""
         results = self.kw.get("results", None)
         fcs = getattr(results, "facet_counts", None)
         if results is not None and fcs is not None:

@@ -7,6 +7,7 @@ jobs:
       fail-fast: false
       matrix:
         python-version: [3.8]
+        black-version: 21.11b1
 
     steps:
       # git checkout
@@ -28,7 +29,7 @@ jobs:
 
       # install black
       - name: install black
-        run: pip install black
+        run: pip install black==${{ matrix.black-version }}
 
       # run black
       - name: run black

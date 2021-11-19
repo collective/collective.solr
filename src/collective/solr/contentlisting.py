@@ -174,7 +174,7 @@ class FlareContentListingObject(object):
 
         Adapted from plone.app.contentlisting.catalog.CatalogContentListingObject
         """
-        if name.startswith('_'):
+        if name.startswith("_"):
             raise AttributeError(name)
         flare_value = self.flare.get(name, missing)
         if flare_value is not missing:

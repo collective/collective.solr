@@ -35,7 +35,7 @@ logger = getLogger("collective.solr.search")
 
 @implementer(ISearch)
 class Search(object):
-    """ a search utility for solr """
+    """a search utility for solr"""
 
     def __init__(self):
         self.manager = None
@@ -60,7 +60,7 @@ class Search(object):
         default_operator="AND",
         **parameters
     ):
-        """ perform a search with the given querystring and parameters """
+        """perform a search with the given querystring and parameters"""
         start = time()
         config = self.getConfig()
         manager = self.getManager()
@@ -130,7 +130,7 @@ class Search(object):
     __call__ = search
 
     def buildQueryAndParameters(self, default=None, **args):
-        """ helper to build a querystring for simple use-cases """
+        """helper to build a querystring for simple use-cases"""
         schema = self.getManager().getSchema() or {}
 
         params = subtractQueryParameters(args)
