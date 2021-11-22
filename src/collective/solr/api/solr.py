@@ -2,7 +2,9 @@ from plone.restapi.search.handler import SearchHandler
 from plone.restapi.search.utils import unflatten_dotted_dict
 from plone.restapi.services import Service
 from AccessControl.SecurityManagement import getSecurityManager
+from plone.restapi.serializer.catalog import LazyCatalogResultSerializer
 from collective.solr.interfaces import ISolrConnectionManager
+from zope.component import queryMultiAdapter
 from Products.CMFPlone.utils import base_hasattr
 from zope.component import queryUtility
 from zope.component import getUtility
@@ -34,150 +36,12 @@ class SolrSearchGet(Service):
                 "review_state": obj.get("review_state"),
                 "allowedRolesAndUsers": obj.get("allowedRolesAndUsers"),
             }
-            for obj in search(query=query)
+            for obj in search(query=query, fq=self.security_filter())
         ]
-
-
-SPECIAL_CHARS = [
-    "+",
-    "-",
-    "&&",
-    "||",
-    "!",
-    "(",
-    ")",
-    "{",
-    "}",
-    "[",
-    "]",
-    "^",
-    '"',
-    "~",
-    "*",
-    "?",
-    ":",
-    "/",
-]
-
-OPERATORS = re.compile(r"(.*)\s+(AND|OR|NOT)\s+", re.UNICODE)
-
-
-def escape(term):
-    for char in SPECIAL_CHARS:
-        term = term.replace(char, "\\" + char)
-    return term
-
-
-def is_simple_search(phrase):
-    num_quotes = phrase.count('"')
-    if num_quotes % 2 == 0:
-        # Replace quoted parts with a marker
-        # "foo bar" -> quoted
-        parts = phrase.split('"')
-        new_parts = []
-        for i in range(0, len(parts)):
-            if i % 2 == 0:
-                new_parts.append(parts[i])
-            else:
-                new_parts.append("quoted")
-        phrase = u"".join(new_parts)
-    if bool(OPERATORS.match(phrase)):
-        return False
-    return True
-
-
-def split_simple_search(phrase):
-    parts = phrase.split('"')
-    terms = []
-    for i in range(0, len(parts)):
-        if i % 2 == 0:
-            # Unquoted text
-            terms.extend([term for term in parts[i].split() if term])
-        else:
-            # The uneven parts are those inside quotes
-            if parts[i]:
-                terms.append('"%s"' % parts[i])
-    return terms
-
-
-def make_query(phrase):
-    phrase = phrase.strip()
-    if isinstance(phrase, six.binary_type):
-        phrase = phrase.decode("utf8")
-    registry = getUtility(IRegistry)
-    settings = registry.forInterface(ISolrSchema)
-    if is_simple_search(phrase):
-        terms = split_simple_search(phrase)[:10]
-        pattern = settings.simple_search_term_pattern
-        term_queries = [pattern.format(term=escape(t)) for t in terms]
-        if len(term_queries) > 1:
-            term_queries = [u"(%s)" % q for q in term_queries]
-        query = u" AND ".join(term_queries)
-        if len(terms) > 1 or not phrase.isalnum():
-            query = u"(%s) OR (%s)" % (
-                settings.simple_search_phrase_pattern.format(phrase=escape(phrase)),
-                query,
-            )
-    else:
-        pattern = settings.complex_search_pattern
-        query = pattern.format(phrase=phrase)
-    if settings.local_query_parameters:
-        query = settings.local_query_parameters + query
-    return query
-
-
-class ISolrSearch(Interface):
-    """Solr search utility"""
-
-    def search(
-        request_handler=u"/select",
-        query=u"*:*",
-        filters=None,
-        start=0,
-        rows=1000,
-        sort=None,
-        **params
-    ):
-        """Perform a search with the given querystring and extra parameters"""
-
-
-@implementer(ISolrSearch)
-class SolrSearch(object):
-    """A search utility for Solr"""
-
-    def __init__(self):
-        self._manager = None
-
-    @property
-    def manager(self):
-        if self._manager is None:
-            self._manager = queryUtility(ISolrConnectionManager)
-        return self._manager
-
-    def search(
-        self,
-        request_handler=u"/select",
-        query=u"*:*",
-        filters=None,
-        start=0,
-        rows=1000,
-        sort=None,
-        **params
-    ):
-        conn = self.manager.connection
-        params = {u"params": params}
-        params[u"query"] = query
-        params[u"offset"] = start
-        params[u"limit"] = rows
-        if sort is not None:
-            params[u"sort"] = sort
-        if filters is None:
-            filters = []
-        if not isinstance(filters, list):
-            filters = [filters]
-        filters.insert(0, self.security_filter())
-        params[u"filter"] = filters
-        return conn.search(params, request_handler=request_handler)
+        # serializer = queryMultiAdapter(
+        #     (self.context, self.request), LazyCatalogResultSerializer
+        # )
+        # return serializer()
 
     def security_filter(self):
         user = getSecurityManager().getUser()
