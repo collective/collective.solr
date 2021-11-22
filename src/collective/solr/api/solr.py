@@ -20,6 +20,12 @@ import re
 import six
 
 
+def escape(term):
+    for char in SPECIAL_CHARS:
+        term = term.replace(char, "\\" + char)
+    return term
+
+
 class SolrSearchGet(Service):
     def reply(self):
         search = getUtility(ISearch)
