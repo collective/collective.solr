@@ -10,7 +10,6 @@ jobs:
         plone-version: [5.2]
         solr-version: [7.7.3, 8.2.0]
     steps:
-
       # git checkout
       - uses: actions/checkout@v2
 
@@ -40,7 +39,7 @@ jobs:
 
       # choose Plone version
       - name: choose Plone version
-        run: sed -ie "s#plone-x.x.x.cfg#plone-${{ matrix.plone-version }}.x.cfg#" ci.cfg
+        run: sed -ie "s#plone-x.x.x.cfg#plone-${{ matrix.plone-version }}.x.cfg#" buildout.cfg
 
       # choose Solr version
       - run: sed -ie "s#solr/.\..\..#solr/${{ matrix.solr-version }}#" base.cfg
