@@ -19,6 +19,27 @@ from zope.component import getUtility
 import re
 import six
 
+SPECIAL_CHARS = [
+    "+",
+    "-",
+    "&&",
+    "||",
+    "!",
+    "(",
+    ")",
+    "{",
+    "}",
+    "[",
+    "]",
+    "^",
+    '"',
+    "~",
+    "*",
+    "?",
+    ":",
+    "/",
+]
+
 
 def escape(term):
     for char in SPECIAL_CHARS:
