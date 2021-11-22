@@ -31,6 +31,7 @@
     <implements interface=".interfaces.ICatalogTool" />
   </class>
 
+  <include package=".api" />
   <include package=".browser" />
 
     <adapter

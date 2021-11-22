@@ -1,21 +1,12 @@
 <configure
     xmlns="http://namespaces.zope.org/zope"
     xmlns:browser="http://namespaces.zope.org/browser"
-    xmlns:plone="http://namespaces.plone.org/plone"
     xmlns:zcml="http://namespaces.zope.org/zcml"
     i18n_domain="solr">
 
   <include package="Products.CMFCore" file="permissions.zcml"
       xmlns:zcml="http://namespaces.zope.org/zcml"
       zcml:condition="have plone-41" />
-
-  <plone:service
-      method="GET"
-      factory=".solr.SolrSearchGet"
-      for="zope.interface.Interface"
-      permission="zope2.View"
-      name="@solr"
-      />
 
   <browser:resourceDirectory
       name="collective.solr.images"
