@@ -1,5 +1,3 @@
-# most of the code here is a shameless copy from ftw.solr:
-# https://github.com/4teamwork/ftw.solr/pull/162
 from plone.restapi.search.handler import SearchHandler
 from plone.restapi.search.utils import unflatten_dotted_dict
 from plone.restapi.services import Service
@@ -7,6 +5,8 @@ from AccessControl.SecurityManagement import getSecurityManager
 from collective.solr.interfaces import ISolrConnectionManager
 from Products.CMFPlone.utils import base_hasattr
 from zope.component import queryUtility
+from zope.component import getUtility
+from collective.solr.interfaces import ISearch
 from zope.interface import implementer
 from zope.interface import Interface
 from collective.solr.interfaces import ISolrSchema
@@ -20,9 +20,22 @@ import six
 
 class SolrSearchGet(Service):
     def reply(self):
-        query = self.request.form.copy()
-        query = unflatten_dotted_dict(query)
-        return SearchHandler(self.context, self.request).search(query)
+        search = getUtility(ISearch)
+        query = self.request.form.get("q")
+        if not query:
+            query = "*:*"
+        # return poor man's serializer for now
+        return [
+            {
+                "id": obj.get("id"),
+                "UID": obj.get("UID"),
+                "Type": obj.get("Type"),
+                "Title": obj.get("Title"),
+                "review_state": obj.get("review_state"),
+                "allowedRolesAndUsers": obj.get("allowedRolesAndUsers"),
+            }
+            for obj in search(query=query)
+        ]
 
 
 SPECIAL_CHARS = [
