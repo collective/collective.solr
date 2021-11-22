@@ -47,7 +47,7 @@ jobs:
 
       # buildout
       - name: buildout
-        run: buildout -t 10 -c ci.cfg
+        run: buildout -t 10 -c buildout.cfg
         env:
           CI: true
 
