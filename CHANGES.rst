@@ -16,6 +16,9 @@ Changelog
 - Remove AT conditionals
   [timo]
 
+- Remove collective.js.showmore dependency
+  [timo]
+
 9.0.0a1 (2021-11-19)
 --------------------
 
