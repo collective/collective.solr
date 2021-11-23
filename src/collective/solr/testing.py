@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from Products.CMFCore.utils import getToolByName
 from collective.solr.utils import activate
-from plone import api
 from plone.app.robotframework.testing import REMOTE_LIBRARY_BUNDLE_FIXTURE
 from plone.app.testing import FunctionalTesting
 from plone.app.testing import IntegrationTesting
@@ -36,19 +35,8 @@ import six.moves.urllib.request
 import six.moves.urllib.error
 import six.moves.urllib.parse
 import subprocess
-import pkg_resources
-
-USE_COLLECTIVE_INDEXING = api.env.plone_version() < "5.1"
-if USE_COLLECTIVE_INDEXING:
-    from plone.testing.z2 import installProduct
 
 BIN_DIR = os.path.dirname(os.path.realpath(sys.argv[0]))
-
-try:  # pragma: no cover
-    pkg_resources.get_distribution("Products.LinguaPlone")
-    HAS_LINGUAPLONE = True
-except pkg_resources.DistributionNotFound:  # pragma: no cover
-    HAS_LINGUAPLONE = False
 
 
 class SolrLayer(Layer):

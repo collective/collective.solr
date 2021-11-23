@@ -1,23 +1,8 @@
-from plone.restapi.search.handler import SearchHandler
-from plone.restapi.search.utils import unflatten_dotted_dict
 from plone.restapi.services import Service
 from AccessControl.SecurityManagement import getSecurityManager
-from plone.restapi.serializer.catalog import LazyCatalogResultSerializer
-from collective.solr.interfaces import ISolrConnectionManager
-from zope.component import queryMultiAdapter
 from Products.CMFPlone.utils import base_hasattr
-from zope.component import queryUtility
 from zope.component import getUtility
 from collective.solr.interfaces import ISearch
-from zope.interface import implementer
-from zope.interface import Interface
-from collective.solr.interfaces import ISolrSchema
-from plone.registry.interfaces import IRegistry
-from six.moves import range
-from zope.component import getUtility
-
-import re
-import six
 
 SPECIAL_CHARS = [
     "+",

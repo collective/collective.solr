@@ -27,7 +27,6 @@ from collective.solr.parser import SolrResponse
 from collective.solr.search import Search
 from collective.solr.solr import logger as logger_solr
 from collective.solr.testing import activateAndReindex
-from collective.solr.testing import HAS_LINGUAPLONE
 from collective.solr.testing import HAS_PAC
 from collective.solr.testing import LEGACY_COLLECTIVE_SOLR_FUNCTIONAL_TESTING
 from collective.solr.testing import set_attributes
@@ -483,8 +482,6 @@ class SolrErrorHandlingTests(TestCase):
         self.folder = self.portal.folder
         self.config = getConfig()
         self.port = self.config.port  # remember previous port setting
-        if HAS_LINGUAPLONE:
-            self.folder.unmarkCreationFlag()  # stop LinguaPlone from renaming
         # Prevent collective indexing queues to pile up for folder creation
         commit()
 
@@ -561,8 +558,6 @@ class SolrServerTests(TestCase):
         self.maintenance.clear()
         self.config = getConfig()
         self.search = getUtility(ISearch)
-        if HAS_LINGUAPLONE:
-            self.folder.unmarkCreationFlag()  # stop LinguaPlone from renaming
 
     def tearDown(self):
         # due to the `commit()` in the tests below the activation of the
@@ -813,8 +808,6 @@ class SolrServerTests(TestCase):
         self.maintenance.reindex()
         self.config.search_pattern = None
         query = {"SearchableText": "News"}
-        if HAS_LINGUAPLONE:
-            query["Language"] = "all"
         response = solrSearchResults(**query)
         self.assertEqual(len(response), 2)
         self.assertEqual(response.response.numFound, "2")
@@ -828,8 +821,6 @@ class SolrServerTests(TestCase):
         self.config.search_pattern = u"(Title:{value}^5 OR getId:{value})"
         # for single-word searches we get both, wildcards & the custom pattern
         kw_query = {"SearchableText": "news"}
-        if HAS_LINGUAPLONE:
-            kw_query["Language"] = "all"
         response = solrSearchResults(**kw_query)
         query = response.responseHeader["params"]["q"]
         self.assertEqual(query, "(Title:(news* OR news)^5 " "OR getId:(news* OR news))")
