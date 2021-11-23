@@ -4,7 +4,8 @@ Changelog
 9.0.0a2 (unreleased)
 --------------------
 
-- Nothing changed yet.
+- Remove plone.app.contenttypes conditionals in code.
+  [timo]
 
 
 9.0.0a1 (2021-11-19)

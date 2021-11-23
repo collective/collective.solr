@@ -27,7 +27,6 @@ from collective.solr.parser import SolrResponse
 from collective.solr.search import Search
 from collective.solr.solr import logger as logger_solr
 from collective.solr.testing import activateAndReindex
-from collective.solr.testing import HAS_PAC
 from collective.solr.testing import LEGACY_COLLECTIVE_SOLR_FUNCTIONAL_TESTING
 from collective.solr.testing import set_attributes
 from collective.solr.tests.utils import numFound
@@ -106,25 +105,6 @@ DEFAULT_OBJS = [
         "depth": 0,
     },
 ]
-if not HAS_PAC:
-    DEFAULT_OBJS.extend(
-        [
-            {
-                "Title": "test_user_1_",
-                "getId": "test_user_1_",
-                "Type": "Folder",
-                "portal_type": "Folder",
-                "depth": 1,
-            },
-            {
-                "Title": "",
-                "getId": "Members",
-                "Type": "Folder",
-                "portal_type": "Folder",
-                "depth": 0,
-            },
-        ]
-    )
 
 
 @implementer(ISolrAddHandler)
@@ -583,9 +563,8 @@ class SolrServerTests(TestCase):
         fields.remove("geolocation")
         # remove _version_ field
         fields.remove("_version_")
-        if HAS_PAC:
-            # remove getIcon which is defined for Plone 5 only
-            fields.remove("getIcon")
+        # remove getIcon which is defined for Plone 5 only
+        fields.remove("getIcon")
 
         proc = SolrIndexProcessor(manager)
         # without explicit attributes all data should be returned
@@ -962,8 +941,6 @@ class SolrServerTests(TestCase):
         )
 
         expected = ["/plone/events", "/plone/front-page", "/plone/news"]
-        if not HAS_PAC:
-            expected.insert(0, "/plone/Members")
         self.assertEqual(search(path={"query": "/plone", "depth": 1}), expected)
 
     def testMultiplePathSearches(self):
@@ -1040,8 +1017,6 @@ class SolrServerTests(TestCase):
             "/plone/news/aggregator",
             "/plone/news/folder",
         ]
-        if not HAS_PAC:
-            expected.insert(0, "/plone/Members")
         self.assertEqual(search(["/plone/news", "/plone"], depth=1), expected)
 
     def testLogicalOperators(self):
@@ -1089,10 +1064,9 @@ class SolrServerTests(TestCase):
         wf_tool.setChainForPortalTypes(
             ("Folder", "Collection"), "simple_publication_workflow"
         )
-        if HAS_PAC:
-            wfAction(self.portal.news, "retract")
-            wfAction(self.portal.news.folder, "retract")
-            wfAction(self.portal.events, "retract")
+        wfAction(self.portal.news, "retract")
+        wfAction(self.portal.news.folder, "retract")
+        wfAction(self.portal.events, "retract")
         wfAction(self.portal.news.aggregator, "retract")
         wfAction(self.portal.events.aggregator, "retract")
         wf_tool.updateRoleMappings()
@@ -1103,9 +1077,6 @@ class SolrServerTests(TestCase):
         setRoles(self.portal, TEST_USER_ID, [])
         results = self.portal.portal_catalog(request)
         expected = ["/plone/front-page"]
-        if not HAS_PAC:
-            expected.insert(0, "/plone/Members")
-            expected.insert(1, "/plone/Members/" + TEST_USER_ID)
         self.assertEqual(sorted([r.path_string for r in results]), expected)
 
     def testEffectiveRange(self):
