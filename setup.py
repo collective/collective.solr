@@ -64,12 +64,11 @@ setup(
         "zope.schema",
     ],
     extras_require={
-        "test": ["plone.app.testing[robot]", "plone.app.robotframework[debug]"],
-        "test4": [
-            "Products.LinguaPlone >=3.1a1",
-            "plone.app.robotframework[debug]",
+        "test": [
             "plone.app.testing[robot]",
-        ],
+            "plone.app.robotframework[debug]",
+            "plone.restapi[test]",
+        ]
     },
     entry_points="""
       [z3c.autoinclude.plugin]
