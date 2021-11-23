@@ -1,9 +1,5 @@
 # -*- coding: utf-8 -*-
-try:
-    from Products.CMFCore.interfaces import IIndexQueueProcessor
-except ImportError:
-    # Plone < 5.1
-    from collective.indexing.interfaces import IIndexQueueProcessor
+from Products.CMFCore.interfaces import IIndexQueueProcessor
 from zope.interface import Interface
 from zope.schema import Bool
 from zope.schema import Float

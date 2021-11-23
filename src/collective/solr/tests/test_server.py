@@ -5,14 +5,8 @@ from DateTime import DateTime
 from Missing import MV
 from Products.CMFCore.utils import getToolByName
 
-try:
-    from Products.CMFCore.indexing import getQueue
-except ImportError:
-    from collective.indexing.queue import getQueue
-try:
-    from Products.CMFCore.indexing import processQueue
-except ImportError:
-    from collective.indexing.queue import processQueue
+from Products.CMFCore.indexing import getQueue
+from Products.CMFCore.indexing import processQueue
 from collective.solr.dispatcher import FallBackException
 from collective.solr.dispatcher import solrSearchResults
 from collective.solr.flare import PloneFlare
@@ -51,15 +45,6 @@ from zExceptions import Unauthorized
 from zope.component import getUtility, queryAdapter
 from zope.interface import implementer
 from zope.schema.interfaces import IVocabularyFactory
-
-try:
-    from Products.Archetypes.interfaces import IBaseObject
-except ImportError:
-    IBaseObject = None
-try:
-    from Products.Archetypes.config import UUID_ATTR
-except ImportError:
-    UUID_ATTR = None
 
 import unittest
 
@@ -370,14 +355,10 @@ class SolrMaintenanceTests(TestCase):
         commit()
         self.assertEqual(numFound(self.search()), 2)
         sm = self.portal.getSiteManager()
-        if api.env.plone_version() >= "5.0":
-            from plone.app.contenttypes.interfaces import IImage
+        from plone.app.contenttypes.interfaces import IImage
 
-            iface = IImage
-        else:
-            iface = IBaseObject
-        if iface:
-            sm.registerAdapter(RaisingAdder, required=(iface,), name="Image")
+        iface = IImage
+        sm.registerAdapter(RaisingAdder, required=(iface,), name="Image")
 
         self.clear_solr()
         # ignore_exceptions=False should raise the handler's exception,
@@ -1852,11 +1833,7 @@ class SolrServerTests(TestCase):
 
         uuid_orig = IUUID(self.portal["news"])
 
-        # Dexterity
         setattr(self.portal["news"], ATTRIBUTE_NAME, "test-solr-uid")
-        # Archetypes
-        if UUID_ATTR:
-            setattr(self.portal["news"], UUID_ATTR, "test-solr-uid")
         resp = self.search("NewsFolder")
         self.assertEqual(len(resp), 1)
         self.assertEqual(resp.results()[0]["UID"], uuid_orig)
