@@ -43,7 +43,7 @@ class SolrMaintenanceTests(unittest.TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.headers.get("Content-Type"), "application/json")
-        self.assertEqual(5, len(response.json()))
+        self.assertEqual(6, len(response.json()))
 
     def test_solr_endpoint(self):
         response = self.api_session.get("/@solr?q=Colorless")
