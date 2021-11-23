@@ -139,15 +139,9 @@ class CollectiveSolrLayer(PloneSandboxLayer):
         HTTPRequest.retry_max_count = 3
 
         # Load ZCML
-        if USE_COLLECTIVE_INDEXING:
-            import collective.indexing
-
-            self.loadZCML(package=collective.indexing)
         import collective.solr
 
         self.loadZCML(package=collective.solr)
-        if USE_COLLECTIVE_INDEXING:
-            installProduct(app, "collective.indexing")
 
     def tearDownZope(self, app):
         HTTPRequest.retry_max_count = self._orig_retry_max_count
@@ -292,7 +286,8 @@ COLLECTIVE_SOLR_INTEGRATION_TESTING = IntegrationTesting(
 )
 
 COLLECTIVE_SOLR_FUNCTIONAL_TESTING = FunctionalTesting(
-    bases=(COLLECTIVE_SOLR_FIXTURE,), name="CollectiveSolr:Functional"
+    bases=(COLLECTIVE_SOLR_FIXTURE, z2.ZSERVER_FIXTURE),
+    name="CollectiveSolr:Functional",
 )
 
 COLLECTIVE_SOLR_ROBOT_TESTING = FunctionalTesting(
@@ -305,5 +300,6 @@ LEGACY_COLLECTIVE_SOLR_INTEGRATION_TESTING = IntegrationTesting(
 )
 
 LEGACY_COLLECTIVE_SOLR_FUNCTIONAL_TESTING = FunctionalTesting(
-    bases=(LEGACY_COLLECTIVE_SOLR_FIXTURE,), name="CollectiveSolr:Functional"
+    bases=(LEGACY_COLLECTIVE_SOLR_FIXTURE, z2.ZSERVER_FIXTURE),
+    name="CollectiveSolr:Functional",
 )
