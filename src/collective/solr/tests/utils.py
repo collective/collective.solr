@@ -12,10 +12,7 @@ from collective.solr import tests
 
 import six
 
-try:
-    from zope.component.hooks import getSite, setSite
-except ImportError:
-    from zope.app.component.hooks import getSite, setSite
+from zope.component.hooks import getSite, setSite
 
 try:
     from Zope2.App import zcml
