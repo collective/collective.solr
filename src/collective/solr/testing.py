@@ -148,6 +148,9 @@ class CollectiveSolrLayer(PloneSandboxLayer):
         self.solr_layer.tearDown()
 
 
+COLLECTIVE_SOLR_FIXTURE = CollectiveSolrLayer(solr_active=True)
+
+
 class LegacyCollectiveSolrLayer(CollectiveSolrLayer):
     def setUpPloneSite(self, portal):
         super(LegacyCollectiveSolrLayer, self).setUpPloneSite(portal)
@@ -266,8 +269,6 @@ def set_attributes(context, values):  # pragma: no cover
 
 
 COLLECTIVE_SOLR_MOCK_REGISTRY_FIXTURE = CollectiveSolrMockRegistryLayer()
-
-COLLECTIVE_SOLR_FIXTURE = CollectiveSolrLayer(solr_active=True)
 
 COLLECTIVE_SOLR_INTEGRATION_TESTING = IntegrationTesting(
     bases=(COLLECTIVE_SOLR_FIXTURE,), name="CollectiveSolr:Integration"
