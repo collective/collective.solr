@@ -69,13 +69,46 @@ class TestSolr(TestCase):
             str(c),
             "SolrConnection{host=localhost:8983, solrBase=/solr/plone, "
             "persistent=True, postHeaders={'Content-Type': 'text/xml; "
-            "charset=utf-8'}, reconnects=0}",
+            "charset=utf-8'}, reconnects=0, login=None, password=None}",
+        )
+
+    def test_connection_str_authentication(self):
+        c = SolrConnection(
+            host="localhost:8983", persistent=True, login="login", password="password"
+        )
+        self.assertEqual(
+            str(c),
+            "SolrConnection{host=localhost:8983, solrBase=/solr/plone, "
+            "persistent=True, postHeaders={'Content-Type': 'text/xml; "
+            "charset=utf-8', 'Authorization': 'Basic bG9naW46cGFzc3dvcmQ='}, "
+            "reconnects=0, login=login, password=***}",
         )
 
     def test_commit(self):
         commit_request = getData("commit_request.txt").rstrip(b"\n")
         commit_response = getData("commit_response.txt")
         c = SolrConnection(host="localhost:8983", persistent=True)
+        output = fakehttp(c, commit_response)
+        res = c.commit()
+        self.assertEqual(len(res), 1)  # one request was sent
+        res = res[0]
+        self.failUnlessEqual(str(output), commit_request.decode("utf-8"))
+        # Status
+        node = res.findall(".//int")[0]
+        self.failUnlessEqual(node.attrib["name"], "status")
+        self.failUnlessEqual(node.text, "0")
+        # QTime
+        node = res.findall(".//int")[1]
+        self.failUnlessEqual(node.attrib["name"], "QTime")
+        self.failUnlessEqual(node.text, "55")
+        res.find("QTime")
+
+    def test_commit_with_authentication(self):
+        commit_request = getData("commit_request_authentication.txt").rstrip(b"\n")
+        commit_response = getData("commit_response.txt")
+        c = SolrConnection(
+            host="localhost:8983", persistent=True, login="login", password="password"
+        )
         output = fakehttp(c, commit_response)
         res = c.commit()
         self.assertEqual(len(res), 1)  # one request was sent
