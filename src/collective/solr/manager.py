@@ -14,10 +14,18 @@ from zope.component import queryUtility
 from zope.interface import implementer
 from plone.registry.interfaces import IRegistry
 from zope.component import getUtility
+import os
 import six
 
 logger = getLogger("collective.solr.manager")
 marker = object()
+
+
+def none_formatter(value):
+    """Return `None` if value is considered as empty"""
+    if not value:
+        return
+    return value
 
 
 @implementer(IZCMLSolrConnectionConfig)
@@ -58,6 +66,18 @@ class SolrConnectionManager(object):
         if clearSchema:
             setLocal("schema", None)
 
+    def getConfigParameter(self, key, env_key=None, formatter=None):
+        """Return config from environment variable or by default from registry"""
+        if not env_key:
+            # Transform registry to match environment variable key
+            # collective.solr.variable become COLLECTIVE_SOLR_VARIABLE
+            env_key = key.replace(".", "_").upper()
+        registry = getUtility(IRegistry)
+        value = os.getenv(env_key, registry[key])
+        if formatter:
+            return formatter(value)
+        return value
+
     def getConnection(self):
         """returns an existing connection or opens one"""
         if not isActive():
@@ -67,10 +87,17 @@ class SolrConnectionManager(object):
             return conn
 
         zcmlconfig = queryUtility(IZCMLSolrConnectionConfig)
-        registry = getUtility(IRegistry)
-        config_host = registry["collective.solr.host"]
-        config_login = registry["collective.solr.solr_login"]
-        config_password = registry["collective.solr.solr_password"]
+        config_host = self.getConfigParameter("collective.solr.host")
+        config_login = self.getConfigParameter(
+            "collective.solr.solr_login",
+            env_key="COLLECTIVE_SOLR_LOGIN",
+            formatter=none_formatter,
+        )
+        config_password = self.getConfigParameter(
+            "collective.solr.solr_password",
+            env_key="COLLECTIVE_SOLR_PASSWORD",
+            formatter=none_formatter,
+        )
         if zcmlconfig is not None:
             # use connection parameters defined in zcml...
             logger.debug("opening connection to %s", zcmlconfig.host)
@@ -84,8 +111,8 @@ class SolrConnectionManager(object):
             setLocal("connection", conn)
         elif config_host is not None:
             # otherwise use connection parameters defined in control panel...
-            config_port = registry["collective.solr.port"]
-            config_base = registry["collective.solr.base"]
+            config_port = self.getConfigParameter("collective.solr.port", formatter=int)
+            config_base = self.getConfigParameter("collective.solr.base")
             host = "%s:%d" % (config_host, config_port)
             logger.debug("opening connection to %s", host)
             conn = SolrConnection(
