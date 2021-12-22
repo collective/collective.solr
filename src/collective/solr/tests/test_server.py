@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import os
 import unittest
 from operator import itemgetter
 from re import split
@@ -12,6 +13,7 @@ from collective.solr.indexer import BinaryAdder, DefaultAdder, SolrIndexProcesso
 from collective.solr.indexer import logger as logger_indexer
 from collective.solr.interfaces import ISearch, ISolrAddHandler, ISolrConnectionManager
 from collective.solr.manager import logger as logger_manager
+from collective.solr.manager import none_formatter
 from collective.solr.parser import SolrResponse
 from collective.solr.search import Search
 from collective.solr.solr import logger as logger_solr
@@ -520,7 +522,13 @@ class SolrServerTests(TestCase):
         self.config.auto_commit = True
         if getattr(self.search, "config", None) is not None:
             self.search.config = None
+        manager = getUtility(ISolrConnectionManager)
+        manager.closeConnection()  # Ensure that a new connection will be opened
         commit()
+        for key in ("HOST", "BASE", "PORT", "LOGIN", "PASSWORD"):
+            env_key = "COLLECTIVE_SOLR_{0}".format(key)
+            if env_key in os.environ:
+                del os.environ[env_key]
 
     def testGetData(self):
         manager = getUtility(ISolrConnectionManager)
@@ -1801,3 +1809,80 @@ class SolrServerTests(TestCase):
         self.maintenance.reindex()
         self.maintenance.optimize()
         self.assertTrue(True)
+
+    def testConfigParametersFromRegistry(self):
+        """Test parameters that can come from registry"""
+        manager = getUtility(ISolrConnectionManager)
+        self.assertEqual(
+            "127.0.0.1", manager.getConfigParameter("collective.solr.host")
+        )
+        self.assertEqual(8983, manager.getConfigParameter("collective.solr.port"))
+        self.assertEqual(
+            "/solr/plone", manager.getConfigParameter("collective.solr.base")
+        )
+        self.assertEqual(None, manager.getConfigParameter("collective.solr.solr_login"))
+        self.assertEqual(
+            None, manager.getConfigParameter("collective.solr.solr_password")
+        )
+
+    def testConfigParametersFromEnvironment(self):
+        """Test parameters that can come from environment variables"""
+        manager = getUtility(ISolrConnectionManager)
+        os.environ["COLLECTIVE_SOLR_HOST"] = "localhost"
+        os.environ["COLLECTIVE_SOLR_PORT"] = "8988"
+        os.environ["COLLECTIVE_SOLR_BASE"] = "/solr/plone2"
+        os.environ["COLLECTIVE_SOLR_LOGIN"] = "login"
+        os.environ["COLLECTIVE_SOLR_PASSWORD"] = "password"
+        self.assertEqual(
+            "localhost", manager.getConfigParameter("collective.solr.host")
+        )
+        self.assertEqual("8988", manager.getConfigParameter("collective.solr.port"))
+        self.assertEqual(
+            "/solr/plone2", manager.getConfigParameter("collective.solr.base")
+        )
+        self.assertEqual(
+            "login",
+            manager.getConfigParameter(
+                "collective.solr.solr_login", env_key="COLLECTIVE_SOLR_LOGIN"
+            ),
+        )
+        self.assertEqual(
+            "password",
+            manager.getConfigParameter(
+                "collective.solr.solr_password", env_key="COLLECTIVE_SOLR_PASSWORD"
+            ),
+        )
+
+    def testConfigParametersFormatting(self):
+        """Test parameters formatting that ensure that string from environment variables
+        are correctly converted"""
+        manager = getUtility(ISolrConnectionManager)
+        os.environ["COLLECTIVE_SOLR_PORT"] = "8983"
+        os.environ["COLLECTIVE_SOLR_LOGIN"] = ""
+        self.assertEqual(
+            8983, manager.getConfigParameter("collective.solr.port", formatter=int)
+        )
+        self.assertEqual(
+            None,
+            manager.getConfigParameter(
+                "collective.solr.solr_login",
+                env_key="COLLECTIVE_SOLR_LOGIN",
+                formatter=none_formatter,
+            ),
+        )
+
+    def testConfigParametersConnection(self):
+        """Test connection parameters that came from environment variables"""
+        os.environ["COLLECTIVE_SOLR_HOST"] = "localhost"
+        os.environ["COLLECTIVE_SOLR_PORT"] = "8988"
+        os.environ["COLLECTIVE_SOLR_BASE"] = "/solr/plone2"
+        os.environ["COLLECTIVE_SOLR_LOGIN"] = ""
+        os.environ["COLLECTIVE_SOLR_PASSWORD"] = ""
+        manager = getUtility(ISolrConnectionManager)
+        manager.closeConnection()  # Ensure that a new connection will be opened
+        connection = manager.getConnection()
+
+        self.assertEqual("localhost:8988", connection.host)
+        self.assertEqual("/solr/plone2", connection.solrBase)
+        self.assertEqual(None, connection.login)
+        self.assertEqual({}, connection.auth_headers)
