@@ -1,18 +1,17 @@
 # -*- coding: utf-8 -*-
+from datetime import date, datetime
 from logging import getLogger
-from lxml import etree
+
+import six
 from Acquisition import aq_get
 from DateTime import DateTime
-from datetime import date, datetime
-from zope.component import queryUtility, queryMultiAdapter
-from zope.component import queryAdapter, adapts
-from zope.interface import implementer
-from zope.interface import Interface
+from lxml import etree
+from Products.CMFCore.CMFCatalogAware import CMFCatalogAware
+from Products.CMFCore.utils import getToolByName
 from ZODB.interfaces import BlobError
 from ZODB.POSException import ConflictError
-from Products.CMFCore.utils import getToolByName
-from Products.CMFCore.CMFCatalogAware import CMFCatalogAware
-import six
+from zope.component import adapts, queryAdapter, queryMultiAdapter, queryUtility
+from zope.interface import Interface, implementer
 
 try:
     from Products.Archetypes.CatalogMultiplex import CatalogMultiplex
@@ -23,20 +22,21 @@ try:  # noqa
 except ImportError:  # noqa
     # Plone 5
     from plone.indexer.interfaces import IIndexableObjectWrapper
-from plone.indexer.interfaces import IIndexableObject
-from zope.component import getUtility
-from plone.registry.interfaces import IRegistry
 
-from collective.solr.interfaces import ISolrConnectionManager
-from collective.solr.interfaces import ISolrIndexQueueProcessor
-from collective.solr.interfaces import ICheckIndexable
-from collective.solr.interfaces import ISolrAddHandler
-from collective.solr.exceptions import SolrConnectionException
-from collective.solr.utils import prepareData
-from collective.solr.utils import getConfig
 from socket import error
-from six.moves.urllib.parse import urlencode
 
+from collective.solr.exceptions import SolrConnectionException
+from collective.solr.interfaces import (
+    ICheckIndexable,
+    ISolrAddHandler,
+    ISolrConnectionManager,
+    ISolrIndexQueueProcessor,
+)
+from collective.solr.utils import getConfig, prepareData
+from plone.indexer.interfaces import IIndexableObject
+from plone.registry.interfaces import IRegistry
+from six.moves.urllib.parse import urlencode
+from zope.component import getUtility
 
 logger = getLogger("collective.solr.indexer")
 
