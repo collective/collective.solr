@@ -4,7 +4,8 @@ Changelog
 9.0.0a2 (unreleased)
 --------------------
 
-- Nothing changed yet.
+- Add option to use upload binary files via Tika instead of relying on accessing blobs via the file system
+  [NicolasGoeddel, timo]
 
 
 9.0.0a1 (2021-11-19)
