@@ -150,26 +150,40 @@ class BinaryAdder(DefaultAdder):
         if path is None:
             super(BinaryAdder, self).__call__(conn, **data)
 
-        openedBlob = self.getblob().open()
-
         postdata["extractFormat"] = "text"
         postdata["extractOnly"] = "true"
         postdata["wt"] = "xml"
-        postdata["myfile"] = (
-            data["id"],
-            openedBlob,
-            data.get("content_type", "application/octet-stream"),
-        )
-
-        encodedPost = MultipartEncoder(fields=postdata)
-
         headers = conn.formheaders
-        headers["Content-Type"] = encodedPost.content_type
+
+        registry = getUtility(IRegistry)
+        use_tika = registry.get("collective.solr.use_tika")
+
+        # blobs are accessed via the file system
+        if use_tika:
+            breakpoint()
+            openedBlob = self.getblob().open()
+
+            postdata["myfile"] = (
+                data["id"],
+                openedBlob,
+                data.get("content_type", "application/octet-stream"),
+            )
+
+            encodedPost = MultipartEncoder(fields=postdata)
+
+            headers["Content-Type"] = encodedPost.content_type
+            postdata_urlencoded = encodedPost.to_string()
+        else:
+            postdata["stream.file"] = self.getpath()
+            postdata["stream.contentType"] = data.get(
+                "content_type", "application/octet-stream"
+            )
+            postdata_urlencoded = urlencode(postdata, doseq=True)
 
         url = "%s/update/extract" % conn.solrBase
 
         try:
-            response = conn.doPost(url, encodedPost.to_string(), headers)
+            response = conn.doPost(url, postdata_urlencoded, headers)
             root = etree.parse(response)
             data["SearchableText"] = root.find(".//str").text.strip()
         except SolrConnectionException as e:
@@ -179,7 +193,8 @@ class BinaryAdder(DefaultAdder):
             logger.warn("Parsing error %s @ %s.", e, data["path_string"])
             data["SearchableText"] = ""
         finally:
-            openedBlob.close()
+            if use_tika:
+                openedBlob.close()
 
         super(BinaryAdder, self).__call__(conn, **data)
 
