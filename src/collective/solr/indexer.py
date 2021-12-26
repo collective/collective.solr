@@ -148,7 +148,10 @@ class BinaryAdder(DefaultAdder):
         path = self.getpath()
         if path is None:
             super(BinaryAdder, self).__call__(conn, **data)
-        postdata["stream.file"] = self.getpath()
+
+        # postdata["stream.file"] = self.getpath()
+        postdata["stream.url"] = self.context.absolute_url()
+
         postdata["stream.contentType"] = data.get(
             "content_type", "application/octet-stream"
         )
