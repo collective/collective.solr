@@ -8,6 +8,7 @@ from DateTime import DateTime
 from lxml import etree
 from Products.CMFCore.CMFCatalogAware import CMFCatalogAware
 from Products.CMFCore.utils import getToolByName
+from requests_toolbelt import MultipartEncoder
 from ZODB.interfaces import BlobError
 from ZODB.POSException import ConflictError
 from zope.component import adapts, queryAdapter, queryMultiAdapter, queryUtility
@@ -149,29 +150,37 @@ class BinaryAdder(DefaultAdder):
         if path is None:
             super(BinaryAdder, self).__call__(conn, **data)
 
-        # postdata["stream.file"] = self.getpath()
-        postdata["stream.url"] = self.context.absolute_url()
+        openedBlob = self.getblob().open()
 
-        postdata["stream.contentType"] = data.get(
-            "content_type", "application/octet-stream"
-        )
         postdata["extractFormat"] = "text"
         postdata["extractOnly"] = "true"
         postdata["wt"] = "xml"
+        postdata["myfile"] = (
+            data["id"],
+            openedBlob,
+            data.get("content_type", "application/octet-stream"),
+        )
+
+        encodedPost = MultipartEncoder(fields=postdata)
+
+        headers = conn.formheaders
+        headers["Content-Type"] = encodedPost.content_type
 
         url = "%s/update/extract" % conn.solrBase
+
         try:
-            response = conn.doPost(
-                url, urlencode(postdata, doseq=True), conn.formheaders
-            )
+            response = conn.doPost(url, encodedPost.to_string(), headers)
             root = etree.parse(response)
             data["SearchableText"] = root.find(".//str").text.strip()
         except SolrConnectionException as e:
-            logger.warning("Error %s @ %s", e, data["path_string"])
+            logger.warn("Error %s @ %s", e, data["path_string"])
             data["SearchableText"] = ""
         except etree.XMLSyntaxError as e:
-            logger.warning("Parsing error %s @ %s.", e, data["path_string"])
+            logger.warn("Parsing error %s @ %s.", e, data["path_string"])
             data["SearchableText"] = ""
+        finally:
+            openedBlob.close()
+
         super(BinaryAdder, self).__call__(conn, **data)
 
 

@@ -1,5 +1,4 @@
-from setuptools import setup
-from setuptools import find_packages
+from setuptools import find_packages, setup
 
 version = "9.0.0a2.dev0"
 
@@ -55,6 +54,7 @@ setup(
         "plone.browserlayer",
         "plone.indexer",
         "plone.restapi",
+        "requests-toolbelt",
         "setuptools",
         "transaction",
         "zope.component",
