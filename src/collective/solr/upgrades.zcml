@@ -33,4 +33,14 @@
     profile="collective.solr:default"
     />
 
+  <genericsetup:upgradeDepends
+    title="Upgrade to collective.solr 9"
+    description="Add use_tika registry entry."
+    source="4"
+    destination="5"
+    import_steps="plone.app.registry"
+    sortkey="1"
+    profile="collective.solr:default"
+    />
+
 </configure>
