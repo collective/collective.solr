@@ -28,10 +28,10 @@
 # c.delete('123')
 # c.commit()
 
+import base64
 import codecs
-from copy import deepcopy
-import six.moves.http_client
 import socket
+from copy import deepcopy
 from logging import getLogger
 from xml.etree.cElementTree import fromstring
 from xml.sax.saxutils import escape
@@ -45,12 +45,6 @@ from collective.solr.parser import SolrSchema
 from collective.solr.utils import getConfig, translation_map
 from plone.dexterity.utils import safe_unicode
 from requests_toolbelt import MultipartEncoder
-from collective.solr.utils import getConfig
-from collective.solr.utils import translation_map
-
-from logging import getLogger
-import base64
-import six
 
 logger = getLogger(__name__)
 
