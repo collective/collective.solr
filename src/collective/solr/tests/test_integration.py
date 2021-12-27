@@ -1,18 +1,12 @@
-# -*- coding: utf-8 -*-
 from Products.CMFCore.utils import getToolByName
 
-try:
-    from Products.CMFCore.interfaces import IIndexQueueProcessor
-except ImportError:
-    # Plone < 5.1
-    from collective.indexing.interfaces import IIndexQueueProcessor
+from Products.CMFCore.interfaces import IIndexQueueProcessor
 from collective.solr.exceptions import SolrInactiveException
 from collective.solr.interfaces import ISearch
 from collective.solr.interfaces import ISolrConnectionManager
 from collective.solr.interfaces import ISolrIndexQueueProcessor
 from collective.solr.interfaces import IZCMLSolrConnectionConfig
 from collective.solr.mangler import mangleQuery
-from collective.solr.testing import HAS_PAC
 from collective.solr.testing import LEGACY_COLLECTIVE_SOLR_FUNCTIONAL_TESTING
 from collective.solr.tests.utils import fakehttp
 from collective.solr.tests.utils import getData
@@ -31,8 +25,6 @@ from zope.component import queryUtility
 from zope.configuration import xmlconfig
 from zope.event import notify
 from zope.lifecycleevent import ObjectModifiedEvent
-
-import unittest
 
 
 class UtilityTests(TestCase):
@@ -244,15 +236,6 @@ class SiteSetupTests(TestCase):
 
     def setUp(self):
         self.portal = self.layer["portal"]
-
-    @unittest.skipIf(HAS_PAC, "Plone 4 Only")
-    def testBrowserResourcesPlone4(self):
-        cssreg = getToolByName(self.portal, "portal_css")
-        self.assertTrue(
-            cssreg.getResource(
-                "++resource++collective.solr.resources/style.css"
-            ).getEnabled()
-        )
 
     def testTranslation(self):
         utrans = getToolByName(self.portal, "translation_service").utranslate
