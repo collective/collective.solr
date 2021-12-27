@@ -217,6 +217,8 @@ class CollectiveSolrMockRegistry(object):
         self.field_list = []
         self.atomic_updates = False
         self.boost_script = u""
+        self.login = None
+        self.password = None
 
     def __getitem__(self, name):
         name_parts = name.split(".")

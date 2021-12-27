@@ -7,6 +7,9 @@ Changelog
 - Add option to upload binary files via Tika instead of relying on accessing blobs via the file system
   [NicolasGoeddel, timo]
 
+- Add support of SolR basic authentication
+  [mpeeters]
+
 - Remove plone.app.contenttypes conditionals in code.
   [timo]
 
