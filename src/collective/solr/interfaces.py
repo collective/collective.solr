@@ -1,15 +1,6 @@
 # -*- coding: utf-8 -*-
-from Products.CMFCore.interfaces import IIndexQueueProcessor
-from zope.interface import Interface
-from zope.schema import Bool
-from zope.schema import Float
-from zope.schema import Int
-from zope.schema import List
-from zope.schema import Text
-from zope.schema import TextLine
-from zope.schema.interfaces import IVocabularyFactory
-
 from collective.solr import SolrMessageFactory as _
+from Products.CMFCore.interfaces import IIndexQueueProcessor
 from zope.interface import Interface
 from zope.schema import Bool, Float, Int, List, Text, TextLine
 from zope.schema.interfaces import IVocabularyFactory

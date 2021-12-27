@@ -1,26 +1,10 @@
 # -*- coding: utf-8 -*-
 from datetime import date, datetime
 from logging import getLogger
+from socket import error
 
 import six
 from Acquisition import aq_get
-from DateTime import DateTime
-from lxml import etree
-from Products.CMFCore.CMFCatalogAware import CMFCatalogAware
-from Products.CMFCore.utils import getToolByName
-from requests_toolbelt import MultipartEncoder
-from ZODB.interfaces import BlobError
-from ZODB.POSException import ConflictError
-from Products.CMFCore.utils import getToolByName
-from Products.CMFCore.CMFCatalogAware import CMFCatalogAware
-import six
-from plone.indexer.interfaces import IIndexableObjectWrapper
-from plone.indexer.interfaces import IIndexableObject
-from zope.component import getUtility
-from plone.registry.interfaces import IRegistry
-
-from socket import error
-
 from collective.solr.exceptions import SolrConnectionException
 from collective.solr.interfaces import (
     ICheckIndexable,
@@ -29,10 +13,24 @@ from collective.solr.interfaces import (
     ISolrIndexQueueProcessor,
 )
 from collective.solr.utils import getConfig, prepareData
-from plone.indexer.interfaces import IIndexableObject
+from DateTime import DateTime
+from lxml import etree
+from plone.indexer.interfaces import IIndexableObject, IIndexableObjectWrapper
 from plone.registry.interfaces import IRegistry
+from Products.CMFCore.CMFCatalogAware import CMFCatalogAware
+from Products.CMFCore.utils import getToolByName
+from requests_toolbelt import MultipartEncoder
 from six.moves.urllib.parse import urlencode
-from zope.component import getUtility
+from ZODB.interfaces import BlobError
+from ZODB.POSException import ConflictError
+from zope.component import (
+    adapts,
+    getUtility,
+    queryAdapter,
+    queryMultiAdapter,
+    queryUtility,
+)
+from zope.interface import Interface, implementer
 
 logger = getLogger("collective.solr.indexer")
 
