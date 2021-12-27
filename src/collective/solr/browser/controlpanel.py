@@ -3,6 +3,7 @@ from plone.app.registry.browser import controlpanel
 
 try:
     from plone.protect.interfaces import IDisableCSRFProtection
+
     PLONE_PROTECT_INSTALLED = True
 except ImportError:
     PLONE_PROTECT_INSTALLED = False
