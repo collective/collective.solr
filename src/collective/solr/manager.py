@@ -69,11 +69,17 @@ class SolrConnectionManager(object):
         zcmlconfig = queryUtility(IZCMLSolrConnectionConfig)
         registry = getUtility(IRegistry)
         config_host = registry["collective.solr.host"]
+        config_login = registry["collective.solr.login"]
+        config_password = registry["collective.solr.password"]
         if zcmlconfig is not None:
             # use connection parameters defined in zcml...
             logger.debug("opening connection to %s", zcmlconfig.host)
             conn = SolrConnection(
-                host=zcmlconfig.host, solrBase=zcmlconfig.base, persistent=True
+                host=zcmlconfig.host,
+                solrBase=zcmlconfig.base,
+                persistent=True,
+                login=config_login,
+                password=config_password,
             )
             setLocal("connection", conn)
         elif config_host is not None:
@@ -82,7 +88,13 @@ class SolrConnectionManager(object):
             config_base = registry["collective.solr.base"]
             host = "%s:%d" % (config_host, config_port)
             logger.debug("opening connection to %s", host)
-            conn = SolrConnection(host=host, solrBase=config_base, persistent=True)
+            conn = SolrConnection(
+                host=host,
+                solrBase=config_base,
+                persistent=True,
+                login=config_login,
+                password=config_password,
+            )
             setLocal("connection", conn)
         return conn
 

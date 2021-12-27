@@ -1,0 +1,8 @@
+POST /solr/plone/update HTTP/1.1
+Host: localhost
+Accept-Encoding: identity
+Content-Length: 9
+Content-Type: text/xml; charset=utf-8
+Authorization: Basic bG9naW46cGFzc3dvcmQ=
+
+<commit/>

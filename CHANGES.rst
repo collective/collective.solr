@@ -4,9 +4,11 @@ Changelog
 9.0.0a2 (unreleased)
 --------------------
 
+- Add support of SolR basic authentication
+  [mpeeters]
+
 - Remove plone.app.contenttypes conditionals in code.
   [timo]
-
 
 - Remove collective.js.showmore dependency
 - Remove plone.app.contenttypes conditionals in code

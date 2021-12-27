@@ -33,4 +33,14 @@
     profile="collective.solr:default"
     />
 
+  <genericsetup:upgradeStep
+    title="Upgrade to collective.solr 5"
+    description="Handle authentication using login/password"
+    source="4"
+    destination="5"
+    handler=".setuphandlers.migrate_to_5"
+    sortkey="1"
+    profile="collective.solr:default"
+    />
+
 </configure>
