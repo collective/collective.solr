@@ -28,6 +28,7 @@
 # c.delete('123')
 # c.commit()
 
+from copy import deepcopy
 from plone.dexterity.utils import safe_unicode
 import six.moves.http_client
 import socket
@@ -91,6 +92,9 @@ class SolrConnection:
             self.formheaders["Connection"] = "close"
 
     def __str__(self):
+        xmlheaders = deepcopy(self.xmlheaders)
+        if "Authorization" in xmlheaders:
+            xmlheaders["Authorization"] = "Basic ***"
         return (
             "SolrConnection{host=%s, solrBase=%s, persistent=%s, "
             "postHeaders=%s, reconnects=%s, login=%s, password=%s}"
@@ -98,7 +102,7 @@ class SolrConnection:
                 self.host,
                 self.solrBase,
                 self.persistent,
-                self.xmlheaders,
+                xmlheaders,
                 self.reconnects,
                 self.login,
                 self.auth_headers and "***" or None,

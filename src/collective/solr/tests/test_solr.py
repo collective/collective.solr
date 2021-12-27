@@ -80,7 +80,7 @@ class TestSolr(TestCase):
             str(c),
             "SolrConnection{host=localhost:8983, solrBase=/solr/plone, "
             "persistent=True, postHeaders={'Content-Type': 'text/xml; "
-            "charset=utf-8', 'Authorization': 'Basic bG9naW46cGFzc3dvcmQ='}, "
+            "charset=utf-8', 'Authorization': 'Basic ***'}, "
             "reconnects=0, login=login, password=***}",
         )
 
