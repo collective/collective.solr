@@ -11,18 +11,13 @@ from Products.CMFCore.utils import getToolByName
 from requests_toolbelt import MultipartEncoder
 from ZODB.interfaces import BlobError
 from ZODB.POSException import ConflictError
-from zope.component import adapts, queryAdapter, queryMultiAdapter, queryUtility
-from zope.interface import Interface, implementer
-
-try:
-    from Products.Archetypes.CatalogMultiplex import CatalogMultiplex
-except ImportError:
-    CatalogMultiplex = None
-try:  # noqa
-    from plone.app.content.interfaces import IIndexableObjectWrapper
-except ImportError:  # noqa
-    # Plone 5
-    from plone.indexer.interfaces import IIndexableObjectWrapper
+from Products.CMFCore.utils import getToolByName
+from Products.CMFCore.CMFCatalogAware import CMFCatalogAware
+import six
+from plone.indexer.interfaces import IIndexableObjectWrapper
+from plone.indexer.interfaces import IIndexableObject
+from zope.component import getUtility
+from plone.registry.interfaces import IRegistry
 
 from socket import error
 
@@ -51,10 +46,7 @@ class BaseIndexable(object):
         self.context = context
 
     def __call__(self):
-        if not CatalogMultiplex:
-            return isinstance(self.context, CMFCatalogAware)
-        else:
-            return isinstance(self.context, (CatalogMultiplex, CMFCatalogAware))
+        return isinstance(self.context, CMFCatalogAware)
 
 
 def datehandler(value):

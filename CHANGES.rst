@@ -7,6 +7,23 @@ Changelog
 - Add option to upload binary files via Tika instead of relying on accessing blobs via the file system
   [NicolasGoeddel, timo]
 
+- Remove plone.app.contenttypes conditionals in code.
+  [timo]
+
+- Remove collective.js.showmore dependency
+  [timo]
+
+- Remove plone.app.contenttypes conditionals in code
+  [timo]
+
+- Remove traces of collective.indexing
+  [timo]
+
+- Remove Plone 4.3 GS profile
+  [timo]
+
+- Remove AT conditionals
+  [timo]
 
 9.0.0a1 (2021-11-19)
 --------------------
