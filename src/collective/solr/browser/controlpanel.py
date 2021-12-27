@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from plone.app.registry.browser import controlpanel
-
 from plone.protect.interfaces import IDisableCSRFProtection
 from collective.solr.interfaces import ISolrSchema, _
 from plone.restapi.controlpanels import RegistryConfigletPanel

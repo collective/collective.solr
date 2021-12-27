@@ -85,6 +85,8 @@ build-plone-5.2-performance: .installed.cfg  ## Build Plone 5.2
 
 .PHONY: Test
 test:  ## Test
+	bin/pip install zest.pocompile
+	bin/pocompile src
 	bin/test
 
 .PHONY: Test Performance

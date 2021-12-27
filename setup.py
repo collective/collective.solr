@@ -52,6 +52,7 @@ setup(
         "plone.browserlayer",
         "plone.indexer",
         "plone.restapi",
+        "requests-toolbelt",
         "setuptools",
         "transaction",
         "zope.component",

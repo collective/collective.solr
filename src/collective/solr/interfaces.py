@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from collective.solr import SolrMessageFactory as _
 from Products.CMFCore.interfaces import IIndexQueueProcessor
 from zope.interface import Interface
 from zope.schema import Bool
@@ -9,8 +10,6 @@ from zope.schema import Password
 from zope.schema import Text
 from zope.schema import TextLine
 from zope.schema.interfaces import IVocabularyFactory
-
-from collective.solr import SolrMessageFactory as _
 
 
 class ISolrSchema(Interface):
@@ -360,6 +359,16 @@ class ISolrSchema(Interface):
             u"their respecitive boost values.  use an empty string "
             u"as the key to set a boost value for the entire "
             u"document/content item.",
+        ),
+    )
+
+    use_tika = Bool(
+        title=_("label_use_tika", default=u"Use Tika"),
+        description=_(
+            "help_use_tika",
+            default=u"Upload binary files to Solr via Tika. "
+            u"That way Solr does not need direct access to the blob files on the file system. "
+            u"Use this setting when Solr runs on a separate server or if you use Relstorage instead of ZEO.",
         ),
     )
 

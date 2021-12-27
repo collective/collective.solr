@@ -28,23 +28,23 @@
 # c.delete('123')
 # c.commit()
 
-from copy import deepcopy
-from plone.dexterity.utils import safe_unicode
-import six.moves.http_client
+import base64
+import codecs
 import socket
+from copy import deepcopy
+from logging import getLogger
 from xml.etree.cElementTree import fromstring
 from xml.sax.saxutils import escape
-import codecs
-import six.moves.urllib.request
+
+import six
+import six.moves.http_client
 import six.moves.urllib.parse
+import six.moves.urllib.request
 from collective.solr.exceptions import SolrConnectionException
 from collective.solr.parser import SolrSchema
-from collective.solr.utils import getConfig
-from collective.solr.utils import translation_map
-
-from logging import getLogger
-import base64
-import six
+from collective.solr.utils import getConfig, translation_map
+from plone.dexterity.utils import safe_unicode
+from requests_toolbelt import MultipartEncoder
 
 logger = getLogger(__name__)
 
@@ -141,7 +141,7 @@ class SolrConnection:
         return self.doGetOrPost("GET", url, "", headers)
 
     def doGetOrPost(self, method, url, body, headers):
-        if not isinstance(body, six.binary_type):
+        if not isinstance(body, (six.binary_type, MultipartEncoder)):
             body = body.encode("utf-8")
         try:
             self.conn.request(method, url, body, headers)
