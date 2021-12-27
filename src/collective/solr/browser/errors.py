@@ -16,6 +16,6 @@ class ErrorView(BrowserView):
         self.request = request
 
     def errorInfo(self):
-        """ provide error type and value """
+        """provide error type and value"""
         type_ = str(self.exception.__class__).replace("<class '", "").replace("'>", "")
         return {"type": type_, "value": self.exception.args}

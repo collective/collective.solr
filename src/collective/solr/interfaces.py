@@ -1,19 +1,15 @@
 # -*- coding: utf-8 -*-
-try:
-    from Products.CMFCore.interfaces import IIndexQueueProcessor
-except ImportError:
-    # Plone < 5.1
-    from collective.indexing.interfaces import IIndexQueueProcessor
+from collective.solr import SolrMessageFactory as _
+from Products.CMFCore.interfaces import IIndexQueueProcessor
 from zope.interface import Interface
 from zope.schema import Bool
 from zope.schema import Float
 from zope.schema import Int
 from zope.schema import List
+from zope.schema import Password
 from zope.schema import Text
 from zope.schema import TextLine
 from zope.schema.interfaces import IVocabularyFactory
-
-from collective.solr import SolrMessageFactory as _
 
 
 class ISolrSchema(Interface):
@@ -40,6 +36,22 @@ class ISolrSchema(Interface):
         description=_(
             "help_port", default=u"The port of the Solr instance to be used."
         ),
+    )
+
+    login = TextLine(
+        title=_("login", default=u"Login"),
+        description=_(
+            "help_login", default=u"Authentication login of the SolR instance."
+        ),
+        required=False,
+    )
+
+    password = Password(
+        title=_("password", default=u"Password"),
+        description=_(
+            "help_password", default=u"Authentication password of the SolR instance."
+        ),
+        required=False,
     )
 
     base = TextLine(
@@ -350,9 +362,19 @@ class ISolrSchema(Interface):
         ),
     )
 
+    use_tika = Bool(
+        title=_("label_use_tika", default=u"Use Tika"),
+        description=_(
+            "help_use_tika",
+            default=u"Upload binary files to Solr via Tika. "
+            u"That way Solr does not need direct access to the blob files on the file system. "
+            u"Use this setting when Solr runs on a separate server or if you use Relstorage instead of ZEO.",
+        ),
+    )
+
 
 class ISolrConnectionConfig(ISolrSchema):
-    """ utility to hold the connection configuration for the solr server """
+    """utility to hold the connection configuration for the solr server"""
 
 
 class IZCMLSolrConnectionConfig(Interface):
@@ -360,16 +382,16 @@ class IZCMLSolrConnectionConfig(Interface):
 
 
 class ISolrConnectionManager(Interface):
-    """ a thread-local connection manager for solr """
+    """a thread-local connection manager for solr"""
 
     def setHost(active=False, host="localhost", port=8983, base="/solr/plone"):
-        """ set connection parameters """
+        """set connection parameters"""
 
     def closeConnection(clearSchema=False):
-        """ close the current connection, if any """
+        """close the current connection, if any"""
 
     def getConnection():
-        """ returns an existing connection or opens one """
+        """returns an existing connection or opens one"""
 
     def getSchema():
         """returns the currently used schema or fetches it.
@@ -390,11 +412,11 @@ class ISolrConnectionManager(Interface):
 
 
 class ISolrIndexQueueProcessor(IIndexQueueProcessor):
-    """ an index queue processor for solr """
+    """an index queue processor for solr"""
 
 
 class ISolrFlare(Interface):
-    """ a sol(a)r brain, i.e. a data container for search results """
+    """a sol(a)r brain, i.e. a data container for search results"""
 
 
 class IFlare(Interface):
@@ -411,7 +433,7 @@ class ISearch(Interface):
         (see http://wiki.apache.org/solr/CommonQueryParameters)"""
 
     def __call__(query, **parameters):
-        """ convenience alias for `search` """
+        """convenience alias for `search`"""
 
     def buildQueryAndParameters(default=None, **args):
         """helper to build a query for simple use-cases; the query is
@@ -422,7 +444,7 @@ class ISearch(Interface):
 
 
 class ICatalogTool(Interface):
-    """ marker interface for plone's catalog tool """
+    """marker interface for plone's catalog tool"""
 
 
 class ISearchDispatcher(Interface):
@@ -435,13 +457,13 @@ class ISearchDispatcher(Interface):
 
 
 class ISolrMaintenanceView(Interface):
-    """ solr maintenance view for clearing, re-indexing content etc """
+    """solr maintenance view for clearing, re-indexing content etc"""
 
     def optimize():
-        """ optimize solr indexes """
+        """optimize solr indexes"""
 
     def clear():
-        """ clear all data from solr, i.e. delete all indexed objects """
+        """clear all data from solr, i.e. delete all indexed objects"""
 
     def reindex(batch=1000, skip=0):
         """find all contentish objects (meaning all objects derived from one
@@ -460,7 +482,7 @@ class ISolrMaintenanceView(Interface):
 
 
 class ISolrAddHandler(Interface):
-    """ An adder for solr documents """
+    """An adder for solr documents"""
 
 
 class IFacetTitleVocabularyFactory(IVocabularyFactory):
@@ -477,7 +499,7 @@ class IFacetTitleVocabularyFactory(IVocabularyFactory):
 
 
 class ICheckIndexable(Interface):
-    """ Check if an object is indexable """
+    """Check if an object is indexable"""
 
     def __call__():
         """Return `True`, if context is indexable and `False`otherwise"""

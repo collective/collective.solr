@@ -1,10 +1,8 @@
-from setuptools import setup
-from setuptools import find_packages
+from setuptools import find_packages, setup
 
-version = "8.4.3.dev0"
+version = "9.0.0a2.dev0"
 
-long_description = "\n\n".join(
-    [open("README.rst").read(), open("CHANGES.rst").read()])
+long_description = "\n\n".join([open("README.rst").read(), open("CHANGES.rst").read()])
 
 setup(
     name="collective.solr",
@@ -15,9 +13,6 @@ setup(
         "Development Status :: 5 - Production/Stable",
         "Environment :: Web Environment",
         "Framework :: Plone",
-        "Framework :: Plone :: 4.3",
-        "Framework :: Plone :: 5.0",
-        "Framework :: Plone :: 5.1",
         "Framework :: Plone :: 5.2",
         "Intended Audience :: Developers",
         "Intended Audience :: System Administrators",
@@ -25,7 +20,6 @@ setup(
         "License :: OSI Approved :: GNU General Public License (GPL)",
         "Operating System :: OS Independent",
         "Programming Language :: Python",
-        "Programming Language :: Python :: 2.7",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
     ],
@@ -49,8 +43,6 @@ setup(
         "Products.CMFPlone >= 4.3.7",
         "Products.GenericSetup",
         "Products.ZCatalog",
-        # 'collective.indexing >= 2.1',
-        "collective.js.showmore",
         "lxml",
         "plone.app.content",
         "plone.app.layout",
@@ -60,6 +52,7 @@ setup(
         "plone.browserlayer",
         "plone.indexer",
         "plone.restapi",
+        "requests-toolbelt",
         "setuptools",
         "transaction",
         "zope.component",

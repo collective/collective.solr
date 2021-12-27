@@ -4,7 +4,6 @@ from plone.uuid.interfaces import IUUID
 
 from collective.solr.dispatcher import solrSearchResults
 from collective.solr.testing import activateAndReindex
-from collective.solr.testing import HAS_PAC
 from collective.solr.testing import LEGACY_COLLECTIVE_SOLR_FUNCTIONAL_TESTING
 from plone.app.testing import SITE_OWNER_NAME
 from plone.app.testing import SITE_OWNER_PASSWORD
@@ -18,12 +17,6 @@ from ZODB.POSException import ConflictError
 from zope import component
 from zope.interface import Interface
 from zope.lifecycleevent.interfaces import IObjectCreatedEvent
-
-# override IObjectCreatedEvent for AT content
-if not HAS_PAC:
-    from Products.Archetypes.interfaces import (  # noqa
-        IObjectInitializedEvent as IObjectCreatedEvent,
-    )
 
 
 UIDS = []

@@ -4,10 +4,6 @@
     xmlns:zcml="http://namespaces.zope.org/zcml"
     i18n_domain="solr">
 
-  <include package="Products.CMFCore" file="permissions.zcml"
-      xmlns:zcml="http://namespaces.zope.org/zcml"
-      zcml:condition="have plone-41" />
-
   <browser:resourceDirectory
       name="collective.solr.images"
       directory="images" />
@@ -21,6 +17,10 @@
       for="Products.CMFPlone.interfaces.IPloneSiteRoot"
       class=".controlpanel.SolrControlPanel"
       permission="cmf.ManagePortal" />
+
+  <adapter
+    factory=".controlpanel.SolrControlpanelAdapter"
+    name="solr-controlpanel" />
 
   <browser:page
       for="*"
@@ -71,17 +71,6 @@
       template="search.pt"
       layer=".interfaces.IThemeSpecific"
       zcml:condition="have plone-5"
-      />
-
-  <!-- Plone 4.3 -->
-  <browser:page
-      name="search"
-      class=".p4_search.Search"
-      permission="zope2.View"
-      for="plone.app.layout.navigation.interfaces.INavigationRoot"
-      template="search.pt"
-      layer=".interfaces.IThemeSpecific"
-      zcml:condition="not-have plone-5"
       />
 
 </configure>

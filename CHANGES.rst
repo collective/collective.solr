@@ -1,10 +1,45 @@
 Changelog
 =========
 
-8.4.3 (unreleased)
-------------------
+9.0.0a2 (unreleased)
+--------------------
 
-- Nothing changed yet.
+- Add option to upload binary files via Tika instead of relying on accessing blobs via the file system
+  [NicolasGoeddel, timo]
+
+- Add support of SolR basic authentication
+  [mpeeters]
+
+- Remove plone.app.contenttypes conditionals in code.
+  [timo]
+
+- Remove collective.js.showmore dependency
+  [timo]
+
+- Remove plone.app.contenttypes conditionals in code
+  [timo]
+
+- Remove traces of collective.indexing
+  [timo]
+
+- Remove Plone 4.3 GS profile
+  [timo]
+
+- Remove AT conditionals
+  [timo]
+
+- Remove collective.indexing and LinguaPlone from test layer
+  [timo]
+
+
+9.0.0a1 (2021-11-19)
+--------------------
+
+- Add support for Plone 6 / Volto
+  [timo]
+
+- Drop Python 2, Plone 4.3, Plone 5.0, Plone 5.1 compatibility
+  [timo]
 
 
 8.4.2 (2021-04-08)

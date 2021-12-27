@@ -28,21 +28,23 @@
 # c.delete('123')
 # c.commit()
 
-from plone.dexterity.utils import safe_unicode
-import six.moves.http_client
+import base64
+import codecs
 import socket
+from copy import deepcopy
+from logging import getLogger
 from xml.etree.cElementTree import fromstring
 from xml.sax.saxutils import escape
-import codecs
-import six.moves.urllib.request
+
+import six
+import six.moves.http_client
 import six.moves.urllib.parse
+import six.moves.urllib.request
 from collective.solr.exceptions import SolrConnectionException
 from collective.solr.parser import SolrSchema
-from collective.solr.utils import getConfig
-from collective.solr.utils import translation_map
-
-from logging import getLogger
-import six
+from collective.solr.utils import getConfig, translation_map
+from plone.dexterity.utils import safe_unicode
+from requests_toolbelt import MultipartEncoder
 
 logger = getLogger(__name__)
 
@@ -55,6 +57,8 @@ class SolrConnection:
         persistent=True,
         postHeaders={},
         timeout=None,
+        login=None,
+        password=None,
     ):
         self.host = host
         self.solrBase = str(solrBase)
@@ -66,27 +70,42 @@ class SolrConnection:
         # a real connection to the server is not opened at this point.
         self.conn = six.moves.http_client.HTTPConnection(self.host, timeout=timeout)
         # self.conn.set_debuglevel(1000000)
+        self.login = login
+        self.auth_headers = {}
+        if login and password:
+            credentials = "{0}:{1}".format(login, password)
+            authorization = base64.b64encode(credentials.encode("ascii"))
+            self.auth_headers["Authorization"] = "Basic {0}".format(
+                authorization.decode("ascii")
+            )
         self.xmlbody = []
         self.xmlheaders = {"Content-Type": "text/xml; charset=utf-8"}
         self.xmlheaders.update(postHeaders)
+        self.xmlheaders.update(self.auth_headers)
         if not self.persistent:
             self.xmlheaders["Connection"] = "close"
         self.formheaders = {
-            "Content-Type": "application/x-www-form-urlencoded; charset=utf-8"
+            "Content-Type": "application/x-www-form-urlencoded; charset=utf-8",
         }
+        self.formheaders.update(self.auth_headers)
         if not self.persistent:
             self.formheaders["Connection"] = "close"
 
     def __str__(self):
+        xmlheaders = deepcopy(self.xmlheaders)
+        if "Authorization" in xmlheaders:
+            xmlheaders["Authorization"] = "Basic ***"
         return (
             "SolrConnection{host=%s, solrBase=%s, persistent=%s, "
-            "postHeaders=%s, reconnects=%s}"
+            "postHeaders=%s, reconnects=%s, login=%s, password=%s}"
             % (
                 self.host,
                 self.solrBase,
                 self.persistent,
-                self.xmlheaders,
+                xmlheaders,
                 self.reconnects,
+                self.login,
+                self.auth_headers and "***" or None,
             )
         )
 
@@ -111,7 +130,7 @@ class SolrConnection:
         return rsp
 
     def setTimeout(self, timeout):
-        """ set a timeout value for the currently open connection """
+        """set a timeout value for the currently open connection"""
         logger.debug("setting socket timeout on %r: %s", self, timeout)
         self.conn.timeout = timeout
 
@@ -122,7 +141,7 @@ class SolrConnection:
         return self.doGetOrPost("GET", url, "", headers)
 
     def doGetOrPost(self, method, url, body, headers):
-        if not isinstance(body, six.binary_type):
+        if not isinstance(body, (six.binary_type, MultipartEncoder)):
             body = body.encode("utf-8")
         try:
             self.conn.request(method, url, body, headers)
@@ -151,7 +170,7 @@ class SolrConnection:
         self.xmlbody.append(request)
 
     def flush(self):
-        """ send out the stored requests to solr """
+        """send out the stored requests to solr"""
         count = 0
         responses = []
         for request in self.xmlbody:
@@ -336,7 +355,9 @@ class SolrConnection:
         # schema_url = '%s/admin/file/?file=managed-schema'
         logger.debug("getting schema from: %s", schema_url % self.solrBase)
         try:
-            self.conn.request("GET", schema_url % self.solrBase)
+            self.conn.request(
+                "GET", schema_url % self.solrBase, headers=self.auth_headers
+            )
             response = self.conn.getresponse()
         except (
             socket.error,
@@ -346,7 +367,9 @@ class SolrConnection:
         ):
             # see `doPost` method for more info about these exceptions
             self.__reconnect()
-            self.conn.request("GET", schema_url % self.solrBase)
+            self.conn.request(
+                "GET", schema_url % self.solrBase, headers=self.auth_headers
+            )
             response = self.conn.getresponse()
 
         if response.status == 200:

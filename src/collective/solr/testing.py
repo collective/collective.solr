@@ -1,54 +1,36 @@
 # -*- coding: utf-8 -*-
-from Products.CMFCore.utils import getToolByName
-from collective.solr.utils import activate
-from plone import api
-from plone.app.robotframework.testing import REMOTE_LIBRARY_BUNDLE_FIXTURE
-from plone.app.testing import FunctionalTesting
-from plone.app.testing import IntegrationTesting
-import six
-from six.moves import range
-
-try:  # pragma: no cover
-    from plone.app.contenttypes.testing import (
-        PLONE_APP_CONTENTTYPES_FIXTURE as PLONE_FIXTURE,
-    )  # noqa
-
-    HAS_PAC = True
-except ImportError:  # pragma: no cover
-    from plone.app.testing.bbb import PTC_FIXTURE as PLONE_FIXTURE
-
-    HAS_PAC = False
-from plone.app.testing import PloneSandboxLayer
-from plone.app.testing import TEST_USER_NAME
-from plone.app.testing import applyProfile
-from plone.app.testing import login
-from plone.registry.interfaces import IRegistry
-from plone.testing import Layer
-from plone.testing import z2
-from plone.api.portal import set_registry_record
-from zope.interface import implementer
-from zope.component import provideUtility
-from ZPublisher.HTTPRequest import HTTPRequest
-from time import sleep
 import os
+import subprocess
 import sys
-import six.moves.urllib.request
+from time import sleep
+
+import six
 import six.moves.urllib.error
 import six.moves.urllib.parse
-import subprocess
-import pkg_resources
-
-USE_COLLECTIVE_INDEXING = api.env.plone_version() < "5.1"
-if USE_COLLECTIVE_INDEXING:
-    from plone.testing.z2 import installProduct
+import six.moves.urllib.request
+from collective.solr.utils import activate
+from plone.api.portal import set_registry_record
+from plone.app.contenttypes.testing import (
+    PLONE_APP_CONTENTTYPES_FIXTURE as PLONE_FIXTURE,
+)
+from plone.app.robotframework.testing import REMOTE_LIBRARY_BUNDLE_FIXTURE
+from plone.app.testing import (
+    TEST_USER_NAME,
+    FunctionalTesting,
+    IntegrationTesting,
+    PloneSandboxLayer,
+    applyProfile,
+    login,
+)
+from plone.registry.interfaces import IRegistry
+from plone.testing import Layer, z2
+from Products.CMFCore.utils import getToolByName
+from six.moves import range
+from zope.component import provideUtility
+from zope.interface import implementer
+from ZPublisher.HTTPRequest import HTTPRequest
 
 BIN_DIR = os.path.dirname(os.path.realpath(sys.argv[0]))
-
-try:  # pragma: no cover
-    pkg_resources.get_distribution("Products.LinguaPlone")
-    HAS_LINGUAPLONE = True
-except pkg_resources.DistributionNotFound:  # pragma: no cover
-    HAS_LINGUAPLONE = False
 
 
 class SolrLayer(Layer):
@@ -138,16 +120,9 @@ class CollectiveSolrLayer(PloneSandboxLayer):
         self._orig_retry_max_count = HTTPRequest.retry_max_count
         HTTPRequest.retry_max_count = 3
 
-        # Load ZCML
-        if USE_COLLECTIVE_INDEXING:
-            import collective.indexing
-
-            self.loadZCML(package=collective.indexing)
         import collective.solr
 
         self.loadZCML(package=collective.solr)
-        if USE_COLLECTIVE_INDEXING:
-            installProduct(app, "collective.indexing")
 
     def tearDownZope(self, app):
         HTTPRequest.retry_max_count = self._orig_retry_max_count
@@ -191,7 +166,7 @@ LEGACY_COLLECTIVE_SOLR_FIXTURE = LegacyCollectiveSolrLayer()
 
 
 def activateAndReindex(portal):
-    """ activate solr indexing and reindex the existing content """
+    """activate solr indexing and reindex the existing content"""
     activate()
     response = portal.REQUEST.RESPONSE
     original = response.write
@@ -225,6 +200,8 @@ class CollectiveSolrMockRegistry(object):
         self.field_list = []
         self.atomic_updates = False
         self.boost_script = u""
+        self.login = None
+        self.password = None
 
     def __getitem__(self, name):
         name_parts = name.split(".")
@@ -276,11 +253,8 @@ class CollectiveSolrMockRegistryLayer(Layer):
 
 
 def set_attributes(context, values):  # pragma: no cover
-    if HAS_PAC:
-        for key, value in six.iteritems(values):
-            setattr(context, key, value)
-    else:
-        context.processForm(values=values)
+    for key, value in six.iteritems(values):
+        setattr(context, key, value)
 
 
 COLLECTIVE_SOLR_MOCK_REGISTRY_FIXTURE = CollectiveSolrMockRegistryLayer()

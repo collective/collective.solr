@@ -35,7 +35,7 @@ class SearchDispatcher(object):
         self.context = context
 
     def __call__(self, request, **keywords):
-        """ decide on a search backend and perform the given query """
+        """decide on a search backend and perform the given query"""
         if isActive():
             try:
                 return solrSearchResults(request, **keywords)
@@ -97,7 +97,7 @@ def solrSearchResults(request=None, **keywords):
         return SolrResponse()
 
     def wrap(flare):
-        """ wrap a flare object with a helper class """
+        """wrap a flare object with a helper class"""
         adapter = queryMultiAdapter((flare, request), IFlare)
         return adapter is not None and adapter or flare
 
