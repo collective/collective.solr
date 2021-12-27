@@ -12,9 +12,6 @@
 
   <i18n:registerTranslations directory="locales" />
 
-  <!-- collective.indexing is part of Products.CMFPlone since 5.1 -->
-  <include zcml:condition="not-have plone-51" package="collective.indexing" />
-
   <include package="plone.browserlayer" />
   <include package="plone.app.registry" />
   <include package="plone.restapi" />
@@ -37,68 +34,39 @@
         provides=".interfaces.ISearchDispatcher"
         factory=".dispatcher.SearchDispatcher" />
 
+    <include package="plone.dexterity" file="meta.zcml" />
+    <include package="plone.dexterity"  />
 
-    <configure zcml:condition="installed Products.Archetypes">
+    <!-- Schema extender as behavior -->
+    <plone:behavior
+  title="Solr extension"
+  name="solr.fields"
+  description="Extra fields for Solr indexing"
+  provides=".behaviors.ISolrFields"
+  />
 
-      <!-- Schema extender -->
-      <include file="extender.zcml" />
-
-      <!-- Adder adapter for Archetypes-->
-      <adapter
-	  factory=".indexer.DefaultAdder"
-	  for="Products.Archetypes.interfaces.IBaseObject"
-	  name="default"
-	  />
-
-      <adapter
-	  factory=".indexer.BinaryAdder"
-	  for="Products.Archetypes.interfaces.IBaseObject"
-	  name="File"
-	  />
-
-      <adapter
-	  factory=".indexer.BinaryAdder"
-	  for="Products.Archetypes.interfaces.IBaseObject"
-	  name="Image"
-	  />
-    </configure>
-    <configure zcml:condition="installed plone.dexterity">
-
-      <include package="plone.dexterity" file="meta.zcml" />
-      <include package="plone.dexterity"  />
-
-      <!-- Schema extender as behavior -->
-      <plone:behavior
-	  title="Solr extension"
-    name="solr.fields"
-	  description="Extra fields for Solr indexing"
-	  provides=".behaviors.ISolrFields"
-	  zcml:condition="installed plone.app.dexterity"
-	  />
-
-      <!-- Adder adapter for Dexterity -->
-      <adapter
-	  factory=".indexer.DefaultAdder"
-	  for="plone.dexterity.interfaces.IDexterityContent"
-	  name="default"
-	  />
-
-      <adapter
-	  factory=".indexer.DXFileBinaryAdder"
-	  for="plone.dexterity.interfaces.IDexterityContent"
-	  name="File"
-	  />
-
-      <adapter
-	  factory=".indexer.DXImageBinaryAdder"
-	  for="plone.dexterity.interfaces.IDexterityContent"
-	  name="Image"
-	  />
-    </configure>
+    <!-- Adder adapter for Dexterity -->
+    <adapter
+  factory=".indexer.DefaultAdder"
+  for="plone.dexterity.interfaces.IDexterityContent"
+  name="default"
+  />
 
     <adapter
-        factory=".indexer.BaseIndexable"
-        provides="collective.solr.interfaces.ICheckIndexable" />
+  factory=".indexer.DXFileBinaryAdder"
+  for="plone.dexterity.interfaces.IDexterityContent"
+  name="File"
+  />
+
+    <adapter
+  factory=".indexer.DXImageBinaryAdder"
+  for="plone.dexterity.interfaces.IDexterityContent"
+  name="Image"
+  />
+
+  <adapter
+      factory=".indexer.BaseIndexable"
+      provides="collective.solr.interfaces.ICheckIndexable" />
 
   <adapter
       factory=".flare.PloneFlare"
@@ -135,19 +103,16 @@
   <adapter name="path_parents" factory=".attributes.path_parents" />
 
   <adapter
-      zcml:condition="installed plone.app.contentlisting"
       factory="plone.app.contentlisting.contentlisting.ContentListing"
       for="collective.solr.parser.SolrResponse"
       />
 
   <adapter
-      zcml:condition="installed plone.app.contentlisting"
       factory="collective.solr.contentlisting.FlareContentListingObject"
       for="collective.solr.flare.PloneFlare"
       />
 
   <adapter
-    zcml:condition="installed plone.restapi"
     factory="collective.solr.serializer.LazySolrCatalogResultSerializer"
     />
 

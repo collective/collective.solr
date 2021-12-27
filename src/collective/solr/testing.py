@@ -7,17 +7,9 @@ from plone.app.testing import FunctionalTesting
 from plone.app.testing import IntegrationTesting
 import six
 from six.moves import range
-
-try:  # pragma: no cover
-    from plone.app.contenttypes.testing import (
-        PLONE_APP_CONTENTTYPES_FIXTURE as PLONE_FIXTURE,
-    )  # noqa
-
-    HAS_PAC = True
-except ImportError:  # pragma: no cover
-    from plone.app.testing.bbb import PTC_FIXTURE as PLONE_FIXTURE
-
-    HAS_PAC = False
+from plone.app.contenttypes.testing import (
+    PLONE_APP_CONTENTTYPES_FIXTURE as PLONE_FIXTURE,
+)
 from plone.app.testing import PloneSandboxLayer
 from plone.app.testing import TEST_USER_NAME
 from plone.app.testing import applyProfile
@@ -276,11 +268,8 @@ class CollectiveSolrMockRegistryLayer(Layer):
 
 
 def set_attributes(context, values):  # pragma: no cover
-    if HAS_PAC:
-        for key, value in six.iteritems(values):
-            setattr(context, key, value)
-    else:
-        context.processForm(values=values)
+    for key, value in six.iteritems(values):
+        setattr(context, key, value)
 
 
 COLLECTIVE_SOLR_MOCK_REGISTRY_FIXTURE = CollectiveSolrMockRegistryLayer()
