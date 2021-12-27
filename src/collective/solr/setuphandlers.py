@@ -75,8 +75,8 @@ def migrate_to_5(context):
         registry_record.value = None
         registry.records["collective.solr.password"] = registry_record
     if "collective.solr.use_tika" not in registry.records:
-        registry_field = field.TextLine(title=u"Use Tika")
+        registry_field = field.Bool(title=u"Use Tika")
         registry_record = Record(registry_field)
-        registry_record.value = None
+        registry_record.value = False
         registry.records["use_tika"] = registry_record
     logger.info("Migrated to version 5")
