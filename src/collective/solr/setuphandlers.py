@@ -82,5 +82,4 @@ def migrate_to_5(context):
         registry_record.value = False
         registry.records["collective.solr.use_tika"] = registry_record
         logger.info("Create registry entry for collective.solr.use_tika")
-    breakpoint()
     logger.info("Migrated to version 5")
