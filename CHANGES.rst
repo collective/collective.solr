@@ -4,7 +4,10 @@ Changelog
 9.0.0a3 (unreleased)
 --------------------
 
-- Nothing changed yet.
+Internal:
+
+- Rename authentication fields to avoid issues with password managers
+  [mpeeters]
 
 
 9.0.0a2 (2021-12-29)

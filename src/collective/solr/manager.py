@@ -69,8 +69,8 @@ class SolrConnectionManager(object):
         zcmlconfig = queryUtility(IZCMLSolrConnectionConfig)
         registry = getUtility(IRegistry)
         config_host = registry["collective.solr.host"]
-        config_login = registry["collective.solr.login"]
-        config_password = registry["collective.solr.password"]
+        config_login = registry["collective.solr.solr_login"]
+        config_password = registry["collective.solr.solr_password"]
         if zcmlconfig is not None:
             # use connection parameters defined in zcml...
             logger.debug("opening connection to %s", zcmlconfig.host)

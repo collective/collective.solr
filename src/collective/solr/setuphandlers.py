@@ -83,3 +83,39 @@ def migrate_to_5(context):
         registry.records["collective.solr.use_tika"] = registry_record
         logger.info("Create registry entry for collective.solr.use_tika")
     logger.info("Migrated to version 5")
+
+
+def migrate_to_6(context):
+    registry = getUtility(IRegistry)
+    old_login = None
+    old_password = None
+
+    if "collective.solr.login" in registry.records:
+        old_login = registry["collective.solr.login"]
+        del registry.records["collective.solr.login"]
+        logger.info("Remove registry entry for collective.solr.login")
+    if "collective.solr.password" in registry.records:
+        old_password = registry["collective.solr.password"]
+        del registry.records["collective.solr.password"]
+        logger.info("Remove registry entry for collective.solr.password")
+
+    if "collective.solr.solr_login" not in registry.records:
+        registry_field = field.TextLine(title=u"Login")
+        registry_record = Record(registry_field)
+        if old_login:
+            registry_record.value = old_login
+        else:
+            registry_record.value = None
+        registry.records["collective.solr.solr_login"] = registry_record
+        logger.info("Create registry entry for collective.solr.solr_login")
+    if "collective.solr_password" not in registry.records:
+        registry_field = field.TextLine(title=u"Password")
+        registry_record = Record(registry_field)
+        if old_password:
+            registry_record.value = old_password
+        else:
+            registry_record.value = None
+        registry.records["collective.solr.solr_password"] = registry_record
+        logger.info("Create registry entry for collective.solr.solr_password")
+
+    logger.info("Migrated to version 6")

@@ -43,4 +43,14 @@
     profile="collective.solr:default"
     />
 
+  <genericsetup:upgradeStep
+    title="Upgrade to collective.solr 6"
+    description="Update field names for authentication"
+    source="5"
+    destination="6"
+    handler=".setuphandlers.migrate_to_6"
+    sortkey="1"
+    profile="collective.solr:default"
+    />
+
 </configure>
