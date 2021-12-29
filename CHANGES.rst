@@ -4,11 +4,15 @@ Changelog
 9.0.0a2 (unreleased)
 --------------------
 
+New Features:
+
 - Add option to upload binary files via Tika instead of relying on accessing blobs via the file system
   [NicolasGoeddel, timo]
 
 - Add support of SolR basic authentication
   [mpeeters]
+
+Internal:
 
 - Remove plone.app.contenttypes conditionals in code.
   [timo]
@@ -35,10 +39,14 @@ Changelog
 9.0.0a1 (2021-11-19)
 --------------------
 
-- Add support for Plone 6 / Volto
-  [timo]
+Breaking:
 
 - Drop Python 2, Plone 4.3, Plone 5.0, Plone 5.1 compatibility
+  [timo]
+
+New Features:
+
+- Add support for Plone 6 / Volto
   [timo]
 
 
