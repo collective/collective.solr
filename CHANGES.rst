@@ -35,6 +35,9 @@ Internal:
 - Remove collective.indexing and LinguaPlone from test layer
   [timo]
 
+- Use Solr 8 instead of Solr 7 in the default dev/testing buildout
+  [timo]
+
 
 9.0.0a1 (2021-11-19)
 --------------------
