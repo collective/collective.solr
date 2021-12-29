@@ -77,7 +77,7 @@ class SuggestTermsViewIntegrationTest(unittest.TestCase):
     def test_suggest_terms_view_is_registered(self):
         try:
             getMultiAdapter((self.portal, self.request), name="suggest-terms")
-        except:
+        except:  # noqa
             self.fail("suggest-terms view is not registered properly.")
 
     def test_suggest_terms_view_without_param(self):
