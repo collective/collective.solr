@@ -69,14 +69,18 @@ def migrate_to_5(context):
         registry_record = Record(registry_field)
         registry_record.value = None
         registry.records["collective.solr.login"] = registry_record
+        logger.info("Create registry entry for collective.solr.login")
     if "collective.solr.password" not in registry.records:
         registry_field = field.TextLine(title=u"Password")
         registry_record = Record(registry_field)
         registry_record.value = None
         registry.records["collective.solr.password"] = registry_record
+        logger.info("Create registry entry for collective.solr.password")
     if "collective.solr.use_tika" not in registry.records:
         registry_field = field.Bool(title=u"Use Tika")
         registry_record = Record(registry_field)
         registry_record.value = False
-        registry.records["use_tika"] = registry_record
+        registry.records["collective.solr.use_tika"] = registry_record
+        logger.info("Create registry entry for collective.solr.use_tika")
+    breakpoint()
     logger.info("Migrated to version 5")
