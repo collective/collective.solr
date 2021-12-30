@@ -4,10 +4,12 @@ Changelog
 9.0.0a3 (unreleased)
 --------------------
 
-Internal:
+New Feature:
 
 - Allow using of environment variables for SolR config
   [mpeeters]
+
+Bugfix:
 
 - Rename authentication fields to avoid issues with password managers
   [mpeeters]
