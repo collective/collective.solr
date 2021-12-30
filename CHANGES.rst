@@ -6,6 +6,9 @@ Changelog
 
 Internal:
 
+- Allow using of environment variables for SolR config
+  [mpeeters]
+
 - Rename authentication fields to avoid issues with password managers
   [mpeeters]
 
