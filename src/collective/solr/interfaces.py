@@ -38,7 +38,7 @@ class ISolrSchema(Interface):
         ),
     )
 
-    login = TextLine(
+    solr_login = TextLine(
         title=_("login", default=u"Login"),
         description=_(
             "help_login", default=u"Authentication login of the SolR instance."
@@ -46,7 +46,7 @@ class ISolrSchema(Interface):
         required=False,
     )
 
-    password = Password(
+    solr_password = Password(
         title=_("password", default=u"Password"),
         description=_(
             "help_password", default=u"Authentication password of the SolR instance."

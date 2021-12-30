@@ -26,6 +26,8 @@
       <element>portal_type</element>
     </value>
     <value key="boost_script"></value>
+    <value key="solr_login"></value>
+    <value key="solr_password"></value>
     <value key="use_tika">False</value>
   </records>
 </registry>
