@@ -1,7 +1,7 @@
 Changelog
 =========
 
-9.0.0a3 (unreleased)
+9.0.0a3 (2021-12-30)
 --------------------
 
 New Feature:
