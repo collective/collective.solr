@@ -52,3 +52,12 @@ class SolrMaintenanceTests(unittest.TestCase):
         self.assertEqual(response.headers.get("Content-Type"), "application/json")
         self.assertEqual(1, len(response.json()))
         self.assertEqual(response.json()[0]["Title"], "Colorless Green Ideas")
+
+    def test_solr_endpoint_prevent_http_smuggling(self):
+        # http smuggling https://github.com/veracode-research/solr-injection#solr-parameters-injection-http-smuggling
+        response = self.api_session.get("/@solr?q=Colorless%26xfl=review_state")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers.get("Content-Type"), "application/json")
+        self.assertEqual(1, len(response.json()))
+        self.assertEqual(response.json()[0]["Title"], "Colorless Green Ideas")

@@ -2,6 +2,7 @@ from plone.restapi.services import Service
 from AccessControl.SecurityManagement import getSecurityManager
 from Products.CMFPlone.utils import base_hasattr
 from zope.component import getUtility
+from urllib.parse import urlencode
 from collective.solr.interfaces import ISearch
 
 SPECIAL_CHARS = [
@@ -32,10 +33,35 @@ def escape(term):
     return term
 
 
+ALLOWED_SOLR_PARAMETERS = [
+    "q",  # query
+    "fq",  #
+    "fl",  # field list
+    "q.op",  # default operator
+    "sow",  # split on whitespace
+    "sort",  # sort on field
+    "hl",  # highlight
+    "hl.fl",  # highlight fields
+    "hl.simple.pre",  # highlight formatter pre
+    "hl.simple.post",  # highlight formatter post
+    "hl.fragsize",  # highlight fragment size
+]
+
+
 class SolrSearchGet(Service):
     def reply(self):
         search = getUtility(ISearch)
-        query = self.request.form.get("q")
+        breakpoint()
+        # filter allowed solr parameters
+        params = self.request.form
+        params = [{k:v for k, v in i if k in keys} for i in ALLOWED_SOLR_PARAMETERS]
+        
+        [{key:value for key, value in item if key in ALLOWED_SOLR_PARAMETERS} for item in params]
+
+        params = [x for x in self.request.form if x in ]
+
+        params = urlencode(params, doseq=False)
+        query = params.get("q")
         if not query:
             query = "*:*"
         # return poor man's serializer for now
