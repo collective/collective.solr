@@ -95,3 +95,28 @@ def solr_reindex(app, args):
     ignore_exceptions = namespace.ignore_exceptions == "yes"
     mv = SolrMaintenanceView(site, site.REQUEST)
     mv.reindex(ignore_exceptions=ignore_exceptions)
+
+
+def solr_cleanup(app, args):
+    """Cleanup Solr index. Remove no longer existing items from Solr index.
+    This is equivalent to /@@solr-maintenance/cleanup.
+    """
+    site = makerequest(_get_site(app, args))
+    parser = argparse.ArgumentParser()
+
+    namespace, unused = parser.parse_known_args(args)
+    mv = SolrMaintenanceView(site, site.REQUEST)
+    mv.cleanup()
+
+
+def solr_sync(app, args):
+    """Sync Solr index.
+    Index missing objects and remove no longer existing objects from Solr.
+    This is equivalent to /@@solr-maintenance/sync.
+    """
+    site = makerequest(_get_site(app, args))
+    parser = argparse.ArgumentParser()
+
+    namespace, unused = parser.parse_known_args(args)
+    mv = SolrMaintenanceView(site, site.REQUEST)
+    mv.sync()
