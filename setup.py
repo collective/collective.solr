@@ -1,6 +1,6 @@
 from setuptools import find_packages, setup
 
-version = "9.0.0a4"
+version = "9.0.0a5.dev0"
 
 long_description = "\n\n".join([open("README.rst").read(), open("CHANGES.rst").read()])
 
