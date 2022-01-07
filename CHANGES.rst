@@ -1,7 +1,7 @@
 Changelog
 =========
 
-9.0.0a4 (unreleased)
+9.0.0a4 (2022-01-07)
 --------------------
 
 - Add solr_cleanup and solr_sync command line options
