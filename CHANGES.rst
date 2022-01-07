@@ -4,7 +4,11 @@ Changelog
 9.0.0a4 (unreleased)
 --------------------
 
-- Nothing changed yet.
+- Add solr_cleanup and solr_sync command line options
+  [tisto]
+
+- Add maintenance docs with command line options
+  [tisto]
 
 
 9.0.0a3 (2021-12-30)
