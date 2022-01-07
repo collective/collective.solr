@@ -1,10 +1,11 @@
 Installation, Setup and Usage of Solr Integration
 =================================================
 
-.. toctree:: 
+.. toctree::
     :maxdepth: 1
 
     install
     setup
     config
+    maintenance
     production

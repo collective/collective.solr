@@ -76,6 +76,9 @@ setup(
       solr_activate=collective.solr.commands:solr_activate
       solr_deactivate=collective.solr.commands:solr_deactivate
       solr_clear_index=collective.solr.commands:solr_clear_index
+      solr_clear=collective.solr.commands:solr_clear_index
       solr_reindex=collective.solr.commands:solr_reindex
+      solr_cleanup=collective.solr.commands:solr_cleanup
+      solr_sync=collective.solr.commands:solr_sync
     """,
 )
