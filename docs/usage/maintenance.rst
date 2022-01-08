@@ -5,7 +5,7 @@ collective.solr comes with a set of command line options to activate or deactiva
 
 Activate Solr::
 
-    bin/instance solr_deactivate
+    bin/instance solr_activate
 
 Deactivate Solr:
 
