@@ -15,14 +15,14 @@ Reindex Solr index::
 
     bin/instance solr_reindex
 
-Clear Solr index:
+Clear Solr index::
 
     bin/instance solr_clear
 
-Cleanup Solr index:
+Cleanup Solr index::
 
     bin/instance solr_cleanup
 
-Sync Solr index:
+Sync Solr index::
 
     bin/instance solr_sync
