@@ -7,7 +7,7 @@ Activate Solr::
 
     bin/instance solr_activate
 
-Deactivate Solr:
+Deactivate Solr::
 
     bin/instance solr_deactivate
 
