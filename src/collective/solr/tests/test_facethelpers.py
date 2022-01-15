@@ -1,13 +1,10 @@
-# -*- coding: utf-8 -*-
 from unittest import TestCase
-from six.moves.urllib.parse import unquote
 
-from zope.component import provideUtility
-from zope.publisher.browser import TestRequest
-from zope.schema.vocabulary import SimpleTerm
-
-from collective.solr.browser.facets import convertFacets, facetParameters
-from collective.solr.browser.facets import SearchFacetsView
+from collective.solr.browser.facets import (
+    SearchFacetsView,
+    convertFacets,
+    facetParameters,
+)
 from collective.solr.interfaces import IFacetTitleVocabularyFactory
 from collective.solr.parser import SolrResponse
 from collective.solr.testing import COLLECTIVE_SOLR_MOCK_REGISTRY_FIXTURE
@@ -15,6 +12,10 @@ from collective.solr.tests.utils import getData
 from collective.solr.utils import getConfig
 from collective.solr.vocabularies import I18NFacetTitlesVocabularyFactory
 from six.moves import map
+from six.moves.urllib.parse import unquote
+from zope.component import provideUtility
+from zope.publisher.browser import TestRequest
+from zope.schema.vocabulary import SimpleTerm
 
 
 class Dummy(object):

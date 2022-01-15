@@ -1,17 +1,16 @@
 from __future__ import print_function
+
 from os.path import dirname, join
-from six.moves.http_client import HTTPConnection
-from threading import Thread
-from six.moves.BaseHTTPServer import HTTPServer, BaseHTTPRequestHandler
+from re import search
 from socket import error
 from sys import stderr
-from re import search
-
-from collective.solr.local import getLocal, setLocal
-from collective.solr import tests
+from threading import Thread
 
 import six
-
+from collective.solr import tests
+from collective.solr.local import getLocal, setLocal
+from six.moves.BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
+from six.moves.http_client import HTTPConnection
 from zope.component.hooks import getSite, setSite
 
 try:

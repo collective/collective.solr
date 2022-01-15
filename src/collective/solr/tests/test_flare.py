@@ -1,7 +1,7 @@
 from unittest import TestCase
 
-from collective.solr.parser import SolrFlare
 from collective.solr.flare import PloneFlare
+from collective.solr.parser import SolrFlare
 
 
 class FlareTests(TestCase):

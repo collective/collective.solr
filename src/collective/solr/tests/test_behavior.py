@@ -1,11 +1,11 @@
-# -*- coding: utf-8 -*-
 import unittest
 
-from collective.solr.testing import LEGACY_COLLECTIVE_SOLR_INTEGRATION_TESTING
 from collective.solr.behaviors import ISolrFields
-from plone.app.testing import setRoles
-from plone.app.testing import TEST_USER_ID
-from collective.solr.testing import activateAndReindex
+from collective.solr.testing import (
+    LEGACY_COLLECTIVE_SOLR_INTEGRATION_TESTING,
+    activateAndReindex,
+)
+from plone.app.testing import TEST_USER_ID, setRoles
 from plone.dexterity.fti import DexterityFTI
 
 

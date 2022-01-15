@@ -1,12 +1,9 @@
 from unittest import TestCase
-from DateTime import DateTime
-
-from collective.solr.parser import SolrResponse
-from collective.solr.parser import SolrSchema
-from collective.solr.parser import parseDate
-from collective.solr.tests.utils import getData
 
 import six
+from collective.solr.parser import SolrResponse, SolrSchema, parseDate
+from collective.solr.tests.utils import getData
+from DateTime import DateTime
 
 
 class ParserTests(TestCase):

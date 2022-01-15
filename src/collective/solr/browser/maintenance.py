@@ -1,27 +1,22 @@
-# -*- coding: utf-8 -*-
 from logging import getLogger
-from time import time, strftime
+from time import strftime, time
 
 from BTrees.IIBTree import IITreeSet
+from collective.solr.flare import PloneFlare
+from collective.solr.indexer import DefaultAdder, SolrIndexProcessor, boost_values
+from collective.solr.interfaces import (
+    ICheckIndexable,
+    ISolrAddHandler,
+    ISolrConnectionManager,
+    ISolrMaintenanceView,
+)
+from collective.solr.parser import SolrResponse, parse_date_as_datetime, unmarshallers
+from collective.solr.utils import findObjects, prepareData
+from plone.uuid.interfaces import IUUID, IUUIDAware
 from Products.CMFCore.utils import getToolByName
 from Products.Five.browser import BrowserView
-from plone.uuid.interfaces import IUUID, IUUIDAware
+from zope.component import queryAdapter, queryUtility
 from zope.interface import implementer
-from zope.component import queryUtility, queryAdapter
-
-from collective.solr.indexer import DefaultAdder
-from collective.solr.flare import PloneFlare
-from collective.solr.interfaces import ISolrConnectionManager
-from collective.solr.interfaces import ISolrMaintenanceView
-from collective.solr.interfaces import ISolrAddHandler
-from collective.solr.interfaces import ICheckIndexable
-from collective.solr.indexer import SolrIndexProcessor
-from collective.solr.indexer import boost_values
-from collective.solr.parser import parse_date_as_datetime
-from collective.solr.parser import SolrResponse
-from collective.solr.parser import unmarshallers
-from collective.solr.utils import findObjects
-from collective.solr.utils import prepareData
 
 logger = getLogger("collective.solr.maintenance")
 MAX_ROWS = 1000000000

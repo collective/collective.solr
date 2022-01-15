@@ -1,14 +1,12 @@
-# -*- coding: utf-8 -*-
+from collective.solr.interfaces import ISolrSchema, _
 from plone.app.registry.browser import controlpanel
 from plone.protect.interfaces import IDisableCSRFProtection
-from collective.solr.interfaces import ISolrSchema, _
 from plone.restapi.controlpanels import RegistryConfigletPanel
 from Products.CMFPlone.utils import safe_unicode
 from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 from Products.PythonScripts.PythonScript import PythonScript
 from zope.component import adapter
-from zope.interface import alsoProvides
-from zope.interface import Interface
+from zope.interface import Interface, alsoProvides
 
 
 @adapter(Interface, Interface)

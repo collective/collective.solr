@@ -1,20 +1,19 @@
-# -*- coding: utf-8 -*-
+from datetime import datetime
+from unittest import TestCase
 
-from DateTime import DateTime
 from collective.solr.interfaces import ISolrConnectionConfig
-from collective.solr.mangler import cleanupQueryParameters
-from collective.solr.mangler import mangleQuery
-from collective.solr.mangler import optimizeQueryParameters
-from collective.solr.mangler import subtractQueryParameters
-from collective.solr.parser import SolrField
-from collective.solr.parser import SolrSchema
+from collective.solr.mangler import (
+    cleanupQueryParameters,
+    mangleQuery,
+    optimizeQueryParameters,
+    subtractQueryParameters,
+)
+from collective.solr.parser import SolrField, SolrSchema
 from collective.solr.testing import COLLECTIVE_SOLR_MOCK_REGISTRY_FIXTURE
 from collective.solr.utils import getConfig
-from datetime import datetime
+from DateTime import DateTime
 from pytz import timezone
-from unittest import TestCase
-from zope.component import getGlobalSiteManager
-from zope.component import provideUtility
+from zope.component import getGlobalSiteManager, provideUtility
 
 
 def mangle(**keywords):

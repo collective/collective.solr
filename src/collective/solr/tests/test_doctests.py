@@ -1,8 +1,8 @@
-# -*- coding: utf-8 -*-
+import doctest
+from unittest import TestSuite
+
 from collective.solr.testing import LEGACY_COLLECTIVE_SOLR_FUNCTIONAL_TESTING
 from plone.testing import layered
-from unittest import TestSuite
-import doctest
 
 optionflags = (
     doctest.ELLIPSIS

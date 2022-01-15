@@ -1,14 +1,12 @@
-# -*- coding: utf-8 -*-
+from unittest import TestCase
 
-from DateTime import DateTime
-from Missing import MV
 from collective.solr.manager import SolrConnectionManager
 from collective.solr.queryparser import quote
 from collective.solr.search import Search
 from collective.solr.testing import COLLECTIVE_SOLR_MOCK_REGISTRY_FIXTURE
-from collective.solr.tests.utils import fakehttp
-from collective.solr.tests.utils import getData
-from unittest import TestCase
+from collective.solr.tests.utils import fakehttp, getData
+from DateTime import DateTime
+from Missing import MV
 
 
 class QuoteTests(TestCase):

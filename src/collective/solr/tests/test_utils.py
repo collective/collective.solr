@@ -1,19 +1,21 @@
-# -*- coding: utf-8 -*-
+from unittest import TestCase
+
 from collective.solr.exceptions import SolrConnectionException
 from collective.solr.parser import SolrResponse
 from collective.solr.testing import LEGACY_COLLECTIVE_SOLR_INTEGRATION_TESTING
 from collective.solr.tests.utils import getData
-from collective.solr.utils import findObjects
-from collective.solr.utils import isSimpleSearch
-from collective.solr.utils import isSimpleTerm
-from collective.solr.utils import isWildCard
-from collective.solr.utils import padResults
-from collective.solr.utils import prepareData
-from collective.solr.utils import prepare_wildcard
-from collective.solr.utils import removeSpecialCharactersAndOperators
-from collective.solr.utils import setupTranslationMap
-from collective.solr.utils import splitSimpleSearch
-from unittest import TestCase
+from collective.solr.utils import (
+    findObjects,
+    isSimpleSearch,
+    isSimpleTerm,
+    isWildCard,
+    padResults,
+    prepare_wildcard,
+    prepareData,
+    removeSpecialCharactersAndOperators,
+    setupTranslationMap,
+    splitSimpleSearch,
+)
 
 
 class UtilsTests(TestCase):

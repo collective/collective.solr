@@ -1,16 +1,16 @@
-# -*- coding: utf-8 -*-
-from collective.solr.browser.facets import SearchBox
-from collective.solr.browser.facets import SearchFacetsView
+from unittest import TestCase
+
+from collective.solr.browser.facets import SearchBox, SearchFacetsView
 from collective.solr.browser.interfaces import IThemeSpecific
 from collective.solr.dispatcher import solrSearchResults
 from collective.solr.exceptions import SolrConnectionException
-from collective.solr.testing import activateAndReindex
-from collective.solr.testing import LEGACY_COLLECTIVE_SOLR_INTEGRATION_TESTING
+from collective.solr.testing import (
+    LEGACY_COLLECTIVE_SOLR_INTEGRATION_TESTING,
+    activateAndReindex,
+)
 from collective.solr.utils import activate
 from plone import api
-from plone.app.testing import TEST_USER_ID
-from plone.app.testing import setRoles
-from unittest import TestCase
+from plone.app.testing import TEST_USER_ID, setRoles
 from zope.component import getMultiAdapter
 from zope.interface import alsoProvides
 
