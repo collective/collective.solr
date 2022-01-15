@@ -4,11 +4,19 @@ Changelog
 9.0.0a5 (unreleased)
 --------------------
 
-- Nothing changed yet.
+Internal:
+
+- Remote utf-8 encoding lines
+  [tisto]
+
+- Sort Python imports
+  [tisto]
 
 
 9.0.0a4 (2022-01-07)
 --------------------
+
+New Feature:
 
 - Add solr_cleanup and solr_sync command line options
   [tisto]
