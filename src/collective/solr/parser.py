@@ -1,18 +1,18 @@
-# -*- coding: utf-8 -*-
 from datetime import datetime
+
 from DateTime import DateTime
 
 try:
-    from ZTUtils.Lazy import Lazy
-    from ZTUtils.Lazy import _marker
+    from ZTUtils.Lazy import Lazy, _marker
 except ImportError:
     from Products.ZCatalog.Lazy import Lazy
     from Products.ZCatalog.Lazy import _marker
 
-from zope.interface import implementer
-from collective.solr.interfaces import ISolrFlare
 from xml.etree.cElementTree import iterparse
+
 import six
+from collective.solr.interfaces import ISolrFlare
+from zope.interface import implementer
 
 
 class AttrDict(dict):

@@ -1,16 +1,14 @@
-# -*- coding: utf-8 -*-
 import sys
-from zope.interface import implementer
-from zope.component import adapts
-from zope.component.hooks import getSite
-from zope.publisher.interfaces.http import IHTTPRequest
+
+from collective.solr.interfaces import IFlare, ISolrFlare
+from collective.solr.parser import AttrDict
+from DateTime import DateTime
 from OFS.Traversable import path2url
 from Products.CMFPlone.utils import pretty_title_or_id
-from DateTime import DateTime
-
-from collective.solr.interfaces import ISolrFlare
-from collective.solr.interfaces import IFlare
-from collective.solr.parser import AttrDict
+from zope.component import adapts
+from zope.component.hooks import getSite
+from zope.interface import implementer
+from zope.publisher.interfaces.http import IHTTPRequest
 
 timezone = DateTime().timezone()
 

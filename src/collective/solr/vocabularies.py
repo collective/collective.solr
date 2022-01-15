@@ -1,17 +1,14 @@
-# -*- coding: utf-8 -*-
-from zope.component import queryUtility
-from zope.interface import implementer
-from zope.schema.interfaces import IBaseVocabulary
-from zope.schema.interfaces import IVocabularyFactory
-from zope.schema.vocabulary import SimpleTerm, SimpleVocabulary
-
-from collective.solr import SolrMessageFactory
-from collective.solr.interfaces import IFacetTitleVocabularyFactory
-from collective.solr.interfaces import ISolrConnectionManager
-
-from zope.component import getUtility
-from plone.registry.interfaces import IRegistry
 import six
+from collective.solr import SolrMessageFactory
+from collective.solr.interfaces import (
+    IFacetTitleVocabularyFactory,
+    ISolrConnectionManager,
+)
+from plone.registry.interfaces import IRegistry
+from zope.component import getUtility, queryUtility
+from zope.interface import implementer
+from zope.schema.interfaces import IBaseVocabulary, IVocabularyFactory
+from zope.schema.vocabulary import SimpleTerm, SimpleVocabulary
 
 
 @implementer(IVocabularyFactory)

@@ -1,21 +1,21 @@
-# -*- coding: utf-8 -*-
-from AccessControl import getSecurityManager
-from DateTime import DateTime
-from datetime import date
-from datetime import datetime
-from collective.solr.queryparser import quote
-from collective.solr.utils import isSimpleSearch
-from collective.solr.utils import isWildCard
-from collective.solr.utils import prepare_wildcard
-from collective.solr.utils import splitSimpleSearch
-from collective.solr.utils import getConfig
-from collective.solr.utils import removeSpecialCharactersAndOperators
-from pytz import timezone
-from zope.component import getUtility
-from plone.registry.interfaces import IRegistry
-import six
-from six.moves import map
+from datetime import date, datetime
 
+import six
+from AccessControl import getSecurityManager
+from collective.solr.queryparser import quote
+from collective.solr.utils import (
+    getConfig,
+    isSimpleSearch,
+    isWildCard,
+    prepare_wildcard,
+    removeSpecialCharactersAndOperators,
+    splitSimpleSearch,
+)
+from DateTime import DateTime
+from plone.registry.interfaces import IRegistry
+from pytz import timezone
+from six.moves import map
+from zope.component import getUtility
 
 ranges = {
     "min": "[%s TO *]",

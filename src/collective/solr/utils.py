@@ -1,14 +1,12 @@
-from re import compile, UNICODE
+from re import UNICODE, compile
 
-from Acquisition import aq_base
-from unidecode import unidecode
-
-from collective.solr.interfaces import ISolrSchema
-from zope.component import getUtility
-from plone.registry.interfaces import IRegistry
 import six
+from Acquisition import aq_base
+from collective.solr.interfaces import ISolrSchema
+from plone.registry.interfaces import IRegistry
 from six.moves import range
-
+from unidecode import unidecode
+from zope.component import getUtility
 
 if hasattr(str, "maketrans"):
     maketrans = str.maketrans

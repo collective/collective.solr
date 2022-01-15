@@ -1,19 +1,20 @@
-# -*- coding: utf-8 -*-
 from Acquisition import aq_base
 from archetypes.schemaextender.field import ExtensionField
-from archetypes.schemaextender.interfaces import ISchemaExtender
-from archetypes.schemaextender.interfaces import IBrowserLayerAwareExtender
+from archetypes.schemaextender.interfaces import (
+    IBrowserLayerAwareExtender,
+    ISchemaExtender,
+)
+from collective.solr import SolrMessageFactory as _
 from collective.solr.browser.interfaces import IThemeSpecific
 from plone.indexer import indexer
-from Products.Archetypes.atapi import BooleanField
-from Products.Archetypes.atapi import BooleanWidget
-from Products.Archetypes.atapi import TextAreaWidget
-from Products.Archetypes.atapi import TextField
+from Products.Archetypes.atapi import (
+    BooleanField,
+    BooleanWidget,
+    TextAreaWidget,
+    TextField,
+)
 from Products.Archetypes.interfaces import IBaseObject
-from zope.interface import implementer
-from zope.interface import Interface
-
-from collective.solr import SolrMessageFactory as _
+from zope.interface import Interface, implementer
 
 
 @indexer(IBaseObject)
