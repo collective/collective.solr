@@ -365,6 +365,16 @@ class ISolrSchema(Interface):
         ),
     )
 
+    tika_default_field = TextLine(
+        title=_("label_tika_default_field", default=u"Tika default field"),
+        description=_(
+            "help_tika_default_field",
+            default=u"Field that Tika uses to add the extracted text to.",
+        ),
+        default=u"content",
+        required=False,
+    )
+
 
 class ISolrConnectionConfig(ISolrSchema):
     """utility to hold the connection configuration for the solr server"""
