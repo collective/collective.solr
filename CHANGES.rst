@@ -4,6 +4,11 @@ Changelog
 9.0.0a5 (unreleased)
 --------------------
 
+Breaking:
+
+- Use 'content' as default field for Tika indexing instead of 'SearchableText'
+  [tisto]
+
 New Feature:
 
 - Add new tika_default_field setting
