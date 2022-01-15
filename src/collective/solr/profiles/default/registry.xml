@@ -29,5 +29,6 @@
     <value key="solr_login"></value>
     <value key="solr_password"></value>
     <value key="use_tika">False</value>
+    <value key="tika_default_field">content</value>
   </records>
 </registry>

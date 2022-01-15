@@ -117,5 +117,14 @@ def migrate_to_6(context):
             registry_record.value = None
         registry.records["collective.solr.solr_password"] = registry_record
         logger.info("Create registry entry for collective.solr.solr_password")
-
     logger.info("Migrated to version 6")
+
+
+def migrate_to_7(context):
+    registry = getUtility(IRegistry)
+    if "collective.solr.tika_default_field" not in registry.records:
+        registry_field = field.TextLine(title=u"Tika Default Field")
+        registry_record = Record(registry_field)
+        registry_record.value = "content"
+        registry.records["collective.solr.tika_default_field"] = registry_record
+    logger.info("Migrated to version 7")

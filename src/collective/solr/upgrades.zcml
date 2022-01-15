@@ -53,4 +53,13 @@
     profile="collective.solr:default"
     />
 
+  <genericsetup:upgradeStep
+    title="Upgrade to collective.solr 6"
+    description="Add tika_default_field registry entry"
+    source="6"
+    destination="7"
+    handler=".setuphandlers.migrate_to_7"
+    sortkey="1"
+    profile="collective.solr:default"
+    />
 </configure>

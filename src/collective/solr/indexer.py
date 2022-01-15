@@ -147,6 +147,9 @@ class BinaryAdder(DefaultAdder):
 
         registry = getUtility(IRegistry)
         use_tika = registry.get("collective.solr.use_tika")
+        tika_default_field = registry.get(
+            "collective.solr.tika_default_field", "content"
+        )
 
         # blobs are accessed via the file system
         if use_tika:
@@ -174,13 +177,13 @@ class BinaryAdder(DefaultAdder):
         try:
             response = conn.doPost(url, postdata_urlencoded, headers)
             root = etree.parse(response)
-            data["SearchableText"] = root.find(".//str").text.strip()
+            data[tika_default_field] = root.find(".//str").text.strip()
         except SolrConnectionException as e:
             logger.warn("Error %s @ %s", e, data["path_string"])
-            data["SearchableText"] = ""
+            data[tika_default_field] = ""
         except etree.XMLSyntaxError as e:
             logger.warn("Parsing error %s @ %s.", e, data["path_string"])
-            data["SearchableText"] = ""
+            data[tika_default_field] = ""
         finally:
             if use_tika:
                 openedBlob.close()
