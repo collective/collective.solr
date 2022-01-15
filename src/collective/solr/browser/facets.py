@@ -1,19 +1,16 @@
-# -*- coding: utf-8 -*-
 from copy import deepcopy
 from operator import itemgetter
-from six.moves.urllib.parse import urlencode
 
+import six
+from collective.solr.interfaces import IFacetTitleVocabularyFactory
 from plone.app.layout.viewlets.common import SearchBoxViewlet
+from plone.registry.interfaces import IRegistry
 from Products.Five import BrowserView
 from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
-from zope.component import getUtility
-from zope.component import queryUtility
+from six.moves.urllib.parse import urlencode
+from zope.component import getUtility, queryUtility
 from zope.i18n import translate
 from zope.i18nmessageid import Message
-
-from collective.solr.interfaces import IFacetTitleVocabularyFactory
-from plone.registry.interfaces import IRegistry
-import six
 
 
 def param(view, name):

@@ -1,12 +1,11 @@
-from collective.solr.testing import LEGACY_COLLECTIVE_SOLR_FUNCTIONAL_TESTING
-from collective.solr.utils import activate
-from plone import api
-from plone.app.testing import setRoles
-from plone.app.testing import TEST_USER_ID
-from plone.dexterity.utils import safe_unicode
 from unittest import TestCase
 
 import transaction
+from collective.solr.testing import LEGACY_COLLECTIVE_SOLR_FUNCTIONAL_TESTING
+from collective.solr.utils import activate
+from plone import api
+from plone.app.testing import TEST_USER_ID, setRoles
+from plone.dexterity.utils import safe_unicode
 
 
 class TestDublincoreSubjectField(TestCase):

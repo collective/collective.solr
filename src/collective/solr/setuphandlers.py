@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import logging
 
 from collective.solr.interfaces import ISolrConnectionConfig, ISolrSchema

@@ -1,7 +1,6 @@
-# -*- coding: utf-8 -*-
-from zope.interface import Interface
 from plone.indexer import indexer
 from six.moves import range
+from zope.interface import Interface
 
 
 @indexer(Interface)

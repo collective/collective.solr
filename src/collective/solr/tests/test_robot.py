@@ -1,9 +1,10 @@
+import os
+import unittest
+
+import robotsuite
 from collective.solr.testing import COLLECTIVE_SOLR_ROBOT_TESTING
 from plone.app.testing import ROBOT_TEST_LEVEL
 from plone.testing import layered
-import os
-import unittest
-import robotsuite
 
 
 def test_suite():

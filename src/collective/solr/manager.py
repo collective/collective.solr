@@ -1,21 +1,16 @@
-# -*- coding: utf-8 -*-
-from collective.solr.interfaces import ISolrConnectionManager
-from collective.solr.interfaces import IZCMLSolrConnectionConfig
-from collective.solr.local import getLocal
-from collective.solr.local import setLocal
-from collective.solr.solr import SolrConnection
-from collective.solr.utils import getConfig
-from collective.solr.utils import isActive
-from six.moves.http_client import CannotSendRequest
-from six.moves.http_client import ResponseNotReady
+import os
 from logging import getLogger
 from socket import error
-from zope.component import queryUtility
-from zope.interface import implementer
-from plone.registry.interfaces import IRegistry
-from zope.component import getUtility
-import os
+
 import six
+from collective.solr.interfaces import ISolrConnectionManager, IZCMLSolrConnectionConfig
+from collective.solr.local import getLocal, setLocal
+from collective.solr.solr import SolrConnection
+from collective.solr.utils import getConfig, isActive
+from plone.registry.interfaces import IRegistry
+from six.moves.http_client import CannotSendRequest, ResponseNotReady
+from zope.component import getUtility, queryUtility
+from zope.interface import implementer
 
 logger = getLogger("collective.solr.manager")
 marker = object()

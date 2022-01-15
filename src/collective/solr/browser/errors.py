@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from Products.Five import BrowserView
 from zope.component.hooks import getSite
 

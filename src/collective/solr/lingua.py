@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 try:
     from Products.LinguaPlone.catalog import languageFilter
 

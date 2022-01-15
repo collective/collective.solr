@@ -1,23 +1,23 @@
 from unittest import TestCase
 
-from plone.uuid.interfaces import IUUID
-
 from collective.solr.dispatcher import solrSearchResults
-from collective.solr.testing import activateAndReindex
-from collective.solr.testing import LEGACY_COLLECTIVE_SOLR_FUNCTIONAL_TESTING
-from plone.app.testing import SITE_OWNER_NAME
-from plone.app.testing import SITE_OWNER_PASSWORD
+from collective.solr.testing import (
+    LEGACY_COLLECTIVE_SOLR_FUNCTIONAL_TESTING,
+    activateAndReindex,
+)
+from plone.app.testing import SITE_OWNER_NAME, SITE_OWNER_PASSWORD
+from plone.uuid.interfaces import IUUID
 
 try:
     from plone.testing.zope import Browser
 except ImportError:
     from plone.testing.z2 import Browser
+
 from transaction import commit
 from ZODB.POSException import ConflictError
 from zope import component
 from zope.interface import Interface
 from zope.lifecycleevent.interfaces import IObjectCreatedEvent
-
 
 UIDS = []
 

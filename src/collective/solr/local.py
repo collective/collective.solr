@@ -1,6 +1,4 @@
-# -*- coding: utf-8 -*-
 from threading import local
-
 
 # a thread-local object holding data for the queue
 localData = local()

@@ -1,14 +1,12 @@
 from unittest import TestCase
 
-from plone.app.contentlisting.interfaces import IContentListingObject
-from plone.uuid.interfaces import IUUID
-from zope.interface.verify import verifyClass
-
 from collective.solr.contentlisting import FlareContentListingObject
 from collective.solr.flare import PloneFlare
 from collective.solr.testing import LEGACY_COLLECTIVE_SOLR_INTEGRATION_TESTING
-
 from DateTime import DateTime
+from plone.app.contentlisting.interfaces import IContentListingObject
+from plone.uuid.interfaces import IUUID
+from zope.interface.verify import verifyClass
 
 
 class ContentListingTests(TestCase):

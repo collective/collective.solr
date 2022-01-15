@@ -1,27 +1,25 @@
-from Products.CMFCore.utils import getToolByName
+from unittest import TestCase
 
-from Products.CMFCore.interfaces import IIndexQueueProcessor
 from collective.solr.exceptions import SolrInactiveException
-from collective.solr.interfaces import ISearch
-from collective.solr.interfaces import ISolrConnectionManager
-from collective.solr.interfaces import ISolrIndexQueueProcessor
-from collective.solr.interfaces import IZCMLSolrConnectionConfig
+from collective.solr.interfaces import (
+    ISearch,
+    ISolrConnectionManager,
+    ISolrIndexQueueProcessor,
+    IZCMLSolrConnectionConfig,
+)
 from collective.solr.mangler import mangleQuery
 from collective.solr.testing import LEGACY_COLLECTIVE_SOLR_FUNCTIONAL_TESTING
-from collective.solr.tests.utils import fakehttp
-from collective.solr.tests.utils import getData
+from collective.solr.tests.utils import fakehttp, getData
 from collective.solr.utils import getConfig
-from plone.app.testing import TEST_USER_ID
-from plone.app.testing import setRoles
+from plone.app.testing import TEST_USER_ID, setRoles
+from Products.CMFCore.interfaces import IIndexQueueProcessor
+from Products.CMFCore.utils import getToolByName
 
 # from socket import error
 # from socket import timeout
 # from time import sleep
 from transaction import commit
-from unittest import TestCase
-from zope.component import getGlobalSiteManager
-from zope.component import getUtilitiesFor
-from zope.component import queryUtility
+from zope.component import getGlobalSiteManager, getUtilitiesFor, queryUtility
 from zope.configuration import xmlconfig
 from zope.event import notify
 from zope.lifecycleevent import ObjectModifiedEvent

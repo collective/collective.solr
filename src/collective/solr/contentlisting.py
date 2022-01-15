@@ -1,16 +1,14 @@
-# -*- coding: utf-8 -*-
 from Acquisition import aq_base
 from plone import api
 from plone.app.contentlisting.interfaces import IContentListingObject
 from plone.app.layout.icons.interfaces import IContentIcon
 from plone.i18n.normalizer.interfaces import IIDNormalizer
-from plone.uuid.interfaces import IUUID
 from plone.registry.interfaces import IRegistry
+from plone.uuid.interfaces import IUUID
 from Products.CMFPlone.browser.ploneview import Plone as PloneView
 from zope.component import getMultiAdapter, getUtility
 from zope.globalrequest import getRequest
 from zope.interface import implementer
-
 
 missing = object()
 

@@ -1,15 +1,12 @@
-# -*- coding: UTF-8 -*-
-from zope.component import getUtility
+import json
+import unittest
+
+import six
 from collective.solr.browser.errors import ErrorView
 from collective.solr.interfaces import ISolrConnectionManager
 from collective.solr.testing import LEGACY_COLLECTIVE_SOLR_INTEGRATION_TESTING
-from plone.app.testing import setRoles
-from plone.app.testing import TEST_USER_ID
-from zope.component import getMultiAdapter
-
-import json
-import six
-import unittest
+from plone.app.testing import TEST_USER_ID, setRoles
+from zope.component import getMultiAdapter, getUtility
 
 
 class MockResponse:

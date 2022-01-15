@@ -1,9 +1,7 @@
-# -*- coding: utf-8 -*-
-from Products.CMFCore.utils import getToolByName
-from Products.CMFDefault.permissions import ModifyPortalContent
-
 from Products.CMFCore.CMFCatalogAware import CMFCatalogAware
 from Products.CMFCore.CMFCatalogAware import CMFCatalogAware as CatalogMultiplex
+from Products.CMFCore.utils import getToolByName
+from Products.CMFDefault.permissions import ModifyPortalContent
 
 
 def reorderedEvent(event):

@@ -1,23 +1,20 @@
-# -*- coding: utf-8 -*-
-from Products.CMFCore.utils import getToolByName
-
-from collective.solr.interfaces import ISolrConnectionConfig
-from collective.solr.dispatcher import solrSearchResults
-from collective.solr.testing import LEGACY_COLLECTIVE_SOLR_FUNCTIONAL_TESTING
-from collective.solr.testing import activateAndReindex
-from collective.solr.utils import activate
-from collective.solr.utils import getConfig
-from plone.dexterity.fti import DexterityFTI
-from plone.dexterity.content import Item
-from plone.app.testing import TEST_USER_ID
-from plone.app.testing import setRoles
-from transaction import commit
-from zope.interface import implementer
-from zope.interface import Interface
-from zope.component import getUtility
-from zope import schema
-
 import unittest
+
+from collective.solr.dispatcher import solrSearchResults
+from collective.solr.interfaces import ISolrConnectionConfig
+from collective.solr.testing import (
+    LEGACY_COLLECTIVE_SOLR_FUNCTIONAL_TESTING,
+    activateAndReindex,
+)
+from collective.solr.utils import activate, getConfig
+from plone.app.testing import TEST_USER_ID, setRoles
+from plone.dexterity.content import Item
+from plone.dexterity.fti import DexterityFTI
+from Products.CMFCore.utils import getToolByName
+from transaction import commit
+from zope import schema
+from zope.component import getUtility
+from zope.interface import Interface, implementer
 
 
 class ILocation(Interface):

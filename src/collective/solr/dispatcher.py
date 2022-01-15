@@ -1,24 +1,19 @@
-# -*- coding: utf-8 -*-
-from Acquisition import aq_base
-from Missing import MV
-from Products.ZCatalog.ZCatalog import ZCatalog
-from collective.solr.exceptions import FallBackException
-from collective.solr.interfaces import IFlare
-from collective.solr.interfaces import ISearch
-from collective.solr.interfaces import ISearchDispatcher
-from collective.solr.monkey import patchCatalogTool
-from collective.solr.parser import SolrResponse
-from collective.solr.utils import isActive
-from collective.solr.utils import padResults
 from copy import deepcopy
 from logging import getLogger
-from zope.component import queryMultiAdapter
-from zope.component import queryUtility
+
+from Acquisition import aq_base
+from collective.solr.exceptions import FallBackException
+from collective.solr.interfaces import IFlare, ISearch, ISearchDispatcher
+from collective.solr.monkey import patchCatalogTool
+from collective.solr.parser import SolrResponse
+from collective.solr.utils import isActive, padResults
+from Missing import MV
+from plone.registry.interfaces import IRegistry
+from Products.ZCatalog.ZCatalog import ZCatalog
+from zope.component import getUtility, queryMultiAdapter, queryUtility
 from zope.component.hooks import getSite
 from zope.interface import implementer
 from zope.publisher.interfaces.http import IHTTPRequest
-from zope.component import getUtility
-from plone.registry.interfaces import IRegistry
 
 patchCatalogTool()  # patch catalog tool to use the dispatcher...
 

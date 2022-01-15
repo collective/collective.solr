@@ -1,5 +1,5 @@
-# -*- coding: utf-8 -*-
 from re import compile
+
 import six
 
 # Solr/lucene reserved characters/terms:

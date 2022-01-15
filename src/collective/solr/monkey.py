@@ -1,12 +1,9 @@
-# -*- coding: utf-8 -*-
-from zope.component import queryAdapter
+from collective.solr.interfaces import ISearchDispatcher
 from DateTime import DateTime
 from Products.CMFCore.permissions import AccessInactivePortalContent
-from Products.CMFCore.utils import _getAuthenticatedUser
-from Products.CMFCore.utils import _checkPermission
+from Products.CMFCore.utils import _checkPermission, _getAuthenticatedUser
 from Products.CMFPlone.CatalogTool import CatalogTool
-
-from collective.solr.interfaces import ISearchDispatcher
+from zope.component import queryAdapter
 
 
 def searchResults(self, REQUEST=None, **kw):

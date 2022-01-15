@@ -1,21 +1,19 @@
-from unittest import TestCase
+from datetime import date, datetime
+from re import DOTALL, findall, search
 from threading import Thread
-from re import search, findall, DOTALL
-from DateTime import DateTime
-from datetime import datetime
-from datetime import date
-from zope.interface import implementer
-from Products.CMFCore.CMFCatalogAware import CMFCatalogAware
+from unittest import TestCase
 
-from collective.solr.interfaces import ICheckIndexable
-from collective.solr.manager import SolrConnectionManager
 from collective.solr.indexer import SolrIndexProcessor
 from collective.solr.indexer import logger as logger_indexer
-from collective.solr.tests.utils import getData, fakehttp, fakemore
-from collective.solr.testing import COLLECTIVE_SOLR_MOCK_REGISTRY_FIXTURE
+from collective.solr.interfaces import ICheckIndexable
+from collective.solr.manager import SolrConnectionManager
 from collective.solr.solr import SolrConnection
-from collective.solr.utils import getConfig
-from collective.solr.utils import prepareData
+from collective.solr.testing import COLLECTIVE_SOLR_MOCK_REGISTRY_FIXTURE
+from collective.solr.tests.utils import fakehttp, fakemore, getData
+from collective.solr.utils import getConfig, prepareData
+from DateTime import DateTime
+from Products.CMFCore.CMFCatalogAware import CMFCatalogAware
+from zope.interface import implementer
 
 
 @implementer(ICheckIndexable)

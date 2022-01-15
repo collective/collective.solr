@@ -1,26 +1,23 @@
-# -*- coding: utf-8 -*-
-from Missing import MV
-from Products.CMFPlone.utils import safe_unicode
-from collective.solr.exceptions import SolrInactiveException
-from collective.solr.interfaces import ISearch
-from collective.solr.interfaces import ISolrConnectionManager
-from collective.solr.mangler import cleanupQueryParameters
-from collective.solr.mangler import mangleQuery
-from collective.solr.mangler import optimizeQueryParameters
-from collective.solr.mangler import subtractQueryParameters
-from collective.solr.parser import SolrResponse
-from collective.solr.queryparser import quote
-from collective.solr.queryparser import quote_iterable_item
-from collective.solr.utils import isWildCard
-from collective.solr.utils import prepareData
-from collective.solr.utils import prepare_wildcard
-from collective.solr.utils import getConfig
 from logging import getLogger
 from time import time
+
+import six
+from collective.solr.exceptions import SolrInactiveException
+from collective.solr.interfaces import ISearch, ISolrConnectionManager
+from collective.solr.mangler import (
+    cleanupQueryParameters,
+    mangleQuery,
+    optimizeQueryParameters,
+    subtractQueryParameters,
+)
+from collective.solr.parser import SolrResponse
+from collective.solr.queryparser import quote, quote_iterable_item
+from collective.solr.utils import getConfig, isWildCard, prepare_wildcard, prepareData
+from Missing import MV
+from Products.CMFPlone.utils import safe_unicode
+from six.moves import map
 from zope.component import queryUtility
 from zope.interface import implementer
-import six
-from six.moves import map
 
 try:
     from Products.LinguaPlone.catalog import languageFilter

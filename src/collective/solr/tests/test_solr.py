@@ -1,9 +1,9 @@
 from unittest import TestCase
 from xml.etree.cElementTree import fromstring
+
 from collective.solr.solr import SolrConnection
-from collective.solr.tests.utils import fakehttp
-from collective.solr.tests.utils import getData
 from collective.solr.testing import COLLECTIVE_SOLR_MOCK_REGISTRY_FIXTURE
+from collective.solr.tests.utils import fakehttp, getData
 from collective.solr.utils import getConfig
 
 
