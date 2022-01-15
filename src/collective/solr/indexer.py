@@ -170,16 +170,17 @@ class BinaryAdder(DefaultAdder):
 
         url = "%s/update/extract" % conn.solrBase
 
+        tika_default_field = registry.get("collective.solr.tika_default_field")
         try:
             response = conn.doPost(url, postdata_urlencoded, headers)
             root = etree.parse(response)
-            data["SearchableText"] = root.find(".//str").text.strip()
+            data[tika_default_field] = root.find(".//str").text.strip()
         except SolrConnectionException as e:
             logger.warn("Error %s @ %s", e, data["path_string"])
-            data["SearchableText"] = ""
+            data[tika_default_field] = ""
         except etree.XMLSyntaxError as e:
             logger.warn("Parsing error %s @ %s.", e, data["path_string"])
-            data["SearchableText"] = ""
+            data[tika_default_field] = ""
         finally:
             if use_tika:
                 openedBlob.close()
