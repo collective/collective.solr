@@ -54,7 +54,7 @@
     />
 
   <genericsetup:upgradeStep
-    title="Upgrade to collective.solr 6"
+    title="Upgrade to collective.solr 7"
     description="Add tika_default_field registry entry"
     source="6"
     destination="7"
