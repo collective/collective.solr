@@ -146,6 +146,10 @@ class BinaryAdder(DefaultAdder):
 
         registry = getUtility(IRegistry)
         use_tika = registry.get("collective.solr.use_tika")
+        tika_default_field = registry.get("collective.solr.tika_default_field")
+        if not use_tika:
+            # fall back to use SearchableText if tika is not enabled
+            tika_default_field = "SearchableText"
 
         # blobs are accessed via the file system
         if use_tika:
@@ -170,7 +174,6 @@ class BinaryAdder(DefaultAdder):
 
         url = "%s/update/extract" % conn.solrBase
 
-        tika_default_field = registry.get("collective.solr.tika_default_field")
         try:
             response = conn.doPost(url, postdata_urlencoded, headers)
             root = etree.parse(response)
