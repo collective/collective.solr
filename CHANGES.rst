@@ -4,6 +4,11 @@ Changelog
 9.0.0a5 (unreleased)
 --------------------
 
+New Feature:
+
+- Add new tika_default_field setting
+  [tisto]
+
 Internal:
 
 - Remote utf-8 encoding lines
