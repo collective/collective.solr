@@ -4,7 +4,11 @@ Changelog
 9.0.0a6 (unreleased)
 --------------------
 
-- Nothing changed yet.
+Bugfix:
+
+- Fix check on ``Access inactive portal content`` permission in search results.
+  It also takes local permission (ex: sharing) into account now (not only site-wide permission).
+  [laulaz]
 
 
 9.0.0a5 (2022-01-15)
