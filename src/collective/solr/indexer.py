@@ -153,7 +153,10 @@ class BinaryAdder(DefaultAdder):
 
         # blobs are accessed via the file system
         if use_tika:
-            openedBlob = self.getblob().open()
+            blob = self.getblob()
+            if blob is None:
+                return
+            openedBlob = blob.open()
 
             postdata["myfile"] = (
                 data["id"],
