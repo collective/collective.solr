@@ -10,6 +10,7 @@ Bugfix:
   It also takes local permission (ex: sharing) into account now (not only site-wide permission).
   [laulaz]
 
+- Fix transaction abort on blob missing during syncing and indexing
 
 9.0.0a5 (2022-01-15)
 --------------------
