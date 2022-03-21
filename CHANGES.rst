@@ -11,6 +11,10 @@ Bugfix:
   [laulaz]
   
 - Fix transaction abort on blob missing during syncing and indexing
+New Feature:
+
+- Allow search accross multiple SolR cores on the same server by using `core` parameter
+  [mpeeters]
 
 
 9.0.0a5 (2022-01-15)

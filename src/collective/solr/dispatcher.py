@@ -83,10 +83,13 @@ def solrSearchResults(request=None, **keywords):
         else:
             raise FallBackException
 
+    core = args.get("core", None)
     query, params = search.buildQueryAndParameters(**args)
 
     if query != {}:
         __traceback_info__ = (query, params, args)
+        if core is not None:
+            params["core"] = core
         response = search(query, **params)
     else:
         return SolrResponse()
@@ -96,7 +99,7 @@ def solrSearchResults(request=None, **keywords):
         adapter = queryMultiAdapter((flare, request), IFlare)
         return adapter is not None and adapter or flare
 
-    schema = search.getManager().getSchema() or {}
+    schema = search.getManager(core=core).getSchema() or {}
     results = response.results()
     for idx, flare in enumerate(results):
         flare = wrap(flare)
