@@ -1,7 +1,7 @@
 Changelog
 =========
 
-9.0.0a6 (unreleased)
+9.0.0a6 (2022-03-21)
 --------------------
 
 New Feature:
