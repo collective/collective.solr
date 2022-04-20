@@ -4,7 +4,10 @@ Changelog
 9.0.0a7 (unreleased)
 --------------------
 
-- Nothing changed yet.
+Bugfix:
+
+- Fix multipart error on search
+  [reebalazs]
 
 
 9.0.0a6 (2022-03-21)

@@ -36,7 +36,7 @@ update: ## Update Make and Buildout
 bin/buildout: bin/pip
 	bin/pip install --upgrade pip
 	bin/pip install -r requirements.txt
-	bin/pip install black || true
+	bin/pip install click==8.0.4 black==21.10b0 || true
 	@touch -c $@
 
 bin/python bin/pip:
