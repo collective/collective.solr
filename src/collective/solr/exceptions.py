@@ -29,3 +29,7 @@ class SolrConnectionException(SolrException):
 
     def __str__(self):
         return "HTTP code=%s, reason=%s" % (self.httpcode, self.reason)
+
+
+class RepeatableSolrConnectionException(SolrConnectionException):
+    """An exception thrown by solr connections, that can be repeated once"""

@@ -39,7 +39,10 @@ import six
 import six.moves.http_client
 import six.moves.urllib.parse
 import six.moves.urllib.request
-from collective.solr.exceptions import SolrConnectionException
+from collective.solr.exceptions import (
+    SolrConnectionException,
+    RepeatableSolrConnectionException,
+)
 from collective.solr.parser import SolrSchema
 from collective.solr.utils import getConfig, translation_map
 from plone.dexterity.utils import safe_unicode
@@ -58,7 +61,9 @@ class SolrConnection:
         timeout=None,
         login=None,
         password=None,
+        manager=None,
     ):
+        self.manager = manager
         self.host = host
         self.solrBase = str(solrBase)
         self.persistent = persistent
@@ -120,12 +125,19 @@ class SolrConnection:
 
     def __errcheck(self, rsp):
         if rsp.status != 200:
-            ex = SolrConnectionException(rsp.status, rsp.reason)
+            body = None
             try:
-                ex.body = rsp.read()
+                body = rsp.read()
             except:  # noqa
                 pass
-            raise ex
+            if (
+                rsp.status == 500
+                and body is not None
+                and b"Missing initial multi part boundary" in body
+            ):
+                raise RepeatableSolrConnectionException(rsp.status, rsp.reason, body)
+            else:
+                raise SolrConnectionException(rsp.status, rsp.reason, body)
         return rsp
 
     def setTimeout(self, timeout):
@@ -331,7 +343,7 @@ class SolrConnection:
         logger.debug("aborting %d requests: %r", len(self.xmlbody), self.xmlbody)
         del self.xmlbody[:]
 
-    def search(self, **params):
+    def _search(self, **params):
         request_handler = params.get("request_handler", "select")
         if "request_handler" in params:
             del params["request_handler"]
@@ -348,6 +360,18 @@ class SolrConnection:
             if not self.persistent:
                 self.conn.close()
         return response
+
+    def search(self, **params):
+        try:
+            return self._search(**params)
+        except RepeatableSolrConnectionException:
+            # Handle "Missing initial multi part boundary" errors, since
+            # they are also caused by the connection stuck in the thread.
+            # Not fixable by a reconnect, a new connection object has to be made.
+            self.manager.closeConnection()
+            duplicate = self.manager.getConnection()
+            duplicate.reconnects = self.reconnects + 1
+            return duplicate._search(**params)
 
     def getSchema(self):
         schema_url = "%s/admin/file/?file=schema.xml"

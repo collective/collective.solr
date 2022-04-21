@@ -118,6 +118,7 @@ class SolrConnectionManager(object):
                 persistent=True,
                 login=config_login,
                 password=config_password,
+                manager=self,
             )
             setLocal(self.connection_key, conn)
         elif config_host is not None:
@@ -132,6 +133,7 @@ class SolrConnectionManager(object):
                 persistent=True,
                 login=config_login,
                 password=config_password,
+                manager=self,
             )
             setLocal(self.connection_key, conn)
         if self.core:  # Adapt core if it is necessary
