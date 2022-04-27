@@ -4,8 +4,8 @@ Changelog
 9.0.0a8 (unreleased)
 --------------------
 
-- Nothing changed yet.
-
+- Do not fail when a content type does not provide a primary field when Tika is enabled
+  [tisto]
 
 9.0.0a7 (2022-04-21)
 --------------------
@@ -29,7 +29,7 @@ Bugfix:
 - Fix check on ``Access inactive portal content`` permission in search results.
   It also takes local permission (ex: sharing) into account now (not only site-wide permission).
   [laulaz]
-  
+
 - Fix transaction abort on blob missing during syncing and indexing
 
 
