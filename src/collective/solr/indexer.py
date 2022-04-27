@@ -286,6 +286,7 @@ class SolrIndexProcessor(object):
     def reindex(self, obj, attributes=None, update_metadata=False):
         if not attributes:
             attributes = None
+        self.unindex(obj)
         self.index(obj, attributes)
 
     def unindex(self, obj):
