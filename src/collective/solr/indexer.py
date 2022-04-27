@@ -120,6 +120,9 @@ class BinaryAdder(DefaultAdder):
 
     def getblob(self):
         field = self.context.getPrimaryField()
+        # do not return anything if a content object does not provide a primary field
+        if not field:
+            return
         return field.get(self.context).blob
 
     def getpath(self):
