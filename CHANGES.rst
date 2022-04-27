@@ -1,7 +1,7 @@
 Changelog
 =========
 
-9.0.0a8 (unreleased)
+9.0.0a8 (2022-04-27)
 --------------------
 
 - Do not fail when a content type does not provide a primary field when Tika is enabled
