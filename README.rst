@@ -68,7 +68,7 @@ Detailed Documentation
 
 A full Documentation of the Solr integration of Plone could be found on `collectivesolr.readthedocs.org`_.
 
-.. _`collectivesolr.readthedocs.org`: http://collectivesolr.readthedocs.org/en/latest/
+.. _`collectivesolr.readthedocs.org`: https://collectivesolr.readthedocs.org/en/latest/
 
 
 Installation & Configuration
@@ -90,7 +90,7 @@ Your full buildout file should look something like this::
   [buildout]
   parts += instance
   extends =
-      http://dist.plone.org/release/4.3.8/versions.cfg
+      https://dist.plone.org/release/4.3.8/versions.cfg
       solr.cfg
       solr-4.10.x.cfg
 
@@ -163,12 +163,12 @@ The code works with Solr 7. Older versions might work as well but we don't test 
 Bug Reporting & Development
 ===========================
 
-Releases can be found on the Python Package Index at http://pypi.org/project/collective.solr.
+Releases can be found on the Python Package Index at https://pypi.org/project/collective.solr.
 The code and issue trackers can be found on GitHub at https://github.com/collective/collective.solr.
 
 For outstanding issues and features remaining to be implemented please see the `issue tracker`__.
 
   .. __: https://github.com/collective/collective.solr/issues
 
-  .. _`Solr`: http://lucene.apache.org/solr/
-  .. _`Plone`: http://www.plone.org/
+  .. _`Solr`: https://lucene.apache.org/solr/
+  .. _`Plone`: https://www.plone.org/
