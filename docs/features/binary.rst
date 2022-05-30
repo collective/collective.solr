@@ -15,4 +15,4 @@ To further optimize this,
 Solr index operations can be stored in a task queue as provided by `plone.app.async` or solutions build on top of `Celery`.
 This is currently outside the scope of `collective.solr`.
 
-.. _`Apache Tika`: http://tika.apache.org/
+.. _`Apache Tika`: https://tika.apache.org/

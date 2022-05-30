@@ -7,8 +7,8 @@ You can read more about the `Solr Cloud`_ effort which aims to provide this.
 But we can setup a simple master/slave replication using Solr's built-in `Solr Replication`_ support,
 which is a first step in the right direction.
 
-  .. _Solr Cloud: http://wiki.apache.org/solr/SolrCloud
-  .. _Solr Replication: http://wiki.apache.org/solr/SolrReplication
+  .. _Solr Cloud: https://wiki.apache.org/solr/SolrCloud
+  .. _Solr Replication: https://wiki.apache.org/solr/SolrReplication
 
 In order to use this, you can setup a Solr master server and give it some extra config::
 

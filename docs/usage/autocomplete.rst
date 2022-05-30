@@ -1,7 +1,7 @@
 Autocomplete suggestions with Solr
 ..................................
 
-http://wiki.apache.org/solr/Suggester
+https://wiki.apache.org/solr/Suggester
 
 Simple autocomplete configuration using the "Title" field (buildout.cfg)::
 

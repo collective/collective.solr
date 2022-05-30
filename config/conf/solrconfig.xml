@@ -98,7 +98,7 @@
   </requestDispatcher>
 
   <!-- Solr Cell Update Request Handler
-       http://wiki.apache.org/solr/ExtractingRequestHandler
+       https://wiki.apache.org/solr/ExtractingRequestHandler
     -->
   <requestHandler name="/update/extract" startup="lazy" class="solr.extraction.ExtractingRequestHandler">
     <lst name="defaults">
@@ -140,7 +140,7 @@
          Instead of enabling autoCommit, consider using "commitWithin"
          when adding documents.
 
-         http://wiki.apache.org/solr/UpdateXmlMessages
+         https://wiki.apache.org/solr/UpdateXmlMessages
 
          maxDocs - Maximum number of documents to add since the last
                    commit before automatically triggering a new commit.
