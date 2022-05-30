@@ -45,5 +45,5 @@ Always copy the file to your local buildout.
 In general you should never rely on extending buildout config files from servers that aren't under your control.
 
 
-.. _Solr: http://lucene.apache.org/solr/
+.. _Solr: https://lucene.apache.org/solr/
 .. _Plone: https://plone.org

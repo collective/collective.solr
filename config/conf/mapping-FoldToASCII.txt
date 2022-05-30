@@ -18,24 +18,24 @@
 # Characters from the following Unicode blocks are converted; however, only
 # those characters with reasonable ASCII alternatives are converted:
 #
-# - C1 Controls and Latin-1 Supplement: http://www.unicode.org/charts/PDF/U0080.pdf
-# - Latin Extended-A: http://www.unicode.org/charts/PDF/U0100.pdf
-# - Latin Extended-B: http://www.unicode.org/charts/PDF/U0180.pdf
-# - Latin Extended Additional: http://www.unicode.org/charts/PDF/U1E00.pdf
-# - Latin Extended-C: http://www.unicode.org/charts/PDF/U2C60.pdf
-# - Latin Extended-D: http://www.unicode.org/charts/PDF/UA720.pdf
-# - IPA Extensions: http://www.unicode.org/charts/PDF/U0250.pdf
-# - Phonetic Extensions: http://www.unicode.org/charts/PDF/U1D00.pdf
-# - Phonetic Extensions Supplement: http://www.unicode.org/charts/PDF/U1D80.pdf
-# - General Punctuation: http://www.unicode.org/charts/PDF/U2000.pdf
-# - Superscripts and Subscripts: http://www.unicode.org/charts/PDF/U2070.pdf
-# - Enclosed Alphanumerics: http://www.unicode.org/charts/PDF/U2460.pdf
-# - Dingbats: http://www.unicode.org/charts/PDF/U2700.pdf
-# - Supplemental Punctuation: http://www.unicode.org/charts/PDF/U2E00.pdf
-# - Alphabetic Presentation Forms: http://www.unicode.org/charts/PDF/UFB00.pdf
-# - Halfwidth and Fullwidth Forms: http://www.unicode.org/charts/PDF/UFF00.pdf
+# - C1 Controls and Latin-1 Supplement: https://www.unicode.org/charts/PDF/U0080.pdf
+# - Latin Extended-A: https://www.unicode.org/charts/PDF/U0100.pdf
+# - Latin Extended-B: https://www.unicode.org/charts/PDF/U0180.pdf
+# - Latin Extended Additional: https://www.unicode.org/charts/PDF/U1E00.pdf
+# - Latin Extended-C: https://www.unicode.org/charts/PDF/U2C60.pdf
+# - Latin Extended-D: https://www.unicode.org/charts/PDF/UA720.pdf
+# - IPA Extensions: https://www.unicode.org/charts/PDF/U0250.pdf
+# - Phonetic Extensions: https://www.unicode.org/charts/PDF/U1D00.pdf
+# - Phonetic Extensions Supplement: https://www.unicode.org/charts/PDF/U1D80.pdf
+# - General Punctuation: https://www.unicode.org/charts/PDF/U2000.pdf
+# - Superscripts and Subscripts: https://www.unicode.org/charts/PDF/U2070.pdf
+# - Enclosed Alphanumerics: https://www.unicode.org/charts/PDF/U2460.pdf
+# - Dingbats: https://www.unicode.org/charts/PDF/U2700.pdf
+# - Supplemental Punctuation: https://www.unicode.org/charts/PDF/U2E00.pdf
+# - Alphabetic Presentation Forms: https://www.unicode.org/charts/PDF/UFB00.pdf
+# - Halfwidth and Fullwidth Forms: https://www.unicode.org/charts/PDF/UFF00.pdf
 #  
-# See: http://en.wikipedia.org/wiki/Latin_characters_in_Unicode
+# See: https://en.wikipedia.org/wiki/Latin_characters_in_Unicode
 #
 # The set of character conversions supported by this map is a superset of
 # those supported by the map represented by mapping-ISOLatin1Accent.txt.
