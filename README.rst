@@ -8,15 +8,15 @@ collective.solr - Solr integration for the Plone CMS
     :target: https://coveralls.io/r/collective/collective.solr
 
 .. image:: https://img.shields.io/pypi/v/collective.solr.svg
-    :target: https://pypi.python.org/pypi/collective.solr/
+    :target: https://pypi.org/project/collective.solr/
     :alt: Latest Version
 
 .. image:: https://img.shields.io/pypi/status/collective.solr.svg
-    :target: https://pypi.python.org/pypi/collective.solr/
+    :target: https://pypi.org/project/collective.solr/
     :alt: Egg Status
 
 .. image:: https://img.shields.io/pypi/l/collective.solr.svg
-    :target: https://pypi.python.org/pypi/collective.solr/
+    :target: https://pypi.org/project/collective.solr/
     :alt: License
 
 .. contents::
