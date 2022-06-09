@@ -3,7 +3,7 @@ Monitoring
 
 Java has a general monitoring framework called JMX.
 You can use this to get a huge number of details about the Java process in general and Solr in particular.
-Some hints are at https://wiki.apache.org/solr/SolrJmx.
+Some hints are at https://cwiki.apache.org/confluence/display/solr/SolrJmx.
 The default `collective.recipe.solrinstance` config uses `<jmx />`,
 so we can use command line arguments to configure it.
 Our example `buildout/solr.cfg` includes all the relevant values in its `java_opts` variable.
