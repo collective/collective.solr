@@ -9,7 +9,7 @@ from zope.interface import provider
 class ISolrFields(model.Schema):
     """Additional fields to control Solr integration"""
 
-    directives.fieldset("categorization", fields=["showinsearch", "searchwords"])
+    directives.fieldset("search", fields=["showinsearch", "searchwords"])
 
     showinsearch = schema.Bool(
         required=False,
@@ -32,6 +32,3 @@ class ISolrFields(model.Schema):
             u"specified on new lines.",
         ),
     )
-
-
-# EOF
