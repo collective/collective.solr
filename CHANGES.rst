@@ -7,6 +7,8 @@ Changelog
 - Add official support for Python 3.9
   [tisto]
 
+- Add support for Solr 9
+  [tisto]
 
 9.0.0a8 (2022-04-27)
 --------------------
