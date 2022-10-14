@@ -4,7 +4,8 @@ Changelog
 9.0.0a9 (unreleased)
 --------------------
 
-- Nothing changed yet.
+- Add official support for Python 3.9
+  [tisto]
 
 
 9.0.0a8 (2022-04-27)
