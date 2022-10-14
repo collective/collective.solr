@@ -23,7 +23,10 @@ setup(
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
+<<<<<<< HEAD
         "Programming Language :: Python :: 3.10",
+=======
+>>>>>>> main
     ],
     keywords="plone cmf zope indexing searching solr lucene",
     author="Plone Community",
