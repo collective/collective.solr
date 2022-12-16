@@ -69,6 +69,7 @@ class ISolrSchema(Interface):
     auto_commit = Bool(
         title=_("label_auto_commit", default="Automatic commit"),
         default=True,
+        required=False,
         description=_(
             "help_auto_commit",
             default="If enabled each index operation will cause a commit "
@@ -156,6 +157,7 @@ class ISolrSchema(Interface):
             "label_simple_search_prefix_wildcard",
             default="Allow prefix wildcard searches and use them in simple searches",
         ),
+        default=False,
         required=False,
     )
 
@@ -167,6 +169,7 @@ class ISolrSchema(Interface):
             '"Pattern for simple search queries". This will remove all special '
             "solr characters and operators from the query text.",
         ),
+        default=False,
         required=False,
     )
 
@@ -178,6 +181,7 @@ class ISolrSchema(Interface):
             'search text with "solr:" or passing "solr_complex_search" as a field '
             "in the catalog query.",
         ),
+        default=False,
         required=False,
     )
 
@@ -366,6 +370,7 @@ class ISolrSchema(Interface):
             "That way Solr does not need direct access to the blob files on the file system. "
             "Use this setting when Solr runs on a separate server or if you use Relstorage instead of ZEO.",
         ),
+        default=False,
         required=False,
     )
 
