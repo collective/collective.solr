@@ -14,6 +14,7 @@ setup(
         "Environment :: Web Environment",
         "Framework :: Plone",
         "Framework :: Plone :: 5.2",
+        "Framework :: Plone :: 6.0",
         "Intended Audience :: Developers",
         "Intended Audience :: System Administrators",
         "Intended Audience :: Other Audience",
