@@ -6,8 +6,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [3.9, 3.8, 3.7]
-        plone-version: [5.2, 6.0]
+        python-version: ["3.9", "3.8", "3.7"]
+        plone-version: ["5.2", "6.0"]
         solr-version: ["7.7.x", "8.11.x", "9.0.x"]
     steps:
       # git checkout
