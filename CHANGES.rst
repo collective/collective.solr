@@ -10,6 +10,10 @@ Changelog
 - Add support for Solr 9
   [tisto]
 
+- Explicitly set required=False to all "Bool" zope.schema fields in the ISolrSchema interface. zope.schema does not fall back to default=False by default (see https://github.com/zopefoundation/zope.schema/blob/master/CHANGES.rst#611-2021-10-13)
+  [tisto]
+
+
 9.0.0a8 (2022-04-27)
 --------------------
 
