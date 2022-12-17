@@ -6,7 +6,7 @@ from plone.testing import layered
 from collective.solr.testing import LEGACY_COLLECTIVE_SOLR_FUNCTIONAL_TESTING
 
 try:
-    from Products.CMFPlone import relationhelper
+    from Products.CMFPlone import relationhelper  # noqa
 
     HAS_PLONE6 = True
 except ImportError:

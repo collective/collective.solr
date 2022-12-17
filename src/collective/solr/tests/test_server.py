@@ -39,7 +39,7 @@ from collective.solr.tests.utils import numFound
 from collective.solr.utils import activate, getConfig
 
 try:
-    from Products.CMFPlone import relationhelper
+    from Products.CMFPlone import relationhelper  # noqa
 
     HAS_PLONE6 = True
 except ImportError:

@@ -26,7 +26,7 @@ from collective.solr.tests.utils import fakehttp, getData
 from collective.solr.utils import getConfig
 
 try:
-    from Products.CMFPlone import relationhelper
+    from Products.CMFPlone import relationhelper  # noqa
 
     HAS_PLONE6 = True
 except ImportError:
