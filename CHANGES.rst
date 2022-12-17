@@ -4,7 +4,13 @@ Changelog
 9.0.0a9 (unreleased)
 --------------------
 
-- Add official support for Python 3.9
+- Add support for Plone 6.0
+  [tisto]
+
+- Add support for Python 3.9
+  [tisto]
+
+- Drop support for Python 3.7
   [tisto]
 
 - Add support for Solr 9
