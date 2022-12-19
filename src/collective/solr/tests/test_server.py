@@ -6,6 +6,20 @@ from time import sleep
 from unittest import TestCase
 
 from Acquisition import aq_base, aq_parent
+from DateTime import DateTime
+from Missing import MV
+from plone import api
+from plone.app.testing import TEST_USER_ID, TEST_USER_NAME, login, setRoles
+from plone.namedfile.file import NamedBlobFile
+from Products.CMFCore.indexing import getQueue, processQueue
+from Products.CMFCore.utils import getToolByName
+from six.moves import range
+from transaction import abort, commit
+from zExceptions import Unauthorized
+from zope.component import getUtility, queryAdapter
+from zope.interface import implementer
+from zope.schema.interfaces import IVocabularyFactory
+
 from collective.solr.dispatcher import FallBackException, solrSearchResults
 from collective.solr.flare import PloneFlare
 from collective.solr.indexer import BinaryAdder, DefaultAdder, SolrIndexProcessor
@@ -23,19 +37,13 @@ from collective.solr.testing import (
 )
 from collective.solr.tests.utils import numFound
 from collective.solr.utils import activate, getConfig
-from DateTime import DateTime
-from Missing import MV
-from plone import api
-from plone.app.testing import TEST_USER_ID, TEST_USER_NAME, login, setRoles
-from plone.namedfile.file import NamedBlobFile
-from Products.CMFCore.indexing import getQueue, processQueue
-from Products.CMFCore.utils import getToolByName
-from six.moves import range
-from transaction import abort, commit
-from zExceptions import Unauthorized
-from zope.component import getUtility, queryAdapter
-from zope.interface import implementer
-from zope.schema.interfaces import IVocabularyFactory
+
+try:
+    from Products.CMFPlone import relationhelper  # noqa
+
+    HAS_PLONE6 = True
+except ImportError:
+    HAS_PLONE6 = False
 
 DEFAULT_OBJS = [
     {
@@ -81,6 +89,18 @@ DEFAULT_OBJS = [
         "depth": 0,
     },
 ]
+
+# The Plone Site is a Dexterity Object in Plone 6
+if HAS_PLONE6:
+    DEFAULT_OBJS.append(
+        {
+            "Title": "Plone site",
+            "getId": "plone",
+            "Type": "Plone Site",
+            "portal_type": "Plone Site",
+            "depth": 1,
+        }
+    )
 
 
 @implementer(ISolrAddHandler)
@@ -158,7 +178,11 @@ class SolrMaintenanceTests(TestCase):
         self.assertEqual(counts["Title"], len(DEFAULT_OBJS))
         self.assertEqual(counts["path_string"], len(DEFAULT_OBJS))
         self.assertEqual(counts["portal_type"], len(DEFAULT_OBJS))
-        self.assertEqual(counts["review_state"], len(DEFAULT_OBJS))
+        if HAS_PLONE6:
+            # The Dexterity Site Root does not have a review state?!
+            self.assertEqual(counts["review_state"], len(DEFAULT_OBJS) - 1)
+        else:
+            self.assertEqual(counts["review_state"], len(DEFAULT_OBJS))
 
     def testReindexParameters(self):
         # the view allows to skip the first n items...
@@ -196,17 +220,26 @@ class SolrMaintenanceTests(TestCase):
         self.maintenance.clear()
 
         self.maintenance.reindex(only_portal_types=["Folder"])
-        self.assertEqual(numFound(self.search()), len(DEFAULT_OBJS) - 3)
+        if HAS_PLONE6:
+            self.assertEqual(numFound(self.search()), len(DEFAULT_OBJS) - 4)
+        else:
+            self.assertEqual(numFound(self.search()), len(DEFAULT_OBJS) - 3)
         self.maintenance.clear()
 
         self.maintenance.reindex(only_portal_types=["Folder", "Collection"])
-        self.assertEqual(numFound(self.search()), len(DEFAULT_OBJS) - 1)
+        if HAS_PLONE6:
+            self.assertEqual(numFound(self.search()), len(DEFAULT_OBJS) - 2)
+        else:
+            self.assertEqual(numFound(self.search()), len(DEFAULT_OBJS) - 1)
         self.maintenance.clear()
 
         self.maintenance.reindex(
             only_portal_types=["Folder", "Collection", "NotExistingPortalType"]
         )
-        self.assertEqual(numFound(self.search()), len(DEFAULT_OBJS) - 1)
+        if HAS_PLONE6:
+            self.assertEqual(numFound(self.search()), len(DEFAULT_OBJS) - 2)
+        else:
+            self.assertEqual(numFound(self.search()), len(DEFAULT_OBJS) - 1)
         self.maintenance.clear()
 
         # then the ignore_portal_types
@@ -215,17 +248,26 @@ class SolrMaintenanceTests(TestCase):
         self.maintenance.clear()
 
         self.maintenance.reindex(ignore_portal_types=["Folder"])
-        self.assertEqual(numFound(self.search()), 3)
+        if HAS_PLONE6:
+            self.assertEqual(numFound(self.search()), 4)
+        else:
+            self.assertEqual(numFound(self.search()), 3)
         self.maintenance.clear()
 
         self.maintenance.reindex(ignore_portal_types=["Folder", "Collection"])
-        self.assertEqual(numFound(self.search()), 1)
+        if HAS_PLONE6:
+            self.assertEqual(numFound(self.search()), 2)
+        else:
+            self.assertEqual(numFound(self.search()), 1)
         self.maintenance.clear()
 
         self.maintenance.reindex(
             ignore_portal_types=["Folder", "Collection", "NotExistingPortalType"]
         )
-        self.assertEqual(numFound(self.search()), 1)
+        if HAS_PLONE6:
+            self.assertEqual(numFound(self.search()), 2)
+        else:
+            self.assertEqual(numFound(self.search()), 1)
         self.maintenance.clear()
 
         # and then both, which is not supported
@@ -691,7 +733,7 @@ class SolrServerTests(TestCase):
         self.folder.invokeFactory("File", "foo", title="some text")
         data = "page 1 \f page 2 \a"
         if api.env.plone_version() >= "5.0":
-            self.folder.foo.file = NamedBlobFile(data=data, filename=u"file.pdf")
+            self.folder.foo.file = NamedBlobFile(data=data, filename="file.pdf")
         else:
             self.folder.foo.file = data
         commit()  # indexing happens on commit
@@ -739,27 +781,27 @@ class SolrServerTests(TestCase):
         )
 
     def testSolrSearchResultsWithUnicodeTitle(self):
-        self.portal.invokeFactory("Document", id="fs", title=u"Føø sekretær")
+        self.portal.invokeFactory("Document", id="fs", title="Føø sekretær")
         commit()
-        results = solrSearchResults(SearchableText=u"Føø")
-        self.assertEqual([r.Title for r in results], [u"Føø sekretær"])
-        results = solrSearchResults(SearchableText=u"foo")
-        self.assertEqual([r.Title for r in results], [u"Føø sekretær"])
-        results = solrSearchResults(SearchableText=u"Sekretær")
-        self.assertEqual([r.Title for r in results], [u"Føø sekretær"])
-        results = solrSearchResults(SearchableText=u"Sekretaer")
-        self.assertEqual([r.Title for r in results], [u"Føø sekretær"])
+        results = solrSearchResults(SearchableText="Føø")
+        self.assertEqual([r.Title for r in results], ["Føø sekretær"])
+        results = solrSearchResults(SearchableText="foo")
+        self.assertEqual([r.Title for r in results], ["Føø sekretær"])
+        results = solrSearchResults(SearchableText="Sekretær")
+        self.assertEqual([r.Title for r in results], ["Føø sekretær"])
+        results = solrSearchResults(SearchableText="Sekretaer")
+        self.assertEqual([r.Title for r in results], ["Føø sekretær"])
         # second set of characters
-        self.portal.invokeFactory("Document", id="ab", title=u"Åge Þor")
+        self.portal.invokeFactory("Document", id="ab", title="Åge Þor")
         commit()
-        results = solrSearchResults(SearchableText=u"Åge")
-        self.assertEqual([r.Title for r in results], [u"Åge Þor"])
-        results = solrSearchResults(SearchableText=u"age")
-        self.assertEqual([r.Title for r in results], [u"Åge Þor"])
-        results = solrSearchResults(SearchableText=u"Þor")
-        self.assertEqual([r.Title for r in results], [u"Åge Þor"])
-        results = solrSearchResults(SearchableText=u"thor")
-        self.assertEqual([r.Title for r in results], [u"Åge Þor"])
+        results = solrSearchResults(SearchableText="Åge")
+        self.assertEqual([r.Title for r in results], ["Åge Þor"])
+        results = solrSearchResults(SearchableText="age")
+        self.assertEqual([r.Title for r in results], ["Åge Þor"])
+        results = solrSearchResults(SearchableText="Þor")
+        self.assertEqual([r.Title for r in results], ["Åge Þor"])
+        results = solrSearchResults(SearchableText="thor")
+        self.assertEqual([r.Title for r in results], ["Åge Þor"])
 
     def testSolrSearchResultsInformationWithoutCustomSearchPattern(self):
         self.maintenance.reindex()
@@ -775,7 +817,7 @@ class SolrServerTests(TestCase):
 
     def testSolrSearchResultsInformationForCustomSearchPattern(self):
         self.maintenance.reindex()
-        self.config.search_pattern = u"(Title:{value}^5 OR getId:{value})"
+        self.config.search_pattern = "(Title:{value}^5 OR getId:{value})"
         # for single-word searches we get both, wildcards & the custom pattern
         kw_query = {"SearchableText": "news"}
         response = solrSearchResults(**kw_query)
@@ -804,7 +846,7 @@ class SolrServerTests(TestCase):
         )
         del kw_query["Type"]
         # both value and base_value work
-        self.config.search_pattern = u"(Title:{value} OR getId:{base_value})"
+        self.config.search_pattern = "(Title:{value} OR getId:{base_value})"
         kw_query["SearchableText"] = "news"
         response = solrSearchResults(**kw_query)
         query = response.responseHeader["params"]["q"]
@@ -842,12 +884,12 @@ class SolrServerTests(TestCase):
         )
         commit()  # indexing happens on commit
         # first we rank title higher than the description...
-        self.config.search_pattern = u"(Title:{value}^5 OR Description:{value})"  # noqa
+        self.config.search_pattern = "(Title:{value}^5 OR Description:{value})"  # noqa
         search = lambda term: [r.getId for r in solrSearchResults(SearchableText=term)]
         self.assertEqual(search("foo"), ["doc1", "doc2"])
         self.assertEqual(search("bar"), ["doc2", "doc1"])
         # now let's try changing the pattern...
-        self.config.search_pattern = u"(Description:{value}^5 OR Title:{value})"  # noqa
+        self.config.search_pattern = "(Description:{value}^5 OR Title:{value})"  # noqa
         self.assertEqual(search("foo"), ["doc2", "doc1"])
         self.assertEqual(search("bar"), ["doc1", "doc2"])
 
@@ -863,17 +905,17 @@ class SolrServerTests(TestCase):
             [("News", "/plone/news/aggregator"), ("NewsFolder", "/plone/news")],
         )
         # specifying multiple values should required only one of them...
-        config.required = [u"Title", u"foo"]
+        config.required = ["Title", "foo"]
         results = solrSearchResults(Title="News")
         self.assertEqual(
             sorted([(r.Title, r.path_string) for r in results]),
             [("News", "/plone/news/aggregator"), ("NewsFolder", "/plone/news")],
         )
         # but solr won't be used if none of them is present...
-        config.required = [u"foo", u"bar"]
+        config.required = ["foo", "bar"]
         self.assertRaises(FallBackException, solrSearchResults, dict(Title="News"))
         # except if you force it via `use_solr`...
-        config.required = [u"foo", u"bar"]
+        config.required = ["foo", "bar"]
         results = solrSearchResults(Title="News", use_solr=True)
         self.assertEqual(
             sorted([(r.Title, r.path_string) for r in results]),
@@ -887,7 +929,7 @@ class SolrServerTests(TestCase):
             [("News", "/plone/news/aggregator"), ("NewsFolder", "/plone/news")],
         )
         # it does respect a `False` though...
-        config.required = [u"foo", u"bar"]
+        config.required = ["foo", "bar"]
         self.assertRaises(
             FallBackException, solrSearchResults, dict(Title="News", use_solr=False)
         )
@@ -1054,7 +1096,11 @@ class SolrServerTests(TestCase):
         self.assertEqual(len(results), len(DEFAULT_OBJS))
         setRoles(self.portal, TEST_USER_ID, [])
         results = self.portal.portal_catalog(request)
-        expected = ["/plone/front-page"]
+        if HAS_PLONE6:
+            expected = ["/plone", "/plone/front-page"]
+        else:
+            expected = ["/plone/front-page"]
+
         self.assertEqual(sorted([r.path_string for r in results]), expected)
 
     def testEffectiveRange(self):
@@ -1466,7 +1512,7 @@ class SolrServerTests(TestCase):
         # let's remove all required parameters and use a filter query
         config = getConfig()
         config.required = []
-        config.filter_queries = [u"portal_type", u"Language"]
+        config.filter_queries = ["portal_type", "Language"]
         results = solrSearchResults(portal_type=["Document"])
         paths = [p.path_string for p in results]
         self.assertTrue("/plone/front-page" in paths)
@@ -1512,14 +1558,14 @@ class SolrServerTests(TestCase):
         results = solrSearchResults(SearchableText="bar")
         self.assertEqual(sorted([r.Title for r in results]), ["foo:bar"])
         # second round
-        self.portal.invokeFactory("Folder", id="tmp2", title=u"2010:ändern")
+        self.portal.invokeFactory("Folder", id="tmp2", title="2010:ändern")
         commit()
         results = solrSearchResults(SearchableText="2010")
-        self.assertEqual(sorted([r.Title for r in results]), [u"2010:ändern"])
-        results = solrSearchResults(SearchableText=u"2010:ändern")
-        self.assertEqual(sorted([r.Title for r in results]), [u"2010:ändern"])
-        results = solrSearchResults(SearchableText=u"andern")
-        self.assertEqual(sorted([r.Title for r in results]), [u"2010:ändern"])
+        self.assertEqual(sorted([r.Title for r in results]), ["2010:ändern"])
+        results = solrSearchResults(SearchableText="2010:ändern")
+        self.assertEqual(sorted([r.Title for r in results]), ["2010:ändern"])
+        results = solrSearchResults(SearchableText="andern")
+        self.assertEqual(sorted([r.Title for r in results]), ["2010:ändern"])
 
     def testSearchForTermWithForwardSlash(self):
         self.portal.invokeFactory("Document", id="fsb", title="foo/bar")
@@ -1778,7 +1824,12 @@ class SolrServerTests(TestCase):
         resp = self.search("NewsFolder")
         self.assertEqual(len(resp), 1)
         pf = PloneFlare(resp.results()[0])
-        self.assertEqual(pf.getObject(), None)
+        if HAS_PLONE6:
+            # XXX: Why does Plone 6 raises a KeyError here and Plone 5 returns None?
+            with self.assertRaises(KeyError):
+                pf.getObject()
+        else:
+            self.assertEqual(pf.getObject(), None)
         self.maintenance.cleanup()
         resp = self.search("NewsFolder")
         # NewsFolder was removed from index too

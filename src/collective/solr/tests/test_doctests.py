@@ -1,8 +1,16 @@
 import doctest
 from unittest import TestSuite
 
-from collective.solr.testing import LEGACY_COLLECTIVE_SOLR_FUNCTIONAL_TESTING
 from plone.testing import layered
+
+from collective.solr.testing import LEGACY_COLLECTIVE_SOLR_FUNCTIONAL_TESTING
+
+try:
+    from Products.CMFPlone import relationhelper  # noqa
+
+    HAS_PLONE6 = True
+except ImportError:
+    HAS_PLONE6 = False
 
 optionflags = (
     doctest.ELLIPSIS
@@ -14,7 +22,12 @@ optionflags = (
 
 def test_suite():
     suite = TestSuite()
-    testfiles = ["errors.txt", "configlet.txt"]
+    if HAS_PLONE6:
+        # XXX: errors.txt doctest tests won't work with Plone 6 because ZServer is gone
+        testfiles = ["configlet.txt"]
+    else:
+        testfiles = ["errors.txt", "configlet.txt"]
+
     for testfile in testfiles:
         doc_suite = doctest.DocFileSuite(
             testfile, package="collective.solr.tests", optionflags=optionflags
