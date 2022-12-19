@@ -1,8 +1,8 @@
 Changelog
 =========
 
-9.0.0a9 (unreleased)
---------------------
+9.0.0 (2022-12-19)
+------------------
 
 - Add support for Plone 6.0
   [tisto]
