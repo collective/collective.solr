@@ -7,7 +7,7 @@ Changelog
 - Add official support for Python 3.9
   [tisto]
 
-- Add support for Solr 9
+- Add support for Solr 9 and 9.1
   [tisto]
 
 - Explicitly set required=False to all "Bool" zope.schema fields in the ISolrSchema interface. zope.schema does not fall back to default=False by default (see https://github.com/zopefoundation/zope.schema/blob/master/CHANGES.rst#611-2021-10-13)
