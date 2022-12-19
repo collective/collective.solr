@@ -43,7 +43,7 @@ jobs:
 
       # choose Solr version
       - name: choose Solr version
-        run: sed -ie "s#solr-9.0.x.cfg#solr-${{ matrix.solr-version }}.cfg#" buildout.cfg
+        run: sed -ie "s#solr-9.1.x.cfg#solr-${{ matrix.solr-version }}.cfg#" buildout.cfg
 
       # buildout
       - name: buildout
