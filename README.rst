@@ -153,11 +153,20 @@ and require a good deal of memory from ZODB caches.
 Solr will typically answer these requests in 10ms to 50ms
 at which point network latency and the rendering speed of Plone's page templates are a more dominant factor.
 
+Plone Compatibility
+===================
+
+collective.solr works with Plone 5.2 and Plone 6.
+
+Python Compatibility
+====================
+
+collective.solr works with Python 3.8 and 3.9. Older versions might still work but we do not test them.
 
 Solr Compatibility
 ==================
 
-The code works with Solr 7. Older versions might work as well but we don't test them.
+collective.solr works with Solr 7,8, and 9. Older versions might work as well but we do not test them.
 
 
 Bug Reporting & Development

@@ -1,16 +1,5 @@
-from unittest import TestCase
+from unittest import TestCase, skipIf
 
-from collective.solr.exceptions import SolrInactiveException
-from collective.solr.interfaces import (
-    ISearch,
-    ISolrConnectionManager,
-    ISolrIndexQueueProcessor,
-    IZCMLSolrConnectionConfig,
-)
-from collective.solr.mangler import mangleQuery
-from collective.solr.testing import LEGACY_COLLECTIVE_SOLR_FUNCTIONAL_TESTING
-from collective.solr.tests.utils import fakehttp, getData
-from collective.solr.utils import getConfig
 from plone.app.testing import TEST_USER_ID, setRoles
 from Products.CMFCore.interfaces import IIndexQueueProcessor
 from Products.CMFCore.utils import getToolByName
@@ -23,6 +12,25 @@ from zope.component import getGlobalSiteManager, getUtilitiesFor, queryUtility
 from zope.configuration import xmlconfig
 from zope.event import notify
 from zope.lifecycleevent import ObjectModifiedEvent
+
+from collective.solr.exceptions import SolrInactiveException
+from collective.solr.interfaces import (
+    ISearch,
+    ISolrConnectionManager,
+    ISolrIndexQueueProcessor,
+    IZCMLSolrConnectionConfig,
+)
+from collective.solr.mangler import mangleQuery
+from collective.solr.testing import LEGACY_COLLECTIVE_SOLR_FUNCTIONAL_TESTING
+from collective.solr.tests.utils import fakehttp, getData
+from collective.solr.utils import getConfig
+
+try:
+    from Products.CMFPlone import relationhelper  # noqa
+
+    HAS_PLONE6 = True
+except ImportError:
+    HAS_PLONE6 = False
 
 
 class UtilityTests(TestCase):
@@ -106,6 +114,7 @@ class IndexingTests(TestCase):
         self.proc.setHost(active=False)
         commit()
 
+    @skipIf(HAS_PLONE6, "ZServer is gone in Plone 6. Therefore this test does not work")
     def testIndexObject(self):
         output = []
         connection = self.proc.getConnection()
@@ -241,4 +250,4 @@ class SiteSetupTests(TestCase):
         def translate(msg):
             return utrans(msgid=msg, domain="solr")
 
-        self.assertEqual(translate("portal_type"), u"Content type")
+        self.assertEqual(translate("portal_type"), "Content type")
