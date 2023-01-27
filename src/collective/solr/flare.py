@@ -1,3 +1,4 @@
+import json
 import sys
 
 from collective.solr.interfaces import IFlare, ISolrFlare
@@ -98,3 +99,8 @@ class PloneFlare(AttrDict):
         if "review_state" in self:
             return self["review_state"]
         return ""
+
+    @property
+    def image_scales(self):
+        if "image_scales" in self:
+            return json.loads(self["image_scales"])

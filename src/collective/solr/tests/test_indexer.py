@@ -11,6 +11,7 @@ from collective.solr.solr import SolrConnection
 from collective.solr.testing import COLLECTIVE_SOLR_MOCK_REGISTRY_FIXTURE
 from collective.solr.tests.utils import fakehttp, fakemore, getData
 from collective.solr.utils import getConfig, prepareData
+from persistent.mapping import PersistentMapping
 from DateTime import DateTime
 from Products.CMFCore.CMFCatalogAware import CMFCatalogAware
 from zope.interface import implementer
@@ -31,9 +32,9 @@ class Foo(CMFCatalogAware):
 
 def sortFields(output):
     """helper to sort `<field>` tags in output for testing"""
-    pattern = br"^(.*<doc>)(<field .*</field>)(</doc>.*)"
+    pattern = rb"^(.*<doc>)(<field .*</field>)(</doc>.*)"
     prefix, fields, suffix = search(pattern, output, DOTALL).groups()
-    tags = br"(<field [^>]*>[^<]*</field>)"
+    tags = rb"(<field [^>]*>[^<]*</field>)"
     return prefix + b"".join(sorted(findall(tags, fields))) + suffix
 
 
@@ -228,6 +229,19 @@ class QueueIndexerTests(TestCase):
             '"cat" data not found',
         )
         self.assertEqual(output.find("price"), -1, '"price" data found?')
+
+    def testImageScalesIndexing(self):
+        foo = Foo(
+            id="image",
+            name="image",
+            image_scales=PersistentMapping({"key": "value"}),
+        )
+        response = getData("add_response.txt")
+        # fake add response
+        output = fakehttp(self.mngr.getConnection(), response)
+        self.proc.index(foo)
+        required = '<field name="image_scales" update="set">{"key": "value"}</field>'
+        self.assert_(str(output).find(required) > 0, '"image_scales" data not found')
 
 
 class RobustnessTests(TestCase):
