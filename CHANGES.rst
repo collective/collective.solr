@@ -4,7 +4,7 @@ Changelog
 9.0.1 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Fix serialization of image_scales metadata when it is included in the schema. [davisagli]
 
 
 9.0.0 (2022-12-19)
