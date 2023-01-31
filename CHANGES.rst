@@ -4,13 +4,15 @@ Changelog
 9.0.2 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Add support for Python 3.10
+  [tisto]
 
 
 9.0.1 (2023-01-31)
 ------------------
 
-- Fix serialization of image_scales metadata when it is included in the schema. [davisagli]
+- Fix serialization of image_scales metadata when it is included in the schema
+  [davisagli]
 
 
 9.0.0 (2022-12-19)
