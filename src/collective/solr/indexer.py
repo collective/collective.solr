@@ -2,6 +2,7 @@ from datetime import date, datetime
 from logging import getLogger
 from socket import error
 
+import json
 import six
 from Acquisition import aq_get
 from collective.solr.exceptions import SolrConnectionException
@@ -418,6 +419,9 @@ class SolrIndexProcessor(object):
                 value = separator.join(value)
             if isinstance(value, six.binary_type):
                 value = value.decode("utf-8")
+            if name == "image_scales":
+                # image_scales is stored in Plone as a PersistentMapping
+                value = json.dumps(dict(value))
             data[name] = value
         missing = set(schema.requiredFields) - set(data.keys())
         return data, missing
