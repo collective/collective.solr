@@ -462,7 +462,8 @@ class SolrMaintenanceTests(TestCase):
             obj = self.portal.unrestrictedTraverse(path)
             obj_mod = int(obj.modified().toZone("UTC").millis() / 1000)
             solr_mod = int(solr_mod.toZone("UTC").millis() / 1000)
-            self.assertEqual(solr_mod, obj_mod)
+            # compare the first 9 digits, on CI (GHA) the last digit might differ
+            self.assertAlmostEqual(solr_mod, obj_mod, 9)
 
 
 class SolrErrorHandlingTests(TestCase):
