@@ -4,13 +4,15 @@ Changelog
 9.0.2 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Add support for Python 3.10
+  [tisto]
 
 
 9.0.1 (2023-01-31)
 ------------------
 
-- Fix serialization of image_scales metadata when it is included in the schema. [davisagli]
+- Fix serialization of image_scales metadata when it is included in the schema
+  [davisagli]
 
 
 9.0.0 (2022-12-19)
@@ -31,6 +33,8 @@ Changelog
 - Explicitly set required=False to all "Bool" zope.schema fields in the ISolrSchema interface. zope.schema does not fall back to default=False by default (see https://github.com/zopefoundation/zope.schema/blob/master/CHANGES.rst#611-2021-10-13)
   [tisto]
 
+- Add official support for Python 3.10
+  [tisto]
 
 9.0.0a8 (2022-04-27)
 --------------------
