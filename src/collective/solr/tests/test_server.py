@@ -463,7 +463,7 @@ class SolrMaintenanceTests(TestCase):
             obj_mod = int(obj.modified().toZone("UTC").millis() / 1000)
             solr_mod = int(solr_mod.toZone("UTC").millis() / 1000)
             # compare the first 9 digits, on CI (GHA) the last digit might differ
-            self.assertAlmostEqual(solr_mod, obj_mod, 9)
+            self.assertAlmostEqual(solr_mod, obj_mod, delta=1)
 
 
 class SolrErrorHandlingTests(TestCase):
