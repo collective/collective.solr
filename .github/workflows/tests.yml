@@ -38,7 +38,7 @@ jobs:
       - run: pip install virtualenv
       - run: pip install wheel
       - name: pip install
-        run: pip install -r requirements-${{ matrix.plone-version }}.txt
+        run: pip install -r requirements-${{ matrix.plone-version }}.x.txt
 
       # run pocompile for translation tests
       - run: pip install zest.pocompile
