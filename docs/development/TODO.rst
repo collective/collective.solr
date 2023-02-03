@@ -12,7 +12,7 @@ TODOs:
 * mapping from accessor name to attribute name, i.e. getTitle -> title,
   preferably via <copyField> tags in the solr schema
 * evaluate http://www.gnuenterprise.org/~jcater/solr.py as a replacement
-  (also see http://tinyurl.com/2zcogf)
+  (also see https://tinyurl.com/2zcogf)
 * evaluate sunburnet as a replacement https://pypi.python.org/pypi/sunburnt
 * evaluate mysolr as backend https://pypi.python.org/pypi/mysolr
 * implement LocalParams to have a nicer facet view https://wiki.apache.org/solr/SimpleFacetParameters#Multi-Select_Faceting_and_LocalParams
