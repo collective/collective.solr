@@ -616,7 +616,7 @@ buildout section. See https://github.com/collective/collective.solr/blob/master/
   [csenger, buchi]
 
 - Set max_results param to '10000000' as default value as described in
-  http://wiki.apache.org/solr/CommonQueryParameters#rows. It seems this has
+  https://wiki.apache.org/solr/CommonQueryParameters#rows. It seems this has
   changed in Solr 4.
   [timo]
 

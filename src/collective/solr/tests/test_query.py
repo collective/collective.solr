@@ -161,7 +161,7 @@ class QuoteTests(TestCase):
         self.assertEqual(quote(u"john@foo.com"), "john@foo.com")
 
     def testSolrSpecifics(self):
-        # http://wiki.apache.org/solr/SolrQuerySyntax
+        # https://wiki.apache.org/solr/SolrQuerySyntax
         # Seems to be ok to quote function
         self.assertEqual(
             quote('"recip(rord(myfield),1,2,3)"'),
