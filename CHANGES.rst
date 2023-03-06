@@ -7,6 +7,9 @@ Changelog
 - Add support for Python 3.10
   [tisto]
 
+- Fix deserialization of image_scales metadata in FlareContentListingObject.
+  [davisagli]
+
 
 9.0.1 (2023-01-31)
 ------------------
