@@ -166,6 +166,9 @@ class FlareContentListingObject(object):
     def MimeTypeIcon(self):
         raise NotImplementedError
 
+    def image_scales(self):
+        return self.flare.image_scales
+
     def __getattr__(self, name):
         """We'll override getattr so that we can defer name lookups to the real
         underlying objects without knowing the names of all attributes.
