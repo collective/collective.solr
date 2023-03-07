@@ -1,7 +1,7 @@
 Changelog
 =========
 
-9.0.2 (unreleased)
+9.1.0 (2023-03-07)
 ------------------
 
 - Add support for Python 3.10
