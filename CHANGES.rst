@@ -4,7 +4,8 @@ Changelog
 9.1.1 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Fix deserialization of image_scales metadata when there is no value
+  [mpeeters]
 
 
 9.1.0 (2023-03-07)
