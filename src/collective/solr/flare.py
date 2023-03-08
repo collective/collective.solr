@@ -102,5 +102,5 @@ class PloneFlare(AttrDict):
 
     @property
     def image_scales(self):
-        if "image_scales" in self:
+        if self.get("image_scales"):
             return json.loads(self["image_scales"])
