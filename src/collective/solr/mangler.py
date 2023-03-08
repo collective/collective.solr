@@ -257,7 +257,6 @@ def subtractQueryParameters(args, request_keywords=None):
         order = reverse and "desc" or "asc"
         params["sort"] = "%s %s" % (index, order)
 
-    breakpoint()
     limit = get("limit")
     if limit:
         params["rows"] = int(limit)
