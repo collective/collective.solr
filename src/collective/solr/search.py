@@ -2,6 +2,12 @@ from logging import getLogger
 from time import time
 
 import six
+from Missing import MV
+from Products.CMFPlone.utils import safe_unicode
+from six.moves import map
+from zope.component import queryUtility
+from zope.interface import implementer
+
 from collective.solr.exceptions import SolrInactiveException
 from collective.solr.interfaces import ISearch, ISolrConnectionManager
 from collective.solr.mangler import (
@@ -13,11 +19,6 @@ from collective.solr.mangler import (
 from collective.solr.parser import SolrResponse
 from collective.solr.queryparser import quote, quote_iterable_item
 from collective.solr.utils import getConfig, isWildCard, prepare_wildcard, prepareData
-from Missing import MV
-from Products.CMFPlone.utils import safe_unicode
-from six.moves import map
-from zope.component import queryUtility
-from zope.interface import implementer
 
 try:
     from Products.LinguaPlone.catalog import languageFilter
@@ -110,6 +111,12 @@ class Search(object):
             field = schema.get(index, None)
             if field is None or not field.stored:
                 logger.warning('sorting on non-stored attribute "%s"', index)
+        if "rows" in parameters and parameters["rows"] > 1000000000:
+            logger.warning(
+                'The "rows" parameter was set to "%s" and automatically limited to 1000000000 to avoid a Solr java.lang.NumberFormatException',
+                parameters["rows"],
+            )
+            parameters["rows"] = 1000000000
         response = connection.search(q=query, **parameters)
         results = SolrResponse(response)
         response.close()

@@ -1,6 +1,10 @@
 from datetime import datetime
 from unittest import TestCase
 
+from DateTime import DateTime
+from pytz import timezone
+from zope.component import getGlobalSiteManager, provideUtility
+
 from collective.solr.interfaces import ISolrConnectionConfig
 from collective.solr.mangler import (
     cleanupQueryParameters,
@@ -11,9 +15,6 @@ from collective.solr.mangler import (
 from collective.solr.parser import SolrField, SolrSchema
 from collective.solr.testing import COLLECTIVE_SOLR_MOCK_REGISTRY_FIXTURE
 from collective.solr.utils import getConfig
-from DateTime import DateTime
-from pytz import timezone
-from zope.component import getGlobalSiteManager, provideUtility
 
 
 def mangle(**keywords):

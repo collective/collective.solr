@@ -2,6 +2,12 @@ from datetime import date, datetime
 
 import six
 from AccessControl import getSecurityManager
+from DateTime import DateTime
+from plone.registry.interfaces import IRegistry
+from pytz import timezone
+from six.moves import map
+from zope.component import getUtility
+
 from collective.solr.queryparser import quote
 from collective.solr.utils import (
     getConfig,
@@ -11,11 +17,6 @@ from collective.solr.utils import (
     removeSpecialCharactersAndOperators,
     splitSimpleSearch,
 )
-from DateTime import DateTime
-from plone.registry.interfaces import IRegistry
-from pytz import timezone
-from six.moves import map
-from zope.component import getUtility
 
 ranges = {
     "min": "[%s TO *]",
@@ -256,6 +257,7 @@ def subtractQueryParameters(args, request_keywords=None):
         order = reverse and "desc" or "asc"
         params["sort"] = "%s %s" % (index, order)
 
+    breakpoint()
     limit = get("limit")
     if limit:
         params["rows"] = int(limit)
