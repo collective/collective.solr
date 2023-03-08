@@ -6,6 +6,10 @@ from zope.schema.interfaces import IVocabularyFactory
 from collective.solr import SolrMessageFactory as _
 
 
+# If we send too large a number to solr, it can't parse it
+MAX_RESULTS_SUPPORTED_BY_SOLR = 1_000_000_000
+
+
 class ISolrSchema(Interface):
 
     active = Bool(
@@ -121,7 +125,8 @@ class ISolrSchema(Interface):
             "ridiculously large value that is higher than the "
             "possible number of rows that are expected.",
         ),
-        default=1000000,
+        default=1_000_000,
+        max=MAX_RESULTS_SUPPORTED_BY_SOLR,
     )
 
     required = List(
