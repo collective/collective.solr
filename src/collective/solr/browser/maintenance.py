@@ -240,7 +240,9 @@ class SolrMaintenanceView(BrowserView):
         cpu = timer(process_time)  # cpu time
         # get Solr status
         response = conn.search(
-            q=preImportDeleteQuery, rows=MAX_RESULTS_SUPPORTED_BY_SOLR, fl="%s modified" % key
+            q=preImportDeleteQuery,
+            rows=MAX_RESULTS_SUPPORTED_BY_SOLR,
+            fl="%s modified" % key,
         )
         # avoid creating DateTime instances
         simple_unmarshallers = unmarshallers.copy()

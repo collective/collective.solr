@@ -9,7 +9,11 @@ from zope.component import queryUtility
 from zope.interface import implementer
 
 from collective.solr.exceptions import SolrInactiveException
-from collective.solr.interfaces import ISearch, ISolrConnectionManager, MAX_RESULTS_SUPPORTED_BY_SOLR
+from collective.solr.interfaces import (
+    ISearch,
+    ISolrConnectionManager,
+    MAX_RESULTS_SUPPORTED_BY_SOLR,
+)
 from collective.solr.mangler import (
     cleanupQueryParameters,
     mangleQuery,
@@ -58,7 +62,7 @@ class Search(object):
         sow="true",
         lowercase_operator="true",
         default_operator="AND",
-        **parameters
+        **parameters,
     ):
         """perform a search with the given querystring and parameters"""
         start = time()
@@ -98,8 +102,9 @@ class Search(object):
                 if rows > MAX_RESULTS_SUPPORTED_BY_SOLR:
                     logger.warning(
                         'The "rows" parameter was set to "%s" but automatically limited '
-                        ' to %s to avoid a Solr java.lang.NumberFormatException',
-                        parameters["rows"], MAX_RESULTS_SUPPORTED_BY_SOLR
+                        " to %s to avoid a Solr java.lang.NumberFormatException",
+                        parameters["rows"],
+                        MAX_RESULTS_SUPPORTED_BY_SOLR,
                     )
                     parameters["rows"] = MAX_RESULTS_SUPPORTED_BY_SOLR
         if getattr(config, "highlight_fields", None):
@@ -117,7 +122,7 @@ class Search(object):
             else:
                 parameters["fl"] = "* score"
         if isinstance(query, dict):
-            query = u" ".join([safe_unicode(val) for val in query.values()])
+            query = " ".join([safe_unicode(val) for val in query.values()])
         logger.debug("searching for %r (%r)", query, parameters)
         if "sort" in parameters:  # issue warning for unknown sort indices
             index, order = parameters["sort"].split()
