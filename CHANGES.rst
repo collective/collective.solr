@@ -1,7 +1,7 @@
 Changelog
 =========
 
-9.1.1 (unreleased)
+9.1.1 (2023-03-09)
 ------------------
 
 - Fix deserialization of image_scales metadata when there is no value
