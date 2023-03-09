@@ -2,8 +2,18 @@ from logging import getLogger
 from time import time
 
 import six
+from Missing import MV
+from Products.CMFPlone.utils import safe_unicode
+from six.moves import map
+from zope.component import queryUtility
+from zope.interface import implementer
+
 from collective.solr.exceptions import SolrInactiveException
-from collective.solr.interfaces import ISearch, ISolrConnectionManager
+from collective.solr.interfaces import (
+    ISearch,
+    ISolrConnectionManager,
+    MAX_RESULTS_SUPPORTED_BY_SOLR,
+)
 from collective.solr.mangler import (
     cleanupQueryParameters,
     mangleQuery,
@@ -13,11 +23,6 @@ from collective.solr.mangler import (
 from collective.solr.parser import SolrResponse
 from collective.solr.queryparser import quote, quote_iterable_item
 from collective.solr.utils import getConfig, isWildCard, prepare_wildcard, prepareData
-from Missing import MV
-from Products.CMFPlone.utils import safe_unicode
-from six.moves import map
-from zope.component import queryUtility
-from zope.interface import implementer
 
 try:
     from Products.LinguaPlone.catalog import languageFilter
@@ -57,7 +62,7 @@ class Search(object):
         sow="true",
         lowercase_operator="true",
         default_operator="AND",
-        **parameters
+        **parameters,
     ):
         """perform a search with the given querystring and parameters"""
         start = time()
@@ -73,13 +78,13 @@ class Search(object):
         parameters["lowercaseOperators"] = lowercase_operator
         parameters["q.op"] = default_operator
         if "rows" not in parameters:
-            parameters["rows"] = config.max_results or 10000000
+            parameters["rows"] = config.max_results or 10_000_000
             # Check if rows param is 0 for backwards compatibility. Before
             # Solr 4 'rows = 0' meant that there is no limitation. Solr 4
             # always expects a rows param > 0 though:
             # http://wiki.apache.org/solr/CommonQueryParameters#rows
             if parameters["rows"] == 0:
-                parameters["rows"] = 10000000
+                parameters["rows"] = 10_000_000
             logger.debug(
                 'falling back to "max_results" (%d) without a "rows" '
                 "parameter: %r (%r)",
@@ -87,6 +92,21 @@ class Search(object):
                 query,
                 parameters,
             )
+        else:
+            try:
+                rows = int(parameters["rows"])
+            except ValueError:
+                # probably invalid, but we'll let solr complain about it
+                pass
+            else:
+                if rows > MAX_RESULTS_SUPPORTED_BY_SOLR:
+                    logger.warning(
+                        'The "rows" parameter was set to "%s" but automatically limited '
+                        " to %s to avoid a Solr java.lang.NumberFormatException",
+                        parameters["rows"],
+                        MAX_RESULTS_SUPPORTED_BY_SOLR,
+                    )
+                    parameters["rows"] = MAX_RESULTS_SUPPORTED_BY_SOLR
         if getattr(config, "highlight_fields", None):
             if parameters.get("hl", "false") == "true" and "hl.fl" not in parameters:
                 parameters["hl"] = "true"
@@ -102,7 +122,7 @@ class Search(object):
             else:
                 parameters["fl"] = "* score"
         if isinstance(query, dict):
-            query = u" ".join([safe_unicode(val) for val in query.values()])
+            query = " ".join([safe_unicode(val) for val in query.values()])
         logger.debug("searching for %r (%r)", query, parameters)
         if "sort" in parameters:  # issue warning for unknown sort indices
             index, order = parameters["sort"].split()

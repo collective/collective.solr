@@ -7,6 +7,9 @@ Changelog
 - Fix deserialization of image_scales metadata when there is no value
   [mpeeters]
 
+- Limit `rows` to 1000000000; higher values can cause a NumberFormatException in solr.
+  [tisto, davisagli]
+
 
 9.1.0 (2023-03-07)
 ------------------

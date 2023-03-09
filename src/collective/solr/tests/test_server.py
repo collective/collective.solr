@@ -1194,6 +1194,17 @@ class SolrServerTests(TestCase):
         self.assertEqual(results.numFound, str(len(DEFAULT_OBJS)))
         self.assertEqual(len(results), 5)
 
+    def testLimitSearchResultsAvoidSolrException(self):
+        # Solr raises a java.lang.NumberFormatException
+        # when the rows parameter is more than 3000000000 (roughly)
+        # in that case we set the any value higher than 1.000.000.000
+        # to 1.000.000.000
+        self.maintenance.reindex()
+        # not raising an exception here means success
+        self.assertTrue(
+            self.search("+path_parents:\\/plone", rows=3000000000).results()
+        )
+
     def testSortParameters(self):
         self.maintenance.reindex()
 

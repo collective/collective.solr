@@ -39,14 +39,15 @@ import six
 import six.moves.http_client
 import six.moves.urllib.parse
 import six.moves.urllib.request
+from plone.dexterity.utils import safe_unicode
+from requests_toolbelt import MultipartEncoder
+
 from collective.solr.exceptions import (
-    SolrConnectionException,
     RepeatableSolrConnectionException,
+    SolrConnectionException,
 )
 from collective.solr.parser import SolrSchema
 from collective.solr.utils import getConfig, translation_map
-from plone.dexterity.utils import safe_unicode
-from requests_toolbelt import MultipartEncoder
 
 logger = getLogger(__name__)
 

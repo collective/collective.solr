@@ -9,6 +9,7 @@ from collective.solr.interfaces import (
     ISolrAddHandler,
     ISolrConnectionManager,
     ISolrMaintenanceView,
+    MAX_RESULTS_SUPPORTED_BY_SOLR,
 )
 from collective.solr.parser import SolrResponse, parse_date_as_datetime, unmarshallers
 from collective.solr.utils import findObjects, prepareData
@@ -19,7 +20,6 @@ from zope.component import queryAdapter, queryUtility
 from zope.interface import implementer
 
 logger = getLogger("collective.solr.maintenance")
-MAX_ROWS = 1000000000
 
 
 try:
@@ -240,7 +240,9 @@ class SolrMaintenanceView(BrowserView):
         cpu = timer(process_time)  # cpu time
         # get Solr status
         response = conn.search(
-            q=preImportDeleteQuery, rows=MAX_ROWS, fl="%s modified" % key
+            q=preImportDeleteQuery,
+            rows=MAX_RESULTS_SUPPORTED_BY_SOLR,
+            fl="%s modified" % key,
         )
         # avoid creating DateTime instances
         simple_unmarshallers = unmarshallers.copy()
