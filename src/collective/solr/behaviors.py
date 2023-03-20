@@ -16,7 +16,10 @@ class ISolrFields(model.Schema):
         default=True,
         missing_value=True,
         title=_("label_showinsearch", default=u"Show in search"),
-        description=_("help_showinsearch", default="When checked, this content can be found by anybody via search"),
+        description=_(
+            "help_showinsearch",
+            default="When checked, this content can be found by anybody via search",
+        ),
     )
 
     searchwords = schema.List(
