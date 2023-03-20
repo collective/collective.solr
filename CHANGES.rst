@@ -4,7 +4,8 @@ Changelog
 9.1.2 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Fix EN/DE description for the showinsearch field.
+  [tisto]
 
 
 9.1.1 (2023-03-09)
