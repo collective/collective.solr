@@ -202,7 +202,7 @@ msgstr "Hier können Suchwörter definiert werden. Diese Suchwörter werden bei 
 
 #: ../behaviors.py:22
 msgid "help_showinsearch"
-msgstr "Flag, der regelt, ob ein Artikel in den Suchresultaten dargestellt wird."
+msgstr "Wenn diese Option angekreuzt ist, kann dieser Inhalt von allen über die Suche gefunden werden."
 
 #. Default: "Specify a threshold (in milliseconds) after which queries are considered to be slow causing them to be logged. Set to \"0\" to prevent any logging."
 #: ../interfaces.py:181

@@ -114,6 +114,14 @@ docs:  ## Build Docs
 test-release:  ## Run Pyroma and Check Manifest
 	bin/pyroma -n 10 -d .
 
+.PHONY: Start Backend
+start-backend:  ## Start Plone Backend
+	bin/instance fg
+
+.PHONY: Start Solr
+start-solr:  ## Start Solr
+	bin/solr-foreground
+
 .PHONY: Release
 release:  ## Release
 	bin/fullrelease
