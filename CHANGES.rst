@@ -1,7 +1,7 @@
 Changelog
 =========
 
-9.1.2 (unreleased)
+9.1.2 (2023-03-20)
 ------------------
 
 - Fix EN/DE description for the showinsearch field.
