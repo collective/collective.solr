@@ -35,6 +35,10 @@ def update_registry(context):
 
 
 def migrateTo4(context):
+    setup_tool = getToolByName(context, "portal_setup")
+    setup_tool.runImportStepFromProfile(PROFILE_ID, "plone.app.registry")
+    logger.info("Updated registry records to add force_simple_search record")
+
     registry = getUtility(IRegistry)
     if "collective.solr.async" in registry.records:
         old_record = registry.records["collective.solr.async"]
@@ -58,7 +62,7 @@ def migrateTo4(context):
         if type_id not in pt.objectIds():
             continue
         fti = pt[type_id]
-        if new_behavior not in fti.behaviors:
+        if new_behavior not in getattr(fti, 'behaviors', [new_behavior]):
             fti.behaviors += (new_behavior,)
             logger.info("Added new behavior to {}".format(type_id))
 

@@ -4,8 +4,12 @@ Changelog
 8.4.3 (unreleased)
 ------------------
 
-- Nothing changed yet.
-
+- Avoided failure in v4 migration when default types are AT
+  [sgeulette]
+- Updated registry after settings schema change
+  [sgeulette]
+- Handled decoding exception
+  [sgeulette]
 
 8.4.2 (2021-04-08)
 ------------------
