@@ -392,7 +392,12 @@ class SolrIndexProcessor(object):
                 separator = getattr(field, "separator", " ")
                 value = separator.join(value)
             if isinstance(value, six.binary_type):
-                value = value.decode("utf-8")
+                for encod in ('utf-8', 'latin-1'):
+                    try:
+                        value = value.decode(encod)
+                        break
+                    except Exception:  # noqa
+                        pass
             data[name] = value
         missing = set(schema.requiredFields) - set(data.keys())
         return data, missing

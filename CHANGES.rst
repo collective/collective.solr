@@ -8,6 +8,8 @@ Changelog
   [sgeulette]
 - Updated registry after settings schema change
   [sgeulette]
+- Handled decoding exception
+  [sgeulette]
 
 8.4.2 (2021-04-08)
 ------------------
