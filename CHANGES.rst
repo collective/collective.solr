@@ -4,7 +4,7 @@ Changelog
 9.1.3 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Fix indexing of set values in multivalue fields [reebalazs]
 
 
 9.1.2 (2023-03-20)

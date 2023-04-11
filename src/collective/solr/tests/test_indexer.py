@@ -243,6 +243,63 @@ class QueueIndexerTests(TestCase):
         required = '<field name="image_scales" update="set">{"key": "value"}</field>'
         self.assert_(str(output).find(required) > 0, '"image_scales" data not found')
 
+    def testListIndexing(self):
+        foo = Foo(
+            id="zeidler",
+            name="andi",
+            cat=["rock", "paper", "Sharp scissors"],
+        )
+        response = getData("add_response.txt")
+        # fake add response
+        output = fakehttp(self.mngr.getConnection(), response)
+        self.proc.index(foo)
+        required1 = '<field name="cat" update="set">rock</field>'
+        required2 = '<field name="cat" update="set">paper</field>'
+        required3 = '<field name="cat" update="set">Sharp scissors</field>'
+        self.assert_(str(output).find(required1) > 0, "Some element (rock) not found")
+        self.assert_(str(output).find(required2) > 0, "Some element (paper) not found")
+        self.assert_(
+            str(output).find(required3) > 0, "Some element (Sharp scissors) not found"
+        )
+
+    def testTupleIndexing(self):
+        foo = Foo(
+            id="zeidler",
+            name="andi",
+            cat=("rock", "paper", "Sharp scissors"),
+        )
+        response = getData("add_response.txt")
+        # fake add response
+        output = fakehttp(self.mngr.getConnection(), response)
+        self.proc.index(foo)
+        required1 = '<field name="cat" update="set">rock</field>'
+        required2 = '<field name="cat" update="set">paper</field>'
+        required3 = '<field name="cat" update="set">Sharp scissors</field>'
+        self.assert_(str(output).find(required1) > 0, "Some element (rock) not found")
+        self.assert_(str(output).find(required2) > 0, "Some element (paper) not found")
+        self.assert_(
+            str(output).find(required3) > 0, "Some element (Sharp scissors) not found"
+        )
+
+    def testSetIndexing(self):
+        foo = Foo(
+            id="zeidler",
+            name="andi",
+            cat={"rock", "paper", "Sharp scissors"},
+        )
+        response = getData("add_response.txt")
+        # fake add response
+        output = fakehttp(self.mngr.getConnection(), response)
+        self.proc.index(foo)
+        required1 = '<field name="cat" update="set">rock</field>'
+        required2 = '<field name="cat" update="set">paper</field>'
+        required3 = '<field name="cat" update="set">Sharp scissors</field>'
+        self.assert_(str(output).find(required1) > 0, "Some element (rock) not found")
+        self.assert_(str(output).find(required2) > 0, "Some element (paper) not found")
+        self.assert_(
+            str(output).find(required3) > 0, "Some element (Sharp scissors) not found"
+        )
+
 
 class RobustnessTests(TestCase):
 

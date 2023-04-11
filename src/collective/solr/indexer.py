@@ -407,6 +407,8 @@ class SolrIndexProcessor(object):
             except Exception:
                 logger.exception("Error occured while getting data for indexing!")
                 continue
+            if isinstance(value, set):
+                value = list(value)
             field = schema[name]
             handler = handlers.get(field.class_, None)
             if handler is not None:
