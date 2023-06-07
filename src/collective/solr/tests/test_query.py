@@ -64,6 +64,9 @@ class QuoteTests(TestCase):
         self.assertEqual(quote("?test", prefix_wildcard=True), "?test")
         self.assertEqual(quote("**test", prefix_wildcard=True), "*test")
         self.assertEqual(quote("??test", prefix_wildcard=True), "?test")
+        ## standalone wildcard stripped
+        self.assertEqual(quote("*"), "")
+        self.assertEqual(quote("**"), "")
 
     def testQuotingFuzzySearches(self):
         self.assertEqual(quote("roam~"), "roam~")
