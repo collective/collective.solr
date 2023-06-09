@@ -2,7 +2,7 @@ import sys
 
 from setuptools import find_packages, setup
 
-version = "9.1.4.dev0"
+version = "9.1.4"
 
 assert sys.version_info >= (
     3,

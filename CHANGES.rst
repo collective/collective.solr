@@ -1,7 +1,7 @@
 Changelog
 =========
 
-9.1.4 (unreleased)
+9.1.4 (2023-06-09)
 ------------------
 
 - Strip standalone wildcards from the searchable text (#362) [reebalazs]
