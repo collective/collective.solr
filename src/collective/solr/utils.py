@@ -152,7 +152,12 @@ def splitSimpleSearch(term):
     for i in range(0, len(parts)):
         if i % 2 == 0:
             # unquoted text
-            words = [word for word in parts[i].split() if word]
+            # note, make sure that both empty words and standalone wildcards are omitted
+            words = [
+                word
+                for word in parts[i].split()
+                if word and word != "*" and word != "**"
+            ]
             tokens.extend(words)
         else:
             # The uneven parts are those inside quotes.

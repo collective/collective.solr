@@ -4,7 +4,7 @@ Changelog
 9.1.4 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Strip standalone wildcards from the searchable text (#362) [reebalazs]
 
 
 9.1.3 (2023-04-11)

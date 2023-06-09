@@ -126,6 +126,11 @@ class UtilsTests(TestCase):
         )
         self.assertRaises(AssertionError, splitSimpleSearch, "foo AND bar")
         self.assertEqual(splitSimpleSearch("foo 42"), ["foo", "42"])
+        # standalone wildcard stripped
+        self.assertEqual(splitSimpleSearch("foo *"), ["foo"])
+        self.assertEqual(splitSimpleSearch("foo **"), ["foo"])
+        # connected wildcard not stripped
+        self.assertEqual(splitSimpleSearch("foo**"), ["foo**"])
 
     def testIsWildCard(self):
         self.assertTrue(isWildCard("foo*"))
