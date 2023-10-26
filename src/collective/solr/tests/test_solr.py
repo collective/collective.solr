@@ -6,6 +6,8 @@ from collective.solr.testing import COLLECTIVE_SOLR_MOCK_REGISTRY_FIXTURE
 from collective.solr.tests.utils import fakehttp, getData
 from collective.solr.utils import getConfig
 
+import six.moves.http_client
+
 
 class TestSolr(TestCase):
 
@@ -210,3 +212,13 @@ class TestSolr(TestCase):
         self.failUnlessEqual(node.attrib["name"], "QTime")
         self.failUnlessEqual(node.text, "0")
         res.find("QTime")
+
+    def test_conn(self):
+        # http connection
+        c = SolrConnection(host="localhost:8983", persistent=True)
+        self.assertTrue(type(c.conn) is six.moves.http_client.HTTPConnection)
+        # https connection
+        c = SolrConnection(
+            host="localhost:8983", persistent=True, https_connection=True
+        )
+        self.assertTrue(type(c.conn) is six.moves.http_client.HTTPSConnection)

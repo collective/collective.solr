@@ -201,6 +201,8 @@ class CollectiveSolrMockRegistry(object):
         self.boost_script = u""
         self.solr_login = None
         self.solr_password = None
+        self.https_connection = False
+        self.ignore_certificate_check = False
 
     def __getitem__(self, name):
         name_parts = name.split(".")

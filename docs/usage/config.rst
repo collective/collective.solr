@@ -29,6 +29,8 @@ Example::
       COLLECTIVE_SOLR_BASE /solr/plone
       COLLECTIVE_SOLR_LOGIN solr_login
       COLLECTIVE_SOLR_PASSWORD solr_password
+      COLLECTIVE_SOLR_HTTPS_CONNECTION true
+      COLLECTIVE_SOLR_IGNORE_CERTIFICATE_CHECK false
 
 Configuration priority
 ......................
@@ -43,16 +45,17 @@ Since parameters are limited for ZCML and Environement Variables methods, the th
 
 Here is a list of parameters and methods
 
-====================  ===============  ========  =========================  =======
-**Parameter**         **Example**      **ZCML**  **Environment Variables**  **TTW**
-====================  ===============  ========  =========================  =======
-**Host**              localhost        YES       YES                        YES
-**Port**              8983             YES       YES                        YES
-**Base**              /solr/plone      YES       YES                        YES
-**Login**             login            NO        YES                        YES
-**Password**          password         NO        YES                        YES
-**Other parameters**                   NO        NO                         YES
-====================  ===============  ========  =========================  =======
+============================    ===============  ========  =========================  =======
+**Parameter**                   **Example**      **ZCML**  **Environment Variables**  **TTW**
+============================    ===============  ========  =========================  =======
+**Port**                        8983             YES       YES                        YES
+**Base**                        /solr/plone      YES       YES                        YES
+**Login**                       login            NO        YES                        YES
+**Password**                    password         NO        YES                        YES
+**Https connection**            true             NO        YES                        YES
+**Ignore certificate check**    false            NO        YES                        YES
+**Other parameters**                             NO        NO                         YES
+============================    ===============  ========  =========================  =======
 
 
 TTW Configuration

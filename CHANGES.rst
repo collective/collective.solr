@@ -4,7 +4,8 @@ Changelog
 9.1.5 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Add support of https connections
+  [remdub]
 
 
 9.1.4 (2023-06-09)
