@@ -317,6 +317,15 @@ class SolrConnection:
                     lst.append(tmpl % (self.escapeKey(f)))
             else:
                 lst.append(tmpl % self.escapeVal(v))
+
+        # Have to delete every missing field explicitly
+        # XXX how about other field types? Should they also be deleted with some other value (not null)?
+        #     (since something gives an error)
+        nofields = set(map(lambda field: field['name'], filter(lambda field: field['class_'] in ['solr.StrField', 'solr.TextField'], schema.fields))) - set(fields.keys())
+        for name in nofields:
+            tmpl = '<field name="%s" update="set" null="true"/>'
+            lst.append(tmpl % (self.escapeKey(name)))
+
         lst.append("</doc>")
         lst.append("</add>")
         xstr = "".join(lst)
