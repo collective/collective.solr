@@ -11,10 +11,12 @@ from collective.solr.mangler import (
     mangleQuery,
     optimizeQueryParameters,
     subtractQueryParameters,
+    mangleSearchableText,
 )
 from collective.solr.parser import SolrField, SolrSchema
 from collective.solr.testing import COLLECTIVE_SOLR_MOCK_REGISTRY_FIXTURE
 from collective.solr.utils import getConfig
+from unittest import mock
 
 
 def mangle(**keywords):
@@ -31,7 +33,6 @@ class Query:
 
 
 class QueryManglerTests(TestCase):
-
     layer = COLLECTIVE_SOLR_MOCK_REGISTRY_FIXTURE
 
     def setUp(self):
@@ -282,7 +283,6 @@ class PathManglerTests(TestCase):
 
 
 class QueryParameterTests(TestCase):
-
     layer = COLLECTIVE_SOLR_MOCK_REGISTRY_FIXTURE
 
     def testSortIndex(self):
@@ -446,7 +446,7 @@ class QueryParameterTests(TestCase):
         # now unconfigured...
         config = getConfig()
         self.assertEqual(optimize(), (dict(a="a:23", b="b:42", c="c:(23 42)"), dict()))
-        config.filter_queries = [u"a"]
+        config.filter_queries = ["a"]
         self.assertEqual(optimize(), (dict(b="b:42", c="c:(23 42)"), dict(fq=["a:23"])))
         self.assertEqual(
             optimize(fq="x:13"),
@@ -502,3 +502,111 @@ class QueryParameterTests(TestCase):
         self.assertEqual(params, {"facet.foo": "bar"})
         params = extract(dict(facet_foo=("foo:bar", "bar:foo")))
         self.assertEqual(params, {"facet.foo": ("foo", "bar")})
+
+
+@mock.patch("collective.solr.stopword.raw", None)
+@mock.patch("collective.solr.stopword.cooked", None)
+class QueryManglerStopwordsTests(TestCase):
+    layer = COLLECTIVE_SOLR_MOCK_REGISTRY_FIXTURE
+
+    def setUp(self):
+        self.config = getConfig()
+        self.config.stopwords_case_insensitive = False
+        self.config.stopwords = """
+no
+can
+do
+"""
+        self.config.force_simple_search = True
+        provideUtility(self.config, ISolrConnectionConfig)
+
+    def tearDown(self):
+        gsm = getGlobalSiteManager()
+        gsm.unregisterUtility(self.config, ISolrConnectionConfig)
+
+    def testBase(self):
+        self.assertEqual(
+            mangleSearchableText("beautiful world", self.config),
+            "(beautiful* OR beautiful) (world* OR world)",
+        )
+
+    def testNoSimpleSearch(self):
+        self.config.force_simple_search = False
+        self.assertEqual(
+            mangleSearchableText("beautiful can world", self.config),
+            "(beautiful* OR beautiful) (can) (world* OR world)",
+        )
+
+    def testBaseSingleWord(self):
+        self.assertEqual(
+            mangleSearchableText("beautiful", self.config),
+            "(beautiful* OR beautiful)",
+        )
+
+    def testRemovesWildcardTermSingleWord(self):
+        self.assertEqual(
+            mangleSearchableText("can", self.config),
+            "(can)",
+        )
+
+    def testRemovesWildcardTermMultiWord(self):
+        self.assertEqual(
+            mangleSearchableText("beautiful can world", self.config),
+            "(beautiful* OR beautiful) (can) (world* OR world)",
+        )
+        self.assertEqual(
+            mangleSearchableText("no can do", self.config),
+            "(no) (can) (do)",
+        )
+
+    def testRemovesWildcardCaseSensitiveUppercase(self):
+        self.assertEqual(
+            mangleSearchableText("beautiful Can world", self.config),
+            "(beautiful* OR beautiful) (can* OR Can) (world* OR world)",
+        )
+        self.assertEqual(
+            mangleSearchableText("No CAN dO", self.config),
+            "(no* OR No) (can* OR CAN) (do* OR dO)",
+        )
+
+    def testRemovesWildcardCaseAgnosticUppercase(self):
+        self.config.stopwords_case_insensitive = True
+        self.assertEqual(
+            mangleSearchableText("beautiful Can world", self.config),
+            "(beautiful* OR beautiful) (Can) (world* OR world)",
+        )
+        self.assertEqual(
+            mangleSearchableText("No CAN dO", self.config),
+            "(No) (CAN) (dO)",
+        )
+
+    def testRemovesWildcardCaseSensitive(self):
+        self.config.stopwords = """
+No
+CAN
+dO
+"""
+        self.assertEqual(
+            mangleSearchableText("beautiful Can world", self.config),
+            "(beautiful* OR beautiful) (can* OR Can) (world* OR world)",
+        )
+        self.assertEqual(
+            mangleSearchableText("nO can Do", self.config),
+            "(no* OR nO) (can* OR can) (do* OR Do)",
+        )
+
+    def testRemovesWildcardCaseAgnostic(self):
+        self.config.stopwords_case_insensitive = True
+        self.config.stopwords = """
+No
+CAN
+dO
+"""
+        self.assertEqual(
+            mangleSearchableText("beautiful Can world", self.config),
+            "(beautiful* OR beautiful) (Can) (world* OR world)",
+        )
+        self.assertEqual(
+            mangleSearchableText("nO can Do", self.config),
+            "(nO) (can) (Do)",
+        )
