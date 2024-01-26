@@ -4,7 +4,7 @@ Changelog
 9.1.5 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Prevent wildcard expressions for stopwords in simple expressions [reebalazs]
 
 
 9.1.4 (2023-06-09)
