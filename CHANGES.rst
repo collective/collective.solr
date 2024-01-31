@@ -1,7 +1,7 @@
 Changelog
 =========
 
-9.1.5 (unreleased)
+9.2.0 (2024-01-31)
 ------------------
 
 - Prevent wildcard expressions for stopwords in simple expressions [reebalazs]
