@@ -4,7 +4,7 @@ Changelog
 9.2.1 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Fix indexing of null values [reebalazs]
 
 
 9.2.0 (2024-01-31)
