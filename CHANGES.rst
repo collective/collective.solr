@@ -1,7 +1,7 @@
 Changelog
 =========
 
-9.2.1 (unreleased)
+9.2.1 (2024-02-01)
 ------------------
 
 - Fix indexing of null values [reebalazs]
