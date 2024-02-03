@@ -1,6 +1,8 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="utf-8"?>
 <registry>
-  <records interface="collective.solr.interfaces.ISolrSchema" prefix="collective.solr">
+  <records interface="collective.solr.interfaces.ISolrSchema"
+           prefix="collective.solr"
+  >
     <value key="active">False</value>
     <value key="host">127.0.0.1</value>
     <value key="port">8983</value>
@@ -10,7 +12,8 @@
     <value key="max_results">10000000</value>
     <value key="exclude_user">False
     </value>
-    <value key="search_pattern">+(Title:{value}^5 OR Description:{value}^2 OR SearchableText:{value} OR SearchableText:({base_value}) OR searchwords:({base_value})^1000) -showinsearch:False
+    <value key="search_pattern">+(Title:{value}^5 OR Description:{value}^2 OR SearchableText:{value}
+      OR SearchableText:({base_value}) OR searchwords:({base_value})^1000) -showinsearch:False
     </value>
     <value key="prefix_wildcard">False</value>
     <value key="force_simple_search">False</value>
@@ -27,10 +30,22 @@
     <value key="filter_queries">
       <element>portal_type</element>
     </value>
-    <value key="boost_script"></value>
-    <value key="solr_login"></value>
-    <value key="solr_password"></value>
+    <value key="boost_script" />
+    <value key="solr_login" />
+    <value key="solr_password" />
     <value key="use_tika">False</value>
     <value key="tika_default_field">content</value>
+    <!-- Stopwords will not get (word OR word*) simple expression, only (word).
+         Notes:
+         1. This will only work for multi word queries when force_simple_expression=True
+         2. It's still necessary to filter stopwords from Solr, this option only causes the
+            faulty (stopword*) parts removed from the expression.
+
+        This removal is by default case sensitive, but it can be made case insensitive. Use
+        this if you handle your stopwords in a case insensitive way. This depends on your
+        solr configuration.
+  -->
+    <value key="stopwords_case_insensitive">False</value>
+    <value key="stopwords" />
   </records>
 </registry>

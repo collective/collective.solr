@@ -1,0 +1,7 @@
+POST /solr/plone/update HTTP/1.1
+Host: localhost
+Accept-Encoding: identity
+Content-Length: 115
+Content-Type: text/xml; charset=utf-8
+
+<add><doc boost="2"><field name="id">500</field><field name="name" boost="5" update="set" null="true"/></doc></add>

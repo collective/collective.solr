@@ -11,7 +11,6 @@ MAX_RESULTS_SUPPORTED_BY_SOLR = 1_000_000_000
 
 
 class ISolrSchema(Interface):
-
     active = Bool(
         title=_("label_active", default="Active"),
         description=_(
@@ -404,6 +403,41 @@ class ISolrSchema(Interface):
             default="Field that Tika uses to add the extracted text to.",
         ),
         default="content",
+        required=False,
+    )
+
+    stopwords = Text(
+        title=_("label_stopwords", default="Stopwords in the format of stopwords.txt"),
+        description=_(
+            "help_stopwords",
+            default="Copy the stopwords.txt file here. "
+            "Check Solr configuration to understand the format. - "
+            "Stopwords will not get (word OR word*) simple "
+            "expression, only (word). "
+            "Notes: "
+            "1. This will only work for multi word queries "
+            "when force_simple_expression=True. - "
+            "2. It's still necessary to filter stopwords from "
+            "Solr, this option only causes the "
+            "faulty (stopword*) parts removed from "
+            "the expression ",
+        ),
+        default="",
+        required=False,
+    )
+
+    stopwords_case_insensitive = Bool(
+        title=_(
+            "label_stopwords_case_insensitive", default="Stopwords are case insensitive"
+        ),
+        description=_(
+            "help_stopwords_are_case_insensitive",
+            default="Stopwords are case insensitive "
+            "This depends on your Solr setup. If your stopwords are processed in a case insensitive way, "
+            "this should be checked and it will apply the stopword wildcard removal in a case "
+            "insensitive way.",
+        ),
+        default=False,
         required=False,
     )
 

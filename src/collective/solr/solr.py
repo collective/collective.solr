@@ -330,7 +330,16 @@ class SolrConnection:
                     tmpl = '<field name="%s" update="set" null="true"/>'
                     lst.append(tmpl % (self.escapeKey(f)))
             else:
-                lst.append(tmpl % self.escapeVal(v))
+                if v is None:
+                    if f in boost_values:
+                        tmpl = '<field name="%s" boost="%s" update="set" null="true"/>'
+                        tmpl = tmpl % (self.escapeKey(f), boost_values[f])
+                    else:
+                        tmpl = '<field name="%s" update="set" null="true"/>'
+                        tmpl = tmpl % (self.escapeKey(f))
+                    lst.append(tmpl)
+                else:
+                    lst.append(tmpl % self.escapeVal(v))
         lst.append("</doc>")
         lst.append("</add>")
         xstr = "".join(lst)

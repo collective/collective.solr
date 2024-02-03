@@ -1,11 +1,23 @@
 Changelog
 =========
 
-9.1.5 (unreleased)
+9.2.2 (unreleased)
 ------------------
 
 - Add support of https connections
   [remdub]
+
+
+9.2.1 (2024-02-01)
+------------------
+
+- Fix indexing of null values [reebalazs]
+
+
+9.2.0 (2024-01-31)
+------------------
+
+- Prevent wildcard expressions for stopwords in simple expressions [reebalazs]
 
 
 9.1.4 (2023-06-09)

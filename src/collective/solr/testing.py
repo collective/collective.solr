@@ -84,7 +84,6 @@ SOLR_FIXTURE = SolrLayer()
 
 
 class CollectiveSolrLayer(PloneSandboxLayer):
-
     defaultBases = (PLONE_FIXTURE,)
 
     def __init__(
@@ -92,9 +91,9 @@ class CollectiveSolrLayer(PloneSandboxLayer):
         bases=None,
         name="Collective Solr Layer",
         module=None,
-        solr_host=u"localhost",
+        solr_host="localhost",
         solr_port=8983,
-        solr_base=u"/solr/plone",
+        solr_base="/solr/plone",
         solr_active=False,
     ):
         super(PloneSandboxLayer, self).__init__(bases, name, module)
@@ -136,7 +135,7 @@ class CollectiveSolrLayer(PloneSandboxLayer):
     def tearDownPloneSite(self, portal):
         set_registry_record("collective.solr.active", False)
         set_registry_record("collective.solr.port", 8983)
-        set_registry_record("collective.solr.base", u"/solr/plone")
+        set_registry_record("collective.solr.base", "/solr/plone")
         self.solr_layer.tearDown()
 
 
@@ -180,7 +179,7 @@ def activateAndReindex(portal):
 class CollectiveSolrMockRegistry(object):
     def __init__(self):
         self.active = False
-        self.host = u"localhost"
+        self.host = "localhost"
         self.port = None
         self.base = None
         self.async_indexing = False
@@ -198,11 +197,13 @@ class CollectiveSolrMockRegistry(object):
         self.exclude_user = False
         self.field_list = []
         self.atomic_updates = False
-        self.boost_script = u""
+        self.boost_script = ""
         self.solr_login = None
         self.solr_password = None
         self.https_connection = False
         self.ignore_certificate_check = False
+        self.stopwords = ""
+        self.stopwords_case_insensitive = False
 
     def __getitem__(self, name):
         name_parts = name.split(".")
@@ -243,7 +244,7 @@ class CollectiveSolrMockRegistryLayer(Layer):
 
     def setUp(self):
         provideUtility(
-            provides=IRegistry, component=CollectiveSolrMockRegistry(), name=u""
+            provides=IRegistry, component=CollectiveSolrMockRegistry(), name=""
         )
 
     def tearDown(self):

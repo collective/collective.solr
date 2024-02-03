@@ -17,6 +17,8 @@ from collective.solr.utils import (
     removeSpecialCharactersAndOperators,
     splitSimpleSearch,
 )
+from collective.solr.stopword import isStopWord
+
 
 ranges = {
     "min": "[%s TO *]",
@@ -82,7 +84,7 @@ def makeSimpleExpressions(term, levenstein_distance):
 
 def mangleSearchableText(value, config, force_complex_search=False):
     config = config or getConfig()
-    pattern = getattr(config, "search_pattern", u"")
+    pattern = getattr(config, "search_pattern", "")
     force_simple_search = getattr(config, "force_simple_search", False)
     allow_complex_search = getattr(config, "allow_complex_search", False)
     levenstein_distance = getattr(config, "levenshtein_distance", 0)
@@ -108,6 +110,10 @@ def mangleSearchableText(value, config, force_complex_search=False):
 
     for term in splitSimpleSearch(value):
         (term_value, term_base_value) = makeSimpleExpressions(term, levenstein_distance)
+        # If this is a stopword, we never allow an (term AND term*) pattern, just use (term).
+        # Otherwise stopwords won't ever be found, because a (stopword*) search will never succeed.
+        if isStopWord(term, config):
+            term_value = term_base_value
         value_parts.append(term_value)
         base_value_parts.append(term_base_value)
 
@@ -120,6 +126,7 @@ def mangleSearchableText(value, config, force_complex_search=False):
         return set([value])  # add literal query parameter
     if pattern:
         pattern = pattern.encode("utf-8")
+
     return value
 
 
@@ -325,4 +332,4 @@ def optimizeQueryParameters(query, params):
     elif fq:
         params["fq"] = fq
     if not query:
-        query["*"] = u"*:*"  # catch all if no regular query is left...
+        query["*"] = "*:*"  # catch all if no regular query is left...
