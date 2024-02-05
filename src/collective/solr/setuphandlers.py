@@ -128,3 +128,17 @@ def migrate_to_7(context):
         registry_record.value = "content"
         registry.records["collective.solr.tika_default_field"] = registry_record
     logger.info("Migrated to version 7")
+
+def migrate_to_8(context):
+    registry = getUtility(IRegistry)
+    if "collective.solr.stopwords_case_insensitive" not in registry.records:
+        registry_field = field.Bool(title=u"Stopwords are case insensitive")
+        registry_record = Record(registry_field)
+        registry_record.value = False
+        registry.records["collective.solr.stopwords_case_insensitive"] = registry_record
+    if "collective.solr.stopwords" not in registry.records:
+        registry_field = field.Text(title=u"Stopwords in the format of stopwords.txt")
+        registry_record = Record(registry_field)
+        registry_record.value = ""
+        registry.records["collective.solr.stopwords"] = registry_record
+    logger.info("Migrated to version 8")
