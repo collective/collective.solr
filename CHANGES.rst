@@ -1,7 +1,7 @@
 Changelog
 =========
 
-9.2.2 (unreleased)
+9.2.2 (2024-02-06)
 ------------------
 
 - Allow leading spaces in the stopwords configuration [reebalazs]
