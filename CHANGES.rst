@@ -6,6 +6,7 @@ Changelog
 
 - Add support of https connections
   [remdub]
+- Allow leading spaces in the stopwords configuration [reebalazs]
 
 
 9.2.1 (2024-02-01)
