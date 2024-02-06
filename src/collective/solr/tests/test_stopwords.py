@@ -130,3 +130,19 @@ stopthree            # nostopthree
         self.assertTrue(isStopWord("stopone", self.config))
         self.assertTrue(isStopWord("stoptwo", self.config))
         self.assertTrue(isStopWord("stopthree", self.config))
+
+    def testLeadingSpaces(self):
+        # stopwords.txt does not allow leading spaces, but the registry
+        # pads it up because of the way we define it in the xml.
+        self.config.stopwords = (
+            """
+  stopone
+    stoptwo
+"""
+            + "   \n"
+        )
+        self.assertFalse(isStopWord("", self.config))
+        self.assertFalse(isStopWord("  ", self.config))
+        self.assertFalse(isStopWord("    ", self.config))
+        self.assertTrue(isStopWord("stopone", self.config))
+        self.assertTrue(isStopWord("stoptwo", self.config))

@@ -2,7 +2,7 @@ import re
 
 from collective.solr.utils import getConfig
 
-reLine = re.compile(r"^([A-Za-zÀ-ÖØ-öø-ÿ]*)")
+reLine = re.compile(r"^\s*([A-Za-zÀ-ÖØ-öø-ÿ]*)")
 
 raw = None
 raw_case_insensitive = None
