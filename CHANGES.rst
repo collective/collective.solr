@@ -1,7 +1,7 @@
 Changelog
 =========
 
-9.2.3 (unreleased)
+9.2.3 (2024-02-07)
 ------------------
 
 - Add upgrade step for missing stopwords registry entries [remdub]
