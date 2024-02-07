@@ -63,4 +63,14 @@
     profile="collective.solr:default"
     />
 
+  <genericsetup:upgradeStep
+    title="Upgrade to collective.solr 8"
+    description="Add stopwords registry entries"
+    source="7"
+    destination="8"
+    handler=".setuphandlers.migrate_to_8"
+    sortkey="1"
+    profile="collective.solr:default"
+    />
+
 </configure>
