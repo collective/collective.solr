@@ -4,14 +4,16 @@ Changelog
 9.2.3 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Add support of https connections
+  [remdub]
 
 
 9.2.2 (2024-02-06)
 ------------------
 
-- Add support of https connections
+- Add upgrade step for missing stopwords registry entries
   [remdub]
+
 - Allow leading spaces in the stopwords configuration [reebalazs]
 
 

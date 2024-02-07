@@ -132,6 +132,21 @@ def migrate_to_7(context):
 
 def migrate_to_8(context):
     registry = getUtility(IRegistry)
+    if "collective.solr.stopwords_case_insensitive" not in registry.records:
+        registry_field = field.Bool(title=u"Stopwords are case insensitive")
+        registry_record = Record(registry_field)
+        registry_record.value = False
+        registry.records["collective.solr.stopwords_case_insensitive"] = registry_record
+    if "collective.solr.stopwords" not in registry.records:
+        registry_field = field.Text(title=u"Stopwords in the format of stopwords.txt")
+        registry_record = Record(registry_field)
+        registry_record.value = ""
+        registry.records["collective.solr.stopwords"] = registry_record
+    logger.info("Migrated to version 8")
+
+
+def migrate_to_9(context):
+    registry = getUtility(IRegistry)
     if "collective.solr.https_connection" not in registry.records:
         registry_field = field.Bool(title=u"Use HTTPS connection")
         registry_record = Record(registry_field)
@@ -142,4 +157,4 @@ def migrate_to_8(context):
         registry_record = Record(registry_field)
         registry_record.value = False
         registry.records["collective.solr.ignore_certificate_check"] = registry_record
-    logger.info("Migrated to version 8")
+    logger.info("Migrated to version 9")
