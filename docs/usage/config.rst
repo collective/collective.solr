@@ -48,6 +48,7 @@ Here is a list of parameters and methods
 ============================    ===============  ========  =========================  =======
 **Parameter**                   **Example**      **ZCML**  **Environment Variables**  **TTW**
 ============================    ===============  ========  =========================  =======
+**Host**                        localhost        YES       YES                        YES
 **Port**                        8983             YES       YES                        YES
 **Base**                        /solr/plone      YES       YES                        YES
 **Login**                       login            NO        YES                        YES
