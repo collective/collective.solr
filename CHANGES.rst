@@ -4,13 +4,15 @@ Changelog
 9.2.4 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Add french locales
+  [remdub]
 
 
 9.2.3 (2024-02-07)
 ------------------
 
-- Add upgrade step for missing stopwords registry entries [remdub]
+- Add upgrade step for missing stopwords registry entries
+  [remdub]
 
 
 9.2.2 (2024-02-06)
