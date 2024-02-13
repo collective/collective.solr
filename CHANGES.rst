@@ -5,6 +5,7 @@ Changelog
 ------------------
 
 - Add support of https connections
+- Add french locales
   [remdub]
 
 
