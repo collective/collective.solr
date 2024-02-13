@@ -4,6 +4,9 @@ Changelog
 9.2.4 (unreleased)
 ------------------
 
+- Add support of https connections
+  [remdub]
+
 - Add french locales
   [remdub]
 

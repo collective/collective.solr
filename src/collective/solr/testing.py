@@ -200,6 +200,8 @@ class CollectiveSolrMockRegistry(object):
         self.boost_script = ""
         self.solr_login = None
         self.solr_password = None
+        self.https_connection = False
+        self.ignore_certificate_check = False
         self.stopwords = ""
         self.stopwords_case_insensitive = False
 

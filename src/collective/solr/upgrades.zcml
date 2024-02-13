@@ -73,4 +73,14 @@
     profile="collective.solr:default"
     />
 
+  <genericsetup:upgradeStep
+    title="Upgrade to collective.solr 9"
+    description="Add https_connection and ignore_certificate_check registry entries"
+    source="8"
+    destination="9"
+    handler=".setuphandlers.migrate_to_9"
+    sortkey="1"
+    profile="collective.solr:default"
+    />
+
 </configure>

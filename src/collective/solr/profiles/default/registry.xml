@@ -18,6 +18,8 @@
     <value key="prefix_wildcard">False</value>
     <value key="force_simple_search">False</value>
     <value key="allow_complex_search">False</value>
+    <value key="https_connection">False</value>
+    <value key="ignore_certificate_check">False</value>
     <value key="required">
       <element>SearchableText</element>
     </value>

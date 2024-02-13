@@ -23,6 +23,12 @@ def none_formatter(value):
     return value
 
 
+def bool_formatter(value):
+    if isinstance(value, bool):
+        return value
+    return value.lower() in ("true", "1")
+
+
 @implementer(IZCMLSolrConnectionConfig)
 class ZCMLSolrConnectionConfig(object):
     """Connection values that can be configured through zcml"""
@@ -109,6 +115,14 @@ class SolrConnectionManager(object):
             env_key="COLLECTIVE_SOLR_PASSWORD",
             formatter=none_formatter,
         )
+        config_https_connection = self.getConfigParameter(
+            "collective.solr.https_connection",
+            formatter=bool_formatter,
+        )
+        config_ignore_certificate_check = self.getConfigParameter(
+            "collective.solr.ignore_certificate_check",
+            formatter=bool_formatter,
+        )
         if zcmlconfig is not None:
             # use connection parameters defined in zcml...
             logger.debug("opening connection to %s", zcmlconfig.host)
@@ -118,6 +132,8 @@ class SolrConnectionManager(object):
                 persistent=True,
                 login=config_login,
                 password=config_password,
+                https_connection=config_https_connection,
+                ignore_certificate_check=config_ignore_certificate_check,
                 manager=self,
             )
             setLocal(self.connection_key, conn)
@@ -133,6 +149,8 @@ class SolrConnectionManager(object):
                 persistent=True,
                 login=config_login,
                 password=config_password,
+                https_connection=config_https_connection,
+                ignore_certificate_check=config_ignore_certificate_check,
                 manager=self,
             )
             setLocal(self.connection_key, conn)

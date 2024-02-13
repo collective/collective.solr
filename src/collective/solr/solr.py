@@ -30,6 +30,7 @@
 import base64
 import codecs
 import socket
+import ssl
 from copy import deepcopy
 from logging import getLogger
 from xml.etree.cElementTree import fromstring
@@ -62,6 +63,8 @@ class SolrConnection:
         timeout=None,
         login=None,
         password=None,
+        https_connection=False,
+        ignore_certificate_check=False,
         manager=None,
     ):
         self.manager = manager
@@ -73,7 +76,19 @@ class SolrConnection:
         # responses from Solr will always be in UTF-8
         self.decoder = codecs.getdecoder("utf-8")
         # a real connection to the server is not opened at this point.
-        self.conn = six.moves.http_client.HTTPConnection(self.host, timeout=timeout)
+        self.https_connection = https_connection
+        self.ignore_certificate_check = ignore_certificate_check
+        if self.https_connection:
+            if self.ignore_certificate_check:
+                self.conn = six.moves.http_client.HTTPSConnection(
+                    self.host, timeout=timeout, context=ssl._create_unverified_context()
+                )
+            else:
+                self.conn = six.moves.http_client.HTTPSConnection(
+                    self.host, timeout=timeout
+                )
+        else:
+            self.conn = six.moves.http_client.HTTPConnection(self.host, timeout=timeout)
         # self.conn.set_debuglevel(1000000)
         self.login = login
         self.auth_headers = {}

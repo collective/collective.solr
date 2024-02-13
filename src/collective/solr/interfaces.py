@@ -165,6 +165,24 @@ class ISolrSchema(Interface):
         required=False,
     )
 
+    https_connection = Bool(
+        title=_(
+            "label_https_connection",
+            default="Use HTTPS connection",
+        ),
+        default=False,
+        required=False,
+    )
+
+    ignore_certificate_check = Bool(
+        title=_(
+            "label_ignore_certificate_check",
+            default="Ignore certificate check",
+        ),
+        default=False,
+        required=False,
+    )
+
     force_simple_search = Bool(
         title=_("label_force_simple_search", default="Force simple search pattern"),
         description=_(
