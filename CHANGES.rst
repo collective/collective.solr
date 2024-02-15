@@ -1,7 +1,7 @@
 Changelog
 =========
 
-9.2.4 (unreleased)
+9.3.0 (2024-02-15)
 ------------------
 
 - Add support of https connections
