@@ -24,7 +24,7 @@ def isActive():
     """indicate if the solr connection should/can be used"""
     try:
         registry = queryUtility(IRegistry)
-        if not registry:
+        if registry is None:
             return False
         active = registry["collective.solr.active"]
     except KeyError:
