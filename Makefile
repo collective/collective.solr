@@ -88,6 +88,12 @@ build-plone-6.0: .installed.cfg  ## Build Plone 6.0
 	bin/pip install -r requirements-6.0.txt
 	bin/buildout -c plone-6.0.x.cfg
 
+.PHONY: Build Plone 6.1
+build-plone-6.1: .installed.cfg  ## Build Plone 6.1
+	bin/pip install --upgrade pip
+	bin/pip install -r requirements-6.1.txt
+	bin/buildout -c plone-6.1.x.cfg
+
 .PHONY: Test
 test:  ## Test
 	bin/pip install zest.pocompile
