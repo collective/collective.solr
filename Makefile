@@ -3,8 +3,6 @@
 SHELL := /bin/bash
 CURRENT_DIR:=$(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 
-version = 3.8
-
 # We like colors
 # From: https://coderwall.com/p/izxssa/colored-makefile-for-golang-projects
 RED=`tput setaf 1`
@@ -39,7 +37,7 @@ bin/buildout: bin/pip
 	@touch -c $@
 
 bin/python bin/pip:
-	python$(version) -m venv . || virtualenv --python=python$(version) .
+	python -m venv . || virtualenv .
 
 py2:
 	virtualenv --python=python2 .
