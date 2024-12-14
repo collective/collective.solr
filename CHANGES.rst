@@ -4,7 +4,13 @@ Changelog
 9.3.1 (unreleased)
 ------------------
 
+- Add support for Plone 6.1 [pbauer]
+
+- Drop support for Solr 7 and Solr 8. Solr 8 reached its end-of-live in October 2024 (https://solr.apache.org/news.html#solr-8-reaches-end-of-life) 
+  [tisto]
+
 - Fix creating a fresh site in Plone 6.1 when registry does not exist yet. Fixes #378 [pbauer]
+
 
 9.3.0 (2024-02-15)
 ------------------
