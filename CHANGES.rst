@@ -4,6 +4,8 @@ Changelog
 9.3.1 (unreleased)
 ------------------
 
+- Add support for Python 3.11 [tisto]
+
 - Add support for Plone 6.1 [pbauer]
 
 - Drop support for Solr 7 and Solr 8. Solr 8 reached its end-of-live in October 2024 (https://solr.apache.org/news.html#solr-8-reaches-end-of-life) 
