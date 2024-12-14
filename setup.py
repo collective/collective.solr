@@ -24,6 +24,7 @@ setup(
         "Framework :: Plone",
         "Framework :: Plone :: 5.2",
         "Framework :: Plone :: 6.0",
+        "Framework :: Plone :: 6.1",
         "Framework :: Plone :: Addon",
         "Intended Audience :: Developers",
         "Intended Audience :: System Administrators",
