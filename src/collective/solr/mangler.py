@@ -116,6 +116,10 @@ def mangleSearchableText(value, config, force_complex_search=False):
             term_value = term_base_value
         value_parts.append(term_value)
         base_value_parts.append(term_base_value)
+    if len(value_parts) == 0:
+        # Mangled out of existence. This must be done because Solr will choke on an
+        # empty field query.
+        return None
 
     base_value = " ".join(base_value_parts)
     value = " ".join(value_parts)
