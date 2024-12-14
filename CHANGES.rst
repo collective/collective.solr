@@ -4,6 +4,8 @@ Changelog
 9.3.1 (unreleased)
 ------------------
 
+- Add support for Python 3.12 [tisto]
+
 - Add support for Python 3.11 [tisto]
 
 - Add support for Plone 6.1 [pbauer]
