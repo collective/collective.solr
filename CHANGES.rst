@@ -4,8 +4,7 @@ Changelog
 9.3.1 (unreleased)
 ------------------
 
-- Nothing changed yet.
-
+- Fix creating a fresh site in Plone 6.1 when registry does not exist yet. Fixes #378 [pbauer]
 
 9.3.0 (2024-02-15)
 ------------------

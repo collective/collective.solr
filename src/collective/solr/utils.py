@@ -7,6 +7,7 @@ from plone.registry.interfaces import IRegistry
 from six.moves import range
 from unidecode import unidecode
 from zope.component import getUtility
+from zope.component import queryUtility
 
 if hasattr(str, "maketrans"):
     maketrans = str.maketrans
@@ -22,7 +23,9 @@ def getConfig():
 def isActive():
     """indicate if the solr connection should/can be used"""
     try:
-        registry = getUtility(IRegistry)
+        registry = queryUtility(IRegistry)
+        if registry is None:
+            return False
         active = registry["collective.solr.active"]
     except KeyError:
         return False
@@ -132,7 +135,7 @@ def isSimpleSearch(term):
                 new_parts.append(parts[i])
             else:
                 new_parts.append("quoted")
-        term = u"".join(new_parts)
+        term = "".join(new_parts)
     if bool(operators.match(term)):
         return False
     if bool(simpleCharacters.match(term)):
