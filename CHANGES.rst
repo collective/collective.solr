@@ -1,7 +1,7 @@
 Changelog
 =========
 
-9.3.1 (unreleased)
+9.4.0 (2024-12-14)
 ------------------
 
 - Add support for Python 3.11 [tisto]
