@@ -10,6 +10,8 @@ Changelog
 9.4.0 (2024-12-14)
 ------------------
 
+- Add support for Python 3.12 [tisto]
+
 - Add support for Python 3.11 [tisto]
 
 - Add support for Plone 6.1 [pbauer]
