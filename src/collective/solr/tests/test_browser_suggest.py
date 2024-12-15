@@ -2,11 +2,12 @@ import json
 import unittest
 
 import six
+from plone.app.testing import TEST_USER_ID, setRoles
+from zope.component import getMultiAdapter, getUtility
+
 from collective.solr.browser.errors import ErrorView
 from collective.solr.interfaces import ISolrConnectionManager
 from collective.solr.testing import LEGACY_COLLECTIVE_SOLR_INTEGRATION_TESTING
-from plone.app.testing import TEST_USER_ID, setRoles
-from zope.component import getMultiAdapter, getUtility
 
 
 class MockResponse:
@@ -81,7 +82,7 @@ class SuggestTermsViewIntegrationTest(unittest.TestCase):
         view = getMultiAdapter((self.portal, self.portal.REQUEST), name="suggest-terms")
         if hasattr(view, "__of__"):
             view = view.__of__(self.portal)
-        self.failUnless(view())
+        self.assertTrue(view())
         self.assertEqual(view(), "[]")
 
     def test_suggest_terms_view_with_empty_param(self):
@@ -89,7 +90,7 @@ class SuggestTermsViewIntegrationTest(unittest.TestCase):
         view = getMultiAdapter((self.portal, self.portal.REQUEST), name="suggest-terms")
         if hasattr(view, "__of__"):
             view = view.__of__(self.portal)
-        self.failUnless(view())
+        self.assertTrue(view())
         self.assertEqual(view(), "[]")
 
     def test_suggest_terms_view_with_param_not_in_solf(self):
@@ -97,7 +98,7 @@ class SuggestTermsViewIntegrationTest(unittest.TestCase):
         view = getMultiAdapter((self.portal, self.portal.REQUEST), name="suggest-terms")
         if hasattr(view, "__of__"):
             view = view.__of__(self.portal)
-        self.failUnless(view())
+        self.assertTrue(view())
         self.assertEqual(view(), "[]")
 
     def test_suggest_terms_view_with_correctly_spelled_param(self):
@@ -105,7 +106,7 @@ class SuggestTermsViewIntegrationTest(unittest.TestCase):
         view = getMultiAdapter((self.portal, self.portal.REQUEST), name="suggest-terms")
         if hasattr(view, "__of__"):
             view = view.__of__(self.portal)
-        self.failUnless(view())
+        self.assertTrue(view())
         self.assertEqual(view(), "[]")
 
     def test_suggest_terms_view_with_incorrectly_spelled_param(self):
@@ -116,7 +117,7 @@ class SuggestTermsViewIntegrationTest(unittest.TestCase):
         view = getMultiAdapter((self.portal, self.portal.REQUEST), name="suggest-terms")
         if hasattr(view, "__of__"):
             view = view.__of__(self.portal)
-        self.failUnless(view())
+        self.assertTrue(view())
         output = json.loads(view())
         self.assertEqual(len(output), 1)
         self.assertEqual(set(output[0]["value"].keys()), set(["word", "freq"]))

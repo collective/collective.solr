@@ -3,6 +3,11 @@ from re import DOTALL, findall, search
 from threading import Thread
 from unittest import TestCase
 
+from DateTime import DateTime
+from persistent.mapping import PersistentMapping
+from Products.CMFCore.CMFCatalogAware import CMFCatalogAware
+from zope.interface import implementer
+
 from collective.solr.indexer import SolrIndexProcessor
 from collective.solr.indexer import logger as logger_indexer
 from collective.solr.interfaces import ICheckIndexable
@@ -11,10 +16,6 @@ from collective.solr.solr import SolrConnection
 from collective.solr.testing import COLLECTIVE_SOLR_MOCK_REGISTRY_FIXTURE
 from collective.solr.tests.utils import fakehttp, fakemore, getData
 from collective.solr.utils import getConfig, prepareData
-from persistent.mapping import PersistentMapping
-from DateTime import DateTime
-from Products.CMFCore.CMFCatalogAware import CMFCatalogAware
-from zope.interface import implementer
 
 
 @implementer(ICheckIndexable)
@@ -372,7 +373,7 @@ class FakeHTTPConnectionTests(TestCase):
         output = fakehttp(mngr.getConnection(), getData("schema.xml"))
         mngr.getSchema()
         mngr.closeConnection()
-        self.failUnless(output.get().decode("utf-8").startswith(self.schema_request))
+        self.assertTrue(output.get().decode("utf-8").startswith(self.schema_request))
 
     def testTwoRequests(self):
         mngr = SolrConnectionManager(active=True)
@@ -383,7 +384,7 @@ class FakeHTTPConnectionTests(TestCase):
         proc.index(self.foo)
         mngr.closeConnection()
         self.assertEqual(len(output), 2)
-        self.failUnless(output.get().decode("utf-8").startswith(self.schema_request))
+        self.assertTrue(output.get().decode("utf-8").startswith(self.schema_request))
         self.assertEqual(
             sortFields(output.get()), getData("add_request.txt").rstrip(b"\n")
         )
@@ -401,7 +402,7 @@ class FakeHTTPConnectionTests(TestCase):
         proc.unindex(self.foo)
         mngr.closeConnection()
         self.assertEqual(len(output), 3)
-        self.failUnless(output.get().decode("utf-8").startswith(self.schema_request))
+        self.assertTrue(output.get().decode("utf-8").startswith(self.schema_request))
         self.assertEqual(
             sortFields(output.get()), getData("add_request.txt").rstrip(b"\n")
         )
@@ -422,7 +423,7 @@ class FakeHTTPConnectionTests(TestCase):
         proc.commit()
         mngr.closeConnection()
         self.assertEqual(len(output), 4)
-        self.failUnless(output.get().decode("utf-8").startswith(self.schema_request))
+        self.assertTrue(output.get().decode("utf-8").startswith(self.schema_request))
         self.assertEqual(
             sortFields(output.get()), getData("add_request.txt").rstrip(b"\n")
         )
@@ -442,7 +443,7 @@ class FakeHTTPConnectionTests(TestCase):
         proc.unindex(self.foo)
         mngr.closeConnection()
         self.assertEqual(len(output), 3)
-        self.failUnless(output.get().decode("utf-8").startswith(self.schema_request))
+        self.assertTrue(output.get().decode("utf-8").startswith(self.schema_request))
         self.assertEqual(
             sortFields(output.get()), getData("add_request.txt").rstrip(b"\n")
         )
@@ -498,9 +499,9 @@ class ThreadedConnectionTests(TestCase):
         self.assertEqual(
             sortFields(log[0].encode("utf-8")), getData("add_request.txt").rstrip(b"\n")
         )
-        self.failUnless(isinstance(log[1], SolrIndexProcessor))
-        self.failUnless(isinstance(log[2], SolrConnection))
-        self.failUnless(isinstance(proc, SolrIndexProcessor))
-        self.failUnless(isinstance(conn, SolrConnection))
+        self.assertTrue(isinstance(log[1], SolrIndexProcessor))
+        self.assertTrue(isinstance(log[2], SolrConnection))
+        self.assertTrue(isinstance(proc, SolrIndexProcessor))
+        self.assertTrue(isinstance(conn, SolrConnection))
         self.assertEqual(log[1], proc)  # processors should be the same...
         self.assertNotEqual(log[2], conn)  # but not the connections

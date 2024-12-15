@@ -89,14 +89,17 @@ build-plone-6.0: .installed.cfg  ## Build Plone 6.0
 	bin/buildout -c plone-6.0.x.cfg
 
 .PHONY: Build Plone 6.1
-build-plone-6.1: .installed.cfg  ## Build Plone 6.1
-	bin/pip install --upgrade pip
-	bin/pip install -r requirements-6.1.txt
-	bin/buildout -c plone-6.1.x.cfg
+build-plone-6.1: ## Build Plone 6.1
+	pyenv local 3.12
+	python -m venv .
+	pip install  -r requirements-6.1.x.txt
+	sed -ie "s#plone-6.0.x.cfg#plone-6.1.x.cfg#" buildout.cfg
+	sed -ie "s#solr-9.1.x.cfg#solr-9.5.x.cfg#" buildout.cfg
+	buildout
 
 .PHONY: Test
 test:  ## Test
-	bin/pip install zest.pocompile
+	pip install zest.pocompile
 	bin/pocompile src
 	bin/test
 

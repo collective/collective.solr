@@ -682,7 +682,7 @@ class SolrServerTests(TestCase):
             connection.search(q="+path_parents:\\/plone\\/news\\/new_id")
         )
 
-        self.assertEquals("/plone/news/new_id", response.results()[0]["path_string"])
+        self.assertEqual("/plone/news/new_id", response.results()[0]["path_string"])
 
     def testDateBefore1000AD(self):
         # AT's default "floor date" of `DateTime(1000, 1)` is converted

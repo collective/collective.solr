@@ -212,7 +212,7 @@ class UtilsTests(TestCase):
         def test_raise():
             raise e
 
-        self.assertRaisesRegexp(
+        self.assertRaisesRegex(
             SolrConnectionException, "HTTP code=503, reason=Error happend", test_raise
         )
         self.assertEqual(
