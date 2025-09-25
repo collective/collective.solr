@@ -4,7 +4,7 @@ Changelog
 9.4.1 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Reconfigure tika_default_field back to SearchableText [gyst]
 
 
 9.4.0 (2024-12-14)
