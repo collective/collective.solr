@@ -186,10 +186,21 @@ class BinaryAdder(DefaultAdder):
             root = etree.parse(response)
             data[tika_default_field] = root.find(".//str").text.strip()
         except SolrConnectionException as e:
-            logger.warn("Error %s @ %s", e, data["path_string"])
+            logger.warning("Error %s @ %s", e, data["path_string"])
+            if "Remote Streaming is disabled" in str(e.body):
+                logger.error(
+                    "Content not indexed. Remote streaming is disabled. "
+                    "See https://github.com/collective/collective.solr/issues/385 for a fix."
+                )
+            elif "access denied" in str(e.body):
+                logger.error(
+                    "Content not indexed. Java security policy disallows file access. "
+                    "Either set use_tika=True or set solr.allowPaths. "
+                    "See https://github.com/collective/collective.solr/issues/385 for a fix."
+                )
             data[tika_default_field] = ""
         except etree.XMLSyntaxError as e:
-            logger.warn("Parsing error %s @ %s.", e, data["path_string"])
+            logger.warning("Parsing error %s @ %s.", e, data["path_string"])
             data[tika_default_field] = ""
         finally:
             if use_tika:

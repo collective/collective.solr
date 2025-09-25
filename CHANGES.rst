@@ -4,7 +4,7 @@ Changelog
 9.4.1 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Be more helpful when encountering Tika errors [gyst]
 
 
 9.4.0 (2024-12-14)
