@@ -34,7 +34,7 @@
     <value key="solr_login" />
     <value key="solr_password" />
     <value key="use_tika">False</value>
-    <value key="tika_default_field">content</value>
+    <value key="tika_default_field">SearchableText</value>
     <!-- Stopwords will not get (word OR word*) simple expression, only (word).
          Notes:
          1. This will only work for multi word queries when force_simple_expression=True
