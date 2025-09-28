@@ -10,16 +10,16 @@ jobs:
 
     steps:
       # git checkout
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v5
 
       # python setup
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v1
+        uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.python-version }}
 
       # python cache
-      - uses: actions/cache@v1
+      - uses: actions/cache@v4
         with:
           path: ~/.cache/pip
           key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
