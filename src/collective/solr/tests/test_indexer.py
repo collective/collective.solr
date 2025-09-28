@@ -108,8 +108,9 @@ class QueueIndexerTests(TestCase):
         response = getData("add_response.txt")
         output = fakehttp(self.mngr.getConnection(), response)
         self.proc.index(foo)
-        self.assert_(
-            str(output).find('<field name="price" update="set">42.0</field>') > 0,
+        self.assertGreater(
+            str(output).find('<field name="price" update="set">42.0</field>'),
+            0,
             '"price" data not found',
         )
         # then only a subset...
@@ -117,8 +118,9 @@ class QueueIndexerTests(TestCase):
         output = fakehttp(self.mngr.getConnection(), response)
         self.proc.index(foo, attributes=["id", "name"])
         output = str(output)
-        self.assert_(
-            output.find('<field name="name" update="set">foo</field>') > 0,
+        self.assertGreater(
+            output.find('<field name="name" update="set">foo</field>'),
+            0,
             '"name" data not found',
         )
         # at this point we'd normally check for a partial update:
@@ -139,7 +141,7 @@ class QueueIndexerTests(TestCase):
         required = (
             '<field name="timestamp" update="set">' "1972-05-11T03:45:59.999Z</field>"
         )
-        self.assert_(str(output).find(required) > 0, '"date" data not found')
+        self.assertGreater(str(output).find(required), 0, '"date" data not found')
 
     def testDateIndexingWithPythonDateTime(self):
         foo = Foo(
@@ -155,7 +157,7 @@ class QueueIndexerTests(TestCase):
         required = (
             '<field name="timestamp" update="set">' "1980-09-29T14:02:59.999Z</field>"
         )
-        self.assert_(str(output).find(required) > 0, '"date" data not found')
+        self.assertGreater(str(output).find(required), 0, '"date" data not found')
 
     def testDateIndexingWithPythonDate(self):
         foo = Foo(
@@ -168,7 +170,7 @@ class QueueIndexerTests(TestCase):
         required = (
             '<field name="timestamp" update="set">' "1982-08-05T00:00:00.000Z</field>"
         )
-        self.assert_(str(output).find(required) > 0, '"date" data not found')
+        self.assertGreater(str(output).find(required), 0, '"date" data not found')
 
     def testReindexObject(self):
         response = getData("add_response.txt")
@@ -223,8 +225,9 @@ class QueueIndexerTests(TestCase):
         output = fakehttp(self.mngr.getConnection(), response)
         self.proc.index(foo)
         output = str(output)
-        self.assertTrue(
-            output.find('<field name="cat" update="set">nerd</field>') > 0,
+        self.assertGreater(
+            output.find('<field name="cat" update="set">nerd</field>'),
+            0,
             '"cat" data not found',
         )
         self.assertEqual(output.find("price"), -1, '"price" data found?')
@@ -240,7 +243,9 @@ class QueueIndexerTests(TestCase):
         output = fakehttp(self.mngr.getConnection(), response)
         self.proc.index(foo)
         required = '<field name="image_scales" update="set">{"key": "value"}</field>'
-        self.assert_(str(output).find(required) > 0, '"image_scales" data not found')
+        self.assertGreater(
+            str(output).find(required), 0, '"image_scales" data not found'
+        )
 
     def testListIndexing(self):
         foo = Foo(
@@ -255,10 +260,14 @@ class QueueIndexerTests(TestCase):
         required1 = '<field name="cat" update="set">rock</field>'
         required2 = '<field name="cat" update="set">paper</field>'
         required3 = '<field name="cat" update="set">Sharp scissors</field>'
-        self.assert_(str(output).find(required1) > 0, "Some element (rock) not found")
-        self.assert_(str(output).find(required2) > 0, "Some element (paper) not found")
-        self.assert_(
-            str(output).find(required3) > 0, "Some element (Sharp scissors) not found"
+        self.assertGreater(
+            str(output).find(required1), 0, "Some element (rock) not found"
+        )
+        self.assertGreater(
+            str(output).find(required2), 0, "Some element (paper) not found"
+        )
+        self.assertGreater(
+            str(output).find(required3), 0, "Some element (Sharp scissors) not found"
         )
 
     def testTupleIndexing(self):
@@ -274,10 +283,14 @@ class QueueIndexerTests(TestCase):
         required1 = '<field name="cat" update="set">rock</field>'
         required2 = '<field name="cat" update="set">paper</field>'
         required3 = '<field name="cat" update="set">Sharp scissors</field>'
-        self.assert_(str(output).find(required1) > 0, "Some element (rock) not found")
-        self.assert_(str(output).find(required2) > 0, "Some element (paper) not found")
-        self.assert_(
-            str(output).find(required3) > 0, "Some element (Sharp scissors) not found"
+        self.assertGreater(
+            str(output).find(required1), 0, "Some element (rock) not found"
+        )
+        self.assertGreater(
+            str(output).find(required2), 0, "Some element (paper) not found"
+        )
+        self.assertGreater(
+            str(output).find(required3), 0, "Some element (Sharp scissors) not found"
         )
 
     def testSetIndexing(self):
@@ -293,10 +306,14 @@ class QueueIndexerTests(TestCase):
         required1 = '<field name="cat" update="set">rock</field>'
         required2 = '<field name="cat" update="set">paper</field>'
         required3 = '<field name="cat" update="set">Sharp scissors</field>'
-        self.assert_(str(output).find(required1) > 0, "Some element (rock) not found")
-        self.assert_(str(output).find(required2) > 0, "Some element (paper) not found")
-        self.assert_(
-            str(output).find(required3) > 0, "Some element (Sharp scissors) not found"
+        self.assertGreater(
+            str(output).find(required1), 0, "Some element (rock) not found"
+        )
+        self.assertGreater(
+            str(output).find(required2), 0, "Some element (paper) not found"
+        )
+        self.assertGreater(
+            str(output).find(required3), 0, "Some element (Sharp scissors) not found"
         )
 
 
@@ -371,7 +388,7 @@ class FakeHTTPConnectionTests(TestCase):
         output = fakehttp(mngr.getConnection(), getData("schema.xml"))
         mngr.getSchema()
         mngr.closeConnection()
-        self.failUnless(output.get().decode("utf-8").startswith(self.schema_request))
+        self.assertTrue(output.get().decode("utf-8").startswith(self.schema_request))
 
     def testTwoRequests(self):
         mngr = SolrConnectionManager(active=True)
@@ -382,7 +399,7 @@ class FakeHTTPConnectionTests(TestCase):
         proc.index(self.foo)
         mngr.closeConnection()
         self.assertEqual(len(output), 2)
-        self.failUnless(output.get().decode("utf-8").startswith(self.schema_request))
+        self.assertTrue(output.get().decode("utf-8").startswith(self.schema_request))
         self.assertEqual(
             sortFields(output.get()), getData("add_request.txt").rstrip(b"\n")
         )
@@ -400,7 +417,7 @@ class FakeHTTPConnectionTests(TestCase):
         proc.unindex(self.foo)
         mngr.closeConnection()
         self.assertEqual(len(output), 3)
-        self.failUnless(output.get().decode("utf-8").startswith(self.schema_request))
+        self.assertTrue(output.get().decode("utf-8").startswith(self.schema_request))
         self.assertEqual(
             sortFields(output.get()), getData("add_request.txt").rstrip(b"\n")
         )
@@ -421,7 +438,7 @@ class FakeHTTPConnectionTests(TestCase):
         proc.commit()
         mngr.closeConnection()
         self.assertEqual(len(output), 4)
-        self.failUnless(output.get().decode("utf-8").startswith(self.schema_request))
+        self.assertTrue(output.get().decode("utf-8").startswith(self.schema_request))
         self.assertEqual(
             sortFields(output.get()), getData("add_request.txt").rstrip(b"\n")
         )
@@ -441,7 +458,7 @@ class FakeHTTPConnectionTests(TestCase):
         proc.unindex(self.foo)
         mngr.closeConnection()
         self.assertEqual(len(output), 3)
-        self.failUnless(output.get().decode("utf-8").startswith(self.schema_request))
+        self.assertTrue(output.get().decode("utf-8").startswith(self.schema_request))
         self.assertEqual(
             sortFields(output.get()), getData("add_request.txt").rstrip(b"\n")
         )
@@ -497,9 +514,9 @@ class ThreadedConnectionTests(TestCase):
         self.assertEqual(
             sortFields(log[0].encode("utf-8")), getData("add_request.txt").rstrip(b"\n")
         )
-        self.failUnless(isinstance(log[1], SolrIndexProcessor))
-        self.failUnless(isinstance(log[2], SolrConnection))
-        self.failUnless(isinstance(proc, SolrIndexProcessor))
-        self.failUnless(isinstance(conn, SolrConnection))
+        self.assertIsInstance(log[1], SolrIndexProcessor)
+        self.assertIsInstance(log[2], SolrConnection)
+        self.assertIsInstance(proc, SolrIndexProcessor)
+        self.assertIsInstance(conn, SolrConnection)
         self.assertEqual(log[1], proc)  # processors should be the same...
         self.assertNotEqual(log[2], conn)  # but not the connections

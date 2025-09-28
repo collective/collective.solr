@@ -77,7 +77,7 @@ class FacettingHelperTest(TestCase):
 
     def test_i18n_facet_titles(self):
         voc = I18NFacetTitlesVocabularyFactory()(context=None)
-        self.assertTrue("Bogus" in voc)
+        self.assertIn("Bogus", voc)
         term = voc.getTerm("München")
         # self.assertEqual(term.token, 'Mnchen')  XXX different on 4.3 and 5.x
         self.assertEqual(term.value, "München")

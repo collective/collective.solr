@@ -350,12 +350,10 @@ class QueryTests(TestCase):
             bq(name=set(["(Title:foo^10 OR Description:foo)"])),
             "(Title:foo^10 OR Description:foo)",
         )
-        self.assertTrue(
-            bq(name=set(["foo", "bar"])) in ["(foo OR bar)", "(bar OR foo)"]
-        )
-        self.assertTrue(
-            bq(name=set(["foo!", "+bar:camp"]))
-            in ["(foo! OR +bar:camp)", "(+bar:camp OR foo!)"]
+        self.assertIn(bq(name=set(["foo", "bar"])), ["(foo OR bar)", "(bar OR foo)"])
+        self.assertIn(
+            bq(name=set(["foo!", "+bar:camp"])),
+            ["(foo! OR +bar:camp)", "(+bar:camp OR foo!)"],
         )
 
     def testNotQueries(self):

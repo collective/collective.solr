@@ -135,8 +135,8 @@ class SolrFacettingTests(TestCase):
     def checkOrder(self, html, *order):
         for item in order:
             position = html.find(item)
-            self.assertTrue(
-                position >= 0, 'menu item "%s" missing or out of order' % item
+            self.assertGreaterEqual(
+                position, 0, 'menu item "%s" missing or out of order' % item
             )
             html = html[position:]
 
@@ -185,7 +185,7 @@ class SolrFacettingTests(TestCase):
             'value="foo"',
             "</form>",
         )
-        self.assertFalse("portal_type" in output)
+        self.assertNotIn("portal_type", output)
 
     def testUnknownFacetField(self):
         self.request.form["SearchableText"] = "News"
@@ -203,7 +203,7 @@ class SolrFacettingTests(TestCase):
         if hasattr(view, "__of__"):
             view = view.__of__(self.portal)
         output = view(results=solrSearchResults(self.request))
-        self.assertFalse("portal-searchfacets" in output, output)
+        self.assertNotIn("portal-searchfacets", output, output)
 
     def testEmptyFacetValue(self):
         # let's artificially create an empty value;  while this is a
@@ -225,7 +225,7 @@ class SolrFacettingTests(TestCase):
         # only one list item (`<dd>`)
         self.assertEqual(len(output.split("<dd>")), 2)
         # let's also make sure there are no empty filter queries
-        self.assertFalse("fq=portal_type%3A&amp;" in output)
+        self.assertNotIn("fq=portal_type%3A&amp;", output)
 
     def testFacetOrder(self):
         self.request.form["SearchableText"] = "News"

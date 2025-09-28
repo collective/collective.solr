@@ -100,7 +100,7 @@ class SolrSpatialSearchTests(unittest.TestCase):
         from Missing import Missing
 
         self.assertEqual(sorted([r.path_string for r in results]), ["/plone/location1"])
-        self.assertTrue(isinstance(results[0].geolocation, Missing))
+        self.assertIsInstance(results[0].geolocation, Missing)
 
     def testGeoSpatialFieldCanBeUpdated(self):
         self.portal.invokeFactory("Location", id="location1", title="Loc 1")

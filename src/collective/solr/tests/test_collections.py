@@ -33,7 +33,7 @@ class CollectionsTestCase(unittest.TestCase):
         # If not, then the other tests won't do anything.
         results = self.collection.results()
         self.assertGreater(results.length, 0)
-        self.assertTrue(isinstance(results[0], FlareContentListingObject))
+        self.assertIsInstance(results[0], FlareContentListingObject)
 
     def test_render_collection(self):
         # If it renders, it's good.
