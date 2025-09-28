@@ -56,7 +56,7 @@ jobs:
 
       # buildout
       - name: buildout
-        run: buildout -t 10 -c buildout.cfg
+        run: buildout -t 10 -c buildout.cfg install test solr
         env:
           CI: true
 
