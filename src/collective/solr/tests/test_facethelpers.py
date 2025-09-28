@@ -19,7 +19,6 @@ from zope.schema.vocabulary import SimpleTerm
 
 
 class Dummy(object):
-
     """dummy class that allows setting attributes"""
 
     def __init__(self, **kw):
@@ -79,10 +78,10 @@ class FacettingHelperTest(TestCase):
     def test_i18n_facet_titles(self):
         voc = I18NFacetTitlesVocabularyFactory()(context=None)
         self.assertTrue("Bogus" in voc)
-        term = voc.getTerm(u"München")
+        term = voc.getTerm("München")
         # self.assertEqual(term.token, 'Mnchen')  XXX different on 4.3 and 5.x
-        self.assertEqual(term.value, u"München")
-        self.assertEqual(term.title, u"München")
+        self.assertEqual(term.value, "München")
+        self.assertEqual(term.title, "München")
 
     def testConvertFacets(self):
         fields = dict(portal_type=dict(Document=10, Folder=3, Event=5, Topic=2))

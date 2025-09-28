@@ -129,7 +129,7 @@ class SolrFacettingTests(TestCase):
         view.kw = dict(results=solrSearchResults(self.request))
         facets = view.facets()
         self.assertEqual(
-            sorted([c["name"] for c in facets[0]["counts"]]), ["Collection", u"Føø"]
+            sorted([c["name"] for c in facets[0]["counts"]]), ["Collection", "Føø"]
         )
 
     def checkOrder(self, html, *order):

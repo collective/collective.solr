@@ -62,11 +62,11 @@ class UtilsTests(TestCase):
     def testSimpleTerm(self):
         self.assertTrue(isSimpleTerm("foo"))
         self.assertTrue(isSimpleTerm("foo "))
-        self.assertTrue(isSimpleTerm(u"føø"))
+        self.assertTrue(isSimpleTerm("føø"))
         self.assertTrue(isSimpleTerm("føø"))
         self.assertFalse(isSimpleTerm("foo!"))
         self.assertFalse(isSimpleTerm('"foo"'))
-        self.assertFalse(isSimpleTerm(u"føø!"))
+        self.assertFalse(isSimpleTerm("føø!"))
         # XXX Why would this be false?
         # self.assertFalse(isSimpleTerm(six.text_type('föö', 'latin')))
         self.assertTrue(isSimpleTerm("foo42"))
@@ -79,7 +79,7 @@ class UtilsTests(TestCase):
         self.assertTrue(isSimpleSearch("foo bar"))
         self.assertTrue(isSimpleSearch("foo bar "))
         self.assertTrue(isSimpleSearch("foo   bar"))
-        self.assertTrue(isSimpleSearch(u"føø bär"))
+        self.assertTrue(isSimpleSearch("føø bär"))
         self.assertTrue(isSimpleSearch("føø bär"))
         self.assertTrue(isSimpleSearch("foo*"))
         self.assertTrue(isSimpleSearch("foo* bar*"))
@@ -102,7 +102,7 @@ class UtilsTests(TestCase):
             )
         )
         self.assertFalse(isSimpleSearch(""))
-        self.assertFalse(isSimpleSearch(u"føø bär!"))
+        self.assertFalse(isSimpleSearch("føø bär!"))
         # XXX Why would this be false?
         # self.assertFalse(isSimpleSearch(six.text_type('föö bär', 'latin')))
         self.assertFalse(isSimpleSearch("foo AND bar"))
@@ -144,14 +144,14 @@ class UtilsTests(TestCase):
         self.assertTrue(isWildCard("foo bar?"))
         self.assertTrue(isWildCard("*"))
         self.assertTrue(isWildCard("?"))
-        self.assertTrue(isWildCard(u"føø*"))
-        self.assertTrue(isWildCard(u"føø*".encode("utf-8")))
-        self.assertTrue(isWildCard(u"*føø*"))
+        self.assertTrue(isWildCard("føø*"))
+        self.assertTrue(isWildCard("føø*".encode("utf-8")))
+        self.assertTrue(isWildCard("*føø*"))
         self.assertFalse(isWildCard("foo"))
         self.assertFalse(isWildCard("fo#o"))
         self.assertFalse(isWildCard("foo bar"))
-        self.assertFalse(isWildCard(u"føø"))
-        self.assertFalse(isWildCard(u"føø".encode("utf-8")))
+        self.assertFalse(isWildCard("føø"))
+        self.assertFalse(isWildCard("føø".encode("utf-8")))
         # other characters might be meaningful in solr, but we don't
         # distinguish them properly (yet)
         self.assertFalse(isWildCard("foo#?"))
@@ -233,9 +233,9 @@ class TranslationTests(TestCase):
         self.assertEqual(data, {"SearchableText": "foo\n\tbar  \r"})
 
     def testUnicodeSearchableText(self):
-        data = {"SearchableText": u"f\xf8\xf8 bar"}
+        data = {"SearchableText": "f\xf8\xf8 bar"}
         prepareData(data)
-        self.assertEqual(data, {"SearchableText": u"f\xf8\xf8 bar"})
+        self.assertEqual(data, {"SearchableText": "f\xf8\xf8 bar"})
 
 
 class BatchingHelperTests(TestCase):

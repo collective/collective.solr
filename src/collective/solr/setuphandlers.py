@@ -148,12 +148,12 @@ def migrate_to_8(context):
 def migrate_to_9(context):
     registry = getUtility(IRegistry)
     if "collective.solr.https_connection" not in registry.records:
-        registry_field = field.Bool(title=u"Use HTTPS connection")
+        registry_field = field.Bool(title="Use HTTPS connection")
         registry_record = Record(registry_field)
         registry_record.value = False
         registry.records["collective.solr.https_connection"] = registry_record
     if "collective.solr.ignore_certificate_check" not in registry.records:
-        registry_field = field.Bool(title=u"Ignore certificate check")
+        registry_field = field.Bool(title="Ignore certificate check")
         registry_record = Record(registry_field)
         registry_record.value = False
         registry.records["collective.solr.ignore_certificate_check"] = registry_record

@@ -19,7 +19,6 @@ from zope.interface import implementer
 
 @implementer(ICheckIndexable)
 class Foo(CMFCatalogAware):
-
     """dummy test object"""
 
     def __init__(self, **kw):

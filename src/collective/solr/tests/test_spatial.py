@@ -19,9 +19,7 @@ from zope.interface import Interface, implementer
 
 class ILocation(Interface):
 
-    geolocation = schema.TextLine(
-        title=u"Geo Location", description=u"", required=False
-    )
+    geolocation = schema.TextLine(title="Geo Location", description="", required=False)
 
 
 @implementer(ILocation)
