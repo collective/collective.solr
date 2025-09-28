@@ -6,6 +6,12 @@ Changelog
 
 - Update CI to get it working again [gforcada]
 
+- Add support for Python 3.12 and Python 3.13 [gforcada]
+
+- Remove support for Plone 5.2 [gforcada]
+
+- Test Plone 6.1 on CI [gforcada]
+
 9.4.0 (2024-12-14)
 ------------------
 
