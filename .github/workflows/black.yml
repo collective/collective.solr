@@ -6,22 +6,22 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [3.8]
-        black-version: ["21.11b1"]
-        click-version: ["8.0.4"]
+        python-version: [3.13]
+        black-version: ["25.9.0"]
+        click-version: ["8.3.0"]
 
     steps:
       # git checkout
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v5
 
       # python setup
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v1
+        uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.python-version }}
 
       # python cache
-      - uses: actions/cache@v1
+      - uses: actions/cache@v4
         with:
           path: ~/.cache/pip
           key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}

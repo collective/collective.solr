@@ -161,7 +161,7 @@ class QuoteTests(TestCase):
         self.assertEqual(quote("[ø]"), b"\\[\xc3\xb8\\]".decode("utf-8"))
         self.assertEqual(quote('"foø*"'), b'"fo\xc3\xb8\\*"'.decode("utf-8"))
         self.assertEqual(quote('"foø bar?"'), b'"fo\xc3\xb8 bar\\?"'.decode("utf-8"))
-        self.assertEqual(quote(u"john@foo.com"), "john@foo.com")
+        self.assertEqual(quote("john@foo.com"), "john@foo.com")
 
     def testSolrSpecifics(self):
         # https://wiki.apache.org/solr/SolrQuerySyntax
@@ -235,7 +235,7 @@ class QueryTests(TestCase):
         self.assertEqual(bq(("foo", "bar")), "+(foo OR bar)")
         self.assertEqual(bq(("foo", "bar*")), "+(foo OR bar*)")
         self.assertEqual(bq(("foo bar", "hmm")), '+("foo bar" OR hmm)')
-        self.assertEqual(bq((u"foø bar", "hmm")), u'+("foø bar" OR hmm)')
+        self.assertEqual(bq(("foø bar", "hmm")), '+("foø bar" OR hmm)')
         self.assertEqual(bq(('"foo bar"', "hmm")), '+("foo bar" OR hmm)')
         self.assertEqual(bq(name=["foo", "bar"]), "+name:(foo OR bar)")
         self.assertEqual(bq(name=["foo", "bar*"]), "+name:(foo OR bar*)")
@@ -271,19 +271,19 @@ class QueryTests(TestCase):
 
     def testUnicodeArguments(self):
         bq = self.bq
-        self.assertEqual(bq(u"foo"), u"+foo")
-        self.assertEqual(bq(u"foø"), u"+foø")
-        self.assertEqual(bq(u"john@foo.com"), u"+john@foo.com")
-        self.assertEqual(bq(name=[u"foo", u"bar"]), u"+name:(foo OR bar)")
-        self.assertEqual(bq(name=[u"foo", u"bär"]), u"+name:(foo OR bär)")
+        self.assertEqual(bq("foo"), "+foo")
+        self.assertEqual(bq("foø"), "+foø")
+        self.assertEqual(bq("john@foo.com"), "+john@foo.com")
+        self.assertEqual(bq(name=["foo", "bar"]), "+name:(foo OR bar)")
+        self.assertEqual(bq(name=["foo", "bär"]), "+name:(foo OR bär)")
         self.assertEqual(
-            bq(name=u"foo", cat=(u"bar", u"hmm")), u"+cat:(bar OR hmm) +name:foo"
+            bq(name="foo", cat=("bar", "hmm")), "+cat:(bar OR hmm) +name:foo"
         )
         self.assertEqual(
-            bq(name="foo", cat=(u"bär", u"hmm")), u"+cat:(bär OR hmm) +name:foo"
+            bq(name="foo", cat=("bär", "hmm")), "+cat:(bär OR hmm) +name:foo"
         )
         self.assertEqual(
-            bq(name=u"john@foo.com", cat=u"spammer"), "+cat:spammer +name:john@foo.com"
+            bq(name="john@foo.com", cat="spammer"), "+cat:spammer +name:john@foo.com"
         )
 
     def testQuotedQueries(self):
@@ -315,12 +315,12 @@ class QueryTests(TestCase):
     def testComplexQueries(self):
         bq = self.bq
         self.assertEqual(
-            bq(u"foo", name=u'"herb*"', cat=(u"bär", u'"-hmm"')),
-            u'+cat:(bär OR "\\-hmm") +foo +name:"herb\\*"',
+            bq("foo", name='"herb*"', cat=("bär", '"-hmm"')),
+            '+cat:(bär OR "\\-hmm") +foo +name:"herb\\*"',
         )
         self.assertEqual(
-            bq(u"foo", name=u"herb*", cat=(u"bär", u"-hmm")),
-            u"+cat:(bär OR -hmm) +foo +name:herb*",
+            bq("foo", name="herb*", cat=("bär", "-hmm")),
+            "+cat:(bär OR -hmm) +foo +name:herb*",
         )
 
     def testBooleanQueries(self):
@@ -350,12 +350,10 @@ class QueryTests(TestCase):
             bq(name=set(["(Title:foo^10 OR Description:foo)"])),
             "(Title:foo^10 OR Description:foo)",
         )
-        self.assertTrue(
-            bq(name=set(["foo", "bar"])) in ["(foo OR bar)", "(bar OR foo)"]
-        )
-        self.assertTrue(
-            bq(name=set(["foo!", "+bar:camp"]))
-            in ["(foo! OR +bar:camp)", "(+bar:camp OR foo!)"]
+        self.assertIn(bq(name=set(["foo", "bar"])), ["(foo OR bar)", "(bar OR foo)"])
+        self.assertIn(
+            bq(name=set(["foo!", "+bar:camp"])),
+            ["(foo! OR +bar:camp)", "(+bar:camp OR foo!)"],
         )
 
     def testNotQueries(self):

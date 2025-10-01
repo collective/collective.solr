@@ -53,9 +53,7 @@ class UtilityTests(TestCase):
         procs = list(getUtilitiesFor(IIndexQueueProcessor))
         self.assertTrue(procs, "no utilities found")
         solr = queryUtility(ISolrIndexQueueProcessor, name="solr")
-        self.assertTrue(
-            solr in [util for name, util in procs], "solr utility not found"
-        )
+        self.assertIn(solr, [util for name, util in procs], "solr utility not found")
 
     def testSearchInterface(self):
         search = queryUtility(ISearch)
@@ -127,7 +125,7 @@ class IndexingTests(TestCase):
         self.assertEqual(str(output), "", "reindexed unqueued!")
         commit()  # indexing happens on commit
         required = '<field name="Title" update="set">Foo</field>'
-        self.assertTrue(str(output).find(required) > 0, '"title" data not found')
+        self.assertGreater(str(output).find(required), 0, '"title" data not found')
 
     def testNoIndexingForNonCatalogAwareContent(self):
         output = []

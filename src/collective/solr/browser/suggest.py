@@ -35,7 +35,7 @@ class SuggestView(BrowserView):
 
         # Check for existing spellcheck suggestions
         spellcheck_suggestions = spellcheck.get("suggestions", None)
-        correctly_spelled = spellcheck_suggestions == [u"correctlySpelled", True]
+        correctly_spelled = spellcheck_suggestions == ["correctlySpelled", True]
 
         # Autocomplete
         if correctly_spelled:

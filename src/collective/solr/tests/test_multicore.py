@@ -61,7 +61,7 @@ class SolrMulticoreTests(unittest.TestCase):
         self.assertEqual("schema_plone", plone_manager.schema_key)
 
         plone_conn = plone_manager.getConnection()
-        self.assertTrue(default_conn != plone_conn)
+        self.assertNotEqual(default_conn, plone_conn)
         self.assertEqual("/solr/plone", plone_conn.solrBase)
 
         plone_schema = plone_manager.getSchema()
@@ -74,7 +74,7 @@ class SolrMulticoreTests(unittest.TestCase):
         self.assertEqual("schema_foo", foo_manager.schema_key)
 
         foo_conn = foo_manager.getConnection()
-        self.assertTrue(default_conn != foo_conn)
+        self.assertNotEqual(default_conn, foo_conn)
         self.assertEqual("/solr/foo", foo_conn.solrBase)
 
     def test_search_on_core(self):
@@ -94,7 +94,7 @@ class SolrMulticoreTests(unittest.TestCase):
         # Verify connections and schemas
         default_conn = getLocal("connection")
         plone_conn = getLocal("connection_plone")
-        self.assertTrue(default_conn != plone_conn)
+        self.assertNotEqual(default_conn, plone_conn)
         self.assertIsNotNone(default_conn)
         self.assertIsNotNone(plone_conn)
 
