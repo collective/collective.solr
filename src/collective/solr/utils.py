@@ -159,7 +159,7 @@ def splitSimpleSearch(term):
             words = [
                 word
                 for word in parts[i].split()
-                if word and word != "*" and word != "**"
+                if word and word != "*" and word != "**" and len(word) > 2
             ]
             tokens.extend(words)
         else:
