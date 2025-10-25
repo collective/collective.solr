@@ -4,7 +4,12 @@ Changelog
 9.4.1 (unreleased)
 ------------------
 
-- Reconfigure tika_default_field back to SearchableText [gyst]
+- Reconfigure ``tika_default_field`` back to ``SearchableText``, and use the ``tika_default_field`` value also if ``use_tika`` is False,
+  because ``use_tika`` is not about using Tika, it's about using remote streaming.
+  Existing sites should not be impacted, since they already have ``tika_default_field='content'`` as stored value.
+  ``SearchableText`` is used in many places; if you want to use ``content`` instead you'll have to at least adjust ``search_pattern``.
+  If you're using Plone Classic using ``SearchableText`` is more or less mandatory.
+  [gyst]
 
 - Update CI to get it working again [gforcada]
 

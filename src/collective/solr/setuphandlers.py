@@ -158,11 +158,3 @@ def migrate_to_9(context):
         registry_record.value = False
         registry.records["collective.solr.ignore_certificate_check"] = registry_record
     logger.info("Migrated to version 9")
-
-def migrate_to_10(context):
-    registry = getUtility(IRegistry)
-    registry_field = field.TextLine(title="Tika Default Field")
-    registry_record = Record(registry_field)
-    registry_record.value = "SearchableText"
-    registry.records["collective.solr.tika_default_field"] = registry_record
-    logger.info("Reconfigured tika_default_field to SearchableText")

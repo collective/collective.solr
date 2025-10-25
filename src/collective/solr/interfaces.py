@@ -385,10 +385,10 @@ class ISolrSchema(Interface):
     )
 
     use_tika = Bool(
-        title=_("label_use_tika", default="Use Tika"),
+        title=_("label_use_tika", default="Use remote streaming for Tika"),
         description=_(
             "help_use_tika",
-            default="Upload binary files to Solr via Tika. "
+            default="Upload binary files to Solr via https remote streaming. "
             "That way Solr does not need direct access to the blob files on the file system. "
             "Use this setting when Solr runs on a separate server or if you use Relstorage instead of ZEO.",
         ),

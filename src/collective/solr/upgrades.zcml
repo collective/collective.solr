@@ -83,14 +83,4 @@
     profile="collective.solr:default"
     />
 
-  <genericsetup:upgradeStep
-    title="Reconfigure tika_default_field"
-    description="Reconfigure tika_default_field back to SearchableText"
-    source="9"
-    destination="10"
-    handler=".setuphandlers.migrate_to_10"
-    sortkey="1"
-    profile="collective.solr:default"
-    />
-
 </configure>
