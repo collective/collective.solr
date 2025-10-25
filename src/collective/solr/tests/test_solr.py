@@ -29,15 +29,15 @@ class TestSolr(TestCase):
         res = c.flush()
         self.assertEqual(len(res), 1)  # one request was sent
         res = res[0]
-        self.failUnlessEqual(str(output), add_request.decode("utf-8"))
+        self.assertEqual(str(output), add_request.decode("utf-8"))
         # Status
         node = res.findall(".//int")[0]
-        self.failUnlessEqual(node.attrib["name"], "status")
-        self.failUnlessEqual(node.text, "0")
+        self.assertEqual(node.attrib["name"], "status")
+        self.assertEqual(node.text, "0")
         # QTime
         node = res.findall(".//int")[1]
-        self.failUnlessEqual(node.attrib["name"], "QTime")
-        self.failUnlessEqual(node.text, "4")
+        self.assertEqual(node.attrib["name"], "QTime")
+        self.assertEqual(node.text, "4")
         res.find("QTime")
 
     def test_add_with_boost_values(self):
@@ -62,7 +62,7 @@ class TestSolr(TestCase):
 
         res = c.flush()
         self.assertEqual(len(res), 1)  # one request was sent
-        self.failUnlessEqual(str(output), add_request.decode("utf-8"))
+        self.assertEqual(str(output), add_request.decode("utf-8"))
 
     def test_add_none(self):
         config = getConfig()
@@ -81,15 +81,15 @@ class TestSolr(TestCase):
         res = c.flush()
         self.assertEqual(len(res), 1)  # one request was sent
         res = res[0]
-        self.failUnlessEqual(str(output), add_request.decode("utf-8"))
+        self.assertEqual(str(output), add_request.decode("utf-8"))
         # Status
         node = res.findall(".//int")[0]
-        self.failUnlessEqual(node.attrib["name"], "status")
-        self.failUnlessEqual(node.text, "0")
+        self.assertEqual(node.attrib["name"], "status")
+        self.assertEqual(node.text, "0")
         # QTime
         node = res.findall(".//int")[1]
-        self.failUnlessEqual(node.attrib["name"], "QTime")
-        self.failUnlessEqual(node.text, "4")
+        self.assertEqual(node.attrib["name"], "QTime")
+        self.assertEqual(node.text, "4")
         res.find("QTime")
 
     def test_add_none_with_boost_values(self):
@@ -114,7 +114,7 @@ class TestSolr(TestCase):
 
         res = c.flush()
         self.assertEqual(len(res), 1)  # one request was sent
-        self.failUnlessEqual(str(output), add_request.decode("utf-8"))
+        self.assertEqual(str(output), add_request.decode("utf-8"))
 
     def test_connection_str(self):
         c = SolrConnection(host="localhost:8983", persistent=True)
@@ -145,15 +145,15 @@ class TestSolr(TestCase):
         res = c.commit()
         self.assertEqual(len(res), 1)  # one request was sent
         res = res[0]
-        self.failUnlessEqual(str(output), commit_request.decode("utf-8"))
+        self.assertEqual(str(output), commit_request.decode("utf-8"))
         # Status
         node = res.findall(".//int")[0]
-        self.failUnlessEqual(node.attrib["name"], "status")
-        self.failUnlessEqual(node.text, "0")
+        self.assertEqual(node.attrib["name"], "status")
+        self.assertEqual(node.text, "0")
         # QTime
         node = res.findall(".//int")[1]
-        self.failUnlessEqual(node.attrib["name"], "QTime")
-        self.failUnlessEqual(node.text, "55")
+        self.assertEqual(node.attrib["name"], "QTime")
+        self.assertEqual(node.text, "55")
         res.find("QTime")
 
     def test_commit_with_authentication(self):
@@ -166,15 +166,15 @@ class TestSolr(TestCase):
         res = c.commit()
         self.assertEqual(len(res), 1)  # one request was sent
         res = res[0]
-        self.failUnlessEqual(str(output), commit_request.decode("utf-8"))
+        self.assertEqual(str(output), commit_request.decode("utf-8"))
         # Status
         node = res.findall(".//int")[0]
-        self.failUnlessEqual(node.attrib["name"], "status")
-        self.failUnlessEqual(node.text, "0")
+        self.assertEqual(node.attrib["name"], "status")
+        self.assertEqual(node.text, "0")
         # QTime
         node = res.findall(".//int")[1]
-        self.failUnlessEqual(node.attrib["name"], "QTime")
-        self.failUnlessEqual(node.text, "55")
+        self.assertEqual(node.attrib["name"], "QTime")
+        self.assertEqual(node.text, "55")
         res.find("QTime")
 
     def test_optimize(self):
@@ -183,7 +183,7 @@ class TestSolr(TestCase):
         c = SolrConnection(host="localhost:8983", persistent=True)
         output = fakehttp(c, commit_response)
         c.commit(optimize=True)
-        self.failUnlessEqual(str(output), commit_request.decode("utf-8"))
+        self.assertEqual(str(output), commit_request.decode("utf-8"))
 
     def test_commit_no_wait_flush(self):
         commit_request = getData("commit_request.txt").rstrip(b"\n")
@@ -191,7 +191,7 @@ class TestSolr(TestCase):
         c = SolrConnection(host="localhost:8983", persistent=True)
         output = fakehttp(c, commit_response)
         c.commit()
-        self.failUnlessEqual(str(output), commit_request.decode("utf-8"))
+        self.assertEqual(str(output), commit_request.decode("utf-8"))
 
     def test_commit_no_wait_searcher(self):
         commit_request = getData("commit_request_no_wait_searcher.txt").rstrip(b"\n")
@@ -199,7 +199,7 @@ class TestSolr(TestCase):
         c = SolrConnection(host="localhost:8983", persistent=True)
         output = fakehttp(c, commit_response)
         c.commit(waitSearcher=False)
-        self.failUnlessEqual(str(output), commit_request.decode("utf-8"))
+        self.assertEqual(str(output), commit_request.decode("utf-8"))
 
     def test_search(self):
         # XXX: Solr 7 has a new query param 'q.op' which can not be passed to
@@ -228,7 +228,7 @@ class TestSolr(TestCase):
             normalize(output.get()),
             [normalize(search_request), normalize(search_request_py2)],
         )
-        self.failUnless(res.find((".//doc")))
+        self.assertTrue(res.find((".//doc")))
 
     def test_search_with_default_request_handler(self):
         search_response = getData("search_response.txt")
@@ -253,23 +253,23 @@ class TestSolr(TestCase):
         res = c.flush()
         self.assertEqual(len(res), 1)  # one request was sent
         res = res[0]
-        self.failUnlessEqual(str(output), delete_request.decode("utf-8"))
+        self.assertEqual(str(output), delete_request.decode("utf-8"))
         # Status
         node = res.findall(".//int")[0]
-        self.failUnlessEqual(node.attrib["name"], "status")
-        self.failUnlessEqual(node.text, "0")
+        self.assertEqual(node.attrib["name"], "status")
+        self.assertEqual(node.text, "0")
         # QTime
         node = res.findall(".//int")[1]
-        self.failUnlessEqual(node.attrib["name"], "QTime")
-        self.failUnlessEqual(node.text, "0")
+        self.assertEqual(node.attrib["name"], "QTime")
+        self.assertEqual(node.text, "0")
         res.find("QTime")
 
     def test_conn(self):
         # http connection
         c = SolrConnection(host="localhost:8983", persistent=True)
-        self.assertTrue(type(c.conn) is six.moves.http_client.HTTPConnection)
+        self.assertIs(type(c.conn), six.moves.http_client.HTTPConnection)
         # https connection
         c = SolrConnection(
             host="localhost:8983", persistent=True, https_connection=True
         )
-        self.assertTrue(type(c.conn) is six.moves.http_client.HTTPSConnection)
+        self.assertIs(type(c.conn), six.moves.http_client.HTTPSConnection)

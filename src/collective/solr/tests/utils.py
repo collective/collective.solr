@@ -39,7 +39,6 @@ def fakehttp(solrconn, *fakedata):
     """helper function to set up a fake http request on a SolrConnection"""
 
     class FakeOutput(list):
-
         """helper class to organize output from fake connections"""
 
         conn = solrconn
@@ -71,7 +70,6 @@ def fakehttp(solrconn, *fakedata):
     output = FakeOutput()
 
     class FakeSocket(six.BytesIO):
-
         """helper class to fake socket communication"""
 
         def sendall(self, str):
@@ -98,7 +96,6 @@ def fakehttp(solrconn, *fakedata):
             return six.BytesIO.readline(self, length)
 
     class FakeHTTPConnection(HTTPConnection):
-
         """helper class to fake a http connection object from httplib.py"""
 
         def __init__(self, host, *fakedata):

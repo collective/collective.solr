@@ -69,7 +69,7 @@ class SearchExtender(object):
             schemata="settings",
             default=True,
             widget=BooleanWidget(
-                label=_("label_showinsearch", default=u"Show in search"),
+                label=_("label_showinsearch", default="Show in search"),
                 visible={"edit": "visible", "view": "invisible"},
                 description="",
             ),
@@ -80,12 +80,12 @@ class SearchExtender(object):
             schemata="settings",
             languageIndependent=False,
             widget=TextAreaWidget(
-                label=_("label_searchwords", default=u"Search words"),
+                label=_("label_searchwords", default="Search words"),
                 description=_(
                     "help_searchwords",
-                    u"Specify words for which this item will show up "
-                    u"as the first search result. Multiple words can be "
-                    u"specified on new lines.",
+                    "Specify words for which this item will show up "
+                    "as the first search result. Multiple words can be "
+                    "specified on new lines.",
                 ),
                 visible={"edit": "visible", "view": "invisible"},
             ),

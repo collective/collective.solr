@@ -350,11 +350,8 @@ class SolrMaintenanceTests(TestCase):
             queryAdapter(self.portal["front-page"], ISolrAddHandler, name="Document"),
             None,
         )
-        self.assertTrue(
-            isinstance(
-                queryAdapter(self.folder.dull, ISolrAddHandler, name="Image"),
-                BinaryAdder,
-            )
+        self.assertIsInstance(
+            queryAdapter(self.folder.dull, ISolrAddHandler, name="Image"), BinaryAdder
         )
 
     def testReindexIgnoreExceptions(self):
@@ -507,8 +504,8 @@ class SolrErrorHandlingTests(TestCase):
         # socket error, instead of the connection.
         # This also means we do not have the payload sent to solr at this
         # place.
-        self.assertTrue("exception during indexing %r" in log)
-        self.assertTrue("exception during request %r" in log)
+        self.assertIn("exception during indexing %r", log)
+        self.assertIn("exception during request %r", log)
 
     def testNetworkFailureBeforeSchemaCanBeLoaded(self):
         log = []
@@ -532,7 +529,7 @@ class SolrErrorHandlingTests(TestCase):
             "unable to fetch schema, "
             "skipping indexing of {}".format(self.portal.tnfb) in log,
         )
-        self.assertTrue("exception during request %r" in log)
+        self.assertIn("exception during request %r", log)
 
 
 class SolrServerTests(TestCase):
@@ -682,7 +679,7 @@ class SolrServerTests(TestCase):
             connection.search(q="+path_parents:\\/plone\\/news\\/new_id")
         )
 
-        self.assertEquals("/plone/news/new_id", response.results()[0]["path_string"])
+        self.assertEqual("/plone/news/new_id", response.results()[0]["path_string"])
 
     def testDateBefore1000AD(self):
         # AT's default "floor date" of `DateTime(1000, 1)` is converted
@@ -811,7 +808,7 @@ class SolrServerTests(TestCase):
         response = solrSearchResults(**query)
         self.assertEqual(len(response), 2)
         self.assertEqual(response.response.numFound, "2")
-        self.assertTrue(isinstance(response.responseHeader, dict))
+        self.assertIsInstance(response.responseHeader, dict)
         headers = response.responseHeader
         self.assertEqual(sorted(headers), ["QTime", "params", "status"])
         self.assertEqual(headers["params"]["q"], "+SearchableText:(news* OR News)")
@@ -1071,7 +1068,7 @@ class SolrServerTests(TestCase):
         request = dict(SearchableText="[* TO *]")
         results = solrSearchResults(request, is_folderish=True)
         self.assertEqual(len(results), len(DEFAULT_OBJS) - 3)
-        self.assertFalse("/plone/front-page" in [r.path_string for r in results])
+        self.assertNotIn("/plone/front-page", [r.path_string for r in results])
         results = solrSearchResults(request, is_folderish=False)
         self.assertEqual(
             sorted([r.path_string for r in results]),
@@ -1116,13 +1113,13 @@ class SolrServerTests(TestCase):
         results = self.portal.portal_catalog(request)
         self.assertEqual(len(results), len(DEFAULT_OBJS) - 2)
         paths = [r.path_string for r in results]
-        self.assertFalse("/plone/news" in paths)
-        self.assertFalse("/plone/events" in paths)
+        self.assertNotIn("/plone/news", paths)
+        self.assertNotIn("/plone/events", paths)
         results = self.portal.portal_catalog(request, show_inactive=True)
         self.assertEqual(len(results), len(DEFAULT_OBJS))
         paths = [r.path_string for r in results]
-        self.assertTrue("/plone/news" in paths)
-        self.assertTrue("/plone/events" in paths)
+        self.assertIn("/plone/news", paths)
+        self.assertIn("/plone/events", paths)
 
     def testEffectiveRangeWithSteps(self):
         # set some content to become effective/expire around this time...
@@ -1137,22 +1134,22 @@ class SolrServerTests(TestCase):
         request = dict(use_solr=True, show_inactive=True, effectiveRange=now)
         results = self.portal.portal_catalog(request)
         paths = [r.path_string for r in results]
-        self.assertTrue("/plone/news" in paths)
-        self.assertFalse("/plone/events" in paths)
+        self.assertIn("/plone/news", paths)
+        self.assertNotIn("/plone/events", paths)
         self.assertEqual(len(results), len(DEFAULT_OBJS) - 1)
         # with a granularity of 5 minutes the news item isn't effective yet
         self.config.effective_steps = 300
         results = self.portal.portal_catalog(request)
         paths = [r.path_string for r in results]
-        self.assertFalse("/plone/news" in paths)
-        self.assertFalse("/plone/events" in paths)
+        self.assertNotIn("/plone/news", paths)
+        self.assertNotIn("/plone/events", paths)
         self.assertEqual(len(results), len(DEFAULT_OBJS) - 2)
         # with 15 minutes the event hasn't expired yet, though
         self.config.effective_steps = 900
         results = self.portal.portal_catalog(request)
         paths = [r.path_string for r in results]
-        self.assertFalse("/plone/news" in paths)
-        self.assertTrue("/plone/events" in paths)
+        self.assertNotIn("/plone/news", paths)
+        self.assertIn("/plone/events", paths)
         self.assertEqual(len(results), len(DEFAULT_OBJS) - 1)
 
     def testNoAutoCommitIndexing(self):
@@ -1247,13 +1244,13 @@ class SolrServerTests(TestCase):
         )
         # test sort index aliases
         schema = self.search.getManager().getSchema()
-        self.assertTrue("sortable_title" in schema)
+        self.assertIn("sortable_title", schema)
         self.assertEqual(
             search("Title", sort_on="sortable_title"),
             sorted([i["Title"] for i in first_level_objs]),
         )
         # also make sure a non-existing sort index doesn't break things
-        self.assertFalse("foo" in schema)
+        self.assertNotIn("foo", schema)
         self.assertEqual(len(search("Title", sort_on="foo")), len(first_level_objs))
 
     def testFlareHelpers(self):
@@ -1411,9 +1408,9 @@ class SolrServerTests(TestCase):
     def testSolrIndexesVocabulary(self):
         vocab = getUtility(IVocabularyFactory, name="collective.solr.indexes")
         indexes = [i.token for i in vocab(self.portal)]
-        self.assertTrue("SearchableText" in indexes)
-        self.assertTrue("path_depth" in indexes)
-        self.assertFalse("path_string" in indexes)
+        self.assertIn("SearchableText", indexes)
+        self.assertIn("path_depth", indexes)
+        self.assertNotIn("path_string", indexes)
 
     def testFilterQuerySubstitutionDuringSearch(self):
         self.maintenance.reindex()
@@ -1527,7 +1524,7 @@ class SolrServerTests(TestCase):
         config.filter_queries = ["portal_type", "Language"]
         results = solrSearchResults(portal_type=["Document"])
         paths = [p.path_string for p in results]
-        self.assertTrue("/plone/front-page" in paths)
+        self.assertIn("/plone/front-page", paths)
 
     def testAccessSearchResultsFromPythonScript(self):
         self.maintenance.reindex()
@@ -1818,14 +1815,14 @@ class SolrServerTests(TestCase):
         results = self.portal.portal_catalog(use_solr=True)
         self.assertEqual(len(results), len(DEFAULT_OBJS) + 1)
         paths = [r.path_string for r in results]
-        self.assertTrue("/plone/doc" in paths)
+        self.assertIn("/plone/doc", paths)
         # now we have it removed...
         self.config.exclude_user = True
         setRoles(self.portal, TEST_USER_ID, [])
         results = self.portal.portal_catalog(use_solr=True)
         self.assertEqual(len(results), len(DEFAULT_OBJS))
         paths = [r.path_string for r in results]
-        self.assertFalse("/plone/doc" in paths)
+        self.assertNotIn("/plone/doc", paths)
         setRoles(self.portal, TEST_USER_ID, ["Manager"])
         del self.portal["doc"]
 

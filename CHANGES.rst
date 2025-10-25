@@ -6,6 +6,7 @@ Changelog
 
 - Reconfigure tika_default_field back to SearchableText [gyst]
 
+- Update CI to get it working again [gforcada]
 
 9.4.0 (2024-12-14)
 ------------------
