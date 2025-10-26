@@ -5,6 +5,8 @@ Changelog
 ------------------
 
 - Update CI to get it working again [gforcada]
+- Be more helpful when encountering Tika errors [gyst]
+
 
 9.4.0 (2024-12-14)
 ------------------
