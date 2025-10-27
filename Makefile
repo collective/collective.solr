@@ -21,34 +21,34 @@ help: ## This help message
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 
 
-.installed.cfg: .venv/bin/buildout *.cfg
-	.venv/bin/buildout
+.installed.cfg: py3/bin/buildout *.cfg
+	py3/bin/buildout
 
-.venv/bin/buildout: .venv/bin/pip3
-	.venv/bin/pip install -r requirements-6.1.x.txt
-	.venv/bin/pip install click==8.0.4 black==21.10b0 || true
-	.venv/bin/pip install tomli==2.3.0 || true
+py3/bin/buildout: py3/bin/pip3
+	py3/bin/pip install -r requirements-6.1.x.txt
+	py3/bin/pip install click==8.0.4 black==21.10b0 || true
+	py3/bin/pip install tomli==2.3.0 || true
 	@touch -c $@
 
-.venv/bin/pip3:
-	python$(version) -m venv .venv
+py3/bin/pip3:
+	python$(version) -m venv py3
 
 .PHONY: Build Plone 6.0
 build-plone-6.0: .installed.cfg  ## Build Plone 6.0
-	.venv/bin/pip install --upgrade pip
-	.venv/bin/pip install -r requirements-6.0.txt
-	.venv/bin/buildout -c plone-6.0.x.cfg
+	py3/bin/pip install --upgrade pip
+	py3/bin/pip install -r requirements-6.0.txt
+	py3/bin/buildout -c plone-6.0.x.cfg
 
 .PHONY: Build Plone 6.1
 build-plone-6.1: .installed.cfg  ## Build Plone 6.1
-	.venv/bin/pip install --upgrade pip
-	.venv/bin/pip install -r requirements-6.1.x.txt
-	.venv/bin/buildout -c plone-6.1.x.cfg
+	py3/bin/pip install --upgrade pip
+	py3/bin/pip install -r requirements-6.1.x.txt
+	py3/bin/buildout -c plone-6.1.x.cfg
 
 .PHONY: Test
 test:  ## Test
-	.venv/bin/pip install zest.pocompile
-	.venv/bin/pocompile src
+	py3/bin/pip install zest.pocompile
+	py3/bin/pocompile src
 	./bin/test
 
 .PHONY: Test Performance
