@@ -376,7 +376,7 @@ class FacettingHelperTest(TestCase):
         fields = dict(foo={"foo": 0, "bar": 0})
         results = Dummy(facet_counts=dict(facet_fields=fields))
         view = SearchFacetsView(Dummy(), TestRequest())
-        view.kw = dict(results=results)
+        view.results = results
         self.assertEqual(view.facets(), [])
 
     def testFacetFieldFilter(self):

@@ -110,12 +110,12 @@ class SolrFacettingTests(TestCase):
         self.request.form["facet"] = "true"
         self.request.form["facet_field"] = ["portal_type", "review_state:portal_type"]
         view = SearchFacetsView(self.portal, self.request)
-        view.kw = dict(results=solrSearchResults(self.request))
+        view.results = solrSearchResults(self.request)
         facets = [facet["title"] for facet in view.facets()]
         self.assertEqual(facets, ["portal_type"])
         # now again with the required facet selected
         self.request.form["fq"] = "portal_type:Collection"
-        view.kw = dict(results=solrSearchResults(self.request))
+        view.results = solrSearchResults(self.request)
         facets = [facet["title"] for facet in view.facets()]
         self.assertEqual(facets, ["portal_type", "review_state"])
 
@@ -126,7 +126,7 @@ class SolrFacettingTests(TestCase):
         self.request.form["facet"] = "true"
         self.request.form["facet_field"] = "portal_type"
         view = SearchFacetsView(self.portal, self.request)
-        view.kw = dict(results=solrSearchResults(self.request))
+        view.results = solrSearchResults(self.request)
         facets = view.facets()
         self.assertEqual(
             sorted([c["name"] for c in facets[0]["counts"]]), ["Collection", "Føø"]
@@ -159,10 +159,20 @@ class SolrFacettingTests(TestCase):
 
     def testFacetFieldsInSearchBox(self):
         self.request = self.portal.REQUEST
+        alsoProvides(self.request, IThemeSpecific)
         viewlet = SearchBox(self.portal, self.request, None, None)
         if hasattr(viewlet, "__of__"):
             viewlet = viewlet.__of__(self.portal)
         viewlet.update()
+        self.checkOrder(
+            viewlet.hiddenfields(),
+            "<input",
+            'name="facet" value="true"',
+            "<input",
+            'value="portal_type"',
+            "<input",
+            'value="review_state"',
+        )
         output = viewlet.render()
         self.checkOrder(
             output,
@@ -223,7 +233,7 @@ class SolrFacettingTests(TestCase):
         output = view(results=results)
         # the empty facet value should be displayed resulting in
         # only one list item (`<dd>`)
-        self.assertEqual(len(output.split("<dd>")), 2)
+        self.assertEqual(len(output.split('<div class="count')), 2)
         # let's also make sure there are no empty filter queries
         self.assertNotIn("fq=portal_type%3A&amp;", output)
 

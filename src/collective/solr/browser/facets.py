@@ -116,8 +116,8 @@ class FacetMixin:
 
 class SearchBox(SearchBoxViewlet, FacetMixin):
 
-    pass
-
+    # template must be registered here for the test to work
+    index = ViewPageTemplateFile("templates/searchbox.pt")
 
 class SearchView(Search):
 
