@@ -76,8 +76,7 @@ Installation & Configuration
 
 Download the latest default Solr configuration from github::
 
-  $ wget https://github.com/collective/collective.solr/raw/master/solr.cfg
-  $ wget https://raw.githubusercontent.com/collective/collective.solr/master/solr-4.10.x.cfg
+  $ wget https://raw.githubusercontent.com/collective/collective.solr/master/solr-9.9.x.cfg
 
 .. note: Please do not extend your buildout directly with those files since they are likely to change over time.
    Always fetch the files via wget to have a stable local copy.
@@ -90,9 +89,8 @@ Your full buildout file should look something like this::
   [buildout]
   parts += instance
   extends =
-      https://dist.plone.org/release/4.3.8/versions.cfg
-      solr.cfg
-      solr-4.10.x.cfg
+      https://dist.plone.org/release/6.1.3/versions.cfg
+      solr-9.9.x.cfg
 
   [instance]
   recipe = plone.recipe.zope2instance
@@ -102,14 +100,13 @@ Your full buildout file should look something like this::
       Plone
       collective.solr
 
-  [versions]
-  collective.recipe.solrinstance = 5.3.2
 
 After saving this to let's say ``buildout.cfg``,
 the buildout can be run and the `Solr`_ server and `Plone`_ instance started::
 
-  $ python bootstrap-buildout.py
-  $ bin/buildout
+  $ python3 -m venv py3
+  $ py3/bin/pip install -r https://dist.plone.org/release/6.1.3/requirements.txt
+  $ py3/bin/buildout
   ...
   $ bin/solr-instance start
   $ bin/instance start
@@ -134,6 +131,26 @@ Example::
             <solr:connection host="localhost" port="8983" base="/solr/plone"/>
        </configure>
 
+Development build
+=================
+
+If you have a checkout of collective.solr, you can spin up a working installation with::
+
+  make all
+  bin/solr-start
+  bin/instance fg
+
+Instead of running ``bin/solr-start`` you may want to run ``bin/solr-foreground`` in a separate terminal so you can see what Solr is doing.
+
+Then:
+
+- Create a Plone site
+- In Site Setup >> Add-ons: install collective.solr
+- In Site Setup >> Solr settings: activate solr integration
+- In Site Setup >> Solr settings: open the "Solr Reindex" link ``@@solr-maintenance/reindex``
+
+You can verify Solr indexing worked by opening http://localhost:8983/solr/#/plone/query and hitting the button "Execute Query". In a vanilla Classic site with example content, that should show 6 results.
+
 
 Current Project Status
 ======================
@@ -156,17 +173,17 @@ at which point network latency and the rendering speed of Plone's page templates
 Plone Compatibility
 ===================
 
-collective.solr works with Plone 5.2 and Plone 6.
+collective.solr works with Plone 6. Use older versions of collective.solr if you're using an older Plone version.
 
 Python Compatibility
 ====================
 
-collective.solr works with Python 3.8 and 3.9. Older versions might still work but we do not test them.
+collective.solr works with Python 3.10+.
 
 Solr Compatibility
 ==================
 
-collective.solr works with Solr 7,8, and 9. Older versions might work as well but we do not test them.
+collective.solr works with Solr 9. Older versions might work as well but we do not test them.
 
 
 Bug Reporting & Development

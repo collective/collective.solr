@@ -2,13 +2,13 @@ import sys
 
 from setuptools import find_packages, setup
 
-version = "9.4.1.dev0"
+version = "10.0.0.dev0"
 
 assert sys.version_info >= (
     3,
-    6,
+    9,
     0,
-), "collective.solr 9 requires Python 3.8.0+. Please downgrade to collective.solr 8 for Python 2 and Plone 4.3/5.1."
+), "collective.solr 10 requires Python 3.10.0+. Please downgrade to collective.solr 9 for Plone 5.2, or collective.solr 8 for Python 2 and Plone 4.3/5.1."
 
 
 long_description = "\n\n".join([open("README.rst").read(), open("CHANGES.rst").read()])
@@ -22,7 +22,6 @@ setup(
         "Development Status :: 5 - Production/Stable",
         "Environment :: Web Environment",
         "Framework :: Plone",
-        "Framework :: Plone :: 5.2",
         "Framework :: Plone :: 6.0",
         "Framework :: Plone :: 6.1",
         "Framework :: Plone :: Addon",
@@ -33,8 +32,6 @@ setup(
         "Operating System :: OS Independent",
         "Programming Language :: Python",
         "Programming Language :: Python :: 3 :: Only",
-        "Programming Language :: Python :: 3.8",
-        "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
         "Programming Language :: Python :: 3.11",
         "Programming Language :: Python :: 3.12",
@@ -57,7 +54,7 @@ setup(
         "Acquisition",
         "DateTime",
         "Products.CMFCore",
-        "Products.CMFPlone >= 4.3.7",
+        "Products.CMFPlone >= 6.0.0",
         "Products.GenericSetup",
         "Products.ZCatalog",
         "lxml",
@@ -80,11 +77,6 @@ setup(
     ],
     extras_require={
         "test": ["plone.app.testing[robot]", "plone.app.robotframework[debug]"],
-        "test4": [
-            "Products.LinguaPlone >=3.1a1",
-            "plone.app.robotframework[debug]",
-            "plone.app.testing[robot]",
-        ],
     },
     entry_points="""
       [z3c.autoinclude.plugin]

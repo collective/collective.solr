@@ -1,7 +1,7 @@
 Changelog
 =========
 
-9.4.1 (unreleased)
+10.0.0 (unreleased)
 ------------------
 
 - Update CI to get it working again [gforcada]
@@ -11,6 +11,10 @@ Changelog
 - Remove support for Plone 5.2 [gforcada]
 
 - Test Plone 6.1 on CI [gforcada]
+
+- Add Solr 9.9.0 and modernize the development build [gyst]
+
+- Remove support for Python 3.9, Solr 9.0 and Solr 9.1 [gyst]
 
 9.4.0 (2024-12-14)
 ------------------

@@ -3,7 +3,7 @@
 SHELL := /bin/bash
 CURRENT_DIR:=$(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 
-version = 3.8
+version = 3
 
 # We like colors
 # From: https://coderwall.com/p/izxssa/colored-makefile-for-golang-projects
@@ -20,85 +20,36 @@ all: .installed.cfg
 help: ## This help message
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 
-.PHONY: Update Makefile and Buildout
-update: ## Update Make and Buildout
-	wget -O Makefile https://raw.githubusercontent.com/kitconcept/buildout/master/Makefile
-	wget -O requirements.txt https://raw.githubusercontent.com/kitconcept/buildout/master/requirements.txt
-	wget -O plone-4.3.x.cfg https://raw.githubusercontent.com/kitconcept/buildout/master/plone-4.3.x.cfg
-	wget -O plone-5.1.x.cfg https://raw.githubusercontent.com/kitconcept/buildout/master/plone-5.1.x.cfg
-	wget -O plone-5.2.x.cfg https://raw.githubusercontent.com/kitconcept/buildout/master/plone-5.2.x.cfg
-	wget -O ci.cfg https://raw.githubusercontent.com/kitconcept/buildout/master/ci.cfg
 
-.installed.cfg: bin/buildout *.cfg
-	bin/buildout
+.installed.cfg: py3/bin/buildout *.cfg
+	py3/bin/buildout
 
-bin/buildout: bin/pip
-	bin/pip install --upgrade pip
-	bin/pip install -r requirements-6.0.x.txt
-	bin/pip install click==8.0.4 black==21.10b0 || true
+py3/bin/buildout: py3/bin/pip3
+	py3/bin/pip install -r requirements-6.1.x.txt
+	py3/bin/pip install click==8.0.4 black==21.10b0 || true
+	py3/bin/pip install tomli==2.3.0 || true
 	@touch -c $@
 
-bin/python bin/pip:
-	python$(version) -m venv . || virtualenv --python=python$(version) .
-
-py2:
-	virtualenv --python=python2 .
-	bin/pip install --upgrade pip
-	bin/pip install -r requirements.txt
-
-.PHONY: Build Plone 4.3
-build-plone-4.3: py2 ## Build Plone 4.3
-	bin/pip install --upgrade pip
-	bin/pip install -r requirements.txt
-	bin/buildout -c plone-4.3.x.cfg
-
-.PHONY: Build Plone 5.0
-build-plone-5.0: py2 ## Build Plone 5.0
-	bin/pip install --upgrade pip
-	bin/pip install -r requirements.txt
-	bin/buildout -c plone-5.0.x.cfg
-
-.PHONY: Build Plone 5.1
-build-plone-5.1: py2  ## Build Plone 5.1
-	bin/pip install --upgrade pip
-	bin/pip install -r requirements.txt
-	bin/buildout -c plone-5.1.x.cfg
-
-.PHONY: Build Plone 5.2 with Python 2
-build-plone-5.2-py: py2  ## Build Plone 5.2 with Python 2
-	bin/pip install --upgrade pip
-	bin/pip install -r requirements.txt
-	bin/buildout -c plone-5.2.x.cfg
-
-.PHONY: Build Plone 5.2
-build-plone-5.2: .installed.cfg  ## Build Plone 5.2
-	bin/pip install --upgrade pip
-	bin/pip install -r requirements.txt
-	bin/buildout -c plone-5.2.x.cfg
-
-.PHONY: Build Plone 5.2 Performance
-build-plone-5.2-performance: .installed.cfg  ## Build Plone 5.2
-	bin/pip install --upgrade pip
-	bin/pip install -r requirements.txt
-	bin/buildout -c plone-5.2.x-performance.cfg
+py3/bin/pip3:
+	python$(version) -m venv py3
 
 .PHONY: Build Plone 6.0
 build-plone-6.0: .installed.cfg  ## Build Plone 6.0
-	bin/pip install --upgrade pip
-	bin/pip install -r requirements-6.0.txt
-	bin/buildout -c plone-6.0.x.cfg
+	py3/bin/pip install --upgrade pip
+	py3/bin/pip install -r requirements-6.0.txt
+	py3/bin/buildout -c plone-6.0.x.cfg
 
 .PHONY: Build Plone 6.1
 build-plone-6.1: .installed.cfg  ## Build Plone 6.1
-	bin/pip install --upgrade pip
-	bin/pip install -r requirements-6.1.txt
-	bin/buildout -c plone-6.1.x.cfg
+	py3/bin/pip install --upgrade pip
+	py3/bin/pip install -r requirements-6.1.x.txt
+	py3/bin/buildout -c plone-6.1.x.cfg
 
 .PHONY: Test
 test:  ## Test
-	bin/pip install zest.pocompile
-	bin/pocompile src
-	bin/test
+	py3/bin/pip install zest.pocompile
+	py3/bin/pocompile src
+	./bin/test
 
 .PHONY: Test Performance
 test-performance:

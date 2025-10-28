@@ -6,19 +6,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.13", "3.12", "3.11", "3.10", "3.9"]
+        python-version: ["3.13", "3.12", "3.11", "3.10"]
         plone-version: ["6.0", "6.1"]
-        solr-version: ["9.0.x", "9.1.x", "9.5.x"]
-        exclude:
-          - python-version: "3.9"
-            plone-version: "6.1"
-            solr-version: "9.0.x"
-          - python-version: "3.9"
-            plone-version: "6.1"
-            solr-version: "9.1.x"
-          - python-version: "3.9"
-            plone-version: "6.1"
-            solr-version: "9.5.x"
+        solr-version: ["9.5.x", "9.9.x"]
     steps:
       # git checkout
       - uses: actions/checkout@v5
@@ -49,11 +39,11 @@ jobs:
 
       # choose Plone version
       - name: choose Plone version
-        run: sed -ie "s#plone-6.0.x.cfg#plone-${{ matrix.plone-version }}.x.cfg#" buildout.cfg
+        run: sed -ie "s#plone-6.1.x.cfg#plone-${{ matrix.plone-version }}.x.cfg#" buildout.cfg
 
       # choose Solr version
       - name: choose Solr version
-        run: sed -ie "s#solr-9.1.x.cfg#solr-${{ matrix.solr-version }}.cfg#" buildout.cfg
+        run: sed -ie "s#solr-9.9.x.cfg#solr-${{ matrix.solr-version }}.cfg#" buildout.cfg
 
       # buildout
       - name: buildout
