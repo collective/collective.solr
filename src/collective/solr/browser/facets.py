@@ -5,6 +5,7 @@ import six
 from collective.solr.interfaces import IFacetTitleVocabularyFactory
 from plone.app.layout.viewlets.common import SearchBoxViewlet
 from plone.registry.interfaces import IRegistry
+from Products.CMFPlone.browser.search import Search
 from Products.Five import BrowserView
 from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 from six.moves.urllib.parse import urlencode
@@ -113,6 +114,11 @@ class FacetMixin:
 
 
 class SearchBox(SearchBoxViewlet, FacetMixin):
+
+    pass
+
+
+class SearchView(Search):
 
     pass
 

@@ -46,6 +46,15 @@
       permission="zope2.View" />
 
   <browser:page
+      name="search"
+      for="plone.base.interfaces.INavigationRoot"
+      class=".facets.SearchView"
+      template="templates/search.pt"
+      layer=".interfaces.IThemeSpecific"
+      permission="zope2.View"
+      />
+
+  <browser:page
       for="OFS.interfaces.IFolder"
       name="search-facets"
       class=".facets.SearchFacetsView"
