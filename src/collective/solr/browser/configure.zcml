@@ -36,12 +36,12 @@
       class=".errors.ErrorView"
       permission="zope2.Public" />
 
-  <browser:viewlet
-      name="plone.searchbox"
-      manager="plone.app.layout.viewlets.interfaces.IPortalHeader"
-      class=".facets.SearchBox"
-      layer=".interfaces.IThemeSpecific"
-      permission="zope2.View" />
+  <!-- <browser:viewlet -->
+  <!--     name="plone.searchbox" -->
+  <!--     manager="plone.app.layout.viewlets.interfaces.IPortalHeader" -->
+  <!--     class=".facets.SearchBox" -->
+  <!--     layer=".interfaces.IThemeSpecific" -->
+  <!--     permission="zope2.View" /> -->
 
   <browser:page
       for="OFS.interfaces.IFolder"
@@ -61,16 +61,5 @@
       name="solr-autocomplete"
       class=".suggest.AutocompleteView"
       permission="zope2.View"/>
-
-  <!-- Plone 5 -->
-  <browser:page
-      name="search"
-      class="Products.CMFPlone.browser.search.Search"
-      permission="zope2.View"
-      for="plone.app.layout.navigation.interfaces.INavigationRoot"
-      template="search.pt"
-      layer=".interfaces.IThemeSpecific"
-      zcml:condition="have plone-5"
-      />
 
 </configure>

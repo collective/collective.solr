@@ -116,11 +116,6 @@
     factory="collective.solr.serializer.LazySolrCatalogResultSerializer"
     />
 
-  <browser:resourceDirectory
-    name="collective.solr.static"
-    directory="static"
-    />
-
   <include package="plone.behavior" file="meta.zcml" />
 
 </configure>

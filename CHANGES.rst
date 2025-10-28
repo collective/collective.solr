@@ -16,6 +16,8 @@ Changelog
 
 - Remove support for Python 3.9, Solr 9.0 and Solr 9.1 [gyst]
 
+- Fix Classic UI for Plone 6 [gyst]
+
 9.4.0 (2024-12-14)
 ------------------
 
