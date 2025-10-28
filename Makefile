@@ -61,7 +61,7 @@ code-analysis:  ## Code Analysis
 
 .PHONY: Black
 black:  ## Black
-	if [ -f "bin/black" ]; then bin/black src/ ; fi
+	if [ -f "py3/bin/black" ]; then py3/bin/black src/ ; fi
 
 .PHONY: Build Docs
 docs:  ## Build Docs
