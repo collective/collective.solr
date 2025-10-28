@@ -1,58 +1,61 @@
-<div id="portal-searchbox"
-     i18n:domain="plone">
-    <form name="searchform"
-          action="search"
-          tal:attributes="action string:${view/site_url}/@@search">
+<div class="d-flex flex-column position-relative"
+     id="portal-searchbox"
+     tal:define="
+       navigation_root_url view/navigation_root_url;
+     "
+     i18n:domain="plone"
+>
 
-        <label for="searchGadget" class="hiddenStructure"
-                    i18n:translate="text_search">Search Site</label>
+  <form class="d-flex ${python: view.livesearch and 'pat-livesearch'} ${python: view.show_images and 'show_images'}"
+        id="searchGadget_form"
+        action="@@search"
+        role="search"
+        tal:attributes="
+          action string:${navigation_root_url}/@@search;
+          data-pat-livesearch string:ajaxUrl:${navigation_root_url}/@@ajax-search;
+        "
+  >
 
-        <div class="LSBox">
-        <input name="SearchableText"
-               type="text"
-               size="18"
-               value=""
-               title="Search Site"
-               accesskey="4"
-               i18n:attributes="title title_search_site;"
-               tal:attributes="value request/SearchableText|nothing;
-                               id view/search_input_id|default"
-               class="inputLabel" />
+    <label class="hiddenStructure"
+           for="searchGadget"
+           i18n:translate="text_search"
+    >Search Site</label>
 
-        <input class="searchButton"
-               type="submit"
-               value="Search"
-               i18n:attributes="value label_search;" />
+    <input class="searchField form-control me-2"
+           id="searchGadget"
+           name="SearchableText"
+           placeholder="Search Site"
+           size="18"
+           title="Search Site"
+           type="text"
+           value=""
+           tal:attributes="
+             value request/form/SearchableText|nothing;
+           "
+           i18n:attributes="title title_search_site;
+                        placeholder title_search_site"
+    />
 
-        <div class="searchSection">
-            <input id="searchbox_currentfolder_only"
-                   class="noborder"
-                   type="checkbox"
-                   name="path"
-                   tal:attributes="value view/folder_path"
-                   />
-            <label for="searchbox_currentfolder_only"
-                   i18n:translate="label_searchbox_currentfolder_only"
-                   style="cursor: pointer">
-                only in current section
-            </label>
-        </div>
+    <button class="searchButton btn btn-outline-light"
+            type="submit"
+            i18n:translate="label_search"
+    >
+      Search
+    </button>
 
-        <div class="LSResult" id="LSResult" style=""><div class="LSShadow" id="LSShadow"></div></div>
-        </div>
-
-        <div tal:replace="structure view/hiddenfields" />
-
-    </form>
-
-    <div id="portal-advanced-search"
-         class="hiddenStructure">
-        <a href="#"
-           tal:attributes="href string:${view/site_url}/search_form"
-           i18n:translate="label_advanced_search"
-           accesskey="5">
-            Advanced Search&hellip;
-        </a>
+    <div class="hiddenStructure"
+         id="portal-advanced-search"
+    >
+      <a href="#"
+         tal:attributes="
+           href string:${navigation_root_url}/@@search;
+         "
+         i18n:translate="label_advanced_search"
+      >
+          Advanced Search&hellip;
+      </a>
     </div>
+
+  </form>
 
 </div>

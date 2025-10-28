@@ -37,12 +37,13 @@
       template="templates/errors.pt"
       permission="zope2.Public" />
 
-  <!-- <browser:viewlet -->
-  <!--     name="plone.searchbox" -->
-  <!--     manager="plone.app.layout.viewlets.interfaces.IPortalHeader" -->
-  <!--     class=".facets.SearchBox" -->
-  <!--     layer=".interfaces.IThemeSpecific" -->
-  <!--     permission="zope2.View" /> -->
+  <browser:viewlet
+      name="plone.searchbox"
+      manager="plone.app.layout.viewlets.interfaces.IPortalHeader"
+      class=".facets.SearchBox"
+      template="templates/searchbox.pt"
+      layer=".interfaces.IThemeSpecific"
+      permission="zope2.View" />
 
   <browser:page
       for="OFS.interfaces.IFolder"
