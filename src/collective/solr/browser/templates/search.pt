@@ -82,12 +82,24 @@
               <span i18n:translate="batch_x_items_matching_your_criteria" class="d-flex" i18n:domain="plone" id="results-count" >
                 <span i18n:name="number" id="search-results-number" class="badge bg-primary me-2 d-flex justify-content-center align-items-center"
                       tal:content="batch/sequence_length|string:0">234</span>
-                  items matching your search terms.
+                items matching your search terms.
               </span>
             </a>
           </div>
 
-          <div class="nav-item dropdown me-3" id="search-filter">
+
+
+
+          <div class="nav-item dropdown me-3" id="search-filter"
+               tal:condition="view/solr_active">
+            <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false" id="search-filter-toggle" i18n:translate="narrow_search_options">
+              Filter the results
+            </a>
+            <div  tal:replace="structure view/search_facets"/>
+          </div>
+
+          <div class="nav-item dropdown me-3" id="search-filter"
+               tal:condition="not:view/solr_active">
             <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false" id="search-filter-toggle" i18n:translate="narrow_search_options">
               Filter the results
             </a>

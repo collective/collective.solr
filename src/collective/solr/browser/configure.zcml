@@ -55,10 +55,10 @@
       />
 
   <browser:page
-      for="OFS.interfaces.IFolder"
+      for="plone.base.interfaces.INavigationRoot"
       name="search-facets"
       class=".facets.SearchFacetsView"
-      template="templates/facets.pt"
+      layer=".interfaces.IThemeSpecific"
       permission="zope2.View" />
 
   <browser:page

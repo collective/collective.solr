@@ -43,6 +43,8 @@
       Search
     </button>
 
+    <div tal:replace="structure view/hiddenfields" />
+
     <div class="hiddenStructure"
          id="portal-advanced-search"
     >
