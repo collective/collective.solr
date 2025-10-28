@@ -76,7 +76,7 @@ Installation & Configuration
 
 Download the latest default Solr configuration from github::
 
-  $ wget https://raw.githubusercontent.com/collective/collective.solr/master/solr-9.9.0.cfg
+  $ wget https://raw.githubusercontent.com/collective/collective.solr/master/solr-9.9.x.cfg
 
 .. note: Please do not extend your buildout directly with those files since they are likely to change over time.
    Always fetch the files via wget to have a stable local copy.
@@ -90,7 +90,7 @@ Your full buildout file should look something like this::
   parts += instance
   extends =
       https://dist.plone.org/release/6.1.3/versions.cfg
-      solr-9.9.0.cfg
+      solr-9.9.x.cfg
 
   [instance]
   recipe = plone.recipe.zope2instance
