@@ -65,7 +65,7 @@ jobs:
       # solr download cache
       - uses: actions/cache@v4
         with:
-          path: ~/.download-cache
+          path: .download-cache
           key: ${{ runner.os }}-solr-${{ matrix.solr-version }}
           restore-keys: |
             ${{ runner.os }}-solr-
