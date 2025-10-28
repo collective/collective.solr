@@ -58,7 +58,11 @@ jobs:
       - name: choose Solr version
         run: sed -ie "s#solr-9.9.x.cfg#solr-${{ matrix.solr-version }}.cfg#" buildout.cfg
 
-      # solr cache
+      # path must pre-exist for caching to work
+      - name: prepare download cache directory
+        run: mkdir -p .download-cache
+
+      # solr download cache
       - uses: actions/cache@v4
         with:
           path: ~/.download-cache
