@@ -178,7 +178,7 @@ collective.solr works with Plone 6. Use older versions of collective.solr if you
 Python Compatibility
 ====================
 
-collective.solr works with Python 3.9+.
+collective.solr works with Python 3.10+.
 
 Solr Compatibility
 ==================
