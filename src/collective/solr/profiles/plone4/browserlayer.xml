@@ -1,4 +1,0 @@
-<layers>
-  <layer name="collective.solr" 
-         interface="collective.solr.browser.interfaces.IThemeSpecific" />
-</layers>
