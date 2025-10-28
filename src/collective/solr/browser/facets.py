@@ -103,7 +103,7 @@ def convertFacets(fields, view, filter=None):
 class FacetMixin:
     """mixin with helpers common to the viewlet and view"""
 
-    hidden = ViewPageTemplateFile("hiddenfields.pt")
+    hidden = ViewPageTemplateFile("templates/hiddenfields.pt")
 
     def hiddenfields(self):
         """render hidden fields suitable for inclusion in search forms"""

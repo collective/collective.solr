@@ -61,4 +61,3 @@ class SolrControlPanelForm(controlpanel.RegistryEditForm):
 class SolrControlPanel(controlpanel.ControlPanelFormWrapper):
 
     form = SolrControlPanelForm
-    index = ViewPageTemplateFile("controlpanel.pt")
