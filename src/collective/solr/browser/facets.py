@@ -112,10 +112,9 @@ class FacetMixin:
         return self.hidden(facets=facets, queries=queries)
 
 
-# class SearchBox(SearchBoxViewlet, FacetMixin):
+class SearchBox(SearchBoxViewlet, FacetMixin):
 
-#     pass
-#     #index = ViewPageTemplateFile("searchbox.pt")
+    pass
 
 
 class SearchFacetsView(BrowserView, FacetMixin):
