@@ -58,9 +58,17 @@ jobs:
       - name: choose Solr version
         run: sed -ie "s#solr-9.9.x.cfg#solr-${{ matrix.solr-version }}.cfg#" buildout.cfg
 
+      # solr cache
+      - uses: actions/cache@v4
+        with:
+          path: ~/.download-cache
+          key: ${{ runner.os }}-solr-${{ matrix.solr-version }}
+          restore-keys: |
+            ${{ runner.os }}-solr-
+
       # buildout
       - name: buildout
-        run: buildout -t 10 -c buildout.cfg install test solr
+        run: buildout -t 10 -c buildout.cfg download-cache=.download-cache install test solr
         env:
           CI: true
 
