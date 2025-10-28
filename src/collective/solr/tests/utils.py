@@ -32,7 +32,9 @@ def loadZCMLString(string):
 def getData(filename):
     """return a file object from the test data folder"""
     filename = join(dirname(tests.__file__), "data", filename)
-    return open(filename, "rb").read()
+    with open(filename, "rb") as fh:
+        data = fh.read()
+    return data
 
 
 def fakehttp(solrconn, *fakedata):
