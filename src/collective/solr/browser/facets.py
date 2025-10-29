@@ -4,6 +4,7 @@ from operator import itemgetter
 import six
 from collective.solr.interfaces import IFacetTitleVocabularyFactory
 from collective.solr.utils import isActive
+from plone import api
 from plone.app.layout.viewlets.common import SearchBoxViewlet
 from plone.registry.interfaces import IRegistry
 from Products.CMFPlone.browser.search import Search
@@ -127,14 +128,12 @@ class SearchView(Search):
         return isActive()
 
     def search_facets(self):
-        view = SearchFacetsView(self.context, self.request)
+        view = api.content.get_view("search-facets", self.context, self.request)
         return view(results=self.results(batch=False, use_content_listing=False))
 
 
 class SearchFacetsView(BrowserView, FacetMixin):
     """view for displaying facetting info as provided by solr searches"""
-
-    index = ViewPageTemplateFile("templates/facets.pt")
 
     def __call__(self, results):
         self.results = results
