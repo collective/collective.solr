@@ -11,7 +11,6 @@ from collective.solr.testing import (
 from collective.solr.utils import activate
 from plone import api
 from plone.app.testing import TEST_USER_ID, setRoles
-from zope.component import getMultiAdapter
 from zope.interface import alsoProvides
 
 
