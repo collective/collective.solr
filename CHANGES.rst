@@ -22,6 +22,8 @@ Changelog
 
 - Reimplement Solr faceting for Classic UI in Plone 6 [gyst]
 
+- Cache Solr download on Github CI actions [gyst]
+
 9.4.0 (2024-12-14)
 ------------------
 
