@@ -18,6 +18,8 @@ Changelog
 
 - Remove support for Python 3.9, Solr 9.0 and Solr 9.1 [gyst]
 
+- Cache Solr download on Github CI actions [gyst]
+
 9.4.0 (2024-12-14)
 ------------------
 
