@@ -24,6 +24,10 @@ Changelog
 
 - Cache Solr download on Github CI actions [gyst]
 
+- Don't hit Solr twice per search page rendering [gyst]
+
+- Don't break on empty lines in facets configuration [gyst]
+
 9.4.0 (2024-12-14)
 ------------------
 

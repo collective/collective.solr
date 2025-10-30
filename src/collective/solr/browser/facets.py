@@ -112,7 +112,8 @@ class FacetMixin:
         """render hidden fields suitable for inclusion in search forms"""
         facets, dependencies = facetParameters(self)
         queries = param(self, "fq")
-        return self.hidden(facets=facets, queries=queries)
+        # don't break on empty lines in registry field
+        return self.hidden(facets=filter(None, facets), queries=queries)
 
 
 class SearchBox(SearchBoxViewlet, FacetMixin):
