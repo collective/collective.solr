@@ -32,7 +32,8 @@
           <div class="value" title="${item/title}"
                i18n:attributes="title">${item/value}</div>
             <div class=mx-3 remove>
-              <a tal:attributes="href string:${request/ACTUAL_URL}?${item/query}"
+              <a class="dropdown-item"
+                 href="${request/ACTUAL_URL}?${item/query}"
                  title="Remove this search limit..." i18n:attributes="title"
                  i18n:domain="solr">
                 &otimes;
@@ -50,8 +51,8 @@
       <div class="facet-options">
       <div tal:repeat="item facet/counts" class="selectable-facet text-nowrap">
         <div>
-          <a href="#" tal:content="item/title"
-           tal:attributes="href string:${request/ACTUAL_URL}?${item/query}" />
+          <a class="dropdown-item"
+             href="${request/ACTUAL_URL}?${item/query}">${item/title}</a>
         </div>
         <div class="count mx-3" tal:content="item/count" />
       </div>
