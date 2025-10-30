@@ -3,8 +3,11 @@ from operator import itemgetter
 
 import six
 from collective.solr.interfaces import IFacetTitleVocabularyFactory
+from collective.solr.utils import isActive
+from plone import api
 from plone.app.layout.viewlets.common import SearchBoxViewlet
 from plone.registry.interfaces import IRegistry
+from Products.CMFPlone.browser.search import Search
 from Products.Five import BrowserView
 from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 from six.moves.urllib.parse import urlencode
@@ -103,7 +106,7 @@ def convertFacets(fields, view, filter=None):
 class FacetMixin:
     """mixin with helpers common to the viewlet and view"""
 
-    hidden = ViewPageTemplateFile("hiddenfields.pt")
+    hidden = ViewPageTemplateFile("templates/hiddenfields.pt")
 
     def hiddenfields(self):
         """render hidden fields suitable for inclusion in search forms"""
@@ -114,22 +117,32 @@ class FacetMixin:
 
 class SearchBox(SearchBoxViewlet, FacetMixin):
 
-    index = ViewPageTemplateFile("searchbox.pt")
+    # template must be registered here for the test to work
+    index = ViewPageTemplateFile("templates/searchbox.pt")
+
+
+class SearchView(Search):
+
+    @property
+    def solr_active(self):
+        return isActive()
+
+    def search_facets(self):
+        view = api.content.get_view("search-facets", self.context, self.request)
+        return view(results=self.results(batch=False, use_content_listing=False))
 
 
 class SearchFacetsView(BrowserView, FacetMixin):
     """view for displaying facetting info as provided by solr searches"""
 
-    def __call__(self, *args, **kw):
-        self.args = args
-        self.kw = kw
-        return super(SearchFacetsView, self).__call__(*args, **kw)
+    def __call__(self, results):
+        self.results = results
+        return self.index()
 
     def facets(self):
         """prepare and return facetting info for the given SolrResponse"""
-        results = self.kw.get("results", None)
-        fcs = getattr(results, "facet_counts", None)
-        if results is not None and fcs is not None:
+        fcs = getattr(self.results, "facet_counts", None)
+        if self.results is not None and fcs is not None:
             filter = lambda name, count: name and count > 0
             return convertFacets(fcs.get("facet_fields", {}), self, filter)
         else:

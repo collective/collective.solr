@@ -3,7 +3,6 @@ from plone.app.registry.browser import controlpanel
 from plone.protect.interfaces import IDisableCSRFProtection
 from plone.restapi.controlpanels import RegistryConfigletPanel
 from Products.CMFPlone.utils import safe_unicode
-from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 from Products.PythonScripts.PythonScript import PythonScript
 from zope.component import adapter
 from zope.interface import Interface, alsoProvides
@@ -61,4 +60,3 @@ class SolrControlPanelForm(controlpanel.RegistryEditForm):
 class SolrControlPanel(controlpanel.ControlPanelFormWrapper):
 
     form = SolrControlPanelForm
-    index = ViewPageTemplateFile("controlpanel.pt")

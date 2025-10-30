@@ -16,6 +16,7 @@
       name="solr-controlpanel"
       for="Products.CMFPlone.interfaces.IPloneSiteRoot"
       class=".controlpanel.SolrControlPanel"
+      template="templates/controlpanel.pt"
       permission="cmf.ManagePortal" />
 
   <adapter
@@ -32,8 +33,8 @@
   <browser:page
       name="index.html"
       for="socket.error"
-      template="errors.pt"
       class=".errors.ErrorView"
+      template="templates/errors.pt"
       permission="zope2.Public" />
 
   <browser:viewlet
@@ -44,10 +45,20 @@
       permission="zope2.View" />
 
   <browser:page
-      for="OFS.interfaces.IFolder"
+      name="search"
+      for="plone.base.interfaces.INavigationRoot"
+      class=".facets.SearchView"
+      template="templates/search.pt"
+      layer=".interfaces.IThemeSpecific"
+      permission="zope2.View"
+      />
+
+  <browser:page
+      for="plone.base.interfaces.INavigationRoot"
       name="search-facets"
-      template="facets.pt"
       class=".facets.SearchFacetsView"
+      template="templates/facets.pt"
+      layer=".interfaces.IThemeSpecific"
       permission="zope2.View" />
 
   <browser:page
@@ -61,16 +72,5 @@
       name="solr-autocomplete"
       class=".suggest.AutocompleteView"
       permission="zope2.View"/>
-
-  <!-- Plone 5 -->
-  <browser:page
-      name="search"
-      class="Products.CMFPlone.browser.search.Search"
-      permission="zope2.View"
-      for="plone.app.layout.navigation.interfaces.INavigationRoot"
-      template="search.pt"
-      layer=".interfaces.IThemeSpecific"
-      zcml:condition="have plone-5"
-      />
 
 </configure>
