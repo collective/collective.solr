@@ -1,15 +1,21 @@
 from copy import deepcopy
 from operator import itemgetter
+from time import time
 
 import six
 from collective.solr.interfaces import IFacetTitleVocabularyFactory
 from collective.solr.utils import isActive
 from plone import api
+from plone.app.contentlisting.interfaces import IContentListing
 from plone.app.layout.viewlets.common import SearchBoxViewlet
+from plone.base.batch import Batch
+from plone.memoize.volatile import cache
 from plone.registry.interfaces import IRegistry
+from Products.CMFCore.utils import getToolByName
 from Products.CMFPlone.browser.search import Search
 from Products.Five import BrowserView
 from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
+from Products.ZCTextIndex.ParseTree import ParseError
 from six.moves.urllib.parse import urlencode
 from zope.component import getUtility, queryUtility
 from zope.i18n import translate
@@ -122,6 +128,14 @@ class SearchBox(SearchBoxViewlet, FacetMixin):
     index = ViewPageTemplateFile("templates/searchbox.pt")
 
 
+def _query_cache_key(method, self, query):
+    """Hash the query dict, and cache for one minute"""
+    return (
+        hash("::".join([f"{k}={query[k]}" for k in sorted(query.keys())])),
+        time() // 60,
+    )
+
+
 class SearchView(Search):
 
     @property
@@ -130,7 +144,37 @@ class SearchView(Search):
 
     def search_facets(self):
         view = api.content.get_view("search-facets", self.context, self.request)
-        return view(results=self.results(batch=False, use_content_listing=False))
+        return view(results=self.all_results())
+
+    @cache(_query_cache_key)
+    def caching_results(self, query):
+        catalog = getToolByName(self.context, "portal_catalog")
+        return catalog(**query)
+
+    def all_results(self):
+        """To extract factes we need to disable batching and contentlisting"""
+        query = self.filter_query({})
+        if "b_start" in query:
+            del query["b_start"]
+        if "b_size" in query:
+            del query["b_size"]
+        if not query:
+            return []
+        return self.caching_results(query)
+
+    def results(
+        self, query=None, batch=True, b_size=10, b_start=0, use_content_listing=True
+    ):
+        """Bypass .results() in a way that leverages memoized all_results"""
+        if not self.solr_active:
+            return super().results(b_start=b_start, b_size=b_size)
+
+        b_start = int(b_start)
+        b_size = 10
+        results = self.all_results()
+        results = IContentListing(results)
+        results = Batch(results, b_size, b_start)
+        return results
 
 
 class SearchFacetsView(BrowserView, FacetMixin):

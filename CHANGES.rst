@@ -28,6 +28,8 @@ Changelog
 
 - Don't break on empty lines in facets configuration [gyst]
 
+- Don't hit Solr twice per search page rendering [gyst]
+
 9.4.0 (2024-12-14)
 ------------------
 
