@@ -4,25 +4,38 @@ Changelog
 10.0.0 (unreleased)
 ------------------
 
-- Update CI to get it working again [gforcada]
-- Be more helpful when encountering Tika errors [gyst]
+Breaking changes:
 
-
-- Add support for Python 3.12 and Python 3.13 [gforcada]
+- Remove support for Python 3.9 [gyst]
 
 - Remove support for Plone 5.2 [gforcada]
 
-- Test Plone 6.1 on CI [gforcada]
+- Remove support for Solr 9.0 and Solr 9.1 [gyst]
 
-- Add Solr 9.9.0 and modernize the development build [gyst]
+Features:
 
-- Remove support for Python 3.9, Solr 9.0 and Solr 9.1 [gyst]
+- Add support for Python 3.12 and Python 3.13 [gforcada]
+
+- Update to Solr 9.9.0 and modernize the development build [gyst]
+
+- Support for passing `bq` as a query parameter. [davisagli]
+
+Bugfixes:
+
+- Be more helpful when encountering Tika errors [gyst]
 
 - Fix Classic UI for Plone 6 [gyst]
 
 - Reimplement Solr faceting for Classic UI in Plone 6 [gyst]
 
+Internal:
+
+- Update CI to get it working again [gforcada]
+
+- Test Plone 6.1 on CI [gforcada]
+
 - Cache Solr download on Github CI actions [gyst]
+
 
 9.4.0 (2024-12-14)
 ------------------
