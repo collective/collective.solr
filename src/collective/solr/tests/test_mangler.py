@@ -503,6 +503,11 @@ class QueryParameterTests(TestCase):
         params = extract(dict(facet_foo=("foo:bar", "bar:foo")))
         self.assertEqual(params, {"facet.foo": ("foo", "bar")})
 
+    def testBoostQuery(self):
+        extract = subtractQueryParameters
+        params = extract({"bq": "foo:bar^5"})
+        self.assertEqual(params, dict(bq="foo:bar^5"))
+
 
 @mock.patch("collective.solr.stopword.raw", None)
 @mock.patch("collective.solr.stopword.cooked", None)
