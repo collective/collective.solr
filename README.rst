@@ -90,7 +90,7 @@ Your full buildout file should look something like this::
   parts += instance
   extends =
       https://dist.plone.org/release/6.1.3/versions.cfg
-      solr-9.9.x.cfg
+      solr-9.10.x.cfg
 
   [instance]
   recipe = plone.recipe.zope2instance
