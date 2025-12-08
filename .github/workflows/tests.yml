@@ -8,7 +8,7 @@ jobs:
       matrix:
         python-version: ["3.13", "3.12", "3.11", "3.10"]
         plone-version: ["6.0", "6.1"]
-        solr-version: ["9.5.x", "9.9.x"]
+        solr-version: ["9.5.x", "9.9.x",  "9.10.x"]
     steps:
       # git checkout
       - uses: actions/checkout@v5
