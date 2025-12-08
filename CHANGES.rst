@@ -1,7 +1,7 @@
 Changelog
 =========
 
-10.0.1 (unreleased)
+10.1.0 (2025-12-08)
 -------------------
 
 - Add support for Solr 9.10 [tisto]
