@@ -43,7 +43,7 @@ jobs:
 
       # choose Solr version
       - name: choose Solr version
-        run: sed -ie "s#solr-9.9.x.cfg#solr-${{ matrix.solr-version }}.cfg#" buildout.cfg
+        run: sed -ie "s#solr-10.0.x.cfg#solr-${{ matrix.solr-version }}.cfg#" buildout.cfg
 
       # path must pre-exist for caching to work
       - name: prepare download cache directory
