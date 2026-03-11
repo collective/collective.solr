@@ -19,6 +19,13 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
+      # java setup
+      - name: Set up Java 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+
       # python cache
       - uses: actions/cache@v4
         with:
