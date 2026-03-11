@@ -7,6 +7,8 @@ Changelog
 - Fix batching of results in plone.app.querystring when there is a limit
   applied. [davisagli]
 
+- Update build to use Solr 9.10.1 [tisto]
+
 
 10.1.0 (2025-12-08)
 -------------------
