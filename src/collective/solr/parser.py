@@ -145,6 +145,13 @@ class SolrResponse(Lazy):
     def actual_result_count(self, value):
         self._rlen = value
 
+        # plone.app.querystring uses this to limit results.
+        # They may have been padded with None values by padResults,
+        # so truncate them in that case.
+        results = self.results()
+        if value < len(results):
+            results[:] = results[:value]
+
     def __len__(self):
         if self._len is not _marker:
             return self._len

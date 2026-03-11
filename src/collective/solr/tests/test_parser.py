@@ -171,7 +171,7 @@ class ParserTests(TestCase):
         response.actual_result_count = 1
         results = response.response  # the result set is named 'response'
         self.assertEqual(response.actual_result_count, 1)
-        self.assertEqual(len(results), 2)
+        self.assertEqual(len(results), 1)
 
 
 class ParseDateHelperTests(TestCase):
