@@ -1,7 +1,7 @@
 Changelog
 =========
 
-10.1.1 (unreleased)
+10.1.1 (2026-03-11)
 -------------------
 
 - Fix batching of results in plone.app.querystring when there is a limit
