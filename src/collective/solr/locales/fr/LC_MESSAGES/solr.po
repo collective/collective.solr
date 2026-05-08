@@ -225,7 +225,6 @@ msgstr "Délai en secondes après lequel une requête de recherche va expirer. D
 
 #. Default: "Specify words for which this item will show up as the first search result. Multiple words can be specified on new lines."
 #: ../behaviors.py:31
-#: ../extender.py:84
 msgid "help_searchwords"
 msgstr "Définissez les mots pour lesquels cet élément va se retrouver en premier résultats des recherches. Plusieurs mots peuvent être spécifiés, un par ligne."
 
@@ -396,13 +395,11 @@ msgstr "Durée maximale d'une recherche"
 
 #. Default: "Search words"
 #: ../behaviors.py:29
-#: ../extender.py:83
 msgid "label_searchwords"
 msgstr "Mots de recherche"
 
 #. Default: "Show in search"
 #: ../behaviors.py:18
-#: ../extender.py:72
 msgid "label_showinsearch"
 msgstr "Montrer dans la recherche"
 

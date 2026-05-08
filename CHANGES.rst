@@ -4,7 +4,7 @@ Changelog
 10.1.2 (unreleased)
 -------------------
 
-- Nothing changed yet.
+- Remove unused code related to old Archetypes support. [davisagli]
 
 
 10.1.1 (2026-03-11)

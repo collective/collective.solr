@@ -119,12 +119,13 @@ class DefaultAdder(object):
 class BinaryAdder(DefaultAdder):
     """Add binary content to index via tika"""
 
+    fieldname = None
+
     def getblob(self):
-        field = self.context.getPrimaryField()
-        # do not return anything if a content object does not provide a primary field
-        if not field:
+        if self.fieldname is None:
             return
-        return field.get(self.context).blob
+        field = getattr(self.context, self.fieldname, None)
+        return getattr(field, "_blob", None)
 
     def getpath(self):
         blob = self.getblob()
@@ -212,10 +213,6 @@ class BinaryAdder(DefaultAdder):
 class DXFileBinaryAdder(BinaryAdder):
 
     fieldname = "file"
-
-    def getblob(self):
-        field = getattr(self.context, self.fieldname, None)
-        return getattr(field, "_blob", None)
 
 
 class DXImageBinaryAdder(DXFileBinaryAdder):
