@@ -199,7 +199,6 @@ msgstr ""
 
 #. Default: "Specify words for which this item will show up as the first search result. Multiple words can be specified on new lines."
 #: ../behaviors.py:30
-#: ../extender.py:84
 msgid "help_searchwords"
 msgstr ""
 
@@ -334,13 +333,11 @@ msgstr ""
 
 #. Default: "Search words"
 #: ../behaviors.py:28
-#: ../extender.py:83
 msgid "label_searchwords"
 msgstr ""
 
 #. Default: "Show in search"
 #: ../behaviors.py:21
-#: ../extender.py:71
 msgid "label_showinsearch"
 msgstr ""
 

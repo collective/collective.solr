@@ -196,7 +196,7 @@ msgid "help_search_timeout"
 msgstr "Intervall in Sekunden, bis eine Suchaktion abbricht.  Beim Standardwert 0 findet kein Abbruch statt."
 
 #. Default: "Specify words for which this item will show up as the first search result. Multiple words can be specified on new lines."
-#: ../behaviors.py:30 ../extender.py:84
+#: ../behaviors.py:30
 msgid "help_searchwords"
 msgstr "Hier können Suchwörter definiert werden. Diese Suchwörter werden bei den Anfragen an Solr stark priorisert. Ein Suchbegriff pro Zeile."
 
@@ -330,12 +330,12 @@ msgid "label_search_timeout"
 msgstr "Zeitüberschreitung bei der Suche"
 
 #. Default: "Search words"
-#: ../behaviors.py:28 ../extender.py:83
+#: ../behaviors.py:28
 msgid "label_searchwords"
 msgstr "Suchwörter"
 
 #. Default: "Show in search"
-#: ../behaviors.py:21 ../extender.py:71
+#: ../behaviors.py:21
 msgid "label_showinsearch"
 msgstr "In den Suchergebnissen anzeigen"
 
