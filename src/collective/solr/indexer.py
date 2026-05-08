@@ -15,12 +15,12 @@ from collective.solr.interfaces import (
 from collective.solr.utils import getConfig, prepareData
 from DateTime import DateTime
 from lxml import etree
+from plone.app.textfield.value import RawValueHolder
 from plone.indexer.interfaces import IIndexableObject, IIndexableObjectWrapper
 from plone.registry.interfaces import IRegistry
 from Products.CMFCore.CMFCatalogAware import CMFCatalogAware
 from Products.CMFCore.utils import getToolByName
 from requests_toolbelt import MultipartEncoder
-from six.moves.urllib.parse import urlencode
 from ZODB.interfaces import BlobError
 from ZODB.POSException import ConflictError
 from zope.component import (
@@ -121,11 +121,21 @@ class BinaryAdder(DefaultAdder):
 
     fieldname = None
 
-    def getblob(self):
+    # Extracted text is cached on the NamedFile value.
+    # This avoids extracting it repeatedly when the file has not changed.
+    # However you might need to disable the cache
+    # if you are changing how the text gets extracted.
+    ignore_extracted_text_cache = False
+
+    def _getvalue(self):
+        """Get the field value."""
         if self.fieldname is None:
             return
-        field = getattr(self.context, self.fieldname, None)
-        return getattr(field, "_blob", None)
+        return getattr(self.context, self.fieldname, None)
+
+    def getblob(self):
+        value = self._getvalue()
+        return getattr(value, "_blob", None)
 
     def getpath(self):
         blob = self.getblob()
@@ -138,75 +148,66 @@ class BinaryAdder(DefaultAdder):
         logger.debug("Indexing BLOB from path %s", path)
         return path
 
-    def __call__(self, conn, **data):
-        postdata = {}
-        path = self.getpath()
-        if path is None:
-            super(BinaryAdder, self).__call__(conn, **data)
+    def _extract_text(self, conn, data):
+        """Extract text from a file using solr's /update/extract endpoint."""
 
+        postdata = {}
         postdata["extractFormat"] = "text"
         postdata["extractOnly"] = "true"
         postdata["wt"] = "xml"
         headers = conn.formheaders
 
-        registry = getUtility(IRegistry)
-        use_tika = registry.get("collective.solr.use_tika")
-        tika_default_field = registry.get("collective.solr.tika_default_field")
-        if not use_tika:
-            # fall back to use SearchableText if tika is not enabled
-            tika_default_field = "SearchableText"
+        blob = self.getblob()
+        if blob is None:
+            return
+        openedBlob = blob.open()
 
-        # blobs are accessed via the file system
-        if use_tika:
-            blob = self.getblob()
-            if blob is None:
-                return
-            openedBlob = blob.open()
-
-            postdata["myfile"] = (
-                data["id"],
-                openedBlob,
-                data.get("content_type", "application/octet-stream"),
-            )
-
-            encodedPost = MultipartEncoder(fields=postdata)
-
-            headers["Content-Type"] = encodedPost.content_type
-            postdata_urlencoded = encodedPost.to_string()
-        else:
-            postdata["stream.file"] = self.getpath()
-            postdata["stream.contentType"] = data.get(
-                "content_type", "application/octet-stream"
-            )
-            postdata_urlencoded = urlencode(postdata, doseq=True)
-
+        postdata["myfile"] = (
+            data["id"],
+            openedBlob,
+            data.get("content_type", "application/octet-stream"),
+        )
+        encodedPost = MultipartEncoder(fields=postdata)
+        headers["Content-Type"] = encodedPost.content_type
+        postdata_urlencoded = encodedPost.to_string()
         url = "%s/update/extract" % conn.solrBase
-
         try:
             response = conn.doPost(url, postdata_urlencoded, headers)
             root = etree.parse(response)
-            data[tika_default_field] = root.find(".//str").text.strip()
+            text = root.find(".//str").text.strip()
         except SolrConnectionException as e:
             logger.warning("Error %s @ %s", e, data["path_string"])
-            if "Remote Streaming is disabled" in str(e.body):
-                logger.error(
-                    "Content not indexed. Remote streaming is disabled. "
-                    "See https://github.com/collective/collective.solr/issues/385 for a fix."
-                )
-            elif "access denied" in str(e.body):
-                logger.error(
-                    "Content not indexed. Java security policy disallows file access. "
-                    "Either set use_tika=True or set solr.allowPaths. "
-                    "See https://github.com/collective/collective.solr/issues/385 for a fix."
-                )
-            data[tika_default_field] = ""
+            text = ""
         except etree.XMLSyntaxError as e:
             logger.warning("Parsing error %s @ %s.", e, data["path_string"])
-            data[tika_default_field] = ""
+            text = ""
         finally:
-            if use_tika:
-                openedBlob.close()
+            openedBlob.close()
 
+        return text
+
+    def __call__(self, conn, **data):
+        path = self.getpath()
+        if path is None:
+            super(BinaryAdder, self).__call__(conn, **data)
+
+        value = self._getvalue()
+        if value is not None:
+            # Get the extracted text (from a cache if possible)
+            cached_text = None
+            if not self.ignore_extracted_text_cache:
+                cached_text = getattr(value, "_tika_extracted_text", None)
+            if cached_text is None:
+                text = self._extract_text(conn, data)
+                value._tika_extracted_text = cached_text = RawValueHolder(text)
+            text = cached_text.value
+
+            # Add the extracted text to the configured field.
+            registry = getUtility(IRegistry)
+            tika_default_field = registry.get("collective.solr.tika_default_field")
+            data[tika_default_field] = text
+
+        # Send all index data to solr.
         super(BinaryAdder, self).__call__(conn, **data)
 
 
