@@ -8,7 +8,7 @@ jobs:
       matrix:
         python-version: ["3.13", "3.12", "3.11", "3.10"]
         plone-version: ["6.0", "6.1"]
-        solr-version: ["9.5.x", "9.9.x",  "9.10.x"]
+        solr-version: ["9.5.x", "9.9.x", "9.10.x", "10.0.x"]
     steps:
       # git checkout
       - uses: actions/checkout@v5
@@ -18,6 +18,13 @@ jobs:
         uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.python-version }}
+
+      # java setup
+      - name: Set up Java 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
 
       # python cache
       - uses: actions/cache@v4
@@ -43,7 +50,7 @@ jobs:
 
       # choose Solr version
       - name: choose Solr version
-        run: sed -ie "s#solr-9.9.x.cfg#solr-${{ matrix.solr-version }}.cfg#" buildout.cfg
+        run: sed -ie "s#solr-10.0.x.cfg#solr-${{ matrix.solr-version }}.cfg#" buildout.cfg
 
       # path must pre-exist for caching to work
       - name: prepare download cache directory
