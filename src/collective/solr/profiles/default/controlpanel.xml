@@ -7,7 +7,7 @@
     appId="SolrSettings"
     category="Products"
     condition_expr=""
-    icon_expr="string:${portal_url}/++resource++collective.solr.images/icon.png"
+    icon_expr="string:search"
     url_expr="string:${portal_url}/@@solr-controlpanel"
     visible="True"
     i18n:attributes="title">
