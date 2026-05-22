@@ -6,6 +6,8 @@ Changelog
 
 - Remove unused code related to old Archetypes support. [davisagli]
 
+- Replace ``pkg_resources`` namespace with PEP 420 native namespace.
+  Support only Plone 6.2 and Python 3.10+.
 
 10.1.1 (2026-03-11)
 -------------------

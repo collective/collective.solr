@@ -1,6 +1,6 @@
 import sys
 
-from setuptools import find_packages, setup
+from setuptools import setup
 
 version = "11.0.0.dev0"
 
@@ -22,8 +22,7 @@ setup(
         "Development Status :: 5 - Production/Stable",
         "Environment :: Web Environment",
         "Framework :: Plone",
-        "Framework :: Plone :: 6.0",
-        "Framework :: Plone :: 6.1",
+        "Framework :: Plone :: 6.2",
         "Framework :: Plone :: Addon",
         "Intended Audience :: Developers",
         "Intended Audience :: System Administrators",
@@ -44,9 +43,6 @@ setup(
     maintainer_email="tisto@plone.org",
     url="https://github.com/collective/collective.solr",
     license="GPL version 2",
-    packages=find_packages("src"),
-    package_dir={"": "src"},
-    namespace_packages=["collective"],
     include_package_data=True,
     platforms="Any",
     zip_safe=False,
@@ -67,7 +63,6 @@ setup(
         "plone.indexer",
         "plone.restapi",
         "requests-toolbelt",
-        "setuptools",
         "transaction",
         "zope.component",
         "zope.i18nmessageid",
