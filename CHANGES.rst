@@ -1,7 +1,7 @@
 Changelog
 =========
 
-10.1.2 (unreleased)
+11.0.0 (unreleased)
 -------------------
 
 - Remove unused code related to old Archetypes support. [davisagli]
