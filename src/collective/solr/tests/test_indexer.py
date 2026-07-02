@@ -127,6 +127,23 @@ class QueueIndexerTests(TestCase):
         self.assertEqual(output.find("price"), -1, '"price" data found?')
         self.assertEqual(output.find("42"), -1, '"price" data found?')
 
+    def testPartialIndexObjectWithoutData(self):
+        # Reindexing a subset of attributes for an object that has no
+        # value for any of them must not send anything to Solr: a
+        # document containing only the uniqueKey is not an atomic
+        # update — Solr treats it as a full document replace and would
+        # wipe all other fields of the existing document.
+        # Use a schema without required fields (like the one shipped
+        # for Plone), so the required-fields check cannot mask the
+        # problem.
+        self.mngr.getSchema()["requiredFields"] = []
+        foo = Foo(id="500", name="foo")
+        response = getData("dummy_response.txt")
+        output = fakehttp(self.mngr.getConnection(), response)
+        # "price" is in the Solr schema, but foo has no value for it
+        self.proc.index(foo, attributes=["price"])
+        self.assertEqual(str(output), "")
+
     def testDateIndexing(self):
         foo = Foo(
             id="zeidler",

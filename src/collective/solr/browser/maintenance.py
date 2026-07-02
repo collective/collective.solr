@@ -194,7 +194,17 @@ class SolrMaintenanceView(BrowserView):
                 data, missing = proc.getData(obj, attributes=attributes)
                 prepareData(data)
 
-                if not missing or atomic:
+                if atomic and not set(data).difference({key}):
+                    # The attribute-restricted reindex yielded no data
+                    # besides the uniqueKey, e.g. because the object has
+                    # no value for any of the requested attributes.
+                    # There is nothing to update, so don't send anything:
+                    # a document containing only the uniqueKey is not an
+                    # atomic update — Solr treats it as a full document
+                    # replace and would wipe all other fields of the
+                    # existing document.
+                    log("no atomic update data, skipping indexing of %r.\n" % obj)
+                elif not missing or atomic:
                     value = data.get(key, None)
                     if value is not None:
                         log("indexing %r\n" % obj)

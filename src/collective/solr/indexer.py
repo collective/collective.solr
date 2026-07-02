@@ -274,6 +274,16 @@ class SolrIndexProcessor(object):
             if not data:
                 return  # don't index with no data...
             prepareData(data)
+            if attributes and not set(data).difference({uniqueKey}):
+                # An attribute-restricted reindex yielded no data besides
+                # the uniqueKey, e.g. because the object has no value for
+                # any of the requested attributes. There is nothing to
+                # update, so don't send anything: a document containing
+                # only the uniqueKey is not an atomic update — Solr
+                # treats it as a full document replace and would wipe
+                # all other fields of the existing document.
+                logger.debug("no data for atomic update, skipping indexing of %r", obj)
+                return
             if data.get(uniqueKey, None) is not None and not missing:
                 registry = getUtility(IRegistry)
                 config_commit_within = registry["collective.solr.commit_within"]  # noqa

@@ -4,6 +4,14 @@ Changelog
 10.1.2 (unreleased)
 -------------------
 
+- Fix attribute-restricted reindexing (``reindexObject(idxs=...)`` and
+  ``@@solr-maintenance/reindex`` with ``idxs``) wiping the whole Solr
+  document when the object has no value for any of the requested
+  attributes: the document sent to Solr then contained only the
+  uniqueKey, which is not an atomic update but a full document replace.
+  Such updates are now skipped.
+  [reebalazs]
+
 - Remove unused code related to old Archetypes support. [davisagli]
 
 
