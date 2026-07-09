@@ -1,6 +1,13 @@
 Changelog
 =========
 
+8.4.3 (unreleased)
+------------------
+
+- Don't break on a fresh install, when no registry is yet available.
+  [thet]
+
+
 8.4.2 (2021-04-08)
 ------------------
 
