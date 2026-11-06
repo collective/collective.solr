@@ -23,7 +23,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
 
       # python cache
-      - uses: actions/cache@v4
+      - uses: actions/cache@v6
         with:
           path: ~/.cache/pip
           key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
@@ -53,7 +53,7 @@ jobs:
         run: mkdir -p .download-cache
 
       # buildout download cache
-      - uses: actions/cache@v4
+      - uses: actions/cache@v6
         with:
           path: .download-cache
           key: ${{ runner.os }}-buildoutdownload-${{ hashFiles('buildout.cfg') }}
