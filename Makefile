@@ -25,7 +25,7 @@ help: ## This help message
 	py3/bin/buildout
 
 py3/bin/buildout: py3/bin/pip3
-	py3/bin/pip install -r requirements-6.1.x.txt
+	py3/bin/pip install -r requirements-6.2.x.txt
 	py3/bin/pip install click==8.0.4 black==21.10b0 || true
 	py3/bin/pip install tomli==2.3.0 || true
 	@touch -c $@

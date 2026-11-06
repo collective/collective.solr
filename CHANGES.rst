@@ -6,6 +6,10 @@ Changelog
 
 - Remove unused code related to old Archetypes support. [davisagli]
 
+- Test with Solr 9.11 and Plone 6.2 [davisagli]
+
+- Update default buildout configuration to use Solr 9.11.0 and Plone 6.2 [davisagli]
+
 
 10.1.1 (2026-03-11)
 -------------------

@@ -7,8 +7,8 @@ jobs:
       fail-fast: false
       matrix:
         python-version: ["3.13", "3.12", "3.11", "3.10"]
-        plone-version: ["6.0", "6.1"]
-        solr-version: ["9.5.x", "9.9.x",  "9.10.x"]
+        plone-version: ["6.0", "6.1", "6.2"]
+        solr-version: ["9.5.x", "9.9.x", "9.10.x", "9.11.x"]
     steps:
       # git checkout
       - uses: actions/checkout@v5
@@ -39,11 +39,11 @@ jobs:
 
       # choose Plone version
       - name: choose Plone version
-        run: sed -ie "s#plone-6.1.x.cfg#plone-${{ matrix.plone-version }}.x.cfg#" buildout.cfg
+        run: sed -ie "s#plone-6.2.x.cfg#plone-${{ matrix.plone-version }}.x.cfg#" buildout.cfg
 
       # choose Solr version
       - name: choose Solr version
-        run: sed -ie "s#solr-9.9.x.cfg#solr-${{ matrix.solr-version }}.cfg#" buildout.cfg
+        run: sed -ie "s#solr-9.11.x.cfg#solr-${{ matrix.solr-version }}.cfg#" buildout.cfg
 
       # path must pre-exist for caching to work
       - name: prepare download cache directory
