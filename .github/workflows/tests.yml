@@ -6,9 +6,12 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.13", "3.12", "3.11", "3.10"]
-        plone-version: ["6.0", "6.1", "6.2"]
+        python-version: ["3.14", "3.13", "3.12", "3.11"]
+        plone-version: ["6.1", "6.2"]
         solr-version: ["9.5.x", "9.9.x", "9.10.x", "9.11.x"]
+        exclude:
+          - python-version: "3.14"
+            plone-version: "6.1"
     steps:
       # git checkout
       - uses: actions/checkout@v5

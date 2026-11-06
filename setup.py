@@ -6,9 +6,9 @@ version = "10.1.2.dev0"
 
 assert sys.version_info >= (
     3,
-    9,
+    11,
     0,
-), "collective.solr 10 requires Python 3.10.0+. Please downgrade to collective.solr 9 for Plone 5.2, or collective.solr 8 for Python 2 and Plone 4.3/5.1."
+), "collective.solr 10 requires Python 3.11.0+. Please downgrade to collective.solr 9 for Plone 5.2, or collective.solr 8 for Python 2 and Plone 4.3/5.1."
 
 
 long_description = "\n\n".join([open("README.rst").read(), open("CHANGES.rst").read()])
@@ -22,7 +22,6 @@ setup(
         "Development Status :: 5 - Production/Stable",
         "Environment :: Web Environment",
         "Framework :: Plone",
-        "Framework :: Plone :: 6.0",
         "Framework :: Plone :: 6.1",
         "Framework :: Plone :: 6.2",
         "Framework :: Plone :: Addon",
@@ -37,6 +36,7 @@ setup(
         "Programming Language :: Python :: 3.11",
         "Programming Language :: Python :: 3.12",
         "Programming Language :: Python :: 3.13",
+        "Programming Language :: Python :: 3.14",
     ],
     keywords="plone cmf zope indexing searching solr lucene",
     author="Plone Community",
@@ -55,7 +55,7 @@ setup(
         "Acquisition",
         "DateTime",
         "Products.CMFCore",
-        "Products.CMFPlone >= 6.0.0",
+        "Products.CMFPlone >= 6.1.0",
         "Products.GenericSetup",
         "Products.ZCatalog",
         "lxml",

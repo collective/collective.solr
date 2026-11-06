@@ -1,12 +1,26 @@
 Changelog
 =========
 
-10.1.2 (unreleased)
+11.0.0 (unreleased)
 -------------------
 
-- Remove unused code related to old Archetypes support. [davisagli]
+Breaking changes:
 
-- Test with Solr 9.11 and Plone 6.2 [davisagli]
+- Remove support for Python 3.10. [davisagli]
+
+- Remove support for Plone 6.0. [davisagli]
+
+Features:
+
+- Add support for Solr 9.11. [davisagli]
+
+- Add support for Plone 6.2. [davisagli]
+
+- Add support for Python 3.14. [davisagli]
+
+Internal:
+
+- Remove unused code related to old Archetypes support. [davisagli]
 
 - Update default buildout configuration to use Solr 9.11.0 and Plone 6.2 [davisagli]
 
