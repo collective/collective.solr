@@ -25,19 +25,13 @@ help: ## This help message
 	py3/bin/buildout
 
 py3/bin/buildout: py3/bin/pip3
-	py3/bin/pip install -r requirements-6.1.x.txt
+	py3/bin/pip install -r requirements-6.2.x.txt
 	py3/bin/pip install click==8.0.4 black==21.10b0 || true
 	py3/bin/pip install tomli==2.3.0 || true
 	@touch -c $@
 
 py3/bin/pip3:
 	python$(version) -m venv py3
-
-.PHONY: Build Plone 6.0
-build-plone-6.0: .installed.cfg  ## Build Plone 6.0
-	py3/bin/pip install --upgrade pip
-	py3/bin/pip install -r requirements-6.0.txt
-	py3/bin/buildout -c plone-6.0.x.cfg
 
 .PHONY: Build Plone 6.1
 build-plone-6.1: .installed.cfg  ## Build Plone 6.1
