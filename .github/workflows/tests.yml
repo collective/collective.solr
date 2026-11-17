@@ -7,7 +7,7 @@ jobs:
       fail-fast: false
       matrix:
         python-version: ["3.13", "3.12", "3.11", "3.10"]
-        plone-version: ["6.0", "6.1"]
+        plone-version: ["6.2"]
         solr-version: ["9.5.x", "9.9.x",  "9.10.x"]
     steps:
       # git checkout
@@ -39,7 +39,7 @@ jobs:
 
       # choose Plone version
       - name: choose Plone version
-        run: sed -ie "s#plone-6.1.x.cfg#plone-${{ matrix.plone-version }}.x.cfg#" buildout.cfg
+        run: sed -ie "s#plone-6.2.x.cfg#plone-${{ matrix.plone-version }}.x.cfg#" buildout.cfg
 
       # choose Solr version
       - name: choose Solr version
