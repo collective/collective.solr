@@ -89,7 +89,7 @@ Your full buildout file should look something like this::
   [buildout]
   parts += instance
   extends =
-      https://dist.plone.org/release/6.1.3/versions.cfg
+      https://dist.plone.org/release/6.2.3/versions.cfg
       solr-9.10.x.cfg
 
   [instance]
@@ -105,7 +105,7 @@ After saving this to let's say ``buildout.cfg``,
 the buildout can be run and the `Solr`_ server and `Plone`_ instance started::
 
   $ python3 -m venv py3
-  $ py3/bin/pip install -r https://dist.plone.org/release/6.1.3/requirements.txt
+  $ py3/bin/pip install -r https://dist.plone.org/release/6.2.3/requirements.txt
   $ py3/bin/buildout
   ...
   $ bin/solr-instance start
